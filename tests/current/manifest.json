@@ -678,6 +678,10 @@
         "runner": "python"
       },
       {
+        "path": "tests/current/test_referral_transport.cjs",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_hint_chooser.js",
         "runner": "node"
       },

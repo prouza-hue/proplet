@@ -45,7 +45,7 @@ přihlášení a propojení preview s reálnými účty se v této úpravě nem�
 - Doplněné behaviorální regrese chrání přesun souhrnu výsledku a smysluplné
   zobrazení přepínače stran. Rozšířená browser regrese je v existujícím CI;
   lokální vizuální kontrola proběhla přes ovládaný prohlížeč.
-- Aktuální cache marker: `proplet-v4.09.13-studiorefinement5`;
+- Aktuální cache marker: `proplet-v4.09.13-studiorefinement6`;
   styl `studio-edition.css?v=refinement5`. Odkazy na app/theme-init a service-worker
   cache jsou sladěné; Archiv používá `experience.js?v=studio-archive-shortcut1`
   a denní rozložení `home-layout.js?v=studio3`.
@@ -98,7 +98,9 @@ assetů (162 lokálních odkazů). Celý 183testový gate se pro tuto CSS změnu
 ## Archiv vedle Tajenky — rozhodnutí 26. 10. 2026
 
 Po dokončení Denní výzvy, pokud dnes není Extra a je dostupná Tajenka, využije
-desktop od 900 px volné místo vedle Tajenky pro stručný vstup do Archivu.
+desktop a rozložený Fold od 600 px volné místo vedle Tajenky pro stručný vstup
+do Archivu. Hranice odpovídá dvěma sloupcům Dnes a nepřidává další řádek;
+na telefonu 390 px zůstává tento vstup skrytý.
 Používá stávající ilustraci a skutečnou akci katalogu; nevzniká nová herní cesta
 ani kopie odměnové logiky. Mobilní rozložení zůstává stejné a pozvánková reklama
 se na Dnes nevrací. Úprava je určená pouze pro preview.
@@ -106,6 +108,26 @@ se na Dnes nevrací. Úprava je určená pouze pro preview.
 Pro revizi `studiorefinement5` prošly cílené kontroly Archivu (včetně obnovy
 konfigurace, účtové izolace a odměn), stavů Dnes, release/cache kontraktu a všech
 170 kontrol assetů (162 lokálních odkazů). Celý gate se znovu nespouštěl.
+
+## Trvalý vstup do pozvánek v Já — zadání 26. 10. 2026
+
+Uživatel požaduje v profilu trvale dohledatelnou nabídku pozvání s odměnou
+1 000 XP pro každého po pěti různých uznaných deskách nového účtu. Dostupnost
+služby musí rozlišovat načítání, výslovné vypnutí a přechodnou chybu; vstup nemá
+beze zprávy zmizet. Příchozí pozvánka, její postup a potvrzení odměny zůstávají
+zachované. Implementovaný vstup zůstává přítomný i během načítání nebo chyby,
+nabízí opakování a hostovi otevře založení účtu. Seznam pozvaných je sbalený;
+příchozí pozvánka a připsaná odměna mají vlastní stav. Úprava je pouze pro preview,
+nepřidává migraci ani nemění pravidla odměn.
+
+Pro tuto revizi jsou `referrals.js`, `referrals.css` a
+`referral-transport.js` společně verzované jako `profile-entry1` v načítání i cache.
+
+Prošly cílené testy transportu (dostupnost, cache, souběh a izolace účtů), sedm
+kontrol živého preview, pět backendových referral kontrol, analytický kontrakt,
+release/cache kontrakt a 170 kontrol assetů (162 lokálních odkazů). Backendové
+kontroly používaly izolované náhrady služeb; skutečné pozvánky se neodesílaly
+a produkční databáze se při testech neměnila. Celý gate se neopakoval.
 
 Snímky a logy jsou u místního úkolu ve `studio-refinement-evidence-20261025/`
 a `studio-refinement-current-gate-20261025.log`. Produkční nasazení není součástí.

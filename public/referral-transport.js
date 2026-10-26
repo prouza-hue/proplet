@@ -8,29 +8,36 @@ function pendingCode(){try{const entry=JSON.parse(sessionStorage.getItem(key)||'
 const inbound=new URLSearchParams(location.search).get('invite');
 if(valid(inbound)){try{sessionStorage.setItem(key,JSON.stringify({code:inbound,at:Date.now()}))}catch{}}
 function profile(){try{return typeof getProfile==='function'?getProfile():null}catch{return null}}
-const model={ready:false,incoming:false,accepted:false,paid:false,count:0,inviterName:'',inviterCode:'',referrals:[],inviteUrl:'',rewardDismissed:false};
-let flight=null,loadedAt=0,owner=null,invalidNoticeShown=false;
+const emptyModel=availability=>({availability,ready:false,incoming:false,accepted:false,paid:false,count:0,inviterName:'',inviterCode:'',referrals:[],inviteUrl:'',rewardDismissed:false});
+const model=emptyModel('idle');
+let flight=null,loadedAt=0,owner,ownerCode=null,generation=0,invalidNoticeShown=false;
+function resetOwner(identity,code){
+ owner=identity;ownerCode=code;generation++;flight=null;loadedAt=0;
+ Object.assign(model,emptyModel('idle'));
+}
 async function load(force=false){
- const identity=profile()?.id||null;
- if(flight&&owner===identity)return flight;
- if(!force&&owner===identity&&Date.now()-loadedAt<30000)return model;
- if(owner!==identity)Object.assign(model,{ready:false,incoming:false,accepted:false,paid:false,count:0,inviterName:'',inviterCode:'',referrals:[],inviteUrl:'',rewardDismissed:false});
- owner=identity;
- const requestOwner=identity,requestCode=identity?null:pendingCode();
+ const identity=profile()?.id||null,code=identity?null:pendingCode();
+ if(owner!==identity||ownerCode!==code)resetOwner(identity,code);
+ if(!identity&&!code){Object.assign(model,emptyModel('guest'));return model}
+ if(flight)return flight;
+ if(!force&&loadedAt&&Date.now()-loadedAt<30000)return model;
+ const requestOwner=identity,requestCode=code,requestGeneration=++generation;
+ const isCurrent=()=>owner===requestOwner&&generation===requestGeneration&&(profile()?.id||null)===requestOwner;
+ model.availability='loading';
  flight=(async()=>{
   try{
    let d;
-   if(identity){d=await api('/api/referrals');if((profile()?.id||null)!==requestOwner)return model;
-    if(d.enabled===false){model.ready=false;return model}
+   if(identity){d=await api('/api/referrals');if(!isCurrent())return model;
+    if(d.enabled===false){Object.assign(model,emptyModel('disabled'));loadedAt=Date.now();return model}
     const i=d.incoming;
-    Object.assign(model,{ready:true,incoming:!!i,accepted:!!i,paid:!!i?.paid,count:i?.completedBoards||0,inviterName:i?.inviter?.name||'',inviterCode:i?.id||'',rewardDismissed:!!i?.rewardDismissed,inviteUrl:d.invite?.url||'',referrals:(d.referrals||[]).map(r=>({...r,count:r.completedBoards||0,accepted:true}))});
+    Object.assign(model,{availability:'ready',ready:true,incoming:!!i,accepted:!!i,paid:!!i?.paid,count:i?.completedBoards||0,inviterName:i?.inviter?.name||'',inviterCode:i?.id||'',rewardDismissed:!!i?.rewardDismissed,inviteUrl:d.invite?.url||'',referrals:(d.referrals||[]).map(r=>({...r,count:r.completedBoards||0,accepted:true}))});
     try{sessionStorage.removeItem(key)}catch{}
    }else{
     const code=requestCode;
-    if(!code){Object.assign(model,{ready:false,incoming:false,referrals:[],inviteUrl:''});return model}
     d=await api('/api/referrals/invite/'+encodeURIComponent(code));
-    if((profile()?.id||null)!==requestOwner)return model;
-    Object.assign(model,{ready:true,incoming:true,accepted:false,paid:false,count:0,inviterName:d.inviter?.name||'Kamarád',inviterCode:code,referrals:[],inviteUrl:'',rewardDismissed:false});
+    if(!isCurrent()||pendingCode()!==requestCode)return model;
+    if(d.enabled===false){Object.assign(model,emptyModel('disabled'));loadedAt=Date.now();return model}
+    Object.assign(model,{availability:'ready',ready:true,incoming:true,accepted:false,paid:false,count:0,inviterName:d.inviter?.name||'Kamarád',inviterCode:code,referrals:[],inviteUrl:'',rewardDismissed:false});
     // Local deduplication only: the invitation code is never part of telemetry.
     const landingKey='proplet:referral-landing-seen:v1:'+code;
     try{if((window.PROPLET_RUNTIME_ENV||window.PROPLET_RUNTIME_META?.environment)==='production'&&!sessionStorage.getItem(landingKey)&&typeof trackProductEvent==='function'){
@@ -39,11 +46,13 @@ async function load(force=false){
    }
    loadedAt=Date.now();
   }catch(e){
-   if(owner===requestOwner&&Number(e.status)===404){
-    model.ready=false;
-    if(!requestOwner&&requestCode&&pendingCode()===requestCode){
+   if(isCurrent()){
+    // Keep this owner's confirmed progress/history available through transient outages.
+    // A first load remains not ready; another identity never inherits these fields.
+    model.availability='error';loadedAt=0;
+    if(Number(e.status)===404&&!requestOwner&&requestCode&&pendingCode()===requestCode){
      try{sessionStorage.removeItem(key)}catch{}
-     model.incoming=false;
+     Object.assign(model,emptyModel('error'));
      if(inbound===requestCode&&!invalidNoticeShown&&typeof showToast==='function'){
       invalidNoticeShown=true;showToast('Tahle pozvánka už není dostupná. Proplet si můžeš zahrát i bez ní.');
      }
@@ -51,7 +60,7 @@ async function load(force=false){
    }
   }
   return model;
- })().finally(()=>{if(owner===requestOwner)flight=null});
+ })().finally(()=>{if(owner===requestOwner&&generation===requestGeneration)flight=null});
  return flight;
 }
 async function ensureInvite(){
@@ -64,4 +73,8 @@ async function ensureInvite(){
 }
 async function dismiss(){const identity=profile()?.id;if(!identity)throw new Error('Nejdřív se přihlas.');await api('/api/referrals/dismiss',{method:'POST',body:'{}'});if(profile()?.id!==identity)throw new Error('Účet se mezitím změnil.');model.rewardDismissed=true}
 window.PropletReferrals={model,profile,preferences,pendingCode,load,ensureInvite,dismiss};
+document.addEventListener('proplet:account-changed',()=>{
+ const identity=profile()?.id||null,code=identity?null:pendingCode();
+ if(owner!==identity||ownerCode!==code)resetOwner(identity,code);
+});
 })();
