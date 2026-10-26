@@ -24,11 +24,11 @@ def _env(name: str, default: str = "") -> str:
 
 
 def live_player_preview_enabled() -> bool:
-    """One explicitly approved branch may serve real players against the live DB."""
+    """Only explicitly approved preview branches may serve players against the live DB."""
     return (
         _env("PROPLET_LIVE_PLAYER_PREVIEW_ENABLED").lower() in {"1", "true", "yes"}
         and _env("VERCEL_ENV").lower() == "preview"
-        and _env("VERCEL_GIT_COMMIT_REF") == "codex/studio-edition"
+        and _env("VERCEL_GIT_COMMIT_REF") in {"codex/studio-edition", "codex/today-one-screen"}
         and _env("SUPABASE_URL").rstrip("/") == "https://iopyhluayfszskyqqpuc.supabase.co"
     )
 

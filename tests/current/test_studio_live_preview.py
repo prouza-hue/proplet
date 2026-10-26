@@ -22,6 +22,7 @@ LIVE = {
     "VERCEL_GIT_COMMIT_REF": "codex/studio-edition",
     "SUPABASE_URL": "https://iopyhluayfszskyqqpuc.supabase.co",
 }
+LIVE_BRANCHES = ("codex/studio-edition", "codex/today-one-screen")
 
 
 class LivePreview(unittest.TestCase):
@@ -32,23 +33,26 @@ class LivePreview(unittest.TestCase):
         self.addCleanup(self.network.stop)
 
     def test_exact_opt_in_and_configuration(self):
-        with patch.dict(os.environ, LIVE, clear=True):
-            self.assertTrue(config.live_player_preview_enabled())
-            settings = config.load_settings()
-            self.assertTrue(settings.live_player_preview)
-            self.assertTrue(settings.tajenka_release_enabled)
-            self.assertEqual(settings.vercel_env, "preview")
-            for field, values in {
-                "PROPLET_LIVE_PLAYER_PREVIEW_ENABLED": ("", "false", "0"),
-                "VERCEL_ENV": ("production", "development", ""),
-                "VERCEL_GIT_COMMIT_REF": ("main", "preview/studio-edition", "codex/studio-edition-other"),
-                "SUPABASE_URL": ("", "https://eanzztstmwlamwfdskbf.supabase.co", LIVE["SUPABASE_URL"] + ".invalid"),
-            }.items():
-                for value in values:
-                    with self.subTest(field=field, value=value), patch.dict(os.environ, {field: value}):
-                        self.assertFalse(config.live_player_preview_enabled())
-            with patch.dict(os.environ, {"PROPLET_TAJENKA_RELEASE_ENABLED": "false"}):
-                self.assertFalse(config.load_settings().tajenka_release_enabled)
+        for branch in LIVE_BRANCHES:
+            with self.subTest(branch=branch), patch.dict(os.environ, {**LIVE, "VERCEL_GIT_COMMIT_REF": branch}, clear=True):
+                self.assertTrue(config.live_player_preview_enabled())
+                settings = config.load_settings()
+                self.assertTrue(settings.live_player_preview)
+                self.assertTrue(settings.tajenka_release_enabled)
+                self.assertEqual(settings.vercel_env, "preview")
+                for field, values in {
+                    "PROPLET_LIVE_PLAYER_PREVIEW_ENABLED": ("", "false", "0"),
+                    "VERCEL_ENV": ("production", "development", ""),
+                    "VERCEL_GIT_COMMIT_REF": ("main", "preview/studio-edition", "codex/studio-edition-other",
+                                               "preview/today-one-screen", "codex/today-one-screen-other",
+                                               "codex/today-one-screen/child", "codex/Today-one-screen"),
+                    "SUPABASE_URL": ("", "https://eanzztstmwlamwfdskbf.supabase.co", LIVE["SUPABASE_URL"] + ".invalid"),
+                }.items():
+                    for value in values:
+                        with self.subTest(field=field, value=value), patch.dict(os.environ, {field: value}):
+                            self.assertFalse(config.live_player_preview_enabled())
+                with patch.dict(os.environ, {"PROPLET_TAJENKA_RELEASE_ENABLED": "false"}):
+                    self.assertFalse(config.load_settings().tajenka_release_enabled)
 
     def test_real_paths_pass_guard_but_test_results_do_not(self):
         async def exercise(live, path, test=False):
@@ -135,16 +139,21 @@ class LivePreview(unittest.TestCase):
         referrals.install(app, auth_player=auth, db_rpc=rpc, enforce_rate_limit=lambda *a, **kw: None)
         team_victories.install(app, auth_player=auth, db_rpc=rpc, enforce_rate_limit=lambda *a, **kw: None)
         client = TestClient(app)
-        with patch.dict(os.environ, {**LIVE, "PROPLET_REFERRALS_ENABLED": "true"}, clear=True):
-            self.assertTrue(client.get("/api/referrals").json()["enabled"])
-            self.assertTrue(client.get("/api/team-victories").json()["enabled"])
-            self.assertEqual([name for name, _ in calls], ["proplet_referral_status_v1", "proplet_team_victories_state_v1"])
-            self.assertEqual(auth.call_count, 2)
+        for branch in LIVE_BRANCHES:
             calls.clear()
-            with patch.dict(os.environ, {"VERCEL_GIT_COMMIT_REF": "other-preview"}):
-                self.assertFalse(client.get("/api/referrals").json()["enabled"])
-                self.assertFalse(client.get("/api/team-victories").json()["enabled"])
-                self.assertEqual(calls, [])
+            auth.reset_mock()
+            with self.subTest(branch=branch), patch.dict(os.environ, {
+                **LIVE, "VERCEL_GIT_COMMIT_REF": branch, "PROPLET_REFERRALS_ENABLED": "true"
+            }, clear=True):
+                self.assertTrue(client.get("/api/referrals").json()["enabled"])
+                self.assertTrue(client.get("/api/team-victories").json()["enabled"])
+                self.assertEqual([name for name, _ in calls], ["proplet_referral_status_v1", "proplet_team_victories_state_v1"])
+                self.assertEqual(auth.call_count, 2)
+                calls.clear()
+                with patch.dict(os.environ, {"VERCEL_GIT_COMMIT_REF": "other-preview"}):
+                    self.assertFalse(client.get("/api/referrals").json()["enabled"])
+                    self.assertFalse(client.get("/api/team-victories").json()["enabled"])
+                    self.assertEqual(calls, [])
 
     def test_welcome_and_team_mutations_reach_existing_validators(self):
         with patch.object(server, "VERCEL_ENV", "preview"), patch.object(server, "LIVE_PLAYER_PREVIEW", True), \
