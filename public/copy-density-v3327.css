@@ -1,8 +1,7 @@
 /* v3.32.7 — copy redundancy & density polish */
 #screen-daily.home-layout-active .daily-hero .hero-topline{display:none}
 
-#profileModal .account-modal-card>.eyebrow,
-#profileModal #profileModalTitle{display:none}
+#profileModal .account-modal-card>.eyebrow{display:none}
 #profileModal .account-tabs{margin-top:0}
 #profileModal #profileModalDesc{margin-top:12px}
 

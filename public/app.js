@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.13-onescreen2';
+const APP_PREVIEW_RELEASE='proplet-v4.09.13-ui-refinement1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -465,7 +465,7 @@ function rankingsOrchestration(){
  rankingsOrchestrationController=factory.create({
   $,$$,api,pragueDateISO,ensureRankingProfileState,getProfile,updateAccountProfile,
   esc,countCz,levelFor,fmtTime,adjustAccountRankingData:data=>window.PROPLET_ACCOUNT_BONUS_API?.adjustRankingData?.(data)||data,
-  openProfileModal,openTeamMembershipModal,openFamilyLeagueModal,showToast,
+  nav,openProfileModal,openTeamMembershipModal,openFamilyLeagueModal,showToast,
   canShowRankingPrivacyNotice:()=>{if(window.PropletFirstSteps?.quiet())return false;const stats=effectiveStats();return (stats.totalCompleted>0||stats.tajenkaCompleted>0)&&currentScreen!=='game'&&!document.querySelector('.modal:not(.hidden)')},
  });
  return rankingsOrchestrationController;
@@ -992,7 +992,7 @@ function renderFree(){
  renderNewContentBanner();
  $('#difficultyCards').innerHTML=Object.entries(DIFF).map(([key,d])=>{
   const {total,done,pct,resume}=freeProgress(key),action=resume?'Pokračovat':done===total&&total?'Zahrát znovu':'Hrát';
-  return `<article class="cp-card" data-diff="${key}"><div class="cp-top">${difficultyIconMarkup(key,'cp-art')}<div class="cp-heading"><h2>${esc(d.label)}</h2><span class="cp-xp">+${d.xp} XP</span></div><button type="button" class="cp-history" data-played-levels="${key}" aria-label="${esc(d.label)}: ${done} z ${total} hotovo, otevřít přehled úrovní"><strong>${done}</strong> / ${total}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg></button></div><div class="cp-track" role="progressbar" aria-label="Postup: ${esc(d.label)}" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><span style="width:${pct}%"></span></div><button type="button" class="cp-play" data-play-free="${key}" aria-label="${action}: ${esc(d.label)}">${action} <span aria-hidden="true">→</span></button></article>`
+  return `<article class="cp-card" data-diff="${key}"><div class="cp-top">${difficultyIconMarkup(key,'cp-art')}<div class="cp-heading"><h2>${esc(d.label)}</h2><span class="cp-xp">+${d.xp} XP</span></div><button type="button" class="cp-history" data-played-levels="${key}" aria-label="Přehled úrovní: ${esc(d.label)}, ${done} z ${total} hotovo"><span class="cp-history-count"><strong>${done}</strong> / ${total}</span><span class="cp-history-label">Přehled <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg></span></button></div><div class="cp-track" role="progressbar" aria-label="Postup: ${esc(d.label)}" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><span style="width:${pct}%"></span></div><button type="button" class="cp-play" data-play-free="${key}" aria-label="${action}: ${esc(d.label)}">${action} <span aria-hidden="true">→</span></button></article>`
  }).join('');
  $$('[data-play-free]').forEach(b=>{b.onclick=e=>{e.stopPropagation();startFree(b.dataset.playFree)};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startFree(b.dataset.playFree)}}});
  $$('[data-played-levels]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.disabled)openPlayedLevels(b.dataset.playedLevels)});

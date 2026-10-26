@@ -19,7 +19,7 @@
  const offerKey=()=> 'proplet:referral-offer-hidden:v1:'+(transport.profile()?.id||'guest');
  const announcementKey=()=> 'proplet:referral-announcement-seen:v1:'+transport.profile().id;
  const steps=n=>'<div class="ref-steps" role="img" aria-label="Dokončeno '+n+' z 5 desek">'+Array.from({length:5},(_,i)=>'<span class="ref-step ref-step-'+i+(i<n?' done':i===n?' next':'')+'"><b>'+(i<n?'✓':i+1)+'</b></span>').join('')+'</div>';
- let originFocus=null,booted=false,lastReward=false,offerDismissed=false,forwardingShare=false;
+ let originFocus=null,booted=false,lastReward=false,offerDismissed=false;
  const entrySources=new Set(['daily','tajenka','win','home','profile','announcement']);
  function sourceFor(element){
   if(element?.closest('#referralDialog'))return $('#referralDialog').dataset.entrySource;
@@ -126,13 +126,6 @@
    preferences.setItem(announcementKey(),'1');$('#refDialogTitle').focus();return true;
   }
   $('#referralDialog .ref-sheet').classList.remove('ref-announcement');
-  if(kind==='choice'){
-   $('#referralDialog .ref-sheet').innerHTML='<button class="modal-close" data-ref-close aria-label="Zavřít pozvánku">×</button><h2 id="refDialogTitle" tabindex="-1">Pozvi kamaráda</h2><div class="ref-choice"><button class="primary-btn" id="refShareBoard">Poslat tuhle desku</button><p>Kamarád si zahraje stejnou desku a porovnáte výsledky.</p><div class="ref-choice-bonus">'+artwork+reward+'</div><button class="primary-btn" data-ref-open>Pozvat nového hráče</button><p>Po jeho prvních pěti deskách získáte oba bonus.</p></div>';
-   $('#referralDialog').classList.remove('hidden');wire($('#referralDialog'));
-   $('#referralDialog [data-ref-close]').onclick=close;
-   $('#refShareBoard').onclick=()=>{close();forwardingShare=true;try{shareSource?.click()}finally{forwardingShare=false}};
-   $('#refDialogTitle').focus();return;
-  }
   const accept=kind==='accept';
   $('#referralDialog .ref-sheet').innerHTML='<button class="modal-close" data-ref-close aria-label="Zavřít pozvánku">×</button><div class="ref-sheet-art">'+artwork+'</div><h2 id="refDialogTitle" tabindex="-1">'+(accept?esc(m.inviterName)+' tě zve do Propletu.':'Pozvi kamaráda.<br>Tisíc XP pro každého.')+'</h2><ol class="ref-how"><li><span>1</span><div><strong>'+(accept?'Vytvoř si účet':'Pošli pozvánku')+'</strong><small>'+(accept?'Nový hráč přijme pozvánku při registraci.':'Odkaz je tvůj. Můžeš ho poslat více kamarádům.')+'</small></div></li><li><span>2</span><div><strong>'+(accept?'Dohraj 5 různých desek':'Kamarád dohraje 5 desek')+'</strong><small>Dnešní výzva, Tajenka i Volná hra. Klidně v jediný den.</small></div></li><li><span>3</span><div><strong>Oba dostanete +1 000 XP</strong><small>Odměna se připíše po páté dokončené desce.</small></div></li></ol><div class="ref-policy">'+rule+'</div>'+(accept?'<button id="refCreateAccount" class="primary-btn big">Vytvořit účet a přijmout</button><button class="text-btn" data-ref-close>Zatím si jen zahrát</button>':'<button id="refShare" class="primary-btn big">Pozvi kamaráda do Propletu</button><div class="ref-link-row"><input id="refLink" aria-label="Odkaz na pozvánku" readonly value="'+esc(inviteUrl())+'"><button id="refCopy" class="secondary-btn">Kopírovat</button></div>')+'<p id="refStatus" class="ref-status" role="status"></p>';
   $('#referralDialog').classList.remove('hidden');
@@ -185,7 +178,7 @@
    eligible:()=>canInvite()&&preferences.getItem(announcementKey())!=='1'&&(!m.incoming||rewardHidden())&&!!$('#screen-daily')?.classList.contains('active'),
    show:permit=>open('announcement',null,'announcement',permit),close
   });
-  refresh();reload(true);artworkReady();document.addEventListener('click',e=>{const source=e.target.closest?.('#winShareBtn.challenge-share-cta, #shareDailyBtn, #screen-daily [data-tajenka-share]');if(source&&!source.disabled&&!forwardingShare&&canInvite()){e.preventDefault();e.stopImmediatePropagation();open('choice',source)}},true);
+  refresh();reload(true);artworkReady();
   registerGameCompletionHook({id:'referrals',priority:250,after:async({game})=>{
    if(!transport.profile()?.id||!game||['starter','rescue'].includes(game.mode)||game.isReplay)return;
    offerDismissed=false;const wasPaid=m.paid;

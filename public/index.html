@@ -10,7 +10,7 @@
 <script src="/runtime-meta.js?v=40913" data-proplet-runtime-meta="1" data-loaded="1"></script>
   <script src="/app/client-diagnostics.js?v=legacy-body1" id="propletClientDiagnostics"></script>
   <script src="/analytics-init.js?v=telemetry1"></script>
-  <script src="/theme-init.js?v=40913onescreen2"></script>
+  <script src="/theme-init.js?v=40913uirefinement1"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
@@ -48,7 +48,7 @@
   <link rel="stylesheet" href="/mozkokalypsa-launch-preview.css?v=mk100">
   <link rel="stylesheet" href="/engagement-polish.css?v=6">
   <link rel="stylesheet" href="/rank-spotlight.css?v=2">
-  <link rel="stylesheet" href="/compact-difficulties.css?v=mk100">
+  <link rel="stylesheet" href="/compact-difficulties.css?v=ui-refinement1">
   <link rel="stylesheet" href="/team-victories.css?v=personal1">
   <link rel="stylesheet" href="/marketing-consent.css?v=2"/>
 <link rel="stylesheet" href="/mozkokalypsa-difficulty-preview.css?v=mk100-mobile1">
@@ -56,14 +56,14 @@
 <script src="/content/free-order/shared-pestre-v3.js"></script>
   <link rel="stylesheet" href="/mozkokalypsa-achievements.css?v=2" />
   <link rel="stylesheet" href="/achievement-details.css?v=rank-details1" />
-  <link rel="stylesheet" href="/profile-statistics.css?v=1" />
+  <link rel="stylesheet" href="/profile-statistics.css?v=ui-refinement1" />
   <link rel="stylesheet" href="/daily-specials.css?v=2" />
 <link rel="stylesheet" href="/referrals.css?v=profile-entry1">
-<link rel="stylesheet" href="/result-refresh.css?v=extra-entry1">
+<link rel="stylesheet" href="/result-refresh.css?v=ui-refinement1">
   <link rel="stylesheet" href="/continuation.css?v=1">
   <script defer src="/app/account/continuation.js?v=1"></script>
   <link rel="stylesheet" href="/app/archive/experience.css?v=home-stable1">
-  <link rel="stylesheet" href="/app/archive/discovery.css?v=extra-entry1">
+  <link rel="stylesheet" href="/app/archive/discovery.css?v=ui-refinement1">
 </head>
 <body class="studio-edition today-one-screen">
   <div class="ambient ambient-one"></div>
@@ -193,10 +193,10 @@
       <div class="screen-title"><span class="eyebrow">HRÁČ</span><h1>Moje cesta Propletem</h1></div>
       <div id="profileCard" class="card profile-card"></div>
 
-      <div class="card level-roadmap-card">
-        <div class="section-head"><div><span class="eyebrow">HODNOSTI</span><h2>Kam míříš</h2></div></div>
+      <details class="card level-roadmap-card profile-collection-detail">
+        <summary>Všechny hodnosti</summary>
         <div id="levelRoadmap" class="level-roadmap"></div>
-      </div>
+      </details>
 
       <div class="card achievement-card">
         <div class="section-head">
@@ -209,10 +209,10 @@
         </div>
       </div>
 
-      <div class="card badge-card">
-        <div class="section-head"><div><span class="eyebrow">ODZNAKY SÉRIE</span><h2>Každý den o kus dál</h2></div></div>
+      <details class="card badge-card profile-collection-detail">
+        <summary>Odznaky série</summary>
         <div id="profileBadges" class="profile-badges"></div>
-      </div>
+      </details>
 
       <div class="card settings-card appearance-card">
         <div class="section-head"><div><span class="eyebrow">VZHLED</span><h2>Jak má Proplet svítit?</h2></div></div>
@@ -745,14 +745,14 @@
   <script src="/app/offline.js?v=1"></script>
   <link rel="stylesheet" href="/offline.css?v=fold-sync1">
   <link rel="stylesheet" href="/hints-printshop.css?v=1">
-  <link rel="stylesheet" href="/ranking-navigation.css?v=4">
+  <link rel="stylesheet" href="/ranking-navigation.css?v=ui-refinement1">
   <script src="/app/core/api-client.js?v=analytics2"></script>
   <script src="/app/analytics.js?v=usage20261008"></script>
   <script src="/app/core/storage.js"></script>
   <script src="/app/account/session.js"></script>
   <script src="/app/account/tajenka-storage.js"></script>
-  <script src="/app/account/statistics.js?v=profile-recovery1"></script>
-  <script src="/app/account/account.js?v=module-contract1"></script>
+  <script src="/app/account/statistics.js?v=ui-refinement1"></script>
+  <script src="/app/account/account.js?v=ui-refinement1"></script>
   <script src="/app/game/state.js?v=wordfix1"></script>
   <script src="/app/game/fair-play.js?v=receipt1"></script>
   <script src="/app/game/board.js?v=starterguide3"></script>
@@ -765,14 +765,14 @@
   <link rel="stylesheet" href="/free-order.css?v=shared3">
   <script src="/app/content/free-order-engine.js?v=3"></script>
   <script src="/app/content/free-order-store.js?v=shared3"></script>
-  <script src="/app/content/free-order-ui.js?v=shared3"></script>
+  <script src="/app/content/free-order-ui.js?v=ui-refinement1"></script>
   <script src="/app/content/daily-dated.js?v=dailygen6-20261008"></script>
   <script src="/app/content/daily-special.js?v=daily-specials1"></script>
   <script src="/app/engagement/announcements.js?v=archive-release1"></script>
   <script src="/app/content/daily-special-ui.js?v=studio2"></script>
   <script src="/app/content/progression.js?v=progression-compat1"></script>
   <script src="/app/content/daily.js?v=dailygen6-20261008"></script>
-  <script src="/app/rankings/rankings.js?v=navigation2"></script>
+  <script src="/app/rankings/rankings.js?v=ui-refinement1"></script>
   <script src="/ribbon-catalog.js?v=mk-achievements1"></script>
   <script src="/ribbon-ui.js?v=artcutout3"></script>
   <link rel="stylesheet" href="/first-steps.css?v=2">
@@ -783,9 +783,9 @@
   <script src="/app/content/refresh-ui.js?v=archive-release1"></script>
   <script src="/app/content/refresh-release.js?v=archive-release1"></script>
   <script src="/app/archive/solution-contract.js"></script>
-  <script src="/app/archive/experience.js?v=studio-archive-shortcut1"></script>
-  <script src="/app.js?v=40913onescreen2"></script>
-  <script src="/app/weekly/competition.js?v=weekly-live1"></script>
+  <script src="/app/archive/experience.js?v=ui-refinement1"></script>
+  <script src="/app.js?v=40913uirefinement1"></script>
+  <script src="/app/weekly/competition.js?v=ui-refinement1"></script>
   <link rel="stylesheet" href="/mozkokalypsa.css?v=mk3release1">
   <script src="/app/mozkokalypsa.js?v=mk3release1"></script>
   <script src="/app/marketing.js?v=5"></script>
@@ -794,7 +794,7 @@
   <script src="/achievement-details.js?v=rank-details1"></script>
   <script src="/organic-ui-v4023.js?v=artcutout3"></script>
   <script src="/app/mozkokalypsa-launch.js?v=archive-release1"></script>
-<script src="/referrals.js?v=profile-entry1"></script>
+<script src="/referrals.js?v=ui-refinement1"></script>
   <script src="/studio-shell.js?v=1"></script>
   <link rel="stylesheet" href="/studio-edition.css?v=refinement5">
   <link rel="stylesheet" href="/today-one-screen.css?v=2">

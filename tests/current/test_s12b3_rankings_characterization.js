@@ -120,19 +120,19 @@ for(const [period,label] of [['today','dnes'],['week','tento týden'],['all','ce
   assert(html.includes('🧠 Myslitel'),'XP rank chip drifted');
   assert(html.includes('👥 Propletači'),'player team label drifted');
   assert(html.includes('1 234 XP')||html.includes('1 234 XP')||html.includes('1234 XP'),'XP value drifted');
-  assert(html.includes(`<small>${label}</small>`),`XP period label drifted for ${period}`);
+  assert(!html.includes(`<small>${label}</small>`),`XP period belongs once above the table, not in each row: ${period}`);
 }
 
 const xpTeam=rankings.xp(payload,'teams','week');
 assert(xpTeam.includes('🥈'),'XP team rank drifted');
 assert(xpTeam.includes('👥 Tým &amp; spol.'),'XP team name is no longer escaped');
 assert(xpTeam.includes('4 členové'),'XP team member count drifted');
-assert(xpTeam.includes('<small>tento týden</small>'),'XP team period drifted');
+assert(!xpTeam.includes('<small>tento týden</small>'),'XP team rows must not repeat the table period');
 
 const dailyPlayer=rankings.daily(payload,'players');
 assert(dailyPlayer.includes('Čistě · 7 tahů'),'Daily player quality/moves drifted');
 assert(dailyPlayer.includes('1:23'),'Daily player time drifted');
-assert(dailyPlayer.includes('<small>dnešní výzva</small>'),'Daily player score label drifted');
+assert(!dailyPlayer.includes('<small>dnešní výzva</small>'),'Daily rows must not repeat the selected view');
 const hintedDaily={players:[{...payload.players[0],cleanSolve:false,hintsUsed:2,moves:1}],teams:[]};
 assert(rankings.daily(hintedDaily,'players').includes('2 nápovědy · 1 tah'),'Daily hint quality drifted');
 const noHintDaily={players:[{...payload.players[0],cleanSolve:false,hintsUsed:0,moves:3}],teams:[]};
@@ -168,10 +168,10 @@ if(hasOwner){
   assert.strictEqual(adjust(included),included,'server-included account reward was applied twice');
 }
 
-// Initial ranking reads stay concurrent. Scope changes reuse one endpoint payload;
+// Only the active view loads. Scope changes reuse one endpoint payload;
 // Daily is always today's Prague date;
 // XP period is the selected today/week/all state, independent of player/team scope.
-assert(rankingSource.includes("await Promise.allSettled([loadRanking('xp',{anchor,refresh:true}),loadRanking('daily',{anchor,refresh:true})])"),'initial ranking reads are no longer concurrent');
+assert(rankingSource.includes('await loadRanking(rankingView,{anchor,refresh})'),'only the selected ranking view is loaded');
 assert(rankingSource.includes('/api/rankings/xp?period=${period}'),'XP period API contract drifted');
 assert(rankingSource.includes('/api/rankings/daily?daily_date=${date}')&&rankingSource.includes("date=d.pragueDateISO?.()||''"),'Daily date API contract drifted');
 assert(rankingSource.includes("$('#dailyTeamMethod')?.classList.toggle('hidden',rankingDailyScope!=='teams')"),'Daily team-method visibility drifted');

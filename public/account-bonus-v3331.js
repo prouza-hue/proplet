@@ -47,12 +47,6 @@
       const result=originalSetAccountMode.apply(this,arguments);
       if(mode==='create'){
         trackOfferOnce();
-        const tab=document.querySelector('#profileModeCreate');if(tab)tab.textContent='Uložit + 500 XP';
-        const title=document.querySelector('#profileModalTitle');if(title)title.textContent='Ulož si postup a získej 500 XP';
-        const desc=document.querySelector('#profileModalDesc');if(desc)desc.textContent='Jméno a heslo stačí. Postup uložíme do cloudu a hned dostaneš +500 XP; tým je volitelný.';
-        const save=document.querySelector('#saveProfileBtn');if(save)save.textContent='Vytvořit účet · +500 XP';
-      }else{
-        const tab=document.querySelector('#profileModeCreate');if(tab)tab.textContent='Uložit + 500 XP';
       }
       return result;
     };

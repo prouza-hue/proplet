@@ -4,6 +4,7 @@
   window.__PROPLET_CHALLENGE_CTA_V3333__=true;
 
   const $=s=>document.querySelector(s);
+  const primaryHandlers=new WeakMap();
 
   function setText(el,value){
     if(el.textContent!==value)el.textContent=value;
@@ -21,23 +22,79 @@
     }
   }
 
+  function rewardPresentation(source){
+    const strong=source?.querySelector('strong'),small=source?.querySelector('small');
+    const headline=(strong?.textContent||source?.textContent||'').trim();
+    const detail=(small?.textContent||'').trim();
+    const numeric=headline.match(/^(\+\s*[0-9][0-9\s\u00a0,.]*\s*XP)(?:\s*[·–—]\s*(.+))?$/i);
+    if(numeric)return {value:numeric[1].trim(),status:[numeric[2],detail].filter(Boolean).join(' · ')};
+    if(headline==='XP'&&detail==='Ověřujeme')return {value:'',status:'Odměnu ověřujeme.'};
+    return {value:'',status:[headline,detail].filter(Boolean).join(' · ')};
+  }
+
+  function syncRewardPresentation(){
+    const source=$('#winXp'),value=$('#winRewardValue'),status=$('#winRewardStatus');
+    if(!source||!value||!status)return;
+    const presentation=rewardPresentation(source);
+    setText(value,presentation.value);setText(status,presentation.status);
+    value.hidden=!presentation.value;status.hidden=!presentation.status;
+  }
+
+  function restorePrimaryHandler(primary){
+    const previous=primaryHandlers.get(primary);if(!previous)return;
+    if(primary.onclick===previous.assigned)primary.onclick=previous.original;
+    primaryHandlers.delete(primary);
+  }
+
+  function syncResultAction(primary,extra,secondary,actions,modal){
+    const game=typeof currentGame==='undefined'?null:currentGame;
+    const recap=typeof tajenkaRecapOpen!=='undefined'&&tajenkaRecapOpen;
+    const protectedFlow=modal.classList.contains('starter-win')||modal.classList.contains('first-steps-win')||game?.postStarterWarmup;
+    const menu=$('#winMenuBtn');if(menu)menu.hidden=false;
+    setClass(primary,'result-secondary-action',false);
+    if(protectedFlow){restorePrimaryHandler(primary);return;}
+    const daily=game?.mode==='daily',special=game?.mode==='daily_special',tajenka=game?.mode==='tajenka'||recap;
+    if(daily&&!recap){
+      setText(primary,'Zpět na Dnes');
+      if(typeof closeWinToMenu==='function'){
+        const previous=primaryHandlers.get(primary);
+        if(!previous||primary.onclick!==previous.assigned)primaryHandlers.set(primary,{original:primary.onclick,assigned:closeWinToMenu});
+        primary.onclick=closeWinToMenu;
+      }
+    }else{
+      restorePrimaryHandler(primary);
+      if((special||tajenka)&&!recap)setText(primary,'Zpět na Dnes');
+    }
+    if(menu&&(daily||special||tajenka))menu.hidden=true;
+    const offerExtra=daily&&extra&&!extra.classList.contains('hidden')&&!extra.hidden;
+    if(offerExtra){
+      setClass(primary,'result-secondary-action',true);
+      if(primary.parentElement!==secondary||secondary.firstElementChild!==primary)secondary.prepend(primary);
+    }else if(primary.parentElement!==actions)actions.append(primary);
+  }
+
   function syncWinLayout(win){
     const modal=$('#winModal'),primary=$('#winPrimaryBtn'),summary=modal?.querySelector('.win-summary'),secondary=modal?.querySelector('.win-secondary-actions');
     if(!primary||!summary||!secondary)return;
     if(typeof renderWinExtraAction==='function')renderWinExtraAction();
     const extra=$('#winExtraBtn');
-    const card=modal.querySelector('.win-card'),starter=modal.classList.contains('starter-win');
+    const card=modal.querySelector('.win-card'),starter=modal.classList.contains('starter-win')||modal.classList.contains('first-steps-win');
     const scroll=card.querySelector(':scope > .win-result-scroll'),footer=card.querySelector(':scope > .win-result-footer');
-    // Preserve every child (including achievements) when leaving the old docked layout.
+    // Keep canonical nodes and every earned award; only their presentation moves.
     if(scroll){for(const child of [...scroll.childNodes])card.insertBefore(child,scroll);scroll.remove()}
     if(footer){for(const child of [...footer.childNodes])card.insertBefore(child,footer);footer.remove()}
     setClass(modal,'result-action-docked',false);
     setClass(modal,'result-compact',!starter);
-    const title=$('#winTitle'),xp=$('#winXp');
+    if(modal.getAttribute('aria-labelledby')!=='winTitle')modal.setAttribute('aria-labelledby','winTitle');
+    const title=$('#winTitle'),xp=$('#winXp'),menu=$('#winMenuBtn');
     if(starter){
       const oldHeader=card.querySelector('.win-result-heading');
-      if(oldHeader){oldHeader.before(title);summary.querySelector('.win-summary-chips')?.prepend(xp);oldHeader.remove()}
+      if(oldHeader){oldHeader.before(title);oldHeader.remove()}
+      const originalChips=summary.querySelector('.win-summary-chips');
+      if(originalChips&&(xp.parentElement!==originalChips||originalChips.firstElementChild!==xp))originalChips.prepend(xp);
       setClass(xp,'xp-sticker',false);
+      restorePrimaryHandler(primary);setClass(primary,'result-secondary-action',false);if(menu)menu.hidden=false;
+      $('#winRewardStatus')?.remove();
       if(summary.nextElementSibling!==primary)summary.after(primary);
       if(win.parentElement!==secondary)secondary.prepend(win);
       const oldActions=$('#winResultActions');if(oldActions){for(const child of [...oldActions.children])oldActions.before(child);oldActions.remove()}
@@ -46,22 +103,31 @@
     let header=card.querySelector('.win-result-heading');
     if(!header){header=document.createElement('div');header.className='win-result-heading';title.before(header)}
     if(title.parentElement!==header)header.append(title);
-    if(xp.parentElement!==header)header.append(xp);
-    setClass(xp,'xp-sticker',true);
+    const chips=summary.querySelector('.win-summary-chips');if(chips&&xp.parentElement!==chips)chips.prepend(xp);
+    setClass(xp,'xp-sticker',false);
+    let reward=$('#winRewardValue');
+    if(!reward){reward=document.createElement('span');reward.id='winRewardValue';reward.className='xp-sticker';header.append(reward)}
+    let status=$('#winRewardStatus');
+    if(!status){status=document.createElement('p');status.id='winRewardStatus';status.className='win-reward-status';status.setAttribute('role','status')}
+    if(header.nextElementSibling!==summary)header.after(summary);
+    const phrase=$('#tajenkaWinPhrase'),anchor=phrase&&!phrase.classList.contains('hidden')?phrase:summary;
+    if(anchor===phrase&&summary.nextElementSibling!==phrase)summary.after(phrase);
+    if(anchor.nextElementSibling!==status)anchor.after(status);
     let actions=$('#winResultActions');
     if(!actions){actions=document.createElement('div');actions.id='winResultActions';actions.className='win-result-actions'}
-    const ranking=$('#levelLeaderboardBox');
-    const anchor=starter?summary:ranking||summary;
-    if(anchor.nextElementSibling!==actions)anchor.after(actions);
-    if(primary.parentElement!==actions)actions.append(primary);
-    if(extra&&(extra.parentElement!==actions||extra.nextElementSibling!==primary))primary.before(extra);
-    if(win.parentElement!==actions||primary.nextElementSibling!==win)primary.after(win);
+    if(status.nextElementSibling!==actions)status.after(actions);
+    if(extra&&extra.parentElement!==actions)actions.prepend(extra);
+    if(win.parentElement!==secondary)secondary.prepend(win);
+    syncResultAction(primary,extra,secondary,actions,modal);
+    if(actions.nextElementSibling!==secondary)actions.after(secondary);
+    const ranking=$('#levelLeaderboardBox');if(ranking&&secondary.nextElementSibling!==ranking)secondary.after(ranking);
     modal.querySelector('.win-main-actions')?.remove();
+    syncRewardPresentation();
   }
 
   function setChallengeContent(el){
-    if(el.dataset.plainInvite!=='true')el.dataset.plainInvite='true';
-    setText(el,'Pozvi kamaráda');
+    delete el.dataset.plainInvite;
+    setText(el,'Sdílet výsledek');
     setClass(el,'painted-action-control',false);
   }
 
@@ -100,21 +166,22 @@
 
     if(win){
       if(challengeMode){
-        setChallengeContent(win);
-        setClass(win,'challenge-share-cta',true);
-        setAriaLabel(win,$('#winModal')?.classList.contains('tajenka-daily-result')||mode==='tajenka'?'Sdílet tuto Tajenku: Pozvi kamaráda':extraGame?'Sdílet tuto Extra výzvu: Pozvi kamaráda':dailyGame?'Sdílet tuto Denní výzvu: Pozvi kamaráda':'Sdílet tuto desku: Pozvi kamaráda');
+        setText(win,'Sdílet výsledek');
+        setClass(win,'challenge-share-cta',false);
+        delete win.dataset.plainInvite;
+        setAriaLabel(win,$('#winModal')?.classList.contains('tajenka-daily-result')||mode==='tajenka'?'Sdílet výsledek Tajenky':extraGame?'Sdílet výsledek Extra výzvy':dailyGame?'Sdílet výsledek Denní výzvy':'Sdílet výsledek této desky');
       }else{
         if(win.classList.contains('challenge-share-cta'))setText(win,'↗ Sdílet');
         setClass(win,'challenge-share-cta',false);
         setAriaLabel(win,'');
       }
-      syncWinLayout(win,free||dailyGame);
+      syncWinLayout(win);
     }
 
     if(daily){
       setChallengeContent(daily);
       setClass(daily,'daily-challenge-cta',true);
-      setAriaLabel(daily,'Sdílet dnešní výzvu: Pozvi kamaráda');
+      setAriaLabel(daily,'Sdílet výsledek dnešní výzvy');
       syncDailyLayout(daily);
     }
 
@@ -122,7 +189,7 @@
       setChallengeContent(detail);
       setClass(detail,'challenge-share-cta',true);
       setClass(detail,'challenge-share-detail-cta',true);
-      setAriaLabel(detail,'Sdílet tuto úroveň: Pozvi kamaráda');
+      setAriaLabel(detail,'Sdílet výsledek této úrovně');
     }
   }
 
@@ -133,6 +200,8 @@
     const detailModal=$('#levelDetailModal');
     const daily=$('#shareDailyBtn');
     if(winModal)observer.observe(winModal,{attributes:true,attributeFilter:['class']});
+    const rewardSource=$('#winXp');
+    if(rewardSource)observer.observe(rewardSource,{childList:true,subtree:true,characterData:true});
     if(detailModal)observer.observe(detailModal,{attributes:true,attributeFilter:['class']});
     if(daily)observer.observe(daily,{attributes:true,attributeFilter:['class']});
     window.addEventListener('pageshow',syncShareCtas);

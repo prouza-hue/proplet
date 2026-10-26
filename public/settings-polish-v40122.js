@@ -31,13 +31,13 @@
       row=document.createElement('div');
       row.id='settingsHelperControl';
       row.className='settings-helper-control';
-      row.innerHTML='<div class="settings-helper-copy"><strong>Automatická nabídka nápovědy</strong><small id="settingsHelperValue"></small></div><button id="settingsHelperBtn" class="secondary-btn" type="button">Nastavit</button>';
+      row.innerHTML='<div class="settings-helper-copy"><strong>Nabídka nápovědy</strong><small id="settingsHelperValue"></small></div><button id="settingsHelperBtn" class="secondary-btn" type="button">Nastavit</button>';
       const head=q('.section-head',gameplay);
       if(head)head.insertAdjacentElement('afterend',row);else gameplay.prepend(row);
       q('#settingsHelperBtn',row).onclick=()=>{try{if(typeof getProfile==='function'&&getProfile()?.token)openSupportModeModal();else openProfileModal('login')}catch{}};
     }
     const signedIn=typeof getProfile==='function'&&!!getProfile()?.token,mode=currentHelperMode();
-    const value=q('#settingsHelperValue',row),copy=signedIn?(mode.label==='Nenabízet'?'Vypnutá':`${mode.label} · nabídne pomoc, když se zasekneš.`):'Dostupná po přihlášení. Ruční nápovědu můžeš používat i bez účtu.';
+    const value=q('#settingsHelperValue',row),copy=signedIn?(mode.label==='Nenabízet'?'Vypnutá':Number.isFinite(mode.seconds)?`${mode.label} · po ${mode.seconds} s bez nového slova`:`${mode.label} · při delším hledání`):'Po přihlášení. Ruční nápověda funguje i bez účtu.';
     setText(value,copy);setText(q('#settingsHelperBtn',row),signedIn?'Nastavit':'Přihlásit se');
   }
 
@@ -51,7 +51,7 @@
     const card=q('#installAppCard');if(!card)return;
     q('.section-head .eyebrow',card)?.remove();
     setText(q('.section-head h2',card),'Hraj i bez internetu');
-    setText(q(':scope>p.muted',card),'Nainstaluj si Proplet. Volné desky i Archiv se připraví automaticky při prvním spuštění s připojením.');
+    setText(q(':scope>p.muted',card),'Nainstaluj Proplet. Volné desky i Archiv se připraví při prvním spuštění online.');
     const status=q('#installAppStatus',card),text=(status?.textContent||'').trim();
     const redundant=/^(Otevře se jako|Přidej si Proplet|Budeš ho mít)/i.test(text);
     status?.classList.toggle('settings-install-status-redundant',redundant);

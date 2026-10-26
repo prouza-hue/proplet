@@ -167,11 +167,11 @@
 #screen-profile.settings-open>.badge-card{display:none!important}
 #screen-profile.settings-open>.profile-settings-header{display:flex;order:0;align-items:center;gap:12px;margin:3px 2px 20px}
 .profile-settings-back{
-  flex:0 0 auto;min-height:40px;padding:8px 11px;border:1px solid var(--line);border-radius:13px;background:var(--paper);
-  color:var(--muted);font:inherit;font-size:12px;font-weight:900;cursor:pointer;box-shadow:var(--soft-shadow)
+  flex:0 0 auto;min-height:44px;padding:8px 5px;border:0;border-radius:6px;background:none;
+  color:var(--muted);font:inherit;font-size:14px;font-weight:600;cursor:pointer;box-shadow:none
 }
 .profile-settings-heading{min-width:0}
-.profile-settings-heading h1{margin:0;font-size:clamp(30px,5vw,42px);line-height:1;letter-spacing:-.045em}
+.profile-settings-heading h1{margin:0;font-size:clamp(28px,4vw,34px);line-height:1.1;letter-spacing:-.035em}
 .profile-settings-heading p{margin:5px 0 0;color:var(--muted);font-size:12.5px;line-height:1.35}
 
 /* Stable order + one vertical rhythm across all top-level settings blocks. */
@@ -193,7 +193,7 @@
   margin:0;font-size:21px;line-height:1.18;letter-spacing:-.025em
 }
 #screen-profile.settings-open :is(.settings-card,#profileTeamSettingsCard) .section-head .eyebrow{
-  font-size:10px;line-height:1.2;letter-spacing:.085em
+  display:none
 }
 #screen-profile.settings-open :is(.settings-card,#profileTeamSettingsCard)>p.muted{
   margin:8px 0 14px;font-size:13px;line-height:1.45
@@ -217,15 +217,18 @@
 #screen-profile.settings-open .settings-support-polished small{font-size:12px;line-height:1.4;color:var(--muted)}
 #screen-profile.settings-open .settings-support-polished .secondary-btn{font-size:12px}
 
-/* Appearance: the controls are self-explanatory; no explanatory paragraph underneath. */
+/* Retain the meaning of Auto; the fixed themes do not need duplicate subtitles. */
 #screen-profile.settings-open .appearance-card{padding:18px 19px}
 #screen-profile.settings-open .appearance-card .section-head{margin-bottom:13px}
 #screen-profile.settings-open .theme-segment{margin-top:0}
+#screen-profile.settings-open .theme-choice{min-height:64px;padding:10px 6px;gap:4px}
+#screen-profile.settings-open .theme-choice:not([data-theme-mode="auto"]) small{display:none}
+#screen-profile.settings-open .theme-choice[data-theme-mode="auto"] small{font-size:12px;line-height:1.3}
 
 /* Notifications: one sentence, in normal Czech, with transient status only when it adds information. */
 #screen-profile.settings-open .push-card{padding:18px 19px}
 #screen-profile.settings-open .push-card .section-head{margin-bottom:14px}
-#screen-profile.settings-open .notification-pref-row{padding:13px 14px}
+#screen-profile.settings-open .notification-pref-row{padding:4px 0;border:0;background:none;box-shadow:none}
 #screen-profile.settings-open .notification-pref-copy strong{font-size:14.5px;line-height:1.25}
 #screen-profile.settings-open .notification-pref-copy>small{margin-top:3px;font-size:12.5px;line-height:1.42;color:var(--muted)}
 #screen-profile.settings-open #pushStatusText{margin-top:5px;font-size:11.5px;line-height:1.35}
@@ -510,6 +513,8 @@ html[data-theme="dark"] .ranking-privacy-preview{background:#292631!important;bo
 .settings-diagnostics-body{display:grid;gap:12px;padding-top:4px}
 .settings-diagnostics-body .push-self-test{margin:0;padding-top:12px}
 #screen-profile.settings-open #profileAccountHub #accountSecurityDetails .profile-account-body{margin-top:0}
+/* These forms already have a clear title; decorative pre-headings add no help. */
+:is(#supportModeModal,#teamPinModal,#teamMembershipModal) .modal-card>.eyebrow{display:none}
 @media(max-width:420px){.settings-help-actions{grid-template-columns:1fr}#screen-profile.settings-open .settings-helper-control{flex-wrap:wrap;gap:10px}}
 @media(prefers-reduced-motion:reduce){#screen-profile.settings-open .settings-switch::after{transition:none}}
 
