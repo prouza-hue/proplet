@@ -2526,6 +2526,39 @@ def support_report(
     return {"ok": True, "reportId": row.get("id")}
 
 
+def client_error_actor_context(actor, provenance):
+    details = provenance.get('_event_context', {})
+    metadata = {'context_at': 'report'}
+    if not actor:
+        return metadata
+    player_id, anonymous_id = actor.get('player_id'), actor.get('anonymous_id')
+    try:
+        if player_id: metadata['reporting_actor_key'] = 'p:' + str(uuid.UUID(str(player_id)))
+        elif re.fullmatch(r'[a-f0-9]{64}', anonymous_id or ''): metadata['reporting_actor_key'] = 'a:' + anonymous_id
+    except (ValueError, TypeError):
+        pass
+    for key in ('starter_run_id', 'first_steps_run_id'):
+        if details.get(key): metadata['reported_' + key] = details[key]
+    try:
+        attempt_id = str(uuid.UUID(details.get('run_id', '')))
+    except (ValueError, TypeError, AttributeError):
+        return metadata
+    metadata['reported_attempt_id'] = attempt_id
+    metadata['attempt_link'] = 'unverified'
+    try:
+        rows = db_select('puzzle_attempts', id=attempt_id, **actor_filters(actor),
+                         environment=provenance.get('environment'), is_test=provenance.get('is_test'),
+                         columns='id,puzzle_id')
+        if rows and str(rows[0].get('id')) == attempt_id and (not details.get('puzzle_id') or rows[0].get('puzzle_id') == details['puzzle_id']):
+            metadata['attempt_id'] = attempt_id
+            metadata['attempt_link'] = 'owned'
+        else:
+            metadata['attempt_link'] = 'not_owned_or_missing'
+    except HTTPException:
+        metadata['attempt_link'] = 'lookup_unavailable'
+    return metadata
+
+
 @app.post("/api/client-error")
 def client_error(
     payload: ClientErrorCreate,
@@ -2535,6 +2568,7 @@ def client_error(
 ):
     enforce_rate_limit(request, "client_error", limit=20, window_seconds=3600)
     actor_kind = "network"
+    actor = None
     try:
         actor = telemetry_actor(authorization, x_proplet_anon_id)
         actor_kind = "player" if actor.get("player_id") else "anonymous"
@@ -2556,6 +2590,7 @@ def client_error(
     match = re.match(r'^proplet-v(\d+\.\d+\.\d+)-', measured_release)
     client_version = match.group(1) if match else client_app_version(request)
     safe_metadata = {"message": str(payload.message or "")[:200], 'client_provenance': source, 'server_version': APP_VERSION}
+    safe_metadata.update(client_error_actor_context(actor, provenance))
     if explicit_header and explicit_body and header_release != body_release:
         safe_metadata['client_provenance_conflict'] = True
     source_file = getattr(payload, 'source_file', None)

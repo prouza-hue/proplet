@@ -52,6 +52,8 @@ def request_context(request, environment):
     try:
         if starter_run:details['starter_run_id']=str(uuid.UUID(starter_run))
     except (ValueError,TypeError):pass
+    input_outcome=request.headers.get('x-proplet-starter-input','')
+    if 'starter_run_id' in details and input_outcome in {'correct','invalid','empty','cancelled'}:details['starter_input_outcome']=input_outcome
     starter_ms=request.headers.get('x-proplet-starter-ms','')
     if starter_ms.isdigit() and 0<=int(starter_ms)<=86400000:details['starter_ms']=int(starter_ms)
     reason=request.headers.get('x-proplet-starter-reason','')
@@ -94,6 +96,7 @@ def enrich(table, row):
     provenance = context.get()
     if table not in TABLES or not provenance:return row
     details={**provenance.get('_event_context',{})}
+    if table!='product_events' or row.get('event_type')!='starter_v1_input_outcome':details.pop('starter_input_outcome',None)
     if table != 'product_events' or not str(row.get('event_type', '')).startswith('referral_'):
         details.pop('referral_entry_source', None)
         details.pop('referral_copy_method', None)

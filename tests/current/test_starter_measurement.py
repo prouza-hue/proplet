@@ -31,3 +31,13 @@ assert set(load_registry()['events'])==set(EMBEDDED_EVENT_NAMES)
 assert len(EMBEDDED_EVENT_NAMES)==len(set(EMBEDDED_EVENT_NAMES))
 print('PASS starter and experiment context: bounded values, unknown legacy auth, claim preservation, registry parity')
 
+
+for outcome in ('correct','invalid','empty','cancelled'):
+    provenance=capture({'x-proplet-starter-run':safe['x-proplet-starter-run'],'x-proplet-starter-input':outcome})
+    token=context.set(provenance)
+    try:
+        assert enrich('product_events',{'event_type':'starter_v1_input_outcome'})['context']['starter_input_outcome']==outcome
+        assert 'starter_input_outcome' not in enrich('product_events',{'event_type':'starter_v1_completed'})['context']
+    finally:context.reset(token)
+assert 'starter_input_outcome' not in capture({'x-proplet-starter-input':'correct'})['_event_context']
+assert 'starter_input_outcome' not in capture({'x-proplet-starter-run':safe['x-proplet-starter-run'],'x-proplet-starter-input':'private'})['_event_context']

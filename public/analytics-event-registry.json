@@ -183,7 +183,8 @@
     "referral_copy_failed",
     "referral_landing_validated",
     "starter_v1_presentation_checked",
-    "starter_v1_idle"
+    "starter_v1_idle",
+    "starter_v1_input_outcome"
   ],
   "bounded_provenance_headers": {
     "X-Proplet-Referral-Source": [

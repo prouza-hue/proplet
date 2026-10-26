@@ -39,7 +39,8 @@ async function diagnostics(){
  // Standalone fallback is truthful when the bootstrap diagnostics asset failed.
  const fallbackCalls=[],f={...c,APP_PREVIEW_RELEASE:reporter,APP_VERSION:'99.0.0',navigator:{onLine:true},analyticsHeaders:()=>({}),getProfile:()=>null,getAnonymousId:()=> 'fixture',fetch:(url,init)=>{fallbackCalls.push(init);return Promise.resolve({ok:true})},window:{}};
  vm.createContext(f);vm.runInContext(app.slice(app.indexOf('let reportingClientError=false;'),app.indexOf('let accountUIController=')),f);
- await f.reportClientError('window_error','Script error.',{message:'Script error.'});body=JSON.parse(fallbackCalls[0].body);assert.equal(body.source_availability,'opaque');assert.equal(body.reporter_release,reporter);assert.equal(body.client_version,'4.09.13');
+ await f.reportClientError('window_error','Script error.',{message:'Script error.'});body=JSON.parse(fallbackCalls[0].body);assert.equal(body.source_availability,'opaque');assert.equal(body.reporter_release,reporter);assert.equal(body.client_version,reporter.match(/^proplet-v(\d+\.\d+\.\d+)-/)[1]);
+ c.APP_PREVIEW_RELEASE='proplet-v4.09.9-mama1';c.clientErrorHeaders=()=>({'X-Proplet-Starter-Run':'starter-fixture','X-Proplet-First-Steps-Run':'flow-fixture'});await c.window.PropletClientDiagnostics.report('window_error','synthetic');assert.equal(calls.at(-1).init.headers['X-Proplet-Starter-Run'],'starter-fixture');assert.equal(calls.at(-1).init.headers['X-Proplet-First-Steps-Run'],'flow-fixture');
  console.log('PASS legacy string/Request enrichment, producer/reporter split, safe frames, unknown producer, fallback and no duplicate writes');
 }
 (async()=>{hints();await diagnostics()})().catch(e=>{console.error(e);process.exitCode=1});

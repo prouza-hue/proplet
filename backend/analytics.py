@@ -28,7 +28,7 @@ REFERRAL_EVENT_NAMES = (
     "referral_landing_validated",
 )
 
-STARTER_DIAGNOSTIC_EVENT_NAMES = ('starter_v1_presentation_checked', 'starter_v1_idle')
+STARTER_DIAGNOSTIC_EVENT_NAMES = ('starter_v1_presentation_checked', 'starter_v1_idle', 'starter_v1_input_outcome')
 
 EMBEDDED_EVENT_NAMES = (
     "account_authenticated",
