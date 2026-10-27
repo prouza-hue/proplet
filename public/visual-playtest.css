@@ -1,0 +1,38 @@
+/* Server-eligible pilot only; scoped to its own card and dialog. */
+#visualPlaytestInvite [hidden],#visualPlaytestDialog [hidden],#visualPlaytestFooter[hidden]{display:none!important}
+#visualPlaytestInvite{box-sizing:border-box;margin:18px 0;position:relative;max-width:620px;padding:22px;border:1px solid var(--td-line,#d5d3c5);border-radius:16px;background:var(--td-paper,#fffcf5);box-shadow:0 3px 0 #0000000c}
+#visualPlaytestInvite h2{font:650 25px/1.2 Fraunces,Georgia,serif;margin:0 32px 10px 0;color:var(--td-ink,#293747)}
+#visualPlaytestInvite p{font:400 16px/1.5 Outfit,sans-serif;margin:0 0 18px;color:var(--td-ink,#293747)}
+:is(#visualPlaytestInvite,#visualPlaytestDialog) .vp-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+#visualPlaytestInvite :is(button,a),#visualPlaytestDialog button,#visualPlaytestFooter{touch-action:manipulation}
+:is(#visualPlaytestInvite,#visualPlaytestDialog) .vp-primary{min-height:46px;padding:11px 16px;border:1px solid #214a92;border-radius:10px;background:#315da8;color:#fffaf0;font:600 15px/1.4 Outfit,sans-serif;box-shadow:0 3px 0 #213f71;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+:is(#visualPlaytestInvite,#visualPlaytestDialog) .vp-text{min-height:44px;padding:8px 4px;border:0;background:none;color:var(--td-blue,#315da8);font:500 14px/1.4 Outfit,sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+:is(#visualPlaytestInvite,#visualPlaytestDialog) .vp-dismiss{position:absolute;right:8px;top:8px;width:40px;height:40px;min-height:40px;padding:0;border:0;background:none;color:var(--td-muted,#626b72);font:400 25px/1 Outfit,sans-serif;cursor:pointer}
+#visualPlaytestDialog{box-sizing:border-box;width:min(480px,calc(100vw - 24px));max-height:calc(100dvh - 28px);overflow:auto;margin:auto;padding:24px;background:var(--td-paper,#fffcf5);color:var(--td-ink,#293747);border:1px solid var(--td-line,#d5d3c5);border-radius:18px;box-shadow:0 18px 80px #0005;font:400 15px/1.45 Outfit,sans-serif}
+#visualPlaytestDialog::backdrop{background:#18251c99}
+#visualPlaytestTitle{font:650 27px/1.15 Fraunces,Georgia,serif;margin:0 32px 10px 0;color:inherit}
+#visualPlaytestTitle:focus,#visualPlaytestDialog .vp-thanks h3:focus{outline:none}
+#visualPlaytestDialog form fieldset{margin:0;padding:0;border:0;min-width:0}
+#visualPlaytestDialog form legend{font-size:15px;margin-bottom:10px}
+#visualPlaytestDialog form .vp-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#visualPlaytestDialog form .vp-options label{display:flex;align-items:center;gap:8px;padding:10px;min-height:44px;border:1px solid var(--td-line,#d5d3c5);border-radius:9px;cursor:pointer}
+#visualPlaytestDialog form .vp-options label:has(input:checked){border-color:var(--td-blue,#315da8);background:var(--td-tint,#e8effa)}
+#visualPlaytestDialog form input[type=radio]{width:18px;height:18px;flex:none;accent-color:var(--td-blue,#315da8);margin:0}
+#visualPlaytestDialog form .vp-comment{display:block;margin:18px 0 12px;font-weight:600}
+#visualPlaytestDialog form .vp-comment>span{font-size:13px;font-weight:400;color:var(--td-muted,#626b72)}
+#visualPlaytestDialog form textarea{box-sizing:border-box;display:block;width:100%;margin-top:8px;padding:10px 12px;border:1px solid var(--td-line,#d5d3c5);border-radius:9px;background:var(--td-paper,#fffcf5);color:var(--td-ink,#293747);font:400 16px/1.4 Outfit,sans-serif;resize:vertical;min-height:96px}
+#visualPlaytestDialog [role=alert]{color:var(--td-ink,#293747);font-size:14px;margin:8px 0}
+#visualPlaytestDialog [role=alert]:empty{display:none}
+#visualPlaytestDialog form>button{display:block;width:100%;margin-top:9px}
+#visualPlaytestDialog .vp-thanks h3{font:650 22px/1.25 Outfit,sans-serif;margin:18px 0 10px}
+#visualPlaytestDialog .vp-answer{padding:12px;background:var(--td-tint,#e8effa);border-radius:9px;white-space:pre-wrap;overflow-wrap:anywhere}
+:is(#visualPlaytestInvite,#visualPlaytestDialog) :is(button,a,input,textarea):focus-visible{outline:3px solid var(--td-blue,#315da8);outline-offset:3px}
+body.playing #visualPlaytestInvite{display:none}
+@media(max-width:599px){#visualPlaytestInvite{padding:18px}#visualPlaytestDialog{padding:20px}#visualPlaytestInvite h2{font-size:23px}}
+
+#visualPlaytestInvite .vp-status:empty{display:none}
+#visualPlaytestInvite .vp-status{font-size:14px;margin:12px 0 0}
+#visualPlaytestInvite .vp-account-note{font-size:13px;line-height:1.45;color:var(--td-muted,#626b72);margin:14px 0 0}
+.app-footer .vp-footer-status{flex-basis:100%;font-size:13px;line-height:1.4;color:var(--td-ink,#293747)}
+:is(#visualPlaytestInvite,#visualPlaytestDialog) button:disabled{opacity:.65;cursor:wait}
+#visualPlaytestInvite[hidden]{display:none!important}

@@ -728,6 +728,18 @@
       {
         "path": "tests/current/test_google_oauth_callback.cjs",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_visual_pilot_push.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_visual_playtest.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_visual_playtest_ui.cjs",
+        "runner": "node"
       }
     ]
   },
