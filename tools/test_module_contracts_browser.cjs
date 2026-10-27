@@ -8,7 +8,7 @@ const historical=(sha,file)=>execFileSync('git',['show',sha+':public/'+file],{cw
 const oldTeam=historical('c2501bc31fcb5c4da4c8fa3d5932ad910c8f432b','team-victories.js');
 const oldHome=historical('1e3e3c0^','home-layout.js');
 const oldHints=historical('07350e5','app/game/hints.js'),beforeAccount=historical('9f8ae24','app/account/account.js'),beforeApp=historical('9f8ae24','app.js');
-const profile={id:'onboarding-synthetic',name:'Fixture Player',token:'fixture-token-not-a-credential',avatar:'đź™‚',hasPassword:true,supportMode:'none'};
+const profile={id:'onboarding-synthetic',name:'Fixture Player',token:'fixture-token-not-a-credential',avatar:'🙂',hasPassword:true,supportMode:'none'};
 const fixture=spawn(process.execPath,['tools/onboarding_fixture_server.cjs'],{cwd:root,env:{...process.env,PORT:'18775',TEST_BASELINE_SHA:legacy},stdio:['ignore','pipe','pipe']});
 let log='';fixture.stdout.on('data',s=>log+=s);fixture.stderr.on('data',s=>log+=s);
 const checks=[];

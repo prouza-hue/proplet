@@ -4,7 +4,7 @@ const input=require(process.env.INPUT_MODULE||'../../public/app/game/input.js');
 const paths=[[0,1,2],[3,6,7],[4,5,8]];
 function harness(mode='starter',version=3){
  let game;const submissions=[],feedback=[],outcomes=[];
- const reset=()=>game={mode,puzzle:{meta:{starterVersion:version},cols:3,letters:[...'PESLĂ„ĹšAESJ'],answers:paths.map(path=>({path}))},found:[],used:new Map(),path:[],dragging:false};reset();
+ const reset=()=>game={mode,puzzle:{meta:{starterVersion:version},cols:3,letters:[...'PESLČAESJ'],answers:paths.map(path=>({path}))},found:[],used:new Map(),path:[],dragging:false};reset();
  const cell=index=>({dataset:{index:String(index)},setPointerCapture(){},closest(){return this}});
  const xy=index=>({clientX:(index%3)*50+25,clientY:Math.floor(index/3)*50+25});
  const event=(index,id=1)=>({currentTarget:cell(index),pointerId:id,isPrimary:true,button:0,preventDefault(){},...xy(index)});
@@ -23,7 +23,7 @@ for(const kinds of [['tap','tap','tap'],['drag','drag','drag'],['tap','drag','ta
  h.tap(0);h.tap(1);h.tap(0);assert.deepEqual(h.game().path,[0],'first cell starts over');
  h.api.pointerDown(h.event(1));h.api.pointerCancel(h.event(1));h.api.pointerUp(h.event(1));assert.deepEqual(h.game().path,[]);assert.equal(h.submissions.length,0);
  h.tap(0);h.api.resetStarter();h.tap(1);assert.equal(h.submissions.length,0);assert.deepEqual(h.game().path,[]);
- h.tap(0);h.restart();h.tap(1);assert.deepEqual(h.game().path,[],'new run cannot inherit prefix');
+ h.tap(0);h.restart();assert.equal(h.game().puzzle.letters.length,9);h.tap(1);assert.deepEqual(h.game().path,[],'new run cannot inherit prefix');
  paths[0].forEach(h.tap);h.tap(3);h.tap(0);assert.deepEqual(h.game().path,[],'used cell resets pending prefix');
 }
 {
