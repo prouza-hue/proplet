@@ -25,7 +25,7 @@ const submit=app.slice(app.indexOf('function submitPath(){'),app.indexOf('functi
 const accepted=Error('accepted by minimum-length guard');
 for(const [mode,version,word,allow] of [['starter',3,'PES',true],['starter',3,'PE',false],['starter',2,'PES',false],['free',3,'PES',false],['free',3,'STŮL',true]]){
  const game={mode,puzzle:{meta:{starterVersion:version},answers:{findIndex(){throw accepted}}},path:[0,1,2],moves:0};
- const test={currentGame:game,currentWord:()=>word,updateActive(){},message(){},renderGameBoard(){},renderGameHUD(){},$:()=>({})};
+ const test={trackStarterInput(){},currentGame:game,currentWord:()=>word,updateActive(){},message(){},renderGameBoard(){},renderGameHUD(){},$:()=>({})};
  vm.createContext(test);vm.runInContext(submit,test);
  if(allow)assert.throws(()=>test.submitPath(),error=>error===accepted);else assert.doesNotThrow(()=>test.submitPath());
 }

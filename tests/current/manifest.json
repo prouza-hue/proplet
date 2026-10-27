@@ -776,6 +776,14 @@
       {
         "path": "tests/current/test_google_oauth_callback.cjs",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_error_actor_context.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_first_input_diagnostics.cjs",
+        "runner": "node"
       }
     ]
   },

@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.13-ui-refinement6';
+const APP_PREVIEW_RELEASE='proplet-v4.09.14-ui-refinement7';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -1012,6 +1012,19 @@ function renderNewContentBanner(selector='#newContentBanner'){
  root.classList.remove('hidden');root.querySelector('.primary-btn').onclick=()=>{trackProductEvent('content_drop_cta_clicked');startLatestContent()};
 }
 
+let homeLayoutRecovery=null,homeLayoutRecoveryAttempted=false;
+function renderFreeResumeCard(){
+ if(typeof window.PropletHomeLayout?.renderResumeCard==='function'){window.PropletHomeLayout.renderResumeCard();return;}
+ if(homeLayoutRecoveryAttempted)return;
+ homeLayoutRecoveryAttempted=true;
+ homeLayoutRecovery=new Promise((resolve,reject)=>{
+  const script=document.createElement('script');let settled=false;
+  const finish=()=>{if(settled)return;settled=true;clearTimeout(timer);script.remove();typeof window.PropletHomeLayout?.renderResumeCard==='function'?resolve():reject(new Error('home-layout-contract'));};
+  const timer=setTimeout(finish,10000);
+  script.src='/home-layout.js?v=resume-recovery1';script.onload=finish;script.onerror=finish;
+  try{document.head.append(script)}catch{finish()}
+ }).then(()=>window.PropletHomeLayout.renderResumeCard()).catch(error=>{reportClientError('home_layout_contract','HomeLayout resume card unavailable',error);});
+}
 function renderFree(){
  renderAccountProgressStatus();
  renderNewContentBanner();
@@ -1023,7 +1036,7 @@ function renderFree(){
  $$('[data-played-levels]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.disabled)openPlayedLevels(b.dataset.playedLevels)});
  window.PropletFreeOrderUI?.mount({store:freeOrder(),progress:freeProgress,labels:DIFF,change:changeFreeOrder});
  globalThis.PropletArchiveExperience?.free();
- window.PropletHomeLayout?.renderResumeCard();
+ renderFreeResumeCard();
 }
 async function startFree(diff){
  if(!allowAccountGameStart())return;
@@ -1076,6 +1089,12 @@ function trackStarterPhase(trace,phase,reason){
  trace.seen.add(phase);
  if(['interaction','completed','failed','cancelled','left'].includes(phase))clearTimeout(trace.idleTimer);
  try{trackProductEvent('starter_v1_'+phase,{starterRunId:trace.id,starterElapsedMs:Math.round(performance.now()-trace.started),starterReason:reason,starterProvenance:trace.provenance})}catch{}
+}
+function trackStarterInput(outcome){
+ const g=currentGame;
+ if(g?.mode!=='starter'||!g.starterTrace||!['correct','invalid','empty','cancelled'].includes(outcome)||g.starterTrace.seen.has('input_outcome'))return;
+ g.starterTrace.seen.add('input_outcome');
+ try{trackProductEvent('starter_v1_input_outcome',{starterRunId:g.starterTrace.id,starterElapsedMs:Math.round(performance.now()-g.starterTrace.started),starterProvenance:g.starterTrace.provenance,starterInputOutcome:outcome})}catch{}
 }
 function starterPresentationReason(g){
  if(currentGame!==g||currentScreen!=='game')return 'navigation';
@@ -1255,12 +1274,13 @@ function updateActive(){
 function samePath(a,b){return a.length===b.length&&a.every((v,i)=>v===b[i])}
 function submitPath(){
  if(!currentGame||currentGame.finished||currentGame.pausedAt!=null)return;
- const g=currentGame,word=currentWord(),path=[...g.path];if(!word){g.path=[];return updateActive()}const minLength=g.mode==='starter'&&g.puzzle.meta?.starterVersion===3?3:4;if(word.length<minLength){g.path=[];message(`Slova mají aspoň ${minLength} písmena.`);renderGameBoard();renderGameHUD();$('#currentWord').textContent='—';return}
+ const g=currentGame,word=currentWord(),path=[...g.path];if(!word){trackStarterInput('empty');g.path=[];return updateActive()}const minLength=g.mode==='starter'&&g.puzzle.meta?.starterVersion===3?3:4;if(word.length<minLength){trackStarterInput('invalid');g.path=[];message(`Slova mají aspoň ${minLength} písmena.`);renderGameBoard();renderGameHUD();$('#currentWord').textContent='—';return}
  g.moves++;
  globalThis.PropletArchiveExperience?.beforeSubmit(g,word,path);
  const ai=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i)&&a.word===word&&samePath(a.path,g.path));
  const wordIndex=g.puzzle.answers.findIndex((a,i)=>!g.found.some(f=>f.answerIndex===i)&&a.word===word),alreadyFound=g.found.some(f=>f.word===word);
  let wrong=false;
+ trackStarterInput(ai>=0?'correct':'invalid');
  if(ai>=0){const colorIndex=g.found.length%COLORS.length;g.found.push({answerIndex:ai,word,colorIndex,path});path.forEach(i=>g.used.set(i,colorIndex));g.lastFound=path;g.lastProgressAt=performance.now();if(g.mode==='tajenka'){g.lastTajenkaReveal=ai;trackProductEvent('tajenka_word_found');setTimeout(()=>{if(currentGame===g&&g.lastTajenkaReveal===ai){g.lastTajenkaReveal=null;renderTajenkaPhrase(g)}},1100)}else sendAttemptCheckpoint('correct');message(word==='KIVI'?'✓ KIVI je pták, KIWI ovoce.':`✓ ${word}`,'good');fx('correct')}
  else if(wordIndex>=0){g.wrongAttempts=(g.wrongAttempts||0)+1;message(`„${word}“ je správné slovo, ale tahle cesta se do plochy nevejde.`,'bad');wrong=true;fx('wrong')}
  else if(alreadyFound){g.wrongAttempts=(g.wrongAttempts||0)+1;message(`„${word}“ už máš. Hledej dál.`,'bad');wrong=true;fx('wrong')}
@@ -1603,7 +1623,7 @@ function gameInput(){
  if(gameInputController)return gameInputController;
  const factory=window.PropletGameInput;if(!factory?.create)return null;
  gameInputController=factory.create({
-  getGame:()=>gameSession()?.get()||currentGame,neighbours:i=>pNeighbours(i),updateActive,ensureAudio,fx,hideUndo:hideGameUndo,clearHints:clearHintTrace,submit:()=>submitPath(),feedback:text=>message(text),
+  getGame:()=>gameSession()?.get()||currentGame,neighbours:i=>pNeighbours(i),updateActive,ensureAudio,fx,hideUndo:hideGameUndo,clearHints:clearHintTrace,submit:()=>submitPath(),firstInput:trackStarterInput,feedback:text=>message(text),
   query:$,documentObj:document,windowObj:window,navigatorObj:navigator,colors:COLORS,escapeHtml:esc,getSettings,
  });return gameInputController;
 }
@@ -1648,6 +1668,7 @@ function analyticsHeaders(eventType,properties){
  const starterTrace=g?.starterTrace,starterRun=properties?.starterRunId||starterTrace?.id;
  const provenance=properties?.starterProvenance||(eventType&&starterRun===starterTrace?.id?starterTrace?.provenance:null);
  const starterHeaders=eventType&&starterRun?{'X-Proplet-Starter-Run':starterRun,'X-Proplet-Starter-Ms':String(properties?.starterElapsedMs??Math.max(0,Math.round(performance.now()-starterTrace.started)))}:{};
+ if(['correct','invalid','empty','cancelled'].includes(properties?.starterInputOutcome))starterHeaders['X-Proplet-Starter-Input']=properties.starterInputOutcome;
  if(properties?.starterReason)starterHeaders['X-Proplet-Starter-Reason']=properties.starterReason;
  const gameHeaders=puzzleId?{'X-Proplet-Puzzle':puzzleId,'X-Proplet-Run':properties?.attemptId||g?.attemptId||'','X-Proplet-Hints':String(g?.hints||0),'X-Proplet-Elapsed-Ms':String(Math.round(g?.elapsedMs||0))}:{};
  const experimentKey=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentKey||'')?properties.experimentKey:null,experimentVariant=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentVariant||'')?properties.experimentVariant:null,experimentBucket=Number.isInteger(properties?.experimentBucket)&&properties.experimentBucket>=0&&properties.experimentBucket<100?properties.experimentBucket:null;
@@ -1803,7 +1824,11 @@ function clientErrorSource(detail){
  return frames.length?{source_file:frames[0].file,source_line:frames[0].line,source_column:frames[0].column,source_frames:frames,source_availability:'available'}:{source_availability:detail?.message==='Script error.'?'opaque':'missing'};
 }
 function clientErrorHeaders(){
- let captured={};try{captured=analyticsHeaders()}catch{}
+ let captured={};try{captured=analyticsHeaders();
+  const trace=currentGame?.starterTrace,flow=currentGame?.firstStepsTelemetry?.provenance?.firstStepsRunId;
+  if(trace?.id)captured['X-Proplet-Starter-Run']=trace.id;
+  if(flow)captured['X-Proplet-First-Steps-Run']=flow;
+ }catch{}
  const release=typeof APP_PREVIEW_RELEASE==='string'?APP_PREVIEW_RELEASE:'legacy',version=release.match(/^proplet-v(\d+\.\d+\.\d+)-/)?.[1]||APP_VERSION;
  const test=captured['X-Proplet-Test']==='1'||new URLSearchParams(location.search).get('tutorial')==='1'||(typeof CONTENT_PREVIEW_DATE!=='undefined'&&!!CONTENT_PREVIEW_DATE)||window.PROPLET_RUNTIME_ENV==='preview';
  return {...captured,'Content-Type':'application/json','X-Proplet-Version':version,'X-Proplet-Client-Release':release,'X-Proplet-Analytics':'2',...(test?{'X-Proplet-Test':'1'}:{})};
