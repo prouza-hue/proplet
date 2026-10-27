@@ -26,6 +26,7 @@ html body :is(#referralHome,#referralInviteHome):not(.ref-incoming) .ref-story{g
 html body :is(#referralHome,#referralInviteHome) .ref-visual .ref-art{width:120px;transform:scale(.9);transform-origin:center center}
 html body :is(#referralHome,#referralInviteHome) .ref-visual .xp-sticker{font-size:16px!important;padding:8px 9px!important}.ref-visual{gap:8px}
 }
+
 @media(max-width:380px){
 html body :is(#referralHome,#referralInviteHome):not(.ref-incoming) .ref-story{grid-template-columns:minmax(0,1fr) 95px;gap:10px}
 html body :is(#referralHome,#referralInviteHome) .ref-visual .ref-art{width:120px;transform:scale(.75);transform-origin:center center;margin:0 -12px}
@@ -135,4 +136,10 @@ html.tiskarna-ui body #winModal.result-compact .win-details>summary{min-height:4
  html.tiskarna-ui body #winModal.result-compact .win-result-heading{grid-template-columns:minmax(0,1fr);gap:10px}
  html.tiskarna-ui body #winModal.result-compact #winTitle{font-size:24px!important}
  html.tiskarna-ui body #winModal.result-compact #winRewardValue{justify-self:start}
+}
+@media(min-width:600px){
+ html.tiskarna-ui body #winModal.result-compact .win-card{width:min(100%,880px)!important;padding:28px 32px!important}
+ html.tiskarna-ui body #winModal.result-compact #winTitle{font-size:36px!important}
+ html.tiskarna-ui body #winModal.result-compact .mini-leader-row{min-height:56px!important;padding:10px 12px!important}
+ html.tiskarna-ui body #winModal.result-compact #winResultActions>:is(#winExtraBtn,#winPrimaryBtn){min-height:56px!important;font-size:18px!important}
 }

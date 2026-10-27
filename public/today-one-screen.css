@@ -94,64 +94,67 @@ html[data-theme=dark] .os-feature>.os-arrow{color:var(--td-blue)}
  .os-feature>.os-art{width:66px;height:66px}
  .os-feature>.os-arrow{bottom:9px}
 }
-/* Unfolded Fold with browser chrome: use width, not two oversized stacked rows. */
-@media(min-width:600px) and (max-width:899px) and (max-height:600px){
- html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday{grid-template-columns:minmax(0,.95fr) minmax(0,1.2fr);gap:12px;align-items:stretch}
- .os-main{gap:6px}
- .os-feature-slot{display:flex;flex:1}
- .os-feature,.os-feature.os-complete{grid-template-columns:minmax(0,1fr) 64px;grid-template-rows:auto 1fr auto;gap:6px 8px;min-height:148px;height:100%;padding:14px 14px 34px}
- .os-feature .os-copy{display:contents}
- .os-feature .os-title,.os-feature.os-complete .os-title{grid-column:1/-1;grid-row:1;font-size:24px}
- .os-feature .os-detail{grid-column:1;grid-row:2;align-self:center;font-size:13px;line-height:1.35}
- .os-feature .os-reward{grid-column:1;grid-row:3;justify-self:start;align-self:start;font-size:12px}
- .os-feature>.os-art,.os-feature.os-complete>.os-art{grid-column:2;grid-row:2/span 2;align-self:center;width:64px;height:68px}
- .os-feature.os-complete .os-detail{grid-column:1/-1;grid-row:2;align-self:start;text-wrap:balance}
- .os-feature.os-complete>.os-art{grid-row:3;width:44px;height:48px}
- .os-feature>.os-arrow{right:14px;bottom:10px;font-size:14px}
- .os-week{min-height:44px;padding:0;gap:1px}
- .os-day{padding:3px 0;gap:3px}
- .os-day b{font-size:11px}
- .os-day-icons{gap:0}
- .os-day-icons img{width:15px;height:17px}
- .os-grid{gap:10px}
- .os-tile{grid-template-columns:40px minmax(0,1fr);gap:8px;min-height:76px;padding:10px}
- .os-tile>.os-art{width:40px;height:46px}
- .os-tile .os-title{font-size:17px;line-height:1.18}
- .os-tile .os-detail{font-size:12px}
- .os-tile .os-reward{font-size:12px}
- .os-notices{grid-column:1/-1}
-}
-@media(min-width:600px) and (max-width:899px) and (min-height:500px) and (max-height:600px){
- .os-feature,.os-feature.os-complete{min-height:210px;grid-template-columns:minmax(0,1fr) 76px}
- .os-feature>.os-art,.os-feature.os-complete>.os-art{width:76px;height:80px}
- .os-tile{grid-template-columns:46px minmax(0,1fr)}
- .os-tile>.os-art{width:46px;height:52px}
-}
-/* Taller unfolded view can stack again without inheriting oversized artwork. */
-@media(min-width:600px) and (max-width:899px) and (min-height:601px) and (max-height:699px){
- .os-feature,.os-feature.os-complete{grid-template-columns:minmax(0,1fr) 76px;min-height:112px;padding:12px 18px 30px}
- .os-feature>.os-art,.os-feature.os-complete>.os-art{width:76px;height:76px}
- .os-feature .os-title{font-size:28px}
- .os-week{min-height:44px;padding-block:0}
- .os-tile{grid-template-columns:50px minmax(0,1fr);min-height:82px;padding:10px 14px;gap:10px}
- .os-tile>.os-art{width:50px;height:54px}
+/* Wide screens use a shallow daily panel beside the weekly rhythm. */
+@media(min-width:600px){
+ html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday{grid-template-columns:minmax(0,1fr);gap:16px}
+ .os-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:stretch}
+ .os-feature-slot{display:flex;min-width:0}
+ .os-feature,.os-feature.os-complete{min-height:170px;height:auto;grid-template-columns:minmax(0,1fr) 96px;grid-template-rows:auto;gap:12px;padding:22px 22px 42px}
+ .os-feature .os-copy{display:flex;gap:6px}
+ .os-feature .os-title,.os-feature.os-complete .os-title{font-size:30px}
+ .os-feature>.os-art,.os-feature.os-complete>.os-art{width:96px;height:104px}
+ .os-week-slot{display:flex;align-items:stretch}
+ .os-week{height:100%;gap:4px;padding:10px 0;align-items:center}
+ .os-day{min-height:82px;gap:10px;padding:10px 1px}
+ .os-day b{font-size:14px}
+ .os-day-icons img{width:22px;height:24px}
+ .os-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+ .os-tile{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;align-content:center;justify-items:start;gap:8px;padding:16px;min-height:136px}
+ .os-tile>.os-art{grid-column:1;grid-row:1;width:52px;height:56px}
+ .os-tile>.os-copy{grid-column:1;grid-row:2}
  .os-tile .os-title{font-size:20px}
  .os-tile .os-detail,.os-tile .os-reward{font-size:13px}
+ .os-notices{grid-column:1/-1}
+}
+/* Browser chrome leaves little height on an unfolded Fold. */
+@media(min-width:600px) and (max-width:899px) and (max-height:600px){
+ html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday{gap:10px}
+ .os-main{gap:12px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .os-feature,.os-feature.os-complete{min-height:116px;grid-template-columns:minmax(0,1fr) 56px;padding:12px 14px 28px;gap:6px}
+ .os-feature .os-title,.os-feature.os-complete .os-title{font-size:24px}
+ .os-feature .os-detail{font-size:13px}
+ .os-feature .os-reward{font-size:12px}
+ .os-feature>.os-art,.os-feature.os-complete>.os-art{width:56px;height:62px}
+ .os-feature>.os-arrow{right:14px;bottom:8px;font-size:14px}
+ .os-week{padding:0;gap:1px}
+ .os-day{min-height:66px;padding:7px 0;gap:8px}
+ .os-day b{font-size:12px}
+ .os-day-icons{gap:0}
+ .os-day-icons img{width:16px;height:18px}
+ .os-grid{gap:8px}
+ .os-tile{min-height:86px;padding:9px 8px;gap:6px;grid-template-columns:28px minmax(0,1fr);grid-template-rows:auto;align-items:center}
+ .os-tile>.os-art{grid-column:1;grid-row:1;width:28px;height:34px}
+ .os-tile>.os-copy{grid-column:2;grid-row:1;gap:2px}
+ .os-tile .os-title{font-size:16px}
+ .os-tile .os-detail,.os-tile .os-reward{font-size:12px}
 }
 @media(max-height:430px),(max-width:359px){
  html.tiskarna-ui body.today-one-screen.one-screen-ready:not(.playing):has(#screen-daily.active) .app-footer{margin-top:6px!important;padding-top:3px!important}
 }
 @media(min-width:900px){
  html.tiskarna-ui body.today-one-screen.one-screen-ready:not(.playing):has(#screen-daily.active) .app-shell{padding-bottom:28px!important}
- html.tiskarna-ui body.today-one-screen.one-screen-ready:not(.playing):has(#screen-daily.active) .app-header{min-height:78px!important;margin-bottom:30px!important;padding-block:14px!important}
- html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;align-items:stretch}
- .os-main{gap:12px}.os-feature-slot{flex:1;display:flex}.os-feature{min-height:248px;height:100%;grid-template-columns:minmax(0,1fr) 132px;padding:28px 24px 48px}
- .os-feature>.os-art{width:132px;height:142px}.os-feature .os-title{font-size:38px}.os-feature .os-detail{font-size:17px}.os-feature .os-reward{font-size:16px}
- .os-feature>.os-arrow{right:24px;bottom:20px;font-size:18px}.os-week{min-height:58px}
- .os-day b{font-size:14px}.os-day-icons img{width:24px;height:24px}
- .os-grid{gap:16px}.os-tile{grid-template-columns:minmax(0,1fr);grid-template-rows:76px auto;justify-items:start;align-content:center;gap:10px;padding:22px;min-height:146px}
- .os-tile>.os-art{grid-column:1;grid-row:1;width:70px;height:76px}.os-tile>.os-copy{grid-column:1;grid-row:2}.os-tile .os-title{font-size:24px}
- .os-tile>.os-arrow{display:block;position:absolute;right:20px;bottom:23px;font-size:21px;color:var(--td-blue)}
- .os-tile.os-next>.os-arrow{color:#fff8e9}.os-notices{grid-column:1/-1}
+ html.tiskarna-ui body.today-one-screen.one-screen-ready:not(.playing):has(#screen-daily.active) .app-header{min-height:78px!important;margin-bottom:24px!important;padding-block:14px!important}
+ html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday{gap:20px}
+ .os-main{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+ .os-feature,.os-feature.os-complete{min-height:200px;padding:26px 28px 46px;grid-template-columns:minmax(0,1fr) 112px}
+ .os-feature .os-title,.os-feature.os-complete .os-title{font-size:36px}
+ .os-feature .os-detail{font-size:17px}.os-feature .os-reward{font-size:16px}
+ .os-feature>.os-art,.os-feature.os-complete>.os-art{width:112px;height:120px}
+ .os-feature>.os-arrow{right:28px;bottom:18px;font-size:18px}
+ .os-week{gap:6px}.os-day{min-height:104px;gap:14px}.os-day b{font-size:16px}.os-day-icons img{width:28px;height:30px}
+ .os-grid{gap:16px}.os-tile{min-height:166px;padding:22px;gap:12px}
+ .os-tile>.os-art{width:60px;height:64px}.os-tile .os-title{font-size:24px}.os-tile .os-detail{font-size:14px}
+ .os-tile>.os-arrow{display:block;position:absolute;right:20px;bottom:22px;font-size:21px;color:var(--td-blue)}
+ .os-tile.os-next>.os-arrow{color:#fff8e9}
 }
 @media(prefers-reduced-motion:reduce){.os-today button:active{transform:none!important}}
