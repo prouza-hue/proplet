@@ -57,3 +57,7 @@ Kampaň `visual-refresh-20261027-v1` zůstává neaktivní. Skupina deseti hrá�
 Funkční ovládání pozvánky a formuláře je dostupné výhradně v preview s `?reviewPlaytest=1`. Běžná návštěva se nemění. Ovládání ukázky nabízí Pozvánka, Formulář, Nasimulovat 2 hry a Reset demo. Přijetí, odklad, odmítnutí, hodnocení i komentář se ukládají pouze do zvláštního demo klíče v tomto prohlížeči. Zřetelné označení vysvětluje, že se nic neodesílá. Reset nezasahuje do účtu ani postupu. Technickou chybu lze dál nahlásit původním formulářem.
 
 Tento náhled není spuštěný sběr odpovědí a neověřuje synchronizaci účasti mezi zařízeními. Před spuštěním zůstává nutné samostatně zapojit účetní stav kampaně a skutečné ukládání zpětné vazby, předat zmrazenou kohortu neveřejnému backendu a výslovně aktivovat nábor. Současná implementace to neprovádí automaticky ani podle členství v seznamu.
+
+## Doplnění skupiny
+
+Na výslovné přání autora byli přidáni dva ověření dlouhodobě zkušení hráči nad rámec původní TOP 10. Skupina nyní obsahuje 12 účtů; původní pořadí a zmrazené období zůstávají zachované. Identifikátory a důvody nominací jsou pouze v neveřejném lokálním podkladu. Stav zůstává draft_not_invited, bez rozesílání.

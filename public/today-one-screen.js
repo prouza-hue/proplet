@@ -31,16 +31,16 @@
   const metrics=text(daily?.querySelector('.studio-result-metrics'));
   const meta=q('#dailyMeta'),metaDetails=meta?.children.length?[...meta.children].filter(e=>!e.classList.contains('studio-xp')).map(text).join(' · '):text(meta);
   const feature={key:'feature',title:text(q('#dailyHeroTitle'))||'Denní výzva',art:q('#studioDailyArt')?.getAttribute('src'),
-   detail:complete?'✓ Hotovo'+(metrics?' · '+metrics:''):metaDetails,
+   detail:complete?'✓ Hotovo':metaDetails,metrics:complete?metrics:'',
    reward:complete?'':reward(q('#dailyMeta')),action:shortAction,target:mainAction,disabled:!target||!!target.disabled,
    label:complete?'Denní výzva. Zobrazit výsledek. '+metrics:text(play),complete,special,
    colors:['--feature','--feature-ink','--feature-muted','--feature-action'].map(k=>style.getPropertyValue(k).trim())};
-  feature.label=[feature.title,feature.detail,feature.reward,complete?'Zobrazit výsledek':text(play)].filter(Boolean).join('. ');
+  feature.label=[feature.title,feature.detail,feature.metrics,feature.reward,complete?'Zobrazit výsledek':text(play)].filter(Boolean).join('. ');
   const tiles=[];
   if(special&&hasDaily)tiles.push({key:'daily-result',title:'Denní',detail:'✓ '+(metrics.split(' · ')[0]||'Hotovo'),art:'/rewards/printshop/symbol-daily.svg',target:'#studioDailyResult button',label:'Zobrazit výsledek Denní výzvy. '+metrics,kind:'daily-done'});
   else if(special)tiles.push({key:'daily-base',title:'Denní',detail:'Základní výzva',art:'/rewards/printshop/symbol-daily.svg',target:'#playDailyBtn',label:'Otevřít základní Denní výzvu',kind:'daily-choice'});
   const extra=q('#studioExtraCard'),tajenka=q('#tajenkaPreviewCard');
-  if(visible(extra))tiles.push({key:'extra',title:'Extra',detail:reward(extra)?'':text(extra.querySelector('p')?.lastElementChild),reward:reward(extra),art:icon(extra),target:'#studioExtraCard>button',label:'Extra. '+separatedText(extra.querySelector('p'))+'. '+text(extra.querySelector('button')),kind:'extra'});
+  if(visible(extra)){const detail=reward(extra)?'':text(extra.querySelector('p')?.lastElementChild);tiles.push({key:'extra',title:'Extra',detail:/^(?:✓\s*)?(?:Hotovo|Dokončeno)$/i.test(detail)?'✓ Hotovo':detail,reward:reward(extra),art:icon(extra),target:'#studioExtraCard>button',label:'Extra. '+separatedText(extra.querySelector('p'))+'. '+text(extra.querySelector('button')),kind:'extra'});}
   if(visible(tajenka)){
    const done=tajenka.classList.contains('completed');
    const target=done?'#tajenkaPreviewCard [data-tajenka-recap]':'#tajenkaPreviewBtn';
@@ -85,7 +85,9 @@
    if(model.detail)copy.append(make('span','os-detail',model.detail));
    if(model.reward)copy.append(make('span','os-reward',model.reward));
    const children=[copy];if(model.art)children.push(image(model.art,'os-art'));
-   const arrow=make('span','os-arrow',model.action?model.action+' →':'→');arrow.setAttribute('aria-hidden','true');children.push(arrow);e.replaceChildren(...children);
+   const arrow=make('span','os-arrow',model.action?model.action+' →':'→');arrow.setAttribute('aria-hidden','true');
+   if(model.complete){const result=make('span','os-completion-row');if(model.metrics)result.append(make('span','os-metrics',model.metrics));result.append(arrow);children.push(result);}else children.push(arrow);
+   e.replaceChildren(...children);
    if(model.colors)model.colors.forEach((v,i)=>e.style.setProperty(['--os-feature','--os-ink','--os-muted','--os-action'][i],v));
    e.classList.toggle('os-complete',!!model.complete);e.classList.toggle('os-special',!!model.special);e.dataset.signature=signature;
   }

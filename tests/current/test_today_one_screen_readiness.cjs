@@ -81,4 +81,14 @@ const difficulty=new Element('span'),completed=new Element('span');difficulty.te
 assert.equal(rendered('feature').querySelector('.os-arrow').textContent,'Výsledek →','finished Extra uses a result action, not Play');
 assert.match(rendered('feature').querySelector('.os-detail').textContent,/Mozkožrout.*Hotovo/);
 assert.match(rendered('feature').getAttribute('aria-label'),/Hotovo.*Zobrazit výsledek/);
-console.log('PASS one-screen readiness: recovery observer, guarded actions, unfinished Daily access and completed Extra label');
+// The completed card retains one readable performance string and its native result action.
+hero.classList.toggle('daily-special-selected',false);hero.dataset.studioState='complete';title.textContent='Denní výzva';
+const dailyResult=new Element(),metrics=new Element('span'),resultButton=new Element('button');
+metrics.className='studio-result-metrics';metrics.textContent='0:19 · 8 tahů';dailyResult.append(metrics,resultButton);screen.append(dailyResult);
+selectors.set('#studioDailyResult',dailyResult);selectors.set('#studioDailyResult button',resultButton);
+let openedResult=0;resultButton.onclick=()=>openedResult++;const playsBeforeResult=played;repaint();
+assert.equal(rendered('feature').querySelector('.os-detail').textContent,'✓ Hotovo');
+assert.equal(rendered('feature').querySelector('.os-metrics').textContent,'0:19 · 8 tahů');
+assert.match(rendered('feature').getAttribute('aria-label'),/0:19 · 8 tahů/);
+rendered('feature').click();assert.equal(openedResult,1);assert.equal(played,playsBeforeResult,'completed card never starts another game');
+console.log('PASS one-screen readiness: guarded native actions, separate accessible result metrics, and completed Extra label');
