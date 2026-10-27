@@ -2,7 +2,7 @@
  'use strict';
  if(global.__PROPLET_DIAGNOSTIC_TRANSPORT__)return;
  global.__PROPLET_DIAGNOSTIC_TRANSPORT__=true;
- const REPORTER_RELEASE='proplet-v4.09.13-module1';
+ const REPORTER_RELEASE='proplet-v4.09.14-diagnostics1';
  let appClaimedListeners=false;
  const nativeFetch=global.fetch.bind(global);
  const releasePattern=/^proplet-v\d+\.\d+\.\d+-[A-Za-z0-9_.-]+$/;
@@ -24,7 +24,7 @@
  }
  function report(code,message,detail,providedHeaders){
   if(global.navigator?.onLine===false)return;
-  let inherited={};try{if(typeof analyticsHeaders==='function')inherited=analyticsHeaders()}catch{}
+  let inherited={};try{if(typeof clientErrorHeaders==='function')inherited=clientErrorHeaders();else if(typeof analyticsHeaders==='function')inherited=analyticsHeaders()}catch{}
   const headers={...inherited,...providedHeaders,'Content-Type':'application/json'},release=producer();
   // This is the producing app.js constant, not the newer bootstrap or server.
   if(release){headers['X-Proplet-Client-Release']=release;headers['X-Proplet-Version']=release.match(/^proplet-v(\d+\.\d+\.\d+)-/)[1]}

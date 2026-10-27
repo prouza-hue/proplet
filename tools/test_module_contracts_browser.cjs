@@ -6,6 +6,7 @@ const root=path.resolve(__dirname,'..'),base='http://127.0.0.1:18775',legacy='95
 const reporterRelease=fs.readFileSync(path.join(root,'public/app/client-diagnostics.js'),'utf8').match(/REPORTER_RELEASE='([^']+)'/)[1];
 const historical=(sha,file)=>execFileSync('git',['show',sha+':public/'+file],{cwd:root,encoding:'utf8',maxBuffer:1024*1024});
 const oldTeam=historical('c2501bc31fcb5c4da4c8fa3d5932ad910c8f432b','team-victories.js');
+const oldHome=historical('1e3e3c0^','home-layout.js');
 const oldHints=historical('07350e5','app/game/hints.js'),beforeAccount=historical('9f8ae24','app/account/account.js'),beforeApp=historical('9f8ae24','app.js');
 const profile={id:'onboarding-synthetic',name:'Fixture Player',token:'fixture-token-not-a-credential',avatar:'🙂',hasPassword:true,supportMode:'none'};
 const fixture=spawn(process.execPath,['tools/onboarding_fixture_server.cjs'],{cwd:root,env:{...process.env,PORT:'18775',TEST_BASELINE_SHA:legacy},stdio:['ignore','pipe','pipe']});
@@ -35,6 +36,41 @@ async function hintClose(page){await page.evaluate(()=>{document.querySelector('
   if(signature==='closeModal')await page.evaluate(()=>document.querySelector('#closeHintModal').click());
   await page.waitForFunction(()=>true);assert(errors.some(e=>e.includes(signature)),JSON.stringify(errors));
   checks.push('BASELINE actual historical module reproduces '+signature);await ctx.close();
+ }
+ for(const viewport of [{width:1280,height:900},{width:390,height:844},{width:673,height:841}]){
+  console.log('CHECK HomeLayout and input outcomes '+viewport.width);await control({reset:true,firstSteps:true});const ctx=await context(browser,viewport);let homeLoads=0;
+  await ctx.route('**/home-layout.js*',r=>++homeLoads===1?r.fulfill({contentType:'text/javascript',body:oldHome}):r.continue());
+  const {page,errors}=await load(ctx);
+  await page.evaluate(()=>{const s=getState();s.inProgress['free:g4-e-009']={puzzleId:'g4-e-009',mode:'free',difficulty:'easy',found:[],hints:2,moves:3,elapsedMs:2500};saveState(s)});
+  const saved=await page.evaluate(()=>({profile:localStorage.getItem('proplet-v2-profile'),state:JSON.stringify(getState())}));
+  await page.evaluate(()=>{window.__propletHomeLayoutInstalled=true;applyScreen('free');renderFree();renderFree();renderFree()});
+  await page.waitForFunction(()=>typeof window.PropletHomeLayout?.renderResumeCard==='function').catch(async error=>{console.log(JSON.stringify({homeLoads,errors,state:await page.evaluate(()=>({release:APP_PREVIEW_RELEASE,attempted:homeLayoutRecoveryAttempted,installed:window.__propletHomeLayoutInstalled,keys:Object.keys(window.PropletHomeLayout||{})}))}));throw error});
+  assert.equal(homeLoads,2,'one shared recovery despite repeated renders and old installed marker');
+  await page.locator('#freeResumeCard').waitFor();
+  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'viewport must not overflow');
+  assert.deepEqual(await page.evaluate(()=>({profile:localStorage.getItem('proplet-v2-profile'),state:JSON.stringify(getState())})),saved);
+  for(const outcome of ['invalid','cancelled','empty','correct']){
+   await page.evaluate(async outcome=>{
+    document.querySelectorAll('.modal').forEach(el=>el.classList.add('hidden'));
+    await startGame(window.PropletFirstSteps.trainingPuzzle(),'starter');
+    const e=index=>({currentTarget:document.querySelector(`.cell[data-index="${index}"]`),pointerId:1,isPrimary:true,button:0,clientX:0,clientY:0,preventDefault(){}});
+    if(outcome==='empty')submitPath();
+    else if(outcome==='invalid'){pointerDown(e(4));pointerUp(e(4));}
+    else if(outcome==='cancelled'){pointerDown(e(0));pointerCancel(e(0));}
+    else{for(const i of [0,1,2]){pointerDown(e(i));pointerUp(e(i));}}
+    // A later correct answer must not replace the first diagnostic outcome.
+    for(const i of [0,1,2]){pointerDown(e(i));pointerUp(e(i));}
+    await productAnalytics().flush();await window.PropletClientDiagnostics.report('verification_context','synthetic loopback context');
+   },outcome);
+  }
+  const captured=await fetch(base+'/__fixture/events').then(r=>r.json()),events=captured.events;
+  const errorsWithContext=captured.requests.filter(r=>r.path==='/api/client-error'&&r.body.code==='verification_context');assert.equal(errorsWithContext.length,4);for(const row of errorsWithContext)assert(outcomesRun(row.headers['x-proplet-starter-run']));
+  function outcomesRun(id){return events.some(e=>e.event==='starter_v1_input_outcome'&&e.headers['x-proplet-starter-run']===id)}
+  const outcomes=events.filter(r=>r.event==='starter_v1_input_outcome');
+  assert.deepEqual(outcomes.map(r=>r.headers['x-proplet-starter-input']),['invalid','cancelled','empty','correct']);
+  assert.equal(new Set(outcomes.map(r=>r.headers['x-proplet-starter-run'])).size,4);
+  for(const row of outcomes){assert.equal(row.headers['x-proplet-test'],'1')}
+  assert.deepEqual(errors,[]);checks.push('PASS historical HomeLayout recovery and once/run real input outcomes '+viewport.width);await ctx.close();
  }
  for(const viewport of [{width:1280,height:900},{width:390,height:844},{width:673,height:841}]){
   console.log('CHECK mixed modules '+viewport.width);await control({reset:true});const ctx=await context(browser,viewport);let stale=true;

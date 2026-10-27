@@ -23,7 +23,7 @@ ns = dict(re=re, uuid=uuid, datetime=datetime, TZ=timezone.utc, APP_VERSION='syn
           enforce_rate_limit=lambda *args, **kwargs: None,
           telemetry_actor=lambda *args: {'anonymous_id': 'synthetic-hash'},
           db_insert=lambda table, row: stored.append((table, row)))
-for name in ['sanitized_operational_route', 'record_operational_event', 'client_app_version', 'client_error']:
+for name in ['sanitized_operational_route', 'record_operational_event', 'client_app_version', 'client_error_actor_context', 'client_error']:
     if name not in functions:
         continue  # Before the fix, characterize the real unsanitized endpoint.
     node = functions[name]
@@ -48,7 +48,7 @@ for route, expected in cases:
     row = stored[0][1]
     assert row['route'] == expected, f'Diagnostic route must be pathname: {row["route"]!r}'
     assert row['code'] == 'puzzle_boot_failed' and row['actor_kind'] == 'anonymous'
-    assert row['metadata'] == {'message': 'both-attempts-failed', 'client_provenance':'unreported','server_version':'synthetic'}
+    assert row['metadata'] == {'message': 'both-attempts-failed', 'client_provenance':'unreported','server_version':'synthetic','context_at':'report'}
     assert row['app_version']=='legacy-unknown','unknown clients must not inherit the server version'
     for secret in ['click-secret', 'challenge-secret', 'oauth-secret', 'fbclid', 'access_token']:
         assert secret not in str(row), f'URL secret reached diagnostic storage: {secret}'

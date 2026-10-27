@@ -1,5 +1,5 @@
 (()=>{
-  if(window.__propletHomeLayoutInstalled)return;
+  if(window.__propletHomeLayoutInstalled&&typeof window.PropletHomeLayout?.renderResumeCard==='function')return;
 
   const htmlEsc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const shortHomeDate=iso=>{

@@ -10,6 +10,8 @@ function create(deps={}){
   const hideUndo=deps.hideUndo||(()=>{});
   const clearHints=deps.clearHints||(()=>{});
   const submit=deps.submit||(()=>{});
+  const firstInput=deps.firstInput||(()=>{});
+  const reportInput=outcome=>{try{firstInput(outcome)}catch{}};
   const query=deps.query||(()=>null);
   const documentObj=deps.documentObj||(typeof document!=='undefined'?document:null);
   const windowObj=deps.windowObj||(typeof window!=='undefined'?window:{});
@@ -20,8 +22,9 @@ function create(deps={}){
   const feedback=deps.feedback||(()=>{});
   const shortStarter=game=>game?.mode==='starter'&&game.puzzle?.meta?.starterVersion===3;
   const activeAnswer=game=>game.puzzle.answers.find((_,i)=>!game.found.some(f=>f.answerIndex===i));
-  function resetStarter(){
+  function resetStarter(outcome='cancelled'){
     const game=getGame();if(!shortStarter(game))return false;
+    if(outcome&&(game.starterPointer||game.path?.length))reportInput(outcome);
     game.starterPointer=null;game.dragging=false;game.lastPointer=null;game.path=[];
     hideMagnifier();updateActive();return true;
   }
@@ -97,7 +100,7 @@ function create(deps={}){
     if(!game||game.finished||game.pausedAt!=null||game.wrongPath?.length)return false;
     if(shortStarter(game)){
       if(game.starterPointer||event.isPrimary===false||(event.button!=null&&event.button!==0))return false;
-      if(game.used.has(index)){resetStarter();feedback('Začni znovu prvním písmenem hledaného slova.');return false;}
+      if(game.used.has(index)){reportInput('invalid');resetStarter(null);feedback('Začni znovu prvním písmenem hledaného slova.');return false;}
       const answer=activeAnswer(game),previous=[...game.path];
       const next=index===answer?.path[0]?[index]:[...previous,index];
       const valid=!!answer&&next.every((cell,i)=>cell===answer.path[i])&&(!previous.length||index===answer.path[0]||neighbours(previous.at(-1)).includes(index));
@@ -134,7 +137,7 @@ function create(deps={}){
     if(pointer&&event?.pointerId!=null&&event.pointerId!==pointer.id)return false;
     game.dragging=false;game.lastPointer=null;game.starterPointer=null;
     if(shortStarter(game)&&pointer&&!pointer.drag){
-      if(!pointer.valid){resetStarter();feedback('Začni znovu prvním písmenem hledaného slova.');return true;}
+      if(!pointer.valid){reportInput('invalid');resetStarter(null);feedback('Začni znovu prvním písmenem hledaného slova.');return true;}
       const answer=activeAnswer(game);
       if(!answer||game.path.length!==answer.path.length)return true;
     }
