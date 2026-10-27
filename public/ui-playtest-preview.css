@@ -1,0 +1,40 @@
+/* Explicit review mode only; native pages, game controls and footer links remain. */
+#uiPlaytestReview{box-sizing:border-box;width:min(100%,1120px);margin:12px auto;padding:0 24px;color:var(--td-ink,#293747);font:400 14px/1.4 Outfit,sans-serif}
+#uiPlaytestReview .ui-playtest-toolbar{padding:12px 14px;border:1px dashed var(--td-line,#ccc);border-radius:10px;background:var(--td-paper,#fffaf0)}
+#uiPlaytestReview .ui-playtest-toolbar>strong{display:block;font-size:14px;font-weight:600}
+#uiPlaytestReview .ui-playtest-toolbar>div{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px}
+#uiPlaytestReview .ui-playtest-toolbar button{min-height:40px;padding:8px 0;background:none;border:0;color:var(--td-blue,#315da8);font:600 14px/1.4 Outfit,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.ui-playtest-status{margin:5px 0 0;font-size:13px;color:var(--td-muted,#626b72)}
+.ui-playtest-status:empty{display:none}
+#uiPlaytestReview .ui-playtest-panel{margin-top:12px}
+#uiPlaytestReview [hidden],#uiPlaytestDialog [hidden],#uiPlaytestFeedbackLink[hidden]{display:none!important}
+.ui-playtest-card{position:relative;max-width:620px;padding:22px;border:1px solid var(--td-line,#d5d3c5);border-radius:16px;background:var(--td-paper,#fffcf5);box-shadow:0 3px 0 #0000000c}
+.ui-playtest-card h2{font:650 25px/1.2 Fraunces,Georgia,serif;margin:0 32px 10px 0;color:var(--td-ink,#293747)}
+.ui-playtest-card p{font:400 16px/1.5 Outfit,sans-serif;margin:0 0 18px;color:var(--td-ink,#293747)}
+.ui-playtest-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+#uiPlaytestReview button,#uiPlaytestDialog button,#uiPlaytestFeedbackLink{touch-action:manipulation}
+:is(#uiPlaytestReview,#uiPlaytestDialog) .ui-playtest-primary{min-height:46px;padding:11px 16px;border:1px solid #214a92;border-radius:10px;background:#315da8;color:#fffaf0;font:600 15px/1.4 Outfit,sans-serif;box-shadow:0 3px 0 #213f71;cursor:pointer}
+:is(#uiPlaytestReview,#uiPlaytestDialog) .ui-playtest-text{min-height:44px;padding:8px 4px;border:0;background:none;color:var(--td-blue,#315da8);font:500 14px/1.4 Outfit,sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+:is(#uiPlaytestReview,#uiPlaytestDialog) .ui-playtest-dismiss{position:absolute;right:8px;top:8px;width:40px;height:40px;min-height:40px;padding:0;border:0;background:none;color:var(--td-muted,#626b72);font:400 25px/1 Outfit,sans-serif;cursor:pointer}
+#uiPlaytestDialog{box-sizing:border-box;width:min(480px,calc(100vw - 24px));max-height:calc(100dvh - 28px);overflow:auto;margin:auto;padding:24px;background:var(--td-paper,#fffcf5);color:var(--td-ink,#293747);border:1px solid var(--td-line,#d5d3c5);border-radius:18px;box-shadow:0 18px 80px #0005;font:400 15px/1.45 Outfit,sans-serif}
+#uiPlaytestDialog::backdrop{background:#18251c99}
+#uiPlaytestTitle{font:650 27px/1.15 Fraunces,Georgia,serif;margin:0 32px 10px 0;color:inherit}
+#uiPlaytestTitle:focus,#uiPlaytestThanksTitle:focus{outline:none}
+#uiPlaytestDialog .ui-playtest-demo-note{font-size:13px;color:var(--td-muted,#626b72);margin:0 0 20px}
+#uiPlaytestForm fieldset{margin:0;padding:0;border:0;min-width:0}
+#uiPlaytestForm legend{font-size:15px;margin-bottom:10px}
+#uiPlaytestForm .ui-playtest-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#uiPlaytestForm .ui-playtest-options label{display:flex;align-items:center;gap:8px;padding:10px;min-height:44px;border:1px solid var(--td-line,#d5d3c5);border-radius:9px;cursor:pointer}
+#uiPlaytestForm .ui-playtest-options label:has(input:checked){border-color:var(--td-blue,#315da8);background:var(--td-tint,#e8effa)}
+#uiPlaytestForm input[type=radio]{width:18px;height:18px;flex:none;accent-color:var(--td-blue,#315da8);margin:0}
+#uiPlaytestForm .ui-playtest-comment{display:block;margin:18px 0 12px;font-weight:600}
+#uiPlaytestForm .ui-playtest-comment>span{font-size:13px;font-weight:400;color:var(--td-muted,#626b72)}
+#uiPlaytestForm textarea{box-sizing:border-box;display:block;width:100%;margin-top:8px;padding:10px 12px;border:1px solid var(--td-line,#d5d3c5);border-radius:9px;background:var(--td-paper,#fffcf5);color:var(--td-ink,#293747);font:400 16px/1.4 Outfit,sans-serif;resize:vertical;min-height:96px}
+#uiPlaytestError{color:var(--td-ink,#293747);font-size:14px;margin:8px 0}
+#uiPlaytestError:empty{display:none}
+#uiPlaytestForm>button{display:block;width:100%;margin-top:9px}
+#uiPlaytestThanks h3{font:650 22px/1.25 Outfit,sans-serif;margin:18px 0 10px}
+#uiPlaytestThanksText{padding:12px;background:var(--td-tint,#e8effa);border-radius:9px;white-space:pre-wrap;overflow-wrap:anywhere}
+:is(#uiPlaytestReview,#uiPlaytestDialog) :is(button,input,textarea):focus-visible{outline:3px solid var(--td-blue,#315da8);outline-offset:3px}
+body.playing #uiPlaytestReview{display:none}
+@media(max-width:599px){#uiPlaytestReview{padding:0 12px}.ui-playtest-card{padding:18px}#uiPlaytestDialog{padding:20px}.ui-playtest-card h2{font-size:23px}}

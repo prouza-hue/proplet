@@ -6,6 +6,10 @@
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
       {
+        "path": "tests/current/test_ui_playtest_preview.cjs",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_tajenka_result_presentation.cjs",
         "runner": "node"
       },

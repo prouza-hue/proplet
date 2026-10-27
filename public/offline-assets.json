@@ -79,6 +79,8 @@
     "/assets/hints/printshop/reveal-v1.webp",
     "/recognition/lexicon.js?v=bonuscs1",
     "/recognition/bonus-cs-v1.dawg",
-    "/recognition/manifest.json"
+    "/recognition/manifest.json",
+    "/ui-playtest-preview.css?v=1",
+    "/ui-playtest-preview.js?v=1"
   ]
 }

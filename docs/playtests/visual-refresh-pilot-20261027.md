@@ -16,7 +16,7 @@ V produkci pouze vybraným účtům malá zavíratelná nabídka na Dnes, mimo h
 
 > **Pomůžeš mi doladit nový vzhled?**
 >
-> Zkouším nový vzhled Propletu. Zajímá mě upřímně, co je lepší — a co jsem naopak zhoršil.
+> Zkouším nový vzhled Propletu. Zajímá mě upřímně, jak ti sedne a jestli se ti hraje lépe.
 >
 > **Vyzkoušet náhled** · **Teď ne**
 
@@ -49,3 +49,11 @@ Počítat lidi: kolik jich pozvánku vidělo, přijalo, skutečně použilo náh
 Využitelné jsou běžné účty ve Vercel preview, administrativní inbox hlášení a ochranné podmínky fronty oznámení. Nově je potřeba doplnit výběrový report, stav účasti na účtu, malou nabídku a formulář s identifikátorem kampaně a konkrétní revizí preview. Samotné číslo verze 4.09.13 nerozliší tyto UI varianty. K odpovědi stačí přidat režim barev a velikost obrazovky; její text nepatří do běžné analytiky.
 
 Historický podklad: `docs/playtests/MOZKOKALYPSA-ROUND2-20260926.md` již používá zmrazenou kohortu a upozorňuje na omezení Top 10. Jeho XP pravidla ani tabulky starého experimentu se pro tento test nepřebírají.
+
+## Připravený kontrolní náhled
+
+Kampaň `visual-refresh-20261027-v1` zůstává neaktivní. Skupina deseti hráčů za 20.–26. října byla zmrazena read-only výběrem z potvrzených dokončení; seznam a interní ID jsou pouze v neveřejných místních podkladech mimo Git a veřejné soubory. V produkci nebyly vytvořeny pozvánky ani změněná data.
+
+Funkční ovládání pozvánky a formuláře je dostupné výhradně v preview s `?reviewPlaytest=1`. Běžná návštěva se nemění. Ovládání ukázky nabízí Pozvánka, Formulář, Nasimulovat 2 hry a Reset demo. Přijetí, odklad, odmítnutí, hodnocení i komentář se ukládají pouze do zvláštního demo klíče v tomto prohlížeči. Zřetelné označení vysvětluje, že se nic neodesílá. Reset nezasahuje do účtu ani postupu. Technickou chybu lze dál nahlásit původním formulářem.
+
+Tento náhled není spuštěný sběr odpovědí a neověřuje synchronizaci účasti mezi zařízeními. Před spuštěním zůstává nutné samostatně zapojit účetní stav kampaně a skutečné ukládání zpětné vazby, předat zmrazenou kohortu neveřejnému backendu a výslovně aktivovat nábor. Současná implementace to neprovádí automaticky ani podle členství v seznamu.
