@@ -784,6 +784,18 @@
       {
         "path": "tests/current/test_first_input_diagnostics.cjs",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_visual_pilot_push.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_visual_playtest.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_visual_playtest_ui.cjs",
+        "runner": "node"
       }
     ]
   },
