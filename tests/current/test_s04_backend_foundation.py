@@ -31,7 +31,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (route.path, tuple(sorted(route.methods or ())), route.name)
         for route in server.app.routes
-        if route.path and route.path not in {"/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+        if route.path and route.path not in {"/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -55,6 +55,22 @@ assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 openapi_contract = json.loads(json.dumps(openapi_contract))
 from google_oauth_contract import normalize_google_oauth
 normalize_google_oauth(openapi_contract)
+# The private visual pilot is additive; its auth/state/RLS boundaries have
+# dedicated HTTP and real PostgreSQL acceptance. Keep the historical digest.
+pilot_paths = {"/api/visual-playtest": {"get", "post"}, "/api/cron/visual-pilot-push": {"get"}}
+assert sorted((r.path, method.lower()) for r in server.app.routes for method in (getattr(r, "methods", None) or ())
+              if r.path in pilot_paths) == sorted((path, method) for path, methods in pilot_paths.items() for method in methods)
+for path, methods in pilot_paths.items():
+    assert set(openapi_contract["paths"][path]) == methods
+pilot_schema_name = openapi_contract["paths"]["/api/visual-playtest"]["post"]["requestBody"]["content"]["application/json"]["schema"]["$ref"].rsplit("/", 1)[-1]
+pilot_schema = openapi_contract["components"]["schemas"].pop(pilot_schema_name)
+assert set(pilot_schema["properties"]) == {"action", "rating", "comment"}
+assert pilot_schema["required"] == ["action"] and pilot_schema["additionalProperties"] is False
+assert pilot_schema["properties"]["action"]["enum"] == ["shown", "accept", "snooze", "decline", "feedback"]
+assert next(v for v in pilot_schema["properties"]["rating"]["anyOf"] if v.get("type") == "string")["enum"] == ["better", "similar", "worse", "unsure"]
+assert next(v for v in pilot_schema["properties"]["comment"]["anyOf"] if v.get("type") == "string")["maxLength"] == 2000
+for path in pilot_paths:
+    openapi_contract["paths"].pop(path)
 # Offline publication adds read-only routes; preserve the original API digest.
 for offline_path in ("/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline"):
     assert set(openapi_contract["paths"][offline_path]) == {"get"}

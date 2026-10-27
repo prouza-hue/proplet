@@ -1,12 +1,13 @@
 'use strict';
 const assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('node:vm');
 const {create,presentation,safeUrl,install}=require('../../public/visual-playtest.js');
 const previewUrl='https://proplet-git-codex-today-one-screen-pavel-prouzas-projects.vercel.app/?playtest=visual-refresh-20261027-v1';
 const eligible=()=>({eligible:true,previewUrl,role:'tester',status:'invited',shownCount:0,canShowInvite:true,feedback:null});
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 // Minimal DOM for the module's real emitted form, with native node identity and
 // focus. Network and MutationObserver are inert; no browser or player is used.
-function fixture(){
+function fixture(environment='preview'){
  const handlers={},frames=[];let player={id:'one',token:'private'},data=eligible(),fail=false;
  let doc;
  class Node{
@@ -15,6 +16,10 @@ function fixture(){
   getAttribute(k){return this.attrs[k]??null;}
   removeAttribute(k){delete this.attrs[k];}
   append(node){node.remove();node.parentElement=this;this.children.push(node);}
+  prepend(node){node.remove();node.parentElement=this;this.children.unshift(node);}
+  after(node){const parent=this.parentElement;node.remove();node.parentElement=parent;parent.children.splice(parent.children.indexOf(this)+1,0,node);}
+  get nextElementSibling(){const siblings=this.parentElement?.children||[];return siblings[siblings.indexOf(this)+1]||null;}
+  get firstElementChild(){return this.children[0]||null;}
   remove(){if(this.parentElement){this.parentElement.children=this.parentElement.children.filter(n=>n!==this);this.parentElement=null;}}
   get isConnected(){return this===doc.body||!!this.parentElement?.isConnected;}
   set innerHTML(html){this.children=[];const stack=[this];for(const part of html.match(/<[^>]+>|[^<]+/g)||[]){if(part.startsWith('</')){stack.pop();continue;}if(part.startsWith('<')){const [,tag,tail]=part.match(/^<(\w+)([^>]*)>/);const node=new Node(tag);for(const attr of tail.matchAll(/([\w-]+)(?:="([^"]*)")?/g))node.setAttribute(attr[1],attr[2]??'');stack.at(-1).append(node);if(!['input','br','img'].includes(tag))stack.push(node);}else stack.at(-1)._text+=part;}}
@@ -31,10 +36,10 @@ function fixture(){
   close(){this.open=false;}
   reset(){for(const node of this.querySelectorAll('input'))node.checked=false;for(const node of this.querySelectorAll('textarea'))node.value='';}
  }
- const body=new Node('body'),footer=new Node('div');body.append(footer);
- doc={body,readyState:'complete',activeElement:null,addEventListener:(name,fn)=>handlers[name]=fn,createElement:tag=>new Node(tag),querySelector:selector=>selector==='.app-footer .footer-links'?footer:body.querySelector(selector)};
- const win={document:doc,PROPLET_RUNTIME_ENV:'preview',getProfile:()=>player,addEventListener:(name,fn)=>handlers[name]=fn,requestAnimationFrame:fn=>{frames.push(fn);return frames.length;},MutationObserver:class{observe(){}disconnect(){}},api:async(path,opts)=>{
-  if(fail)throw {status:503};if(opts.method==='POST'){const payload=JSON.parse(opts.body);assert.equal(payload.action,'feedback');data={...data,status:'accepted',feedback:{rating:payload.rating,comment:payload.comment}};}return data;
+ const body=new Node('body'),footer=new Node('div'),daily=new Node('section');daily.id='screen-daily';daily.innerHTML='<section class="daily-hero"></section><section id="axHomeFree"></section><section id="axHomeGames"></section>';body.append(daily);body.append(footer);
+ doc={body,readyState:'complete',activeElement:null,addEventListener:(name,fn)=>handlers[name]=fn,createElement:tag=>new Node(tag),querySelector:selector=>selector==='.app-footer .footer-links'?footer:selector==='#screen-daily.active'?daily:body.querySelector(selector)};
+ const win={document:doc,PROPLET_RUNTIME_ENV:environment,getProfile:()=>player,addEventListener:(name,fn)=>handlers[name]=fn,requestAnimationFrame:fn=>{frames.push(fn);return frames.length;},MutationObserver:class{observe(){}disconnect(){}},api:async(path,opts)=>{
+  if(fail)throw {status:503};if(opts.method==='POST'){const payload=JSON.parse(opts.body);if(payload.action==='shown')data={...data,canShowInvite:false,displayGranted:true,shownCount:1};else{assert.equal(payload.action,'feedback');data={...data,status:'accepted',feedback:{rating:payload.rating,comment:payload.comment}};}}return data;
  }};
  return {win,doc,footer,handlers,setFail:value=>fail=value,logout:()=>{player=null;handlers['proplet:account-changed']();},flush:async()=>{await tick();while(frames.length)frames.shift()();}};
 }
@@ -103,6 +108,16 @@ async function main(){
  dialog.querySelector('[data-vp-edit]').onclick();assert.equal(form.querySelector('textarea').value,'<b>keep literal</b>');assert(form.querySelector('input[value="similar"]').checked);
  dialog.querySelector('[data-vp-close]').onclick();assert.equal(dialog.open,false);assert.equal(f.doc.activeElement,entry,'closing restores the footer opener');
  entry.onclick();f.logout();await f.flush();assert.equal(f.footer.children.length,0);assert.equal(f.doc.body.querySelector('dialog'),null,'account change immediately removes the form and previous answer');
+ // The canonical Archive home owner must preserve the pilot slot as it orders
+ // secondary modules. Repainting both owners converges, retaining node identity.
+ const prod=fixture('production');install(prod.win);await prod.flush();await prod.flush();
+ const daily=prod.doc.querySelector('#screen-daily'),hero=daily.querySelector('.daily-hero'),invite=daily.querySelector('#visualPlaytestInvite');assert(invite);assert.equal(hero.nextElementSibling,invite);
+ const nativeSource=fs.readFileSync('public/app/archive/experience.js','utf8');
+ const ordering=nativeSource.slice(nativeSource.indexOf(' const ordered='),nativeSource.indexOf(' // Tail nodes have one owner'));
+ const nativeOrder=()=>vm.runInNewContext(ordering,{root:daily,q:selector=>prod.doc.querySelector(selector),referral:null,tajenkaSolved:false,tajenka:null,competition:null,games:daily.querySelector('#axHomeGames')});
+ daily.append(invite);nativeOrder();assert.equal(hero.nextElementSibling,invite,'native layout itself places invitation immediately after the hero');
+ for(let i=0;i<3;i++){nativeOrder();prod.handlers['proplet:screen-changed']();await prod.flush();assert.equal(hero.nextElementSibling,invite);}
+ const nativeNodes=daily.children.filter(node=>node!==invite);invite.remove();nativeOrder();assert.deepEqual(daily.children,nativeNodes,'absent pilot preserves the normal layout');
  console.log('PASS visual pilot: server-only eligibility, reservation, snooze/decline visibility, reviewer, no-token link, feedback/edit/error, auth races and ineligible no UI');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

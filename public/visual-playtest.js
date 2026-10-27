@@ -110,7 +110,8 @@
      card.querySelector('[data-vp-later]').onclick=()=>invitationAction('snooze');
      card.querySelector('.vp-dismiss').onclick=()=>invitationAction('decline');
     }
-    const daily=q('#screen-daily');if(daily&&card.parentElement!==daily){const hero=daily.querySelector('.daily-hero');if(hero)hero.after(card);else daily.prepend(card);}
+    // Archive's canonical home ordering reserves this same optional position.
+    const daily=q('#screen-daily');if(daily){const hero=daily.querySelector('.daily-hero');if(hero){if(hero.nextElementSibling!==card)hero.after(card);}else if(daily.firstElementChild!==card)daily.prepend(card);}
     const hidden=!safeScreen();if(card.hidden!==hidden)card.hidden=hidden;
    }else{card?.remove();card=null;}
    if(view.invite&&!grant&&!reserving&&!reservationFailed&&safeScreen())reserve();
