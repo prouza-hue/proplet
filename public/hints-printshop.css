@@ -11,6 +11,7 @@ html #hintModal #hintTitle{
  margin:0 48px 11px 0;padding:0;font-size:clamp(23px,4.3vw,29px);
  line-height:1.12;letter-spacing:-.035em;color:inherit;
 }
+html #hintModal #hintConsequence{margin:0 0 2px;font-size:14px;line-height:1.45;color:var(--td-muted,#586576)}
 html #hintModal #closeHintModal{
  top:11px;right:11px;width:40px;height:40px;display:grid;place-items:center;
  border:1px solid var(--td-line,#d8d2c7);border-radius:11px;background:transparent;

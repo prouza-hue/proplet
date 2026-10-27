@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.13-ui-refinement3';
+const APP_PREVIEW_RELEASE='proplet-v4.09.13-ui-refinement4';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -282,10 +282,35 @@ const PROGRESS_GUARD_MOBILE_AWAY_MS=20*1000;
 const $=s=>document.querySelector(s);
 function renderWinBadges(html=''){
  let box=$('#newBadgeBox');
- const card=$('#winModal .win-card');
+ const modal=$('#winModal'),card=$('#winModal .win-card');
  if(!box&&card){box=document.createElement('div');box.id='newBadgeBox';box.className='new-badge-box hidden';const anchor=$('#starterHardActions')||$('#winPrimaryBtn');if(anchor&&card.contains(anchor))anchor.before(box);else card.append(box);}
  if(!box)return;
- box.classList.toggle('hidden',!html);box.innerHTML=html;
+ box.classList.toggle('hidden',!html);box.classList.remove('win-awards-grouped');box.removeAttribute('role');box.removeAttribute('aria-label');delete box.dataset.awardCount;box.innerHTML=html;
+ if(!html||modal?.classList.contains('starter-win')||modal?.classList.contains('first-steps-win'))return;
+ const rows=[...box.querySelectorAll(':scope > .unlock-row')];
+ if(rows.length){
+  // Keep the rare series celebration prominent; all other earned rows retain
+  // their original order, artwork slots and delegated detail identities.
+  const featured=rows.find(row=>row.dataset.achievementDetail?.startsWith('mozkokalypsa-'))||rows[0];
+  box.querySelectorAll(':scope > .unlock-title').forEach(title=>title.remove());
+  box.classList.add('win-awards-grouped');box.dataset.awardCount=String(rows.length);box.setAttribute('role','group');box.setAttribute('aria-label','Nově získané odměny');
+  featured.classList.add('win-award-featured');box.prepend(featured);
+  const others=rows.filter(row=>row!==featured);
+  if(others.length){
+   const details=document.createElement('details');details.className='win-awards-more';
+   const summary=document.createElement('summary');summary.textContent=`Další odměny (${others.length})`;
+   const list=document.createElement('div');list.className='win-awards-list';
+   for(const row of others){row.classList.add('win-award-compact');list.append(row);}
+   details.append(summary,list);box.append(details);
+  }
+ }
+ positionWinBadges();
+}
+function positionWinBadges(){
+ const modal=$('#winModal'),box=$('#newBadgeBox'),card=$('#winModal .win-card');
+ if(!box||!card||box.classList.contains('hidden')||modal?.classList.contains('starter-win')||modal?.classList.contains('first-steps-win'))return;
+ const anchor=card.querySelector('.win-secondary-actions')||$('#winResultActions')||$('#winPrimaryBtn');
+ if(anchor?.parentElement===card&&anchor.nextElementSibling!==box)anchor.after(box);
 }
 const $$=s=>[...document.querySelectorAll(s)];
 let puzzleDB=null;
@@ -1336,9 +1361,9 @@ async function finishGame(){
  const beforeLongest=calcLongest(Object.values(getState().completed).filter(r=>r.mode==='daily'&&r.challengeKey!==key).map(r=>r.dailyDate));const stats=effectiveStats(),newBadge=(!old&&g.mode==='daily')?BADGES.find(b=>b.days>beforeLongest&&b.days<=stats.longestStreak):null,newAchievements=completionAchievements(statsBefore,stats,g,getState().mozkokalypsaCelebrated);
  $('#winBadge').textContent=g.mode==='daily'?(newBadge?.icon||'☀️'):'✦';renderCompletionPraise(g.puzzle.difficulty,rec);if(g.postStarterWarmup){trackProductEvent('starter_easy_warmup_completed');$('#winTitle').textContent='Paráda. Teď už jsi rozehřátý.';}const levelSuffix=g.mode==='free'&&g.puzzle.meta?.level?` ${g.puzzle.meta.level}`:'';$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[g.puzzle.difficulty].label}${levelSuffix}`;
  g.winBaseXpAwarded=(dailyGenerationUpgrade||dailyReplay||specialPractice||specialReplay||(old&&g.mode==='free')||(g.mode==='free'&&rec.points===0))?0:Math.max(0,Number(rec.points)||0);g.winXpFallbackText=specialPractice?'Tréninkový pokus · bez dalších XP':specialReplay?'Tréninkový pokus · 200 XP už máš':dailyGenerationUpgrade?'✓ Nová Daily započítaná · 100 XP už máš':dailyReplay?'Tréninkový pokus · 100 XP už máš':old&&g.mode==='free'?'Tréninkový pokus · do pořadí platí první výsledek':g.mode==='free'&&rec.points===0?'Tréninkový pokus · XP už máš':`+${rec.points} XP`;renderRunWinXp(g);const wc=$('#winClean');wc.classList.remove('hidden','hinted');wc.textContent=rec.cleanSolve?'✨ Čistě · bez nápovědy':(g.helperHintUsed?`💛 S Pomocníkem · ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`:`💡 ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`);if(!rec.cleanSolve)wc.classList.add('hinted');$('#winWords').innerHTML=g.found.map(f=>`<span class="win-word" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join('');
- const celebrations=[];if(!g.postStarterWarmup&&newBadge)celebrations.push(`<div class="unlock-row"><span class="emoji">${newBadge.icon}</span><div><strong>Nový odznak · ${newBadge.name}</strong><small>${countCz(newBadge.days,'den','dny','dní')} v řadě</small></div></div>`);if(!g.postStarterWarmup&&newAchievements.length){celebrations.push(`<div class="unlock-title">🏆 ${newAchievements.length===1?'Nový úspěch!':`Nové úspěchy · ${newAchievements.length}`}</div>`+newAchievements.map(a=>`<div class="unlock-row achievement-unlock" data-achievement-detail="${a.id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="${esc(a.name)} – zobrazit detail"><span class="emoji">${a.icon}</span><div><strong>${a.name}</strong><small>${a.desc}</small></div></div>`).join(''))}renderWinBadges(celebrations.join(''));
+ const celebrations=[];if(!g.postStarterWarmup&&newBadge)celebrations.push(`<div class="unlock-row" data-streak-detail="${esc(newBadge.name)}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="${esc(newBadge.name)} – zobrazit detail odznaku"><span class="emoji">${newBadge.icon}</span><div><strong>Nový odznak · ${newBadge.name}</strong><small>${countCz(newBadge.days,'den','dny','dní')} v řadě</small></div></div>`);if(!g.postStarterWarmup&&newAchievements.length){celebrations.push(`<div class="unlock-title">🏆 ${newAchievements.length===1?'Nový úspěch!':`Nové úspěchy · ${newAchievements.length}`}</div>`+newAchievements.map(a=>`<div class="unlock-row achievement-unlock" data-achievement-detail="${a.id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="${esc(a.name)} – zobrazit detail"><span class="emoji">${a.icon}</span><div><strong>${a.name}</strong><small>${a.desc}</small></div></div>`).join(''))}renderWinBadges(celebrations.join(''));
  const celebratedMk=newAchievements.filter(a=>a.group==='mozkokalypsa').map(a=>a.id);
- const badgeBox=$('#newBadgeBox'),badgeAnchor=celebratedMk.length?$('#winPrimaryBtn'):$('#starterHardActions');if(badgeBox&&badgeAnchor)badgeAnchor.before(badgeBox);
+ positionWinBadges();
  if(celebratedMk.length&&!g.postStarterWarmup){const latest=getState();latest.mozkokalypsaCelebrated=[...new Set([...(Array.isArray(latest.mozkokalypsaCelebrated)?latest.mozkokalypsaCelebrated:[]),...celebratedMk])];saveState(latest)}
  configureWinReplay(g.mode,g.dailyDate,rec);$('#winShareBtn').classList.toggle('hidden',!!g.postStarterWarmup);$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.postStarterWarmup?'Zůstat ve Volné hře':(g.mode==='daily'||g.mode==='daily_special')?'← Dnes':'← Menu';$('#winPrimaryBtn').textContent=g.postStarterWarmup?'☀️ Jdu na dnešní výzvu':g.mode==='daily_special'?'Zpět na Dnes':g.mode==='daily'?'Vybrat další hru':g.mode==='free'&&g.contentBatchId?(latestContentUnplayed().length?'Hrát další nový':'Zpět k Volné hře'):'Hraj další úroveň';$('#winModal').classList.remove('hidden');updateWinAccountCta();renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
  if(g.puzzle?.meta?.archiveExperience){

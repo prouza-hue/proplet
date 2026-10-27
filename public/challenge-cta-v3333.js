@@ -154,7 +154,9 @@
     if(win.parentElement!==secondary)secondary.prepend(win);
     syncResultAction(primary,extra,secondary,actions,modal);
     if(actions.nextElementSibling!==secondary)actions.after(secondary);
-    const ranking=$('#levelLeaderboardBox');if(ranking&&secondary.nextElementSibling!==ranking)secondary.after(ranking);
+    if(typeof positionWinBadges==='function')positionWinBadges();
+    const awards=$('#newBadgeBox'),ranking=$('#levelLeaderboardBox'),rankingAnchor=awards&&!awards.classList.contains('hidden')&&awards.parentElement===card?awards:secondary;
+    if(ranking&&rankingAnchor.nextElementSibling!==ranking)rankingAnchor.after(ranking);
     modal.querySelector('.win-main-actions')?.remove();
     syncRewardPresentation();
   }

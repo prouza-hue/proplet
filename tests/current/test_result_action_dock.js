@@ -23,13 +23,14 @@ const extra=make('button','winExtraBtn','hidden','Hraj Extra'),primary=make('but
 card.append(title,summary,extra,primary,ranking,secondary,badge,details);secondary.append(share,menu);
 const calls=[];const nativeContinue=()=>calls.push('canonical continue'),nativeShare=()=>calls.push('canonical share');primary.onclick=nativeContinue;share.onclick=nativeShare;extra.onclick=()=>calls.push('canonical Extra');
 const source=fs.readFileSync('public/challenge-cta-v3333.js','utf8');
-const ctx={$:s=>s==='#winModal'?modal:modal.querySelector(s),document:{createElement:tag=>new Node(tag)},currentGame:{mode:'free',finished:true,puzzle:{meta:{}}},tajenkaRecapOpen:false,closeWinToMenu:()=>calls.push('canonical menu')};
-vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('  const primaryHandlers='),source.indexOf('  function boot(){')),ctx);
+const ctx={$:s=>s==='#winModal'?modal:s==='#winModal .win-card'?card:modal.querySelector(s),document:{createElement:tag=>new Node(tag)},currentGame:{mode:'free',finished:true,puzzle:{meta:{}}},tajenkaRecapOpen:false,closeWinToMenu:()=>calls.push('canonical menu')};
+const appSource=fs.readFileSync('public/app.js','utf8');
+vm.createContext(ctx);vm.runInContext(appSource.slice(appSource.indexOf('function positionWinBadges(){'),appSource.indexOf('const $$=')),ctx);vm.runInContext(source.slice(source.indexOf('  const primaryHandlers='),source.indexOf('  function boot(){')),ctx);
 function setXp(value,detail){if(detail){const strong=make('strong',null,'',value),small=make('small',null,'',detail);xp.replaceChildren(strong,small)}else xp.textContent=value}
 function checkLayout(){
  const header=modal.querySelector('.win-result-heading'),actions=modal.querySelector('#winResultActions');assert(header&&actions);
  assert.equal(header.nextElementSibling,summary,'own performance precedes all optional rankings');
- assert.equal(actions.nextElementSibling,secondary);assert.equal(secondary.nextElementSibling,ranking,'main/utility actions never wait below ranking');
+ assert.equal(actions.nextElementSibling,secondary);assert.equal(secondary.nextElementSibling,badge,'continuation and utility actions precede every award');assert.equal(badge.nextElementSibling,ranking,'earned rewards stay before optional ranking');
  assert.equal(share.parentElement,secondary);assert.equal(xp.parentElement,chips,'canonical economic output stays in its native summary');assert.equal(badge.parentElement,card,'earned awards are retained');
  assert.equal(performance.textContent,'2:34 · 7 tahů · Střední');assert.equal(clean.textContent,'2 nápovědy');
  assert.equal(ranking.textContent,'Pořadí se nepodařilo načíst','presentation does not invent or replace ranking data');

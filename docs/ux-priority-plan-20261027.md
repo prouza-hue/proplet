@@ -23,3 +23,13 @@ Každý bod nejprve dostane reprezentativní funkční stav v izolovaném previe
 ## Již dokončené P2
 
 Hlášení chyby a slova, přímé stavové texty pořadí, funkční prázdný přehled úrovní, katalog trofejí a vysvětlení archivních odměn jsou hotové. Není důvod je znovu otevírat bez konkrétního nálezu.
+
+## P2 — dokončeno v ui-refinement4
+
+- **Více současných úspěchů:** jedna hlavní získaná odměna, ostatní původní položky v rozbalovacím přehledu s počtem. Zachovány skutečné ilustrace, detaily, klávesnicové ovládání a vzácná oslava Mozkokalypsy. Hlavní pokračování zůstává nad odměnami. Ověřeny stavy 0, 1, 3 a 10; pouze modelové vykreslení v izolovaném preview, bez přidělení XP či změny hráčského postupu.
+- **Důsledek nápovědy:** krátká věta pro běžnou hru, Denní a Extra. Trénink a Tajenka ji nezobrazují. Nezměněny volby, cílení, čítače, nárok na odměny ani herní deska.
+- **Konkrétní vizuální detail:** přepínače Výzva / XP / Týdenní soutěž mají zřetelný tvar tlačítek, vybraný stav, hover a fokus. Pořadí používá stejnou šířku jako soutěž, takže přepínač při změně pohledu neposkakuje do stran.
+
+Plný gate 191 testů, 172 kontrol assetů a 522 kontrol syntaxe prošel. Poslední kosmetická úprava mezery u textu nápovědy ověřena v prohlížeči, následně release kontrakt a assety znovu cíleně. Produkce v této iteraci beze změny; výchozí ověřený produkční SHA je nyní `aabf24c76a37b6b89f4d2a050267dd0339f372cc` z nezávislé práce mimo tuto preview větev.
+
+Měsíční soutěž jednotlivců byla dohledána jako rozpracovaný vizuální prototyp; její přesné zdroje, pravidla a zbývající produkční kroky jsou v [předání měsíční soutěže](monthly-competition-ui-handoff-20261027.md). Časování pobídek zůstává samostatným prověřením, nikoli automatickou úpravou tohoto UI vydání.
