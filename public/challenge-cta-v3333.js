@@ -42,13 +42,22 @@
 
   function ownRowRepresentsResult(box,game){
     const context=box?.resultContext,record=context?.record;
-    const savedRecap=game?.isReplay&&!game.attemptId&&!!record&&game.resultRecord===record;
-    if(!game?.finished||(game.isReplay&&!savedRecap)||!['daily','daily_special','free'].includes(game.mode)
-      ||context?.game!==game||!record||record.puzzleId!==game.puzzle?.id||record.mode!==game.mode)return false;
+    if(context?.kind==='tajenka'){
+      // A saved Tajenka recap does not replace currentGame. Bind to the explicit
+      // presentation identity instead of accidentally reading a previous Daily.
+      if(context!==box.tajenkaResultView||context!==box.postWinRequest||!record||record.mode!=='tajenka'
+        ||context.puzzleId!==record.puzzleId||!$('#winModal')?.classList.contains('tajenka-daily-result'))return false;
+      if(context.recap){if(typeof tajenkaRecapOpen==='undefined'||!tajenkaRecapOpen)return false;}
+      else if(context.game!==game||game?.mode!=='tajenka'||!game.finished||game.isReplay||game.puzzle?.id!==record.puzzleId)return false;
+    }else{
+      const savedRecap=game?.isReplay&&!game.attemptId&&!!record&&game.resultRecord===record;
+      if(!game?.finished||(game.isReplay&&!savedRecap)||!['daily','daily_special','free'].includes(game.mode)
+        ||context?.game!==game||!record||record.puzzleId!==game.puzzle?.id||record.mode!==game.mode)return false;
+    }
     if(typeof navigator!=='undefined'&&navigator.onLine===false)return false;
     const profile=typeof getProfile==='function'?getProfile():null;
     if(!profile?.id||profile.id!==context.profileId)return false;
-    if(record.attemptId&&game.attemptId&&record.attemptId!==game.attemptId)return false;
+    if(context?.kind!=='tajenka'&&record.attemptId&&game.attemptId&&record.attemptId!==game.attemptId)return false;
     if(!Number.isFinite(record.elapsedMs)||record.elapsedMs<0||!Number.isInteger(record.moves)
       ||!Number.isInteger(record.hintsUsed)||typeof record.cleanSolve!=='boolean')return false;
     // Own rows display whole seconds. Server millisecond normalization must not
@@ -65,8 +74,9 @@
   function syncResultMetrics(){
     const modal=$('#winModal');if(!modal)return;
     const game=typeof currentGame==='undefined'?null:currentGame;
-    const protectedFlow=modal.classList.contains('starter-win')||modal.classList.contains('first-steps-win')||game?.postStarterWarmup;
-    setClass(modal,'result-metrics-in-ranking',!protectedFlow&&ownRowRepresentsResult($('#levelLeaderboardBox'),game));
+    const box=$('#levelLeaderboardBox'),tajenkaRecap=box?.resultContext?.kind==='tajenka'&&box.resultContext.recap;
+    const protectedFlow=modal.classList.contains('starter-win')||modal.classList.contains('first-steps-win')||(!tajenkaRecap&&game?.postStarterWarmup);
+    setClass(modal,'result-metrics-in-ranking',!protectedFlow&&ownRowRepresentsResult(box,game));
   }
 
   function referralChoiceAvailable(){

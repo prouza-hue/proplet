@@ -68,7 +68,7 @@
         try {
           if (!document.querySelector('link[href^="/profile-statistics.css"]')) {
             const style = document.createElement('link');
-            style.rel = 'stylesheet'; style.href = '/profile-statistics.css?v=ui-refinement1';
+            style.rel = 'stylesheet'; style.href = '/profile-statistics.css?v=ui-refinement5';
             document.head.appendChild(style);
           }
           document.head.appendChild(script);

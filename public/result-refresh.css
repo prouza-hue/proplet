@@ -108,6 +108,8 @@ html.tiskarna-ui body #winModal.result-compact #winClean:not(.hidden){display:bl
 /* Deduplicate only confirmed, currently visible own rows. Reward and timing
    notices remain independent even when these two performance lines are hidden. */
 html.tiskarna-ui body #winModal.result-compact.result-metrics-in-ranking :is(#winText,#winClean,.win-summary-chips){display:none!important}
+html.tiskarna-ui body #winModal.result-compact.tajenka-daily-result .tajenka-result-source{justify-content:flex-start;text-align:left;margin:0 0 4px;font-size:13px;line-height:1.4}
+html.tiskarna-ui body #winModal.result-compact.tajenka-daily-result.result-metrics-in-ranking .win-result-heading{margin-bottom:8px}
 html.tiskarna-ui body #winModal.result-compact :is(#winTimingNotice,#winRewardStatus):not([hidden]){display:block!important;margin:8px 0 0!important;font:400 15px/1.45 Outfit,sans-serif!important;color:var(--muted)!important;overflow-wrap:anywhere;text-align:left!important}
 html.tiskarna-ui body #winModal.result-compact .win-praise:empty{display:none!important}
 html.tiskarna-ui body #winModal.result-compact #winResultActions{display:flex!important;flex-direction:column!important;gap:10px;width:100%!important;max-width:none!important;margin:18px 0 0!important}

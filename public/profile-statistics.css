@@ -65,10 +65,13 @@ html.tiskarna-ui body #screen-profile #profileCard .profile-next-goal{margin:9px
 #profileCard .profile-guest-save>div:first-child{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 #profileCard .profile-guest-save .xp-sticker{font-size:12px!important;padding:4px 6px!important}
 html.tiskarna-ui body #screen-profile .profile-collection-detail{margin-top:14px;padding:0 16px!important}
+/* The compact rank disclosure replaces the old separated roadmap section. */
+html.tiskarna-ui body #screen-profile>.level-roadmap-card.profile-collection-detail{border-top:0!important}
 #screen-profile .profile-collection-detail>summary{min-height:54px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font:650 18px/1.3 Outfit,sans-serif;list-style:none;color:var(--td-ink)}
 #screen-profile .profile-collection-detail>summary::after{content:'⌄';font-size:18px;color:var(--td-muted)}
 #screen-profile .profile-collection-detail[open]>summary::after{content:'⌃'}
-#screen-profile .profile-collection-detail[open]{padding-bottom:14px!important}
+/* Match the base selector so its padding shorthand cannot erase this inset. */
+html.tiskarna-ui body #screen-profile .profile-collection-detail[open]{padding-bottom:16px!important}
 html.tiskarna-ui body #screen-profile.settings-open.settings-guest #profileCard>:is(.profile-summary,.profile-grid){display:none!important}
 html.tiskarna-ui body #screen-profile.settings-open.settings-guest .profile-guest-save{display:block!important;border:0;margin:0;padding:0}
 @media(max-width:359px){html.tiskarna-ui body #screen-profile:not(.settings-open) #profileCard .profile-progress-card{padding:14px!important}html.tiskarna-ui body #screen-profile:not(.settings-open) #profileCard .profile-rank-value>strong{font-size:20px!important}#profileCard .profile-stat-summary strong{font-size:22px}#profileCard .profile-stat-summary span{font-size:12px}}
