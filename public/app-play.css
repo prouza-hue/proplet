@@ -103,3 +103,7 @@ html[data-theme="dark"] .home-competition-card{background:linear-gradient(145deg
 /* Four-column Fold/tablet layout: give the difficulty name the whole title row and move XP below it. */
 @media(min-width:760px){.home-diff-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.home-diff-top{grid-template-columns:36px minmax(0,1fr)}.home-diff-top strong{overflow:visible;text-overflow:clip}.home-diff-xp{grid-column:1/-1;justify-self:start;margin-top:2px}}
 @media(min-width:560px) and (max-width:759px){.home-diff-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* An empty history still leads back to its native difficulty/resume flow. */
+#playedLevelsModal .empty-history{display:grid;gap:12px;padding:16px;text-align:left}
+#playedLevelsModal .empty-history p{margin:0;font-size:15px;line-height:1.4}
+#playedLevelsModal .empty-history .primary-btn{min-height:44px;width:100%;font-size:16px}

@@ -144,14 +144,15 @@ async function shot(page,selector,name){
   }
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Daily and rebuilt Tajenka directly preserve canonical board share despite referral availability and stale result');
-  s=await boot(browser);
+  s=await boot(browser,{guest:false,paid:false,announcement:false});
+  await s.page.waitForFunction(()=>!!getProfile()?.id&&PropletReferrals.model.ready&&!PropletReferrals.model.incoming);
   await s.page.evaluate(()=>startFree('easy'));
   await s.page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.answers?.length);
   await s.page.locator('#screen-game .cell').first().waitFor();
   const paths=await s.page.evaluate(()=>currentGame.puzzle.answers.map(a=>a.path));
   for(let i=0;i<paths.length;i++){await draw(s.page,paths[i]);await s.page.waitForFunction(n=>currentGame.found.length===n,i+1)}
   await s.page.locator('#winModal').waitFor({state:'visible'});
-  await s.page.waitForFunction(()=>document.querySelector('.win-secondary-actions #winShareBtn')?.textContent==='Sdílet výsledek');
+  await s.page.waitForFunction(()=>document.querySelector('.win-secondary-actions #winShareBtn')?.textContent==='Pozvat kamaráda');
   assert.equal(await s.page.locator('#winPrimaryBtn').innerText(),'Hraj další úroveň');
   assert.equal(await s.page.locator('#winClean').isVisible(),true);
   assert.equal(await s.page.locator('#winText').isVisible(),true,'own performance does not depend on ranking');
@@ -168,14 +169,25 @@ async function shot(page,selector,name){
    assert(layout.title.x>=layout.heading.x-1&&layout.title.right<=layout.heading.right+1,'result title fits its header');
   }
   await shot(s.page,'#winModal .win-card','native-result');
-  await s.page.evaluate(()=>{window.__nativeShare=null;Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.__nativeShare=data}})});
+  await s.page.evaluate(()=>{window.__nativeShare=null;window.__nativeShareCount=0;Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.__nativeShare=data;window.__nativeShareCount++}})});
+  const inviteRequestsBefore=s.apiCalls.filter(c=>c.path==='/api/referrals/invite'&&c.method==='POST').length;
   await s.page.locator('#winShareBtn').click();
-  await s.page.waitForFunction(()=>window.__nativeShare);
+  await s.page.locator('#referralDialog:not(.hidden) #refShareBoard').waitFor({state:'visible'});
+  assert.equal(await s.page.evaluate(()=>window.__nativeShareCount),0,'opening choices must not share automatically');
+  assert.equal(await s.page.locator('#refShareBoard').innerText(),'Poslat tuhle desku');
+  assert.equal(await s.page.locator('#referralDialog .ref-choice [data-ref-open]').innerText(),'Pozvat nového hráče');
+  await avatars(s.page,'#referralDialog');
+  assert.match(await s.page.locator('#referralDialog .ref-choice-bonus').innerText(),/1 000 XP[\s\S]*pro každého/);
+  await s.page.locator('#refShareBoard').click();
+  await s.page.waitForFunction(()=>window.__nativeShare&&window.__nativeShareCount===1);
+  assert.equal(await s.page.locator('#referralDialog:not(.hidden)').count(),0,'forwarded board share must not reopen choices');
   assert(!new URL(await s.page.evaluate(()=>window.__nativeShare.url)).searchParams.has('invite'));
+  assert.equal(s.apiCalls.filter(c=>c.path==='/api/referrals/invite'&&c.method==='POST').length,inviteRequestsBefore,'board choice does not create a new-player invitation');
+  assert.equal(await s.page.evaluate(()=>window.__nativeShareCount),1,'canonical sharing is delegated exactly once');
   await s.page.locator('#winPrimaryBtn').click();
   await s.page.waitForFunction(()=>currentGame&&!currentGame.finished&&document.querySelector('#winModal').classList.contains('hidden'));
   assert.deepEqual(s.errors,[]);await s.ctx.close();
-  pass('Actual board drawing preserves native result layout, earned XP, board sharing and next level');
+  pass('Actual board drawing preserves result layout and XP; eligible chooser forwards board sharing exactly once and retains next level');
   s=await boot(browser,{paid:true});
   assert.equal(await s.page.locator('#referralHome h2').innerText(),'Bonus máš ty i Katka.');
   assert.equal(await s.page.locator('#referralHome .ref-reward small').count(),0);

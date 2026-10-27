@@ -60,5 +60,7 @@ assert.equal(primary.onclick,training);assert(primary.classList.contains('hidden
 modal.classes.delete('first-steps-win');modal.classes.add('starter-win');ctx.currentGame={mode:'starter'};ctx.syncShareCtas();assert.equal(primary.onclick,training);assert.equal(share.parentElement,secondary);
 modal.classes.delete('starter-win');primary.classes.delete('hidden');primary.onclick=nativeContinue;ctx.currentGame={mode:'free',postStarterWarmup:true};ctx.syncShareCtas();assert.equal(primary.onclick,nativeContinue,'post-training choice keeps its canonical handler');
 
-const referral=fs.readFileSync('public/referrals.js','utf8');assert(!referral.includes("open('choice'"),'result sharing must not be intercepted by referral acquisition');assert(referral.includes("data-ref-open")&&referral.includes("function renderProfile()"),'explicit Profile invitations remain');
-console.log('PASS result hierarchy: independent own metrics, true reward source/pending/replay bonus, one primary by mode, direct canonical sharing, native awards and protected first steps');
+ctx.window={PropletReferrals:{model:{ready:true,incoming:false,paid:false},profile:()=>({id:'member'})}};ctx.currentGame={mode:'free',finished:true};ctx.syncShareCtas();
+assert.equal(share.textContent,'Pozvat kamaráda');assert(share.classList.contains('challenge-share-cta'));assert.equal(share.onclick,nativeShare,'eligible chooser must not replace canonical sharing callback');
+ctx.window.PropletReferrals.profile=()=>null;ctx.syncShareCtas();assert.equal(share.textContent,'Sdílet výsledek');assert(!share.classList.contains('challenge-share-cta'));
+console.log('PASS result hierarchy: fallback metrics, true rewards, primary placement, eligible invitation entry, guest sharing and protected first steps');

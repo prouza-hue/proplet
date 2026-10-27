@@ -234,9 +234,13 @@ function freeOrderReview(method,body){
 
 function boardRanking(url){
  const mine=profile()?.id||profileId;
- const rows=[{id:'review-klara',name:'Klára',avatar:'🌺',rank:1,elapsedMs:42000,moves:8,hintsUsed:0,cleanSolve:true},
-  {id:mine,name:profile()?.name||'Alex',avatar:profile()?.avatar||'🦊',rank:2,elapsedMs:65000,moves:9,hintsUsed:0,cleanSolve:true},
-  {id:'review-matej',name:'Matěj',avatar:'🐉',rank:3,elapsedMs:72000,moves:10,hintsUsed:0,cleanSolve:true}];
+ const key=url.searchParams.get('challenge_key')||(url.searchParams.get('puzzle_id')?'free:'+url.searchParams.get('puzzle_id'):'daily:'+(url.searchParams.get('daily_date')||today()));
+ const record=state().completed[key],elapsed=Number(record?.elapsedMs)||65000;
+ // Reflect the same synthetic first result shown by the native recap; never
+ // use an unrelated hard-coded own time to exercise duplicate presentation.
+ const rows=[{id:'review-klara',name:'Klára',avatar:'🌺',rank:1,elapsedMs:Math.max(1000,elapsed-20000),moves:8,hintsUsed:0,cleanSolve:true},
+  {id:mine,isMine:!!profile()?.id,name:profile()?.name||'Alex',avatar:profile()?.avatar||'🦊',rank:2,elapsedMs:elapsed,moves:record?.moves??9,hintsUsed:record?.hintsUsed??0,cleanSolve:record?.cleanSolve??true,attemptId:record?.attemptId},
+  {id:'review-matej',name:'Matěj',avatar:'🐉',rank:3,elapsedMs:elapsed+30000,moves:10,hintsUsed:0,cleanSolve:true}];
  return {rows,total:3,myRank:2,position:2,players:rows,nextOffset:null,reviewOnly:true,
   puzzleId:url.searchParams.get('puzzle_id'),date:url.searchParams.get('daily_date')||today(),
   challengeKey:url.searchParams.get('challenge_key'),challengeKind:url.pathname.includes('daily-special')?'special':undefined};

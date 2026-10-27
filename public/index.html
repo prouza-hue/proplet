@@ -10,7 +10,7 @@
 <script src="/runtime-meta.js?v=40913" data-proplet-runtime-meta="1" data-loaded="1"></script>
   <script src="/app/client-diagnostics.js?v=legacy-body1" id="propletClientDiagnostics"></script>
   <script src="/analytics-init.js?v=telemetry1"></script>
-  <script src="/theme-init.js?v=40913uirefinement1"></script>
+  <script src="/theme-init.js?v=40913uirefinement2"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
@@ -59,7 +59,7 @@
   <link rel="stylesheet" href="/profile-statistics.css?v=ui-refinement1" />
   <link rel="stylesheet" href="/daily-specials.css?v=2" />
 <link rel="stylesheet" href="/referrals.css?v=profile-entry1">
-<link rel="stylesheet" href="/result-refresh.css?v=ui-refinement1">
+<link rel="stylesheet" href="/result-refresh.css?v=ui-refinement2">
   <link rel="stylesheet" href="/continuation.css?v=1">
   <script defer src="/app/account/continuation.js?v=1"></script>
   <link rel="stylesheet" href="/app/archive/experience.css?v=home-stable1">
@@ -612,16 +612,15 @@
     </div>
   </div>
 
-  <div id="wordReportModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div id="wordReportModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="wordReportTitle" aria-describedby="wordReportDescription">
     <div class="modal-card left">
       <button id="closeWordReportModal" class="modal-close" aria-label="Zavřít">×</button>
-      <span class="eyebrow">KVALITA SLOVNÍKU</span>
-      <h2>Divné slovo?</h2>
-      <p class="muted">Nahlášení nám pomůže vyčistit slovník. Neovlivní tvoje XP ani výsledek.</p>
+      <h2 id="wordReportTitle">Nahlásit slovo</h2>
+      <p id="wordReportDescription" class="muted">Hlášení neovlivní výsledek ani XP.</p>
       <label>Slovo<select id="reportWordSelect"></select></label>
       <label>Poznámka (volitelné)<textarea id="reportWordNote" maxlength="300" rows="3" placeholder="Co je na něm divné?"></textarea></label>
       <div id="wordReportError" class="form-error"></div>
-      <button id="saveWordReportBtn" class="primary-btn big">Odeslat</button>
+      <button id="saveWordReportBtn" class="primary-btn big">Odeslat hlášení</button>
     </div>
   </div>
 
@@ -684,14 +683,13 @@
     </div>
   </div>
 
-  <div id="supportReportModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="supportReportTitle">
+  <div id="supportReportModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="supportReportTitle" aria-describedby="supportReportDescription">
     <div class="modal-card left">
       <button id="closeSupportReportModal" class="modal-close" aria-label="Zavřít">×</button>
-      <span class="eyebrow">POMOC A ZPĚTNÁ VAZBA</span>
-      <h2 id="supportReportTitle">Nahlásit problém</h2>
-      <p class="muted">Napiš, co se stalo. Technické údaje jako heslo nebo PIN sem neposílej.</p>
+      <h2 id="supportReportTitle">Nahlásit chybu</h2>
+      <p id="supportReportDescription" class="muted">Popiš problém a co mu předcházelo. Heslo ani PIN neposílej.</p>
       <label>Typ<select id="supportReportCategory"><option value="bug">Technická chyba</option><option value="account">Účet nebo tým</option><option value="privacy">Soukromí / data</option><option value="idea">Nápad</option><option value="other">Něco jiného</option></select></label>
-      <label>Popis<textarea id="supportReportMessage" maxlength="1200" rows="5" placeholder="Co přesně nefungovalo nebo co potřebuješ?"></textarea></label>
+      <label>Co se stalo?<textarea id="supportReportMessage" maxlength="1200" rows="5" placeholder="Co nefungovalo a co jsi očekával?"></textarea></label>
       <label>Kontakt pro odpověď <span class="optional">(volitelné)</span><input id="supportReportReply" maxlength="160" placeholder="e-mail nebo jiný kontakt" /></label>
       <div id="supportReportError" class="form-error"></div>
       <button id="saveSupportReportBtn" class="primary-btn big">Odeslat hlášení</button>
@@ -783,9 +781,9 @@
   <script src="/app/content/refresh-ui.js?v=archive-release1"></script>
   <script src="/app/content/refresh-release.js?v=archive-release1"></script>
   <script src="/app/archive/solution-contract.js"></script>
-  <script src="/app/archive/experience.js?v=ui-refinement1"></script>
-  <script src="/app.js?v=40913uirefinement1"></script>
-  <script src="/app/weekly/competition.js?v=ui-refinement1"></script>
+  <script src="/app/archive/experience.js?v=ui-refinement2"></script>
+  <script src="/app.js?v=40913uirefinement2"></script>
+  <script src="/app/weekly/competition.js?v=ui-refinement2"></script>
   <link rel="stylesheet" href="/mozkokalypsa.css?v=mk3release1">
   <script src="/app/mozkokalypsa.js?v=mk3release1"></script>
   <script src="/app/marketing.js?v=5"></script>
@@ -794,7 +792,7 @@
   <script src="/achievement-details.js?v=rank-details1"></script>
   <script src="/organic-ui-v4023.js?v=artcutout3"></script>
   <script src="/app/mozkokalypsa-launch.js?v=archive-release1"></script>
-<script src="/referrals.js?v=ui-refinement1"></script>
+<script src="/referrals.js?v=ui-refinement2"></script>
   <script src="/studio-shell.js?v=1"></script>
   <link rel="stylesheet" href="/studio-edition.css?v=refinement5">
   <link rel="stylesheet" href="/today-one-screen.css?v=2">

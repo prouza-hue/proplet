@@ -32,6 +32,9 @@ html body :is(#referralHome,#referralInviteHome) .ref-visual .ref-art{width:120p
 html body :is(#referralHome,#referralInviteHome):not(.ref-incoming) h2{font-size:24px!important}
 html body :is(#referralHome,#referralInviteHome) .ref-visual .xp-sticker{font-size:14px!important;padding:7px 8px!important}
 }
+@media(max-width:359px){
+ html body #referralDialog .ref-sheet>h2{padding-right:32px;font-size:26px!important;line-height:1.15!important}
+}
 
 /* Review 12 October: one invitation treatment, compact reward, centered praise. */
 :root{--invite-fill:linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%);--invite-hover:linear-gradient(135deg,#9e2c59 0%,#bd395f 58%,#d55069 100%)}
@@ -101,6 +104,9 @@ html.tiskarna-ui body #winModal.result-compact #winText{display:block!important;
 html.tiskarna-ui body #winModal.result-compact #winText:empty{display:none!important}
 html.tiskarna-ui body #winModal.result-compact .win-summary-chips{display:block!important;margin:6px 0 0!important}
 html.tiskarna-ui body #winModal.result-compact #winClean:not(.hidden){display:block!important;width:auto!important;margin:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;font:400 15px/1.4 Outfit,sans-serif!important;color:var(--muted)!important;text-align:left!important}
+/* Deduplicate only confirmed, currently visible own rows. Reward and timing
+   notices remain independent even when these two performance lines are hidden. */
+html.tiskarna-ui body #winModal.result-compact.result-metrics-in-ranking :is(#winText,#winClean,.win-summary-chips){display:none!important}
 html.tiskarna-ui body #winModal.result-compact :is(#winTimingNotice,#winRewardStatus):not([hidden]){display:block!important;margin:8px 0 0!important;font:400 15px/1.45 Outfit,sans-serif!important;color:var(--muted)!important;overflow-wrap:anywhere;text-align:left!important}
 html.tiskarna-ui body #winModal.result-compact .win-praise:empty{display:none!important}
 html.tiskarna-ui body #winModal.result-compact #winResultActions{display:flex!important;flex-direction:column!important;gap:10px;width:100%!important;max-width:none!important;margin:18px 0 0!important}
@@ -108,6 +114,9 @@ html.tiskarna-ui body #winModal.result-compact #winResultActions>:is(#winExtraBt
 html:root.tiskarna-ui body #winModal.result-compact .win-secondary-actions{display:grid!important;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);grid-template-columns:none;align-items:stretch;gap:8px;margin:8px 0 0!important;width:100%}
 html:root.tiskarna-ui body #winModal.result-compact .win-secondary-actions>:is(#winPrimaryBtn,#winShareBtn,#winReplayBtn,#winMenuBtn){width:100%!important;min-width:0!important;max-width:none!important;min-height:44px!important;grid-column:auto!important;grid-row:auto!important;margin:0!important;padding:8px 3px!important;background:transparent!important;border:0!important;box-shadow:none!important;color:var(--blue,var(--ink))!important;font:550 15px/1.4 Outfit,sans-serif!important;text-align:center!important;justify-content:center;align-items:center;white-space:normal;overflow-wrap:anywhere}
 html:root.tiskarna-ui body #winModal.result-compact .win-secondary-actions>#winPrimaryBtn.result-secondary-action::after{content:none!important;display:none!important}
+html:root.tiskarna-ui body #winModal.result-compact .win-secondary-actions>#winShareBtn.challenge-share-cta{color:#9b365e!important}
+html:root.tiskarna-ui body #winModal.result-compact .win-secondary-actions>#winShareBtn .painted-action-icon{display:none!important}
+html:root.tiskarna-ui[data-theme=dark] body #winModal.result-compact .win-secondary-actions>#winShareBtn.challenge-share-cta{color:#f0a9c3!important}
 html.tiskarna-ui body #winModal.result-compact :is(#winResultActions,.win-secondary-actions) .hidden{display:none!important}
 html.tiskarna-ui body #winModal.result-compact :is(#winResultActions,.win-secondary-actions) button:focus-visible{outline:3px solid var(--blue,var(--ink))!important;outline-offset:3px}
 html.tiskarna-ui body #winModal.result-compact .level-leaderboard-box{width:100%!important;margin:16px 0 0!important;padding:16px 0 0!important;border:0!important;border-top:1px solid var(--line)!important;background:transparent!important;box-shadow:none!important}

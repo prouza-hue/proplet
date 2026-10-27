@@ -6,6 +6,18 @@
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
       {
+        "path": "tests/current/test_result_referral_choice.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_result_summary_visibility.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_weekly_catalogue.cjs",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_settings_return.cjs",
         "runner": "node"
       },

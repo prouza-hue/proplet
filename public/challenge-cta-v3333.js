@@ -40,6 +40,40 @@
     value.hidden=!presentation.value;status.hidden=!presentation.status;
   }
 
+  function ownRowRepresentsResult(box,game){
+    const context=box?.resultContext,record=context?.record;
+    const savedRecap=game?.isReplay&&!game.attemptId&&!!record&&game.resultRecord===record;
+    if(!game?.finished||(game.isReplay&&!savedRecap)||!['daily','daily_special','free'].includes(game.mode)
+      ||context?.game!==game||!record||record.puzzleId!==game.puzzle?.id||record.mode!==game.mode)return false;
+    if(typeof navigator!=='undefined'&&navigator.onLine===false)return false;
+    const profile=typeof getProfile==='function'?getProfile():null;
+    if(!profile?.id||profile.id!==context.profileId)return false;
+    if(record.attemptId&&game.attemptId&&record.attemptId!==game.attemptId)return false;
+    if(!Number.isFinite(record.elapsedMs)||record.elapsedMs<0||!Number.isInteger(record.moves)
+      ||!Number.isInteger(record.hintsUsed)||typeof record.cleanSolve!=='boolean')return false;
+    // Own rows display whole seconds. Server millisecond normalization must not
+    // leave two visually identical result summaries; replays stay conservative.
+    return [...box.querySelectorAll('.result-player-row.me')].some(row=>{
+      if(!row.getClientRects().length||row.closest('.hidden,[hidden],[aria-busy="true"]'))return false;
+      const {resultElapsed:elapsed,resultMoves:moves,resultHints:hints,resultClean:clean}=row.dataset;
+      return elapsed!==undefined&&elapsed!==''&&moves!==undefined&&moves!==''&&hints!==undefined&&hints!==''
+        &&Number.isFinite(Number(elapsed))&&Math.floor(Number(elapsed)/1000)===Math.floor(record.elapsedMs/1000)
+        &&Number(moves)===record.moves&&Number(hints)===record.hintsUsed&&clean===String(record.cleanSolve);
+    });
+  }
+
+  function syncResultMetrics(){
+    const modal=$('#winModal');if(!modal)return;
+    const game=typeof currentGame==='undefined'?null:currentGame;
+    const protectedFlow=modal.classList.contains('starter-win')||modal.classList.contains('first-steps-win')||game?.postStarterWarmup;
+    setClass(modal,'result-metrics-in-ranking',!protectedFlow&&ownRowRepresentsResult($('#levelLeaderboardBox'),game));
+  }
+
+  function referralChoiceAvailable(){
+    const referral=typeof window==='undefined'?null:window.PropletReferrals,model=referral?.model;
+    return !!model?.ready&&!!referral.profile?.()?.id&&(!model.incoming||model.paid);
+  }
+
   function restorePrimaryHandler(primary){
     const previous=primaryHandlers.get(primary);if(!previous)return;
     if(primary.onclick===previous.assigned)primary.onclick=previous.original;
@@ -166,16 +200,18 @@
 
     if(win){
       if(challengeMode){
-        setText(win,'Sdílet výsledek');
-        setClass(win,'challenge-share-cta',false);
+        const invite=referralChoiceAvailable();
+        setText(win,invite?'Pozvat kamaráda':'Sdílet výsledek');
+        setClass(win,'challenge-share-cta',invite);
         delete win.dataset.plainInvite;
-        setAriaLabel(win,$('#winModal')?.classList.contains('tajenka-daily-result')||mode==='tajenka'?'Sdílet výsledek Tajenky':extraGame?'Sdílet výsledek Extra výzvy':dailyGame?'Sdílet výsledek Denní výzvy':'Sdílet výsledek této desky');
+        setAriaLabel(win,invite?'Pozvat kamaráda':$('#winModal')?.classList.contains('tajenka-daily-result')||mode==='tajenka'?'Sdílet výsledek Tajenky':extraGame?'Sdílet výsledek Extra výzvy':dailyGame?'Sdílet výsledek Denní výzvy':'Sdílet výsledek této desky');
       }else{
         if(win.classList.contains('challenge-share-cta'))setText(win,'↗ Sdílet');
         setClass(win,'challenge-share-cta',false);
         setAriaLabel(win,'');
       }
       syncWinLayout(win);
+      syncResultMetrics();
     }
 
     if(daily){
@@ -204,6 +240,12 @@
     if(rewardSource)observer.observe(rewardSource,{childList:true,subtree:true,characterData:true});
     if(detailModal)observer.observe(detailModal,{attributes:true,attributeFilter:['class']});
     if(daily)observer.observe(daily,{attributes:true,attributeFilter:['class']});
+    let metricsFrame=0;
+    const scheduleMetrics=()=>{if(metricsFrame)return;metricsFrame=requestAnimationFrame(()=>{metricsFrame=0;syncResultMetrics()})};
+    const ranking=$('#levelLeaderboardBox');
+    if(ranking)new MutationObserver(scheduleMetrics).observe(ranking,{subtree:true,childList:true,attributes:true,attributeFilter:['class','hidden','open','aria-busy']});
+    document.addEventListener('proplet:referrals-updated',syncShareCtas);
+    window.addEventListener('online',scheduleMetrics);window.addEventListener('offline',scheduleMetrics);window.addEventListener('resize',scheduleMetrics,{passive:true});
     window.addEventListener('pageshow',syncShareCtas);
     window.matchMedia('(max-width:999px)').addEventListener('change',syncShareCtas);
   }
