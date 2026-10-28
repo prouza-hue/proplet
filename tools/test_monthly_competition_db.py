@@ -1,8 +1,7 @@
 """Real PostgreSQL monthly rules/integrity acceptance in a fresh loopback DB.
 
 No remote DSN accepted. Every player/result is synthetic. Tests submit the real
-atomic command RPC, then inspect the monthly ledger/standings/badges. The pending
-late-sync alternatives are explicitly tested policies, not production approval.
+atomic command RPC, then inspect the monthly ledger/standings/badges. The approved 48-hour review-close policy is exercised with real receipts.
 """
 from __future__ import annotations
 
@@ -68,12 +67,15 @@ def main():
                     report['limitations'].append('Windows PostgreSQL has no pg_cron; existing weekly scheduler migration omitted explicitly. Monthly finalizer itself runs below.')
                     continue
             c.execute(path.read_text(encoding='utf8'))
-        assert c.execute('select enabled,rules_approved,late_sync_policy from monthly_competition_settings').fetchone() == (False, False, None)
+        c.execute('update monthly_competition_settings set isolated=true')
+        c.execute((ROOT/'supabase/tests/monthly_admin_corrections.sql').read_text(encoding='utf8'))
+        report['checks'].append('compact remote rollback acceptance passed on real local PG: shared podium, service ACL, audit, CAS, removal/regrant, unchanged XP')
+        assert c.execute('select enabled,rules_approved,late_sync_policy from monthly_competition_settings').fetchone() == (False, True, 'review-close')
         assert c.execute('select proplet_finalize_monthly_competition_v1()').fetchone()[0]['finalized'] == 0
         assert not c.execute('select proplet_monthly_state_v1(null,null)').fetchone()[0]['enabled']
-        c.execute("update monthly_competition_settings set enabled=true")
+        c.execute("update monthly_competition_settings set enabled=true,rules_approved=false")
         assert c.execute('select proplet_monthly_state_v1(null,null)').fetchone()[0]['reason'] == 'rules-pending'
-        report['checks'].append('migration defaults disabled; unresolved policy fails closed')
+        report['checks'].append('approved review-close default; competition disabled; explicit hold fails closed')
         for role in ('anon', 'authenticated'):
             for table in ('monthly_competition_settings', 'monthly_competition_days', 'monthly_competition_rounds', 'monthly_competition_badges'):
                 assert not c.execute('select has_table_privilege(%s,%s,%s)', (role, table, 'select')).fetchone()[0]
@@ -85,7 +87,7 @@ def main():
         now = c.execute("select now() at time zone 'Europe/Prague'").fetchone()[0]
         month = now.date().replace(day=1)
         end = (month.replace(day=28) + timedelta(days=4)).replace(day=1)
-        c.execute("update monthly_competition_settings set rules_approved=true,late_sync_policy='month-close',launch_month=%s,isolated=true,preview_now=%s", (month, str(end - timedelta(days=1))+' 23:00:00+01'))
+        c.execute("update monthly_competition_settings set rules_approved=true,late_sync_policy='review-close',launch_month=%s,isolated=true,preview_now=%s", (month, str(end - timedelta(days=1))+' 23:00:00+01'))
         players = [str(uuid.uuid4()) for _ in range(5)]
         for i, pid in enumerate(players):
             c.execute('insert into players(id,name,family_code,token_hash) values(%s,%s,%s,%s)', (pid, 'Monthly fixture '+str(i), 'SOLO_MONTHLY', 'fixture-'+pid))
@@ -184,14 +186,14 @@ def main():
         assert c.execute('select points from monthly_competition_days where player_id=%s',(players[4],)).fetchone()[0] == 100
         c.execute("update monthly_competition_settings set preview_now=(%s::date::timestamp at time zone 'Europe/Prague')+interval '24 hours'",(end,))
         c.execute("update result_commands set committed_at=(%s::date::timestamp at time zone 'Europe/Prague') where id=(select command_id from monthly_competition_days where player_id=%s)",(end,players[4]))
-        assert c.execute('select count(*) from monthly_competition_days where player_id=%s',(players[4],)).fetchone()[0] == 0
+        assert c.execute('select points from monthly_competition_days where player_id=%s',(players[4],)).fetchone()[0] == 100
         c.execute("update monthly_competition_settings set late_sync_policy='review-close'")
         c.execute('select proplet_monthly_refresh_day_v1(%s,%s)',(players[4],month))
         assert c.execute('select points from monthly_competition_days where player_id=%s',(players[4],)).fetchone()[0] == 100
         c.execute("update result_commands set committed_at=(%s::date::timestamp at time zone 'Europe/Prague')+interval '48 hours' where id=(select command_id from monthly_competition_days where player_id=%s)",(end,players[4]))
         assert c.execute('select count(*) from monthly_competition_days where player_id=%s',(players[4],)).fetchone()[0] == 0
-        c.execute("update monthly_competition_settings set late_sync_policy='month-close'")
-    report['checks'].append('earlier assisted offline replaces official first without XP; both pending sync-cutoff alternatives tested; exact cutoff excluded')
+        c.execute("update monthly_competition_settings set late_sync_policy='review-close'")
+    report['checks'].append('earlier assisted offline replaces official first without XP; approved review-close sync cutoff tested; exact cutoff excluded')
     with connect() as c:
         c.execute("update monthly_competition_settings set preview_now=(%s::date::timestamp at time zone 'Europe/Prague')+interval '47 hours 59 minutes'",(end,))
         assert c.execute('select proplet_finalize_monthly_competition_v1()').fetchone()[0]['finalized'] == 0
@@ -211,6 +213,7 @@ def main():
         assert c.execute('select array_agg(rank order by rank) from monthly_competition_badges').fetchone()[0] == [1,1,3]
         frozen = c.execute('select standings from monthly_competition_rounds').fetchone()[0]
         snapshot('closed',c,players[0],month)
+        saved_result=c.execute('select to_jsonb(r) from results r where player_id=%s and daily_date=%s',(players[0],month)).fetchone()[0]
         c.execute('delete from results where player_id=%s', (players[0],))
         assert c.execute('select standings from monthly_competition_rounds').fetchone()[0] == frozen
         assert c.execute('select proplet_finalize_monthly_competition_v1()').fetchone()[0]['finalized'] == 0
@@ -218,6 +221,111 @@ def main():
         # DST October is a calendar month, then exactly 48 elapsed hours.
         assert c.execute("select ('2026-11-01'::timestamp at time zone 'Europe/Prague')+interval '48 hours'").fetchone()[0] == datetime(2026,11,2,23,tzinfo=timezone.utc)
     report['checks'].append('48h boundary; 8 concurrent closures; immutable snapshot; 1–1–3 badges once; retry safe; DST close')
+
+    def correct(day,revision,key,pid=players[0],reason='Confirmed administrative result rejection'):
+        with connect() as c:
+            c.execute('set role service_role')
+            return c.execute('select proplet_correct_monthly_competition_v1(%s,%s,%s,%s,%s,%s,%s)',
+                (month,pid,day,revision,key,'test-operator',reason)).fetchone()[0]
+
+    with connect() as c:
+        assert not c.execute("select has_table_privilege('service_role','monthly_competition_rounds','update')").fetchone()[0]
+        assert not c.execute("select has_table_privilege('service_role','monthly_competition_badges','delete')").fetchone()[0]
+        for role in ('anon','authenticated'):
+            c.execute(sql.SQL('set role {}').format(sql.Identifier(role)))
+            try:
+                c.execute('select proplet_correct_monthly_competition_v1(%s,%s,%s,1,%s,%s,%s)',
+                    (month,players[0],month,'unauthorized','test-operator','Unauthorized fixture request'))
+                raise AssertionError('unauthorized monthly correction executed')
+            except psycopg.errors.InsufficientPrivilege:
+                pass
+            c.execute('reset role')
+        assert c.execute('select count(*) from proplet_private.monthly_corrections').fetchone()[0] == 0
+    for rev,reason in ((999,'Confirmed administrative result rejection'),(1,'tiny')):
+        try:
+            correct(month,rev,'invalid-command',reason=reason)
+            raise AssertionError('invalid correction accepted')
+        except (psycopg.errors.SerializationFailure,psycopg.errors.InvalidParameterValue):
+            pass
+    first_correction=correct(month,1,'first-rejection')
+    assert first_correction['revision']==2 and first_correction['dayPoints']==0
+    assert correct(month,1,'first-rejection') == first_correction
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        replays=list(pool.map(lambda _:correct(month,1,'first-rejection'),range(6)))
+    assert all(r==first_correction for r in replays)
+    try:
+        correct(month,1,'first-rejection',reason='Different reason reuses existing key')
+        raise AssertionError('changed command accepted under reused key')
+    except psycopg.errors.InvalidParameterValue:
+        pass
+    with connect() as c:
+        assert c.execute('select rank,shared from monthly_competition_badges where player_id=%s',(players[0],)).fetchone() == (2,True)
+        xp_before=c.execute('select sum(points) from results').fetchone()[0]
+        before_fault=c.execute('select standings from monthly_competition_rounds where month=%s',(month,)).fetchone()[0]
+        c.execute("create function proplet_private.monthly_test_audit_fault() returns trigger language plpgsql as $$ begin raise exception 'INJECTED_AUDIT_FAILURE'; end $$")
+        c.execute('create trigger monthly_test_audit_fault before insert on proplet_private.monthly_corrections for each row execute function proplet_private.monthly_test_audit_fault()')
+    try:
+        correct(month+timedelta(days=6),2,'fault-injection')
+        raise AssertionError('injected audit failure unexpectedly committed')
+    except psycopg.errors.RaiseException as exc:
+        assert 'INJECTED_AUDIT_FAILURE' in str(exc)
+    with connect() as c:
+        assert c.execute('select revision,standings from monthly_competition_rounds where month=%s',(month,)).fetchone() == (2,before_fault)
+        assert c.execute('select count(*) from proplet_private.monthly_corrections').fetchone()[0] == 1
+        assert c.execute('select count(*) from monthly_competition_days where player_id=%s and daily_date=%s',(players[0],month+timedelta(days=6))).fetchone()[0] == 1
+        c.execute('drop trigger monthly_test_audit_fault on proplet_private.monthly_corrections')
+        c.execute('drop function proplet_private.monthly_test_audit_fault()')
+    barrier=threading.Barrier(6)
+    def collision(index):
+        barrier.wait(timeout=20)
+        try:
+            return correct(month+timedelta(days=6),2,'concurrent-'+str(index))
+        except psycopg.errors.SerializationFailure:
+            return None
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        raced=list(pool.map(collision,range(6)))
+    assert sum(r is not None for r in raced)==1
+    revision=3
+    for i in range(25):
+        if i in (0,6): continue
+        receipt=correct(month+timedelta(days=i),revision,'reject-day-'+str(i))
+        revision=receipt['revision']
+    with connect() as c:
+        assert c.execute('select count(*) from monthly_competition_badges where player_id=%s',(players[0],)).fetchone()[0] == 0
+        assert c.execute('select sum(points) from results').fetchone()[0] == xp_before
+        assert c.execute('select count(*) from proplet_private.monthly_corrections').fetchone()[0] == revision-1
+        c.execute('insert into public.results select (json_populate_record(null::public.results,%s::json)).*',(Jsonb(saved_result),))
+        xp_before=c.execute('select sum(points) from results').fetchone()[0]
+    restored=correct(month,revision,'restore-first-day',reason='Confirmed restoration of rejected official result')
+    revision=restored['revision']
+    with connect() as c:
+        assert c.execute('select rank,points from monthly_competition_badges where player_id=%s',(players[0],)).fetchone() == (3,120)
+        assert c.execute('select sum(points) from results').fetchone()[0] == xp_before
+        assert c.execute('select revision from monthly_competition_rounds where month=%s',(month,)).fetchone()[0] == revision
+        assert c.execute('select proplet_monthly_state_v1(%s,%s)',(players[0],month)).fetchone()[0]['revision'] == revision
+    # An earlier offline attempt received after monthly close may replace the
+    # normal gameplay result. Explicit correction must retain the eligible
+    # preclose first run rather than erase it because its source row moved.
+    late_after_close=command(players[2],month,hints=1,unverified=True,
+        completed=month.isoformat()+'T09:00:00+01:00')
+    submit(late_after_close)
+    with connect() as c:
+        c.execute('update result_commands set committed_at=(select closes_at from monthly_competition_rounds where month=%s)+interval \'1 second\' where idempotency_key=%s',
+            (month,late_after_close['idempotencyKey']))
+        xp_before=c.execute('select sum(points) from results').fetchone()[0]
+    retained=correct(month,revision,'late-offline-review',pid=players[2],reason='Review late offline replacement against monthly cutoff')
+    assert retained['dayPoints']==120
+    with connect() as c:
+        assert c.execute('select sum(points) from results').fetchone()[0] == xp_before
+        assert c.execute('select points from monthly_competition_badges where player_id=%s',(players[2],)).fetchone()[0] == 2400
+        c.execute('set role service_role')
+        try:
+            c.execute('delete from proplet_private.monthly_corrections')
+            raise AssertionError('runtime role altered immutable correction audit')
+        except psycopg.errors.InsufficientPrivilege:
+            pass
+    report['checks'].append('explicit closed correction: mandatory reason/operator/CAS; unauthorized denied;6 concurrent same-key replays;6 distinct CAS commands only1 wins; injected audit failure rolls back snapshot/ledger/badges')
+    report['checks'].append('closed correction atomically downgrades/removes/regrants badges and rank ties; immutable audit/revision; XP unchanged; aftercutoff offline retains eligible original')
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report,indent=2),encoding='utf8')
     (ROOT/'data/monthly-preview-scenarios.json').write_text(json.dumps({

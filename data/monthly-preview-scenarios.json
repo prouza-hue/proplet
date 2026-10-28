@@ -2,7 +2,7 @@
   "syntheticOnly": true,
   "source": "real-postgresql-acceptance-snapshot",
   "onlineBackend": false,
-  "generatedAt": "2026-10-28T00:43:03.748396+00:00",
+  "generatedAt": "2026-10-28T01:01:31.337295+00:00",
   "scenarios": {
     "empty": {
       "me": {
@@ -20,6 +20,7 @@
       "endDate": "2026-11-01",
       "closesAt": "2026-11-03T00:00:00+01:00",
       "isolated": true,
+      "revision": null,
       "timezone": "Europe/Prague",
       "standings": [],
       "startDate": "2026-10-01",
@@ -49,6 +50,7 @@
       "endDate": "2026-11-01",
       "closesAt": "2026-11-03T00:00:00+01:00",
       "isolated": true,
+      "revision": null,
       "timezone": "Europe/Prague",
       "standings": [],
       "startDate": "2026-10-01",
@@ -85,6 +87,7 @@
       "endDate": "2026-11-01",
       "closesAt": "2026-11-03T00:00:00+01:00",
       "isolated": true,
+      "revision": null,
       "timezone": "Europe/Prague",
       "standings": [
         {
@@ -277,6 +280,7 @@
       "endDate": "2026-11-01",
       "closesAt": "2026-11-03T00:00:00+01:00",
       "isolated": true,
+      "revision": null,
       "timezone": "Europe/Prague",
       "standings": [
         {
@@ -284,7 +288,7 @@
           "points": 2400,
           "validDays": 20,
           "countedDays": 20,
-          "name": "Zkušební hráč 3",
+          "name": "Zkušební hráč 2",
           "avatar": "🙂",
           "anonymous": false,
           "isMine": false,
@@ -306,7 +310,7 @@
           "points": 2400,
           "validDays": 20,
           "countedDays": 20,
-          "name": "Zkušební hráč 2",
+          "name": "Zkušební hráč 3",
           "avatar": "🙂",
           "anonymous": false,
           "isMine": false,
@@ -502,6 +506,7 @@
       "endDate": "2026-11-01",
       "closesAt": "2026-11-03T00:00:00+01:00",
       "isolated": true,
+      "revision": null,
       "timezone": "Europe/Prague",
       "standings": [
         {
@@ -509,7 +514,7 @@
           "points": 2400,
           "validDays": 20,
           "countedDays": 20,
-          "name": "Zkušební hráč 3",
+          "name": "Zkušební hráč 2",
           "avatar": "🙂",
           "anonymous": false,
           "isMine": false,
@@ -531,7 +536,7 @@
           "points": 2400,
           "validDays": 20,
           "countedDays": 20,
-          "name": "Zkušební hráč 2",
+          "name": "Zkušební hráč 3",
           "avatar": "🙂",
           "anonymous": false,
           "isMine": false,
@@ -727,19 +732,9 @@
       "endDate": "2026-11-01",
       "closesAt": "2026-11-03T00:00:00+01:00",
       "isolated": true,
+      "revision": null,
       "timezone": "Europe/Prague",
       "standings": [
-        {
-          "rank": 1,
-          "points": 2400,
-          "validDays": 20,
-          "countedDays": 20,
-          "name": "Zkušební hráč 3",
-          "avatar": "🙂",
-          "anonymous": false,
-          "isMine": false,
-          "sharedRank": true
-        },
         {
           "rank": 1,
           "points": 2400,
@@ -749,6 +744,17 @@
           "avatar": "🙂",
           "anonymous": false,
           "isMine": true,
+          "sharedRank": true
+        },
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 20,
+          "countedDays": 20,
+          "name": "Zkušební hráč 3",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
           "sharedRank": true
         },
         {
@@ -948,19 +954,9 @@
       "endDate": "2026-11-01",
       "closesAt": "2026-11-03T00:00:00+01:00",
       "isolated": true,
+      "revision": 1,
       "timezone": "Europe/Prague",
       "standings": [
-        {
-          "rank": 1,
-          "points": 2400,
-          "validDays": 20,
-          "countedDays": 20,
-          "name": "Zkušební hráč 3",
-          "avatar": "🙂",
-          "anonymous": false,
-          "isMine": false,
-          "sharedRank": true
-        },
         {
           "rank": 1,
           "points": 2400,
@@ -970,6 +966,17 @@
           "avatar": "🙂",
           "anonymous": false,
           "isMine": true,
+          "sharedRank": true
+        },
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 20,
+          "countedDays": 20,
+          "name": "Zkušební hráč 3",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
           "sharedRank": true
         },
         {

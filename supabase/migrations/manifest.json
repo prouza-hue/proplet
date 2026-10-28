@@ -566,6 +566,19 @@
       "replaced_rpc_definitions": []
     },
     {
+      "id": "20261028-monthly-admin-corrections",
+      "order": 520,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028005634_monthly_admin_corrections.sql",
+      "type": "migration",
+      "status": "prepared-isolated-preview-only-production-disabled",
+      "sha256": "016b62c2c4d9f91b55dc9f5f5d01a0443f9764dcd15651defaf68f3fb8d8250e",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_monthly_state_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

@@ -11,7 +11,7 @@ on:
       - 'public/app/rankings/rankings.js'
       - 'public/ranking-navigation.css'
       - 'vercel.json'
-      - 'supabase/migrations/*monthly_competition.sql'
+      - 'supabase/migrations/*monthly*.sql'
       - 'tools/test_monthly_competition_db.py'
       - 'tests/current/test_monthly_competition*'
       - '.github/workflows/monthly-competition.yml'
