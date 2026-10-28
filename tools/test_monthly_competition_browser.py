@@ -33,7 +33,7 @@ def scenario(status="open", valid_days=23):
 def server_snapshot_qa(args):
     """Read actual local server snapshot responses; monthly GETs are never intercepted."""
     origin = args.origin.rstrip("/")
-    assert urlparse(origin).hostname in {"127.0.0.1", "localhost"}
+    assert urlparse(origin).hostname in {"127.0.0.1", "localhost", "proplet-git-codex-monthly-competi-a7b681-pavel-prouzas-projects.vercel.app"}, "Only local QA or the authorized monthly preview"
     args.output.mkdir(parents=True, exist_ok=True)
     report = {"syntheticSnapshotUIOnly": True, "monthlyResponsesIntercepted": False, "onlineDatabase": False, "checks": [], "errors": [], "blockedWrites": [], "blockedExternal": []}
     with sync_playwright() as pw:
@@ -62,7 +62,7 @@ def server_snapshot_qa(args):
                 with page.expect_response(lambda response: "/api/competition/monthly?" in response.url) as awaited:
                     page.goto(url, wait_until="domcontentloaded")
                 payload = awaited.value.json()
-                page.wait_for_function("typeof currentScreen!=='undefined'&&currentScreen==='monthly'&&!!puzzleDB&&!document.getElementById('propletBootScreen')")
+                page.wait_for_function("() => typeof currentScreen!=='undefined'&&currentScreen==='monthly'&&!!puzzleDB&&!document.getElementById('propletBootScreen')")
                 monthly = page.locator("#screen-monthly")
                 monthly.locator("#content[aria-busy=false]").wait_for()
                 page.evaluate("document.fonts.ready")
@@ -184,7 +184,7 @@ def main():
 
         try:
             page.goto(origin + "/?open=monthly", wait_until="domcontentloaded")
-            page.wait_for_function("typeof currentScreen!=='undefined'&&currentScreen==='monthly'&&!!puzzleDB&&!document.getElementById('propletBootScreen')")
+            page.wait_for_function("() => typeof currentScreen!=='undefined'&&currentScreen==='monthly'&&!!puzzleDB&&!document.getElementById('propletBootScreen')")
             monthly.locator(".personal-score").wait_for()
             page.evaluate("document.fonts.ready")
             label()
