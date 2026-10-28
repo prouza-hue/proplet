@@ -21,6 +21,23 @@ assert.equal(clockContext.resultCompletedAt(),'2026-11-03T12:00:05.000Z');
 assert.equal(DeviceDate.now(),Date.parse('2026-10-28T12:00:05Z'),'device/global clock is unchanged');
 assert.equal(clockContext.acceptMonthlyPreviewClock({environment:'production'}),false);
 assert.equal(clockContext.resultCompletedAt(),'2026-10-28T12:00:05.000Z');
+// A real cold offline restart must keep the *moving* trusted offset, not reset
+// completion to the physical device's October date or replay a frozen qaNow.
+const persistedClock=new Map(),origin='https://proplet-git-codex-monthly-competi-a7b681-pavel-prouzas-projects.vercel.app';
+function coldClock(storage=persistedClock,isPreview=true,currentOrigin=origin){
+ const context={Date:DeviceDate,previewRuntime:()=>isPreview,location:{origin:currentOrigin},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)}};
+ vm.runInNewContext(clockSource,context);return context;
+}
+const warmClock=coldClock();warmClock.acceptMonthlyPreviewClock({environment:'preview',monthlyPreview:qaClock});
+const trustedRecord=new Map(persistedClock);deviceNow+=3000;
+assert.equal(coldClock().resultCompletedAt(),'2026-11-03T12:00:03.000Z','cold restart retains advancing server-relative time');
+assert.equal(coldClock(new Map(trustedRecord),false).resultCompletedAt(),new DeviceDate().toISOString(),'production never restores QA clock');
+assert.equal(coldClock(new Map(trustedRecord),true,'https://hrajproplet.cz').resultCompletedAt(),new DeviceDate().toISOString(),'clock cannot cross origins');
+for(const change of [{branch:'codex/today-one-screen'},{databaseRef:'iopyhluayfszskyqqpuc'},{receivedAt:deviceNow-86400001},{receivedAt:deviceNow+1000},{offsetMs:Infinity}]){
+ const record=new Map(trustedRecord),key=[...record.keys()][0];record.set(key,JSON.stringify({...JSON.parse(record.get(key)),...change}));
+ assert.equal(coldClock(record).resultCompletedAt(),new DeviceDate().toISOString(),'invalid or stale stored QA clock is ignored');
+}
+const productionClock=coldClock();productionClock.acceptMonthlyPreviewClock({environment:'production'});assert.equal(persistedClock.size,0,'fresh production metadata clears stored QA time');
 function fixture(search='',catalogAvailable=true){
   const documentEvents=new Map(),windowEvents=new Map(),rootEvents=new Map(),pending=[],calls=[],nodes=new Map();
   const element=()=>({innerHTML:'',textContent:'',disabled:false,open:false,isConnected:true,attrs:{},listeners:new Map(),addEventListener(n,f){this.listeners.set(n,f);},setAttribute(k,v){this.attrs[k]=v;},focus(){this.focused=true;},showModal(){this.open=true;},close(){this.open=false;this.listeners.get('close')?.();}});

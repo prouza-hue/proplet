@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.0-monthly-liveqa1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.0-monthly-liveqa2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -6,15 +6,28 @@ let livePlayerPreviewEnabled=false,runtimeCapabilitiesChecked=false,runtimeCapab
 function previewRuntime(){return window.PROPLET_RUNTIME_ENV==='preview'||window.PROPLET_RUNTIME_META?.environment==='preview'}
 function livePlayerPreview(){return previewRuntime()&&livePlayerPreviewEnabled===true}
 let monthlyPreviewClockOffsetMs=null;
+const MONTHLY_PREVIEW_CLOCK_KEY='proplet-monthly-preview-clock-v1';
+function clearMonthlyPreviewClock(){monthlyPreviewClockOffsetMs=null;try{localStorage.removeItem(MONTHLY_PREVIEW_CLOCK_KEY)}catch{}}
+function restoreMonthlyPreviewClock(){
+ try{
+  if(typeof previewRuntime!=='function'||!previewRuntime())return false;
+  const saved=JSON.parse(localStorage.getItem(MONTHLY_PREVIEW_CLOCK_KEY)||'null'),age=Date.now()-saved?.receivedAt;
+  if(saved?.origin!==location.origin||saved?.databaseRef!=='eanzztstmwlamwfdskbf'||saved?.branch!=='codex/monthly-competition-202611'||!Number.isFinite(saved?.offsetMs)||Math.abs(saved.offsetMs)>100*86400000||!Number.isFinite(age)||age<0||age>86400000)return false;
+  monthlyPreviewClockOffsetMs=saved.offsetMs;return true;
+ }catch{return false}
+}
+restoreMonthlyPreviewClock();
 function acceptMonthlyPreviewClock(config){
  const clock=config?.monthlyPreview;
  if(config?.environment!=='preview'||clock?.isolated!==true||clock?.databaseRef!=='eanzztstmwlamwfdskbf'||clock?.branch!=='codex/monthly-competition-202611'){
-  if(clock||config?.environment==='production')monthlyPreviewClockOffsetMs=null;
+  if(clock||config?.environment==='production'||config?.environment==='preview')clearMonthlyPreviewClock();
   return false;
  }
  const stamp=Date.parse(clock.qaNow||config.serverNow||'');
- if(!Number.isFinite(stamp)){monthlyPreviewClockOffsetMs=null;return false}
- monthlyPreviewClockOffsetMs=stamp-Date.now();return true;
+ if(!Number.isFinite(stamp)){clearMonthlyPreviewClock();return false}
+ monthlyPreviewClockOffsetMs=stamp-Date.now();
+ try{localStorage.setItem(MONTHLY_PREVIEW_CLOCK_KEY,JSON.stringify({origin:location.origin,databaseRef:clock.databaseRef,branch:clock.branch,offsetMs:monthlyPreviewClockOffsetMs,receivedAt:Date.now()}))}catch{}
+ return true;
 }
 function monthlyPreviewNow(){return new Date(Date.now()+(monthlyPreviewClockOffsetMs??0))}
 function resultCompletedAt(){return monthlyPreviewNow().toISOString()}
