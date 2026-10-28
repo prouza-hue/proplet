@@ -59,7 +59,7 @@ def main():
             monthly.locator(".collection-award").first.wait_for()
             page.wait_for_function("!!puzzleDB&&!document.getElementById('propletBootScreen')")
             page.evaluate("document.fonts.ready")
-            monthly.locator(".collection-award img").first.evaluate("img=>img.decode()")
+            monthly.locator(".collection-award img").evaluate_all("nodes=>Promise.all(nodes.map(img=>img.decode()))")
             assert page.evaluate("getProfile()") is None
             assert monthly.locator(".collection-award").count() == 3
             assert monthly.locator(".collection-award small").all_inner_texts() == ["Náhled odznaku"] * 3
