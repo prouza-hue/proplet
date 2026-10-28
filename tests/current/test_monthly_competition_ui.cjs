@@ -41,7 +41,9 @@ const productionClock=coldClock();productionClock.acceptMonthlyPreviewClock({env
 function fixture(search='',catalogAvailable=true){
   const documentEvents=new Map(),windowEvents=new Map(),rootEvents=new Map(),pending=[],calls=[],nodes=new Map();
   const element=()=>({innerHTML:'',textContent:'',disabled:false,open:false,isConnected:true,attrs:{},listeners:new Map(),addEventListener(n,f){this.listeners.set(n,f);},setAttribute(k,v){this.attrs[k]=v;},focus(){this.focused=true;},showModal(){this.open=true;},close(){this.open=false;this.listeners.get('close')?.();}});
-  for(const key of ['#monthLabel','#status','#content','#previousMonth','#nextMonth','#navigation','#scenarioNotice','#content [data-expand]','#awardDetail','#awardDetailBody','#awardDetailClose'])nodes.set(key,element());
+  for(const key of ['#monthLabel','#status','#content','#previousMonth','#nextMonth','#navigation','#scenarioNotice','#content [data-expand]','#awardDetail','#awardDetailBody','#awardDetailClose','#awardDetailOwnership'])nodes.set(key,element());
+  let detailWrites=0,detailHtml='';
+  Object.defineProperty(nodes.get('#awardDetailBody'),'innerHTML',{get:()=>detailHtml,set:html=>{detailWrites++;detailHtml=html;nodes.get('#awardDetailOwnership').textContent=html.match(/id="awardDetailOwnership"[^>]*>([^<]*)/)?.[1]||'';}});
   const panelButtons=['standings','awards'].map(value=>({...element(),dataset:{monthlyPanel:value}}));
   const root={innerHTML:'',querySelector:s=>nodes.get(s),querySelectorAll:s=>s==='[data-monthly-panel]'?panelButtons:[],addEventListener:(n,f)=>rootEvents.set(n,f)};
   const host={setAttribute(){},attachShadow:()=>root};
@@ -54,7 +56,7 @@ function fixture(search='',catalogAvailable=true){
     document:{createElement:()=>host,querySelector:s=>s==='.app-footer'?{before(){}}:{classList:{add(){}}},addEventListener:(n,f)=>documentEvents.set(n,f)},
     window:{PropletRankings:{mountViewNavigation(){}},addEventListener:(n,f)=>windowEvents.set(n,f)}};
   vm.runInNewContext(source,context);
-  return {context,root,nodes,pending,calls,navs,open:()=>context.window.PropletMonthlyCompetition.open(),setProfile:p=>{profile=p;documentEvents.get('proplet:account-changed')?.();},click:attribute=>rootEvents.get('click')({target:{closest:()=>({hasAttribute:n=>n===attribute})}}),clickData:dataset=>{const button={...element(),dataset,hasAttribute:()=>false};rootEvents.get('click')({target:{closest:()=>button}});return button;},content:()=>nodes.get('#content').innerHTML};
+  return {context,root,nodes,pending,calls,navs,detailWrites:()=>detailWrites,open:()=>context.window.PropletMonthlyCompetition.open(),setProfile:p=>{profile=p;documentEvents.get('proplet:account-changed')?.();},click:attribute=>rootEvents.get('click')({target:{closest:()=>({hasAttribute:n=>n===attribute})}}),clickData:dataset=>{const button={...element(),dataset,hasAttribute:()=>false};rootEvents.get('click')({target:{closest:()=>button}});return button;},content:()=>nodes.get('#content').innerHTML};
 }
 (async()=>{
   clockContext.acceptMonthlyPreviewClock({environment:'preview',monthlyPreview:qaClock});
@@ -87,6 +89,16 @@ function fixture(search='',catalogAvailable=true){
   const opener=gallery.clickData({awardMonth:'2026-12',awardRank:'2'});await tick();assert.equal(gallery.nodes.get('#awardDetail').open,true);assert(gallery.nodes.get('#awardDetailBody').innerHTML.includes('Letos hlídám cukroví. Zatím chybí šest kousků.'));
   gallery.click('data-close-award');assert.equal(gallery.nodes.get('#awardDetail').open,false);assert.equal(opener.focused,true,'dialog restores keyboard focus');
   gallery.nodes.get('#previousMonth').onclick();assert(gallery.content().includes('Král listopadu'));assert(!gallery.content().includes('Král prosince'));
+  const ownership=fixture('?open=monthly&panel=awards&collection=2026-11');ownership.setProfile({id:'owner',token:'owner-token'});ownership.open();await tick();
+  ownership.clickData({awardMonth:'2026-11',awardRank:'1'});await tick();assert.equal(ownership.nodes.get('#awardDetailOwnership').textContent,'Náhled odznaku');
+  ownership.pending[0].resolve({enabled:true,status:'closed',standings:[],badges:[{month:'2026-11',rank:1}]});await tick();
+  assert.equal(ownership.nodes.get('#awardDetailOwnership').textContent,'✓ Získáno','already-open detail updates when server ownership arrives');
+  assert.equal(ownership.nodes.get('#awardDetail').open,true);assert.equal(ownership.detailWrites(),1,'ownership refresh preserves original artwork, detail nodes and focus');
+  ownership.click('data-retry');ownership.pending.at(-1).resolve({enabled:true,status:'closed',standings:[],badges:[]});await tick();
+  assert.equal(ownership.nodes.get('#awardDetailOwnership').textContent,'Náhled odznaku','authoritative removal also updates the open detail');
+  ownership.click('data-retry');ownership.pending.at(-1).resolve({enabled:true,status:'closed',standings:[],badges:[{month:'2026-11',rank:1}]});await tick();
+  ownership.click('data-retry');ownership.pending.at(-1).reject(new Error('offline'));await tick();assert.equal(ownership.nodes.get('#awardDetailOwnership').textContent,'Náhled odznaku','unverified ownership is cleared on fetch failure');assert.equal(ownership.detailWrites(),1);
+  ownership.setProfile({id:'other',token:'other-token'});assert.equal(ownership.nodes.get('#awardDetail').open,false,'account change still closes private ownership detail');
   const unavailable=fixture('',false);unavailable.setProfile({id:'mine',token:'session'});unavailable.open();unavailable.pending[0].resolve(state);await tick();assert(unavailable.content().includes('personal-score'),'catalog failure leaves scores functional');unavailable.clickData({monthlyPanel:'awards'});assert(unavailable.content().includes('Odznaky se nepodařilo načíst'));
   console.log('PASS monthly UI: server-only data, first season, own distant rank, best20 details, escaping, account races, offline and disabled backend');
 })().catch(error=>{console.error(error);process.exitCode=1;});
