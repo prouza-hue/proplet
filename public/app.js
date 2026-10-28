@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.0-monthly-liveqa3';
+const APP_PREVIEW_RELEASE='proplet-v4.10.0-monthly-liveqa4';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -741,6 +741,7 @@ function localFreeSlotState(diff){
  return {actual,legacy:prior,prior,effective,transferred};
 }
 function reconcileLocalGen4Rewards(){
+ if(getProfile()?.stats?.xpAuthoritative===true)return {repairedXp:0,returnBonusXp:Number(getProfile().stats.gen4ReturnBonusXp)||0};
  const state=getState(),rows=Object.values(state.completed||{}),activeGeneration=Number(puzzleDB?.freeGeneration)||1;
  if(activeGeneration<4)return {repairedXp:0,returnBonusXp:0};
  let priorGenerationPlayed=false;const current=[];
@@ -849,11 +850,21 @@ function currentLocalStats(){
  const tajenkaCompleted=Object.keys(tajenkaState()?.completions||{}).length;
  return {points:rows.reduce((a,r)=>a+(r.points||0),0),totalCompleted:gameRows.length,dailyCompleted:dailyDates.length,dailySpecialCompleted,dailyChallengeCompleted:dailyDates.length+dailySpecialCompleted,freeCompleted:free,freeTransferred,freePlayedGen2,currentStreak:streak,longestStreak:longest,bestDailyMs:dailyTimes.length?Math.min(...dailyTimes):null,cleanSolves:cleanRows.length,cleanDaily:cleanRows.filter(r=>r.mode==='daily').length,rescuedDays:rescueDates.length,tajenkaCompleted,mozkomorCompleted:free.mozkomor,discoveredWords:0};
 }
+function pendingAuthoritativeXp(scope=playerScope()){
+ const state=getState(scope),completed=state.completed||{},confirmed=state.remoteConfirmedChallenges||{},seen=new Set();let pending=0;
+ for(const row of getQueue(scope)){
+  const key=row?.challengeKey;if(!key||seen.has(key)||confirmed[key]===true||completed[key]?.serverConfirmed===true||(row.mode==='tajenka'&&tajenkaState(scope)?.completions?.[row.puzzleId]?.remote===true))continue;
+  seen.add(key);
+  const cap=row.mode==='daily'?100:row.mode==='daily_special'&&row.official!==false&&row.rewardEligible!==false?200:row.mode==='free'?Number(DIFF[row.difficulty]?.xp)||0:row.mode==='starter'?Number(puzzleDB?.starter?.meta?.rewardXp)||10:row.mode==='tajenka'?TAJENKA_REWARD_XP:0;
+  pending+=Math.min(cap,Math.max(0,Number(row.points)||0));
+ }
+ return pending;
+}
 function effectiveStats(){
  const local=currentLocalStats(),remote=getProfile()?.stats;if(!remote)return local;
  const free=Object.fromEntries(Object.keys(DIFF).map(d=>[d,0])),freeTransferred={...free},freePlayedGen2={...free};for(const k of Object.keys(free)){free[k]=Math.max(local.freeCompleted?.[k]||0,remote.freeCompleted?.[k]||0);freeTransferred[k]=Math.max(local.freeTransferred?.[k]||0,remote.freeTransferred?.[k]||0);freePlayedGen2[k]=Math.max(local.freePlayedGen2?.[k]||0,remote.freePlayedGen2?.[k]||0)}
  return {...remote,
-  points:Math.max(local.points||0,remote.points||0),totalCompleted:Math.max(local.totalCompleted||0,remote.totalCompleted||0),
+  points:remote.xpAuthoritative===true?Math.max(0,Number(remote.points)||0)+pendingAuthoritativeXp():Math.max(local.points||0,remote.points||0),totalCompleted:Math.max(local.totalCompleted||0,remote.totalCompleted||0),
   dailyCompleted:Math.max(local.dailyCompleted||0,remote.dailyCompleted||0),freeCompleted:free,freeTransferred,freePlayedGen2,
   dailySpecialCompleted:Math.max(local.dailySpecialCompleted||0,remote.dailySpecialCompleted||0),dailyChallengeCompleted:Math.max(local.dailyChallengeCompleted||0,remote.dailyChallengeCompleted||0),
   currentStreak:Math.max(local.currentStreak||0,remote.currentStreak||0),longestStreak:Math.max(local.longestStreak||0,remote.longestStreak||0),
@@ -1761,13 +1772,14 @@ function mergeRemoteProgress(rows,scope=playerScope()){
  for(const r of rows||[]){
   if(!r?.challengeKey)continue;
   if(r.mode==='daily_special'&&(r.rewardEligible===false||r.official===false||r.challengeKey!==`daily-special:${r.dailyDate}:${r.difficulty}`))continue;
+  state.remoteConfirmedChallenges=state.remoteConfirmedChallenges||{};state.remoteConfirmedChallenges[r.challengeKey]=true;
   const old=state.completed[r.challengeKey];
   if(r.mode==='daily_special'&&old&&(old.mode!==r.mode||old.puzzleId!==r.puzzleId||(old.contentHash&&r.contentHash&&old.contentHash!==r.contentHash)))continue;
-  if(!old){state.completed[r.challengeKey]=r;if(state.inProgress?.[r.challengeKey])delete state.inProgress[r.challengeKey];continue}
+  if(!old){state.completed[r.challengeKey]={...r,serverConfirmed:true};if(state.inProgress?.[r.challengeKey])delete state.inProgress[r.challengeKey];continue}
   // Aktivní Daily nesmí přepsat opožděná synchronizace archivované desky.
-  if(r.mode==='daily'&&r.dailyDate){let activeId=datedDailyController?.cached(r.dailyDate)?.puzzleId;try{activeId=activeId||dailyPuzzleFor(r.dailyDate).id}catch{}if(activeId&&old.puzzleId===activeId&&r.puzzleId!==activeId)continue}
+  if(r.mode==='daily'&&r.dailyDate){let activeId=datedDailyController?.cached(r.dailyDate)?.puzzleId;try{activeId=activeId||dailyPuzzleFor(r.dailyDate).id}catch{}if(activeId&&old.puzzleId===activeId&&r.puzzleId!==activeId){old.points=r.points;old.serverConfirmed=true;continue}}
   // Server drží první oficiální dokončení pro Daily i volné úrovně.
-  state.completed[r.challengeKey]={...old,...r};
+  state.completed[r.challengeKey]={...old,...r,serverConfirmed:true};
   if(state.inProgress?.[r.challengeKey])delete state.inProgress[r.challengeKey];
  }
  saveState(state,scope);
@@ -1779,7 +1791,7 @@ async function refreshRemoteProfile({throwOnError=false}={}){
  async function loadSnapshot(){
   for(let attempt=0;attempt<2;attempt++){
    try{
-    const cachedAt=getState(p.id)?.remoteProgressLoadedAt,validCursor=typeof cachedAt==='string'&&Number.isFinite(Date.parse(cachedAt));
+    const cachedState=getState(p.id),cachedAt=cachedState?.remoteProgressLoadedAt,validCursor=cachedState.remoteXpCanonicalVersion===1&&typeof cachedAt==='string'&&Number.isFinite(Date.parse(cachedAt));
     const suffix=validCursor?`?since=${encodeURIComponent(cachedAt)}`:'';
     return await api('/api/account/snapshot'+suffix,{authProfile:p});
    }
@@ -1797,7 +1809,7 @@ async function refreshRemoteProfile({throwOnError=false}={}){
   if(!accountProfileMatches(p))return null;
   if(!Array.isArray(me.completed))throw new Error('Neúplná odpověď postupu');
   mergeRemoteProgress(me.completed||[],p.id);
-  const loadedState=getState(p.id),cursor=typeof me.cursor==='string'&&Number.isFinite(Date.parse(me.cursor))?me.cursor:new Date().toISOString();loadedState.remoteProgressLoadedAt=cursor;saveState(loadedState,p.id);
+  const loadedState=getState(p.id),cursor=typeof me.cursor==='string'&&Number.isFinite(Date.parse(me.cursor))?me.cursor:new Date().toISOString();loadedState.remoteProgressLoadedAt=cursor;loadedState.remoteXpCanonicalVersion=1;saveState(loadedState,p.id);
   accountProgressReady=p;accountProgressAuthRequired=false;
   const remoteMode=validSupportMode(me.supportMode)?me.supportMode:(validSupportMode(p.supportMode)?p.supportMode:'none');rememberSupportMode(remoteMode);
   const repairedBoardXp=Number(me.stats?.gen4RewardRepairXp||0)-Number(me.stats?.gen4ReturnBonusAwardedNow||0);if(repairedBoardXp>0){const state=getState();state.gen4XpRepairNotice=true;saveState(state);document.dispatchEvent(new CustomEvent('proplet:gen4-xp-repair'))}
