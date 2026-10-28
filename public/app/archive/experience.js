@@ -145,7 +145,7 @@ function home(){
  const referral=q('#referralHome');
  const tajenka=q('#tajenkaPreviewCard'),tajenkaSolved=tajenka?.classList.contains('completed');
  const progress=q('#homeCompetitionCard');
- const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),referral,q('#referralInviteHome'),q('#rescueCard'),q('#todayNewContentBanner'),tajenkaSolved?null:tajenka,q('#axHomeFree'),competition,games,q('#levelCard')].filter(Boolean);
+ const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),q('#visualPlaytestInvite'),referral,q('#referralInviteHome'),q('#rescueCard'),q('#todayNewContentBanner'),tajenkaSolved?null:tajenka,q('#axHomeFree'),competition,games,q('#levelCard')].filter(Boolean);
  let prev=null;for(const el of ordered){if(prev){if(prev.nextElementSibling!==el)prev.after(el);}else if(root.firstElementChild!==el)root.prepend(el);prev=el;}
  // Tail nodes have one owner and are never also moved within the ordered prefix.
  if(progress&&root.lastElementChild!==progress)root.append(progress);

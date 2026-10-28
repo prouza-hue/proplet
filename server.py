@@ -5578,6 +5578,19 @@ first_board.install(app, telemetry_actor=telemetry_actor, db_rpc=db_rpc,
 # Server attribution and progress; fixtures are never part of this installer.
 referral_domain.install(app, auth_player=auth_player, db_rpc=db_rpc, enforce_rate_limit=enforce_rate_limit)
 
+# Private visual pilot: canonical sessions and explicit environment capability only.
+from backend import visual_playtest
+visual_playtest.install(app, auth_player=auth_player, db_rpc=db_rpc,
+                        enforce_rate_limit=enforce_rate_limit, environment=VERCEL_ENV,
+                        live_player_preview=globals().get("LIVE_PLAYER_PREVIEW", False))
+from visual_pilot_push import install_visual_pilot_push
+install_visual_pilot_push(
+    app, push_ready=push_ready, db_select_bounded=db_select_bounded,
+    reserve_delivery=_reserve_push_delivery, db_update=db_update, webpush=webpush,
+    campaign_state=lambda: visual_playtest.campaign_state(db_select_bounded, environment=VERCEL_ENV),
+    vapid_private=VAPID_PRIVATE_KEY, vapid_subject=VAPID_SUBJECT, logger=logger,
+)
+
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")
 
