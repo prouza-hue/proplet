@@ -8,6 +8,14 @@ Nový no-scroll design je závazný základ. Měsíční soutěž je čtvrtý po
 
 Uživatel 28. 10. 2026 výslovně schválil pravidlo `review-close`: dokončení musí vzniknout v den vydání a server ho musí přijmout před uzávěrkou 48 hodin po konci měsíce. Před uzávěrkou se opravené výsledky přepočítají a odmítnuté vyřadí; po ní se pořadí i odznaky mění pouze výslovnou administrátorskou opravou. Schválení pravidla je oddělené od aktivace soutěže: `enabled=false` zůstává zachováno. Původní záznamy testů s nepotvrzenou politikou dokládají dřívější stav. Propojení veřejného online API zůstává nedokončené.
 
+## Schválené výtvarné odměny — oprava opomenutí 28. 10.
+
+Aktuálním zdrojem odměn je chat **Dokončení archivu a preview**, ID `6ace7db0-b2c8-83ed-bd7f-4a4f19714eb9`, a commit `edca88a6a201890d31c779f0be824288809fc3aa` z větve `preview/monthly-competition-20261014`. Předchozí předání odkazující pouze na PR #188 tento pozdější schválený výsledek nezahrnovalo. Generické medaile proto neslouží jako finální ocenění měsíční soutěže.
+
+Listopad: **Král listopadu** (kaštanový panovník), **Rytíř listopadu** (dubový chochol), **Kníže listopadu** (žaludový šlechtic). Prosinec: perníkový **Král prosince**, **Rytíř prosince** z vykrajovátka se skořicovým mečem a **Kníže prosince** jako zvoneček. Obnoveno šest původních WebP souborů beze změny bajtů a přesné poslední schválené hlášky. Obě kolekce lze prohlížet a odznaky zvětšit. Samotná prohlídka kolekce neznamená získání odměny.
+
+Podrobná provenience: `docs/design/monthly-awards-recovery-20261028.md`; katalog: `public/rewards/monthly/collections.json`. Historické skórování 80/20 se nepřebírá — toto doplnění přenáší schválené výtvarné zpracování a nemění aktuální schválená pravidla.
+
 ## Implementované části
 
 - Evidence soutěžních dnů vzniká ve stejné transakci jako potvrzený atomický výsledek. Vyžaduje shodu oficiálního výsledku, puzzle run a dokončeného result command; nečte klientský součet ani analytické události. Platí pouze základní `daily:YYYY-MM-DD` dokončené v den vydání.
@@ -38,7 +46,7 @@ Preview: https://proplet-git-codex-monthly-competi-a7b681-pavel-prouzas-projects
 
 ## Postup listopadového spuštění — dosud neprovedeno
 
-1. Pravidlo `review-close` a explicitní administrátorské opravy jsou schválené 28. 10. 2026. Dokončit skutečné izolované online propojení a integrační ověření od dokončení přes API po evidenci a odznak. Uživatel potvrdil, že testovací klíč nastaví a poté dá vědět; tato odpověď sama nepotvrzuje jeho nastavení.
+1. Pravidlo `review-close` a explicitní administrátorské opravy jsou schválené 28. 10. 2026. Dokončit skutečné izolované online propojení a integrační ověření od dokončení přes API po evidenci a odznak. Uživatel 28. 10. 2026 potvrdil nastavení testovacího klíče ve Vercelu; zbývá ověřit jeho skutečné použití v novém preview deploymentu.
 2. Znovu ověřit aktuální main, produkční SHA a souběžné opravy. Sloučení no-scroll vzhledu a nasazení vyžaduje samostatné oprávnění; tento PR se neslučuje.
 3. Po autorizaci nasadit v pořadí `supabase/migrations/20261028003751_monthly_competition.sql` a `supabase/migrations/20261028005634_monthly_admin_corrections.sql`. Přezkoumat jejich checksumy v manifestu. Druhá migrace zaznamenává schválené pravidlo; soutěž zůstává vypnutá a žádná produkční testovací data nevznikají.
 4. Ještě před **1. 11. 2026 00:00 CET** nastavit DB `enabled=true`, `rules_approved=true`, `late_sync_policy='review-close'`, `launch_month='2026-11-01'`, `isolated=false`, `preview_now=null`. Zavolat reconciliation pro listopad (před sezónou bezpečně prázdná). Změny a výsledek ověřit.

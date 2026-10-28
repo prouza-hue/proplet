@@ -1,23 +1,25 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const source=fs.readFileSync('public/app/monthly/competition.js','utf8');
+const approvedCatalog=JSON.parse(fs.readFileSync('public/rewards/monthly/collections.json','utf8'));
 const tick=()=>new Promise(setImmediate);
-function fixture(search=''){
+function fixture(search='',catalogAvailable=true){
   const documentEvents=new Map(),windowEvents=new Map(),rootEvents=new Map(),pending=[],calls=[],nodes=new Map();
-  const element=()=>({innerHTML:'',textContent:'',disabled:false,attrs:{},setAttribute(k,v){this.attrs[k]=v;},focus(){}});
-  for(const key of ['#monthLabel','#status','#content','#previousMonth','#nextMonth','#navigation','#scenarioNotice','#content [data-expand]'])nodes.set(key,element());
-  const root={innerHTML:'',querySelector:s=>nodes.get(s),addEventListener:(n,f)=>rootEvents.set(n,f)};
+  const element=()=>({innerHTML:'',textContent:'',disabled:false,open:false,isConnected:true,attrs:{},listeners:new Map(),addEventListener(n,f){this.listeners.set(n,f);},setAttribute(k,v){this.attrs[k]=v;},focus(){this.focused=true;},showModal(){this.open=true;},close(){this.open=false;this.listeners.get('close')?.();}});
+  for(const key of ['#monthLabel','#status','#content','#previousMonth','#nextMonth','#navigation','#scenarioNotice','#content [data-expand]','#awardDetail','#awardDetailBody','#awardDetailClose'])nodes.set(key,element());
+  const panelButtons=['standings','awards'].map(value=>({...element(),dataset:{monthlyPanel:value}}));
+  const root={innerHTML:'',querySelector:s=>nodes.get(s),querySelectorAll:s=>s==='[data-monthly-panel]'?panelButtons:[],addEventListener:(n,f)=>rootEvents.set(n,f)};
   const host={setAttribute(){},attachShadow:()=>root};
   let profile=null;
   const navs=[];
-  const context={console,Intl,URLSearchParams,location:{search},navigator:{onLine:true},Date,ROUTE_SCREENS:new Set(),currentScreen:'daily',getProfile:()=>profile,
+  const context={console,Intl,URLSearchParams,location:{search},navigator:{onLine:true},Date,ROUTE_SCREENS:new Set(),currentScreen:'daily',getProfile:()=>profile,fetch:async()=>{if(!catalogAvailable)throw new Error('unavailable');return {ok:true,json:async()=>approvedCatalog};},
     api:(url,options)=>{calls.push({url,options});return new Promise((resolve,reject)=>pending.push({resolve,reject}));},
     nav:s=>{context.currentScreen=s;navs.push(s);documentEvents.get('proplet:screen-changed')?.({detail:{screen:s}});},
     rankingsOrchestration:()=>({openView:v=>navs.push(v)}),openProfileModal:()=>{},
     document:{createElement:()=>host,querySelector:s=>s==='.app-footer'?{before(){}}:{classList:{add(){}}},addEventListener:(n,f)=>documentEvents.set(n,f)},
     window:{PropletRankings:{mountViewNavigation(){}},addEventListener:(n,f)=>windowEvents.set(n,f)}};
   vm.runInNewContext(source,context);
-  return {context,root,nodes,pending,calls,navs,open:()=>context.window.PropletMonthlyCompetition.open(),setProfile:p=>{profile=p;documentEvents.get('proplet:account-changed')?.();},click:attribute=>rootEvents.get('click')({target:{closest:()=>({hasAttribute:n=>n===attribute})}}),content:()=>nodes.get('#content').innerHTML};
+  return {context,root,nodes,pending,calls,navs,open:()=>context.window.PropletMonthlyCompetition.open(),setProfile:p=>{profile=p;documentEvents.get('proplet:account-changed')?.();},click:attribute=>rootEvents.get('click')({target:{closest:()=>({hasAttribute:n=>n===attribute})}}),clickData:dataset=>{const button={...element(),dataset,hasAttribute:()=>false};rootEvents.get('click')({target:{closest:()=>button}});return button;},content:()=>nodes.get('#content').innerHTML};
 }
 (async()=>{
   const f=fixture();f.open();assert.equal(f.calls.length,1);assert(f.calls[0].url.startsWith('/api/competition/monthly?month='));assert.equal(f.calls[0].options.authProfile,null);
@@ -37,5 +39,13 @@ function fixture(search=''){
   assert.equal(isolated.nodes.get('#scenarioNotice').hidden,false);assert(isolated.nodes.get('#scenarioNotice').textContent.includes('ukázkoví hráči'));assert(isolated.content().includes('prvních 100 míst a tvoje'));
   assert.equal(isolated.nodes.get('#previousMonth').disabled,true);assert.equal(isolated.nodes.get('#nextMonth').disabled,true);
   const unapproved=fixture('?monthlyScenario=ties');unapproved.open();unapproved.pending[0].resolve(state);await tick();assert(unapproved.content().includes('data-account'),'URL alone does not enable own synthetic identity');assert.equal(unapproved.nodes.get('#scenarioNotice').hidden,true);
+  const gallery=fixture('?open=monthly&panel=awards&collection=2026-12');gallery.open();await tick();
+  assert(gallery.content().includes('Král prosince')&&gallery.content().includes('Rytíř prosince')&&gallery.content().includes('Kníže prosince'),'approved December deep link works before monthly API answers');
+  assert.equal((gallery.content().match(/Náhled odznaku/g)||[]).length,3);assert(!gallery.content().includes('Získáno'),'catalog never fabricates ownership');
+  gallery.pending[0].resolve({enabled:false,reason:'disabled'});await tick();assert(gallery.content().includes('/rewards/monthly/2026-12/knight-v1.webp'),'disabled backend cannot bury approved gallery');
+  const opener=gallery.clickData({awardMonth:'2026-12',awardRank:'2'});await tick();assert.equal(gallery.nodes.get('#awardDetail').open,true);assert(gallery.nodes.get('#awardDetailBody').innerHTML.includes('Letos hlídám cukroví. Zatím chybí šest kousků.'));
+  gallery.click('data-close-award');assert.equal(gallery.nodes.get('#awardDetail').open,false);assert.equal(opener.focused,true,'dialog restores keyboard focus');
+  gallery.nodes.get('#previousMonth').onclick();assert(gallery.content().includes('Král listopadu'));assert(!gallery.content().includes('Král prosince'));
+  const unavailable=fixture('',false);unavailable.setProfile({id:'mine',token:'session'});unavailable.open();unavailable.pending[0].resolve(state);await tick();assert(unavailable.content().includes('personal-score'),'catalog failure leaves scores functional');unavailable.clickData({monthlyPanel:'awards'});assert(unavailable.content().includes('Odznaky se nepodařilo načíst'));
   console.log('PASS monthly UI: server-only data, first season, own distant rank, best20 details, escaping, account races, offline and disabled backend');
 })().catch(error=>{console.error(error);process.exitCode=1;});

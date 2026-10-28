@@ -22,3 +22,7 @@ Vlastní pohled **Měsíční soutěž** vedle Výzva / XP / Týdenní soutěž.
 ## Nutné ověřit a dokončit před spuštěním
 
 Samostatnou serverovou evidenci bodů, uzávěrku po 48 hodinách, shodná pořadí, přidělení odznaků, skutečná data pódia a produkční přepínač. Před implementací znovu ověřit aktuální backend a ostatní rozpracované větve, aby se neduplikovala mezitím dokončená práce. Při této kontrole na produkčním SHA `aabf24c76a37b6b89f4d2a050267dd0339f372cc` měsíční prezentační modul přítomen nebyl.
+
+## Doplnění zdroje odměn — 28. 10. 2026
+
+Výše uvedený PR #188 není úplným zdrojem posledního schváleného výtvarného zpracování. Navazující chat **Dokončení archivu a preview**, ID `6ace7db0-b2c8-83ed-bd7f-4a4f19714eb9`, dokončil vlastní ilustrace Krále, Rytíře a Knížete pro listopad i prosinec, upravené hlášky a rozklikávací kolekce. Poslední zdrojový commit je `edca88a6a201890d31c779f0be824288809fc3aa`, větev `preview/monthly-competition-20261014`. Přesné assety jsou obnovené v `public/rewards/monthly/2026-11` a `2026-12`; katalog a ověřená provenience jsou v `docs/design/monthly-awards-recovery-20261028.md`. Generické medaile nesmějí tyto schválené postavy nahrazovat. Pozdější současné zadání nadále určuje 100/120 bodů, nejlepší dvacítku a společná místa; historické výpočty se s výtvarnou obnovou nepřenášejí.

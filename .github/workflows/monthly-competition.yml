@@ -8,6 +8,7 @@ on:
       - 'server.py'
       - 'public/app/monthly/**'
       - 'public/monthly-competition.css'
+      - 'public/rewards/monthly/**'
       - 'public/app/rankings/rankings.js'
       - 'public/ranking-navigation.css'
       - 'vercel.json'
