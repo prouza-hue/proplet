@@ -6,7 +6,7 @@ declare p uuid:=gen_random_uuid(); owner uuid:=gen_random_uuid(); binding public
 begin
   if not exists(select 1 from monthly_competition_settings where isolated and not enabled) then
     raise exception 'ISOLATED_DISABLED_DATABASE_REQUIRED'; end if;
-  select * into binding from public.daily_special_bindings where daily_date='2026-11-01' limit 1;
+  select * into binding from public.monthly_preview_daily_special_bindings where daily_date='2026-11-01' limit 1;
   if not found then raise exception 'NOVEMBER_EXTRA_BINDING_REQUIRED'; end if;
   update public.daily_specials_policy set enabled=true,preview_date='2026-10-21';
   perform set_config('request.headers','{"x-proplet-monthly-preview":"codex/monthly-competition-202611"}',true);

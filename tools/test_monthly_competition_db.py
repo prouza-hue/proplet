@@ -68,6 +68,8 @@ def main():
                     continue
             c.execute(path.read_text(encoding='utf8'))
         c.execute('update monthly_competition_settings set isolated=true')
+        c.execute((ROOT/'supabase/tests/monthly_preview_empty_claim.sql').read_text(encoding='utf8'))
+        report['checks'].append('server-proven empty QA transfer:8 source kinds, strict marker/isolated/ACL guards, read-only/idempotent; original transfer quota untouched')
         c.execute((ROOT/'supabase/tests/monthly_preview_extra.sql').read_text(encoding='utf8'))
         report['checks'].append('actual official November Extra under monthly QA clock; no monthly points; legacy special policy preserved')
         c.execute((ROOT/'supabase/tests/monthly_preview_clock.sql').read_text(encoding='utf8'))

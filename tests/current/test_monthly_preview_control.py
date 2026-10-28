@@ -60,3 +60,37 @@ with patch.dict(os.environ, env):
         finally:
             server.request_guard_context.reset(token)
 print("PASS isolated QA: startup scope, auth, bounded clock, no arbitrary actions, trusted marker, private secret, request-local clock, original offline timestamp")
+
+# An empty isolated transfer may finish only after server proof. Actual transfers
+# and all production requests keep the original quota; no counters are reset.
+with patch.object(server, "monthly_qa_enabled", return_value=True), \
+     patch.object(server, "auth_player", return_value={"id": "synthetic-player"}) as auth, \
+     patch.object(server, "anonymous_hash", return_value="a" * 64), \
+     patch.object(server, "db_rpc", return_value={"empty": True}) as rpc, \
+     patch.object(server, "db_select", side_effect=AssertionError("empty proof must not transfer data")), \
+     patch.object(server, "enforce_rate_limit") as guard:
+    response = client.post("/api/anonymous/claim", json={"anonymous_id": "synthetic-anonymous-browser"})
+    assert response.status_code == 200 and response.json()["ok"] is True
+    assert all(value == 0 for value in response.json()["claimed"].values())
+    assert [call.args[1] for call in guard.call_args_list] == ["monthly_empty_claim_probe"]
+    assert rpc.call_args.args == ("proplet_monthly_preview_empty_claim_v1", {"p_anonymous_hash": "a" * 64})
+
+from fastapi import HTTPException
+def deny_transfer(request, scope, **kwargs):
+    if scope == "anonymous_claim":
+        assert kwargs == {"limit": 12, "window_seconds": 3600}
+        raise HTTPException(429, "Original transfer quota")
+
+with patch.object(server, "monthly_qa_enabled", return_value=True), \
+     patch.object(server, "auth_player", return_value={"id": "synthetic-player"}), \
+     patch.object(server, "anonymous_hash", return_value="a" * 64), \
+     patch.object(server, "db_rpc", return_value={"empty": False}), \
+     patch.object(server, "enforce_rate_limit", side_effect=deny_transfer):
+    assert client.post("/api/anonymous/claim", json={"anonymous_id": "synthetic-anonymous-browser"}).status_code == 429
+
+with patch.object(server, "monthly_qa_enabled", return_value=False), \
+     patch.object(server, "auth_player", side_effect=AssertionError("production quota must precede auth")), \
+     patch.object(server, "db_rpc", side_effect=AssertionError("production must not use QA proof")), \
+     patch.object(server, "enforce_rate_limit", side_effect=deny_transfer):
+    assert client.post("/api/anonymous/claim", json={"anonymous_id": "synthetic-anonymous-browser"}).status_code == 429
+print("PASS empty QA claim: authenticated server proof only; nonempty and production retain the original quota")

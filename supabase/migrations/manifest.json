@@ -634,6 +634,31 @@
       ]
     },
     {
+      "id": "20261028-monthly-preview-special-bindings",
+      "order": 570,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028101522_monthly_preview_special_bindings.sql",
+      "type": "migration",
+      "status": "isolated-preview-catalog-only",
+      "sha256": "27a3e487a0146d55ace3ce9a71b38d2a45fec220730220d8229bddf329655d9b",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_submit_daily_special_v1",
+        "public.proplet_daily_special_identity_guard"
+      ]
+    },
+    {
+      "id": "20261028-monthly-preview-empty-claim-probe",
+      "order": 580,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028103442_monthly_preview_empty_claim_probe.sql",
+      "type": "migration",
+      "status": "isolated-preview-readonly-guard",
+      "sha256": "82ed82cd44eab407bc954bd73c1172d593d8c51d96f77bfc6ecdd8b4c8f38ca0",
+      "supersedes": [],
+      "replaced_rpc_definitions": []
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

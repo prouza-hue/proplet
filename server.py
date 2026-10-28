@@ -2035,14 +2035,28 @@ def login(payload: PlayerLogin, request: Request):
 
 @app.post("/api/anonymous/claim")
 def claim_anonymous(payload: AnonymousClaim, request: Request, authorization: Optional[str] = Header(default=None)):
+    # Attach anonymous telemetry to the authenticated player. Official results,
+    # XP and leaderboards are never created by this transfer.
+    player = None
+    anon = None
+    if monthly_qa_enabled():
+        # Accelerated isolated QA may authenticate several synthetic browsers.
+        # A server-proven empty transfer is a no-op, not a transfer-quota bypass:
+        # any anonymous session/data retains the ordinary 12/hour guard below.
+        enforce_rate_limit(request, "monthly_empty_claim_probe", limit=120, window_seconds=3600)
+        player = auth_player(authorization)
+        anon = anonymous_hash(payload.anonymous_id)
+        if not anon:
+            raise HTTPException(400, "Chybí anonymní ID")
+        proof = db_rpc("proplet_monthly_preview_empty_claim_v1", {"p_anonymous_hash": anon})
+        if not isinstance(proof, dict) or not isinstance(proof.get("empty"), bool):
+            raise HTTPException(503, "Přenos postupu se nepodařilo ověřit")
+        if proof["empty"]:
+            return {"ok": True, "claimed": {"attempts": 0, "helperEvents": 0, "hintEvents": 0,
+                    "productEvents": 0, "feedback": 0, "pushSubscriptions": 0}}
     enforce_rate_limit(request, "anonymous_claim", limit=12, window_seconds=3600)
-    """Attach anonymous telemetry from this installation to the newly authenticated player.
-
-    This prevents one person from being counted twice after creating/logging into an account.
-    Official results, XP and leaderboards are never created here; only QA telemetry is reassigned.
-    """
-    player = auth_player(authorization)
-    anon = anonymous_hash(payload.anonymous_id)
+    player = player or auth_player(authorization)
+    anon = anon or anonymous_hash(payload.anonymous_id)
     if not anon:
         raise HTTPException(400, "Chybí anonymní ID")
     if play_session_config().get("enabled"):

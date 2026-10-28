@@ -43,10 +43,28 @@
       "canonicalSourceSHA256": "1754779fe383695ad870bf5155e35ae1f65ecf4d83816a0a5882d4889c4900aa"
     },
     {
-      "version": null,
+      "version": "20261028095330",
       "name": "monthly_preview_extra_xp_parity",
       "source": "supabase/migrations/20261028095256_monthly_preview_extra_xp_parity.sql",
       "canonicalSourceSHA256": "d8522d8049d033d20fe35fad604619b9637b4edafeb020613413ddfb5e6acd8e"
+    },
+    {
+      "version": "20261028100020",
+      "name": "monthly_preview_referral_parity",
+      "source": "supabase/prepared/referral_v1.sql",
+      "canonicalSourceSHA256": "ea4bdb63b3ad0f1e42c1500c8d5a4c7c2e5f5fc51945f24ed4299bd81b33d3c8"
+    },
+    {
+      "version": "20261028101732",
+      "name": "monthly_preview_special_bindings",
+      "source": "supabase/migrations/20261028101522_monthly_preview_special_bindings.sql",
+      "canonicalSourceSHA256": "27a3e487a0146d55ace3ce9a71b38d2a45fec220730220d8229bddf329655d9b"
+    },
+    {
+      "version": "20261028103935",
+      "name": "monthly_preview_empty_claim_probe",
+      "source": "supabase/migrations/20261028103442_monthly_preview_empty_claim_probe.sql",
+      "canonicalSourceSHA256": "82ed82cd44eab407bc954bd73c1172d593d8c51d96f77bfc6ecdd8b4c8f38ca0"
     }
   ],
   "remoteRollbackAcceptance": {
@@ -78,5 +96,45 @@
     "passed": true,
     "scope": "Actual official November Extra result and session; no monthly points; legacy October policy unchanged",
     "awardedXP": 200
+  },
+  "legacySpecialCatalogPreserved": {
+    "count": 36,
+    "digestBeforeAndAfter": "5212836dd12c26ce9439a92d361d41ad",
+    "trustedCurrentNovember1": "g6-ds-mozkokalypsa-w03",
+    "unmarkedLegacyNovember1": "g6-ds-mozkokalypsa-w02",
+    "previewCatalogCount": 36,
+    "approvedSource": "data/daily_specials_private.json",
+    "approvedSourceSHA256": "88c130b44fb5288a3e2439df68ff81deedf9e51cd3b8cfc3631000455720a84d"
+  },
+  "referralParity": {
+    "statusRpcVerified": true,
+    "initialClaims": 0,
+    "initialBoards": 0,
+    "initialRewards": 0,
+    "notifications": false,
+    "note": "Required by actual new-account UI; exact existing application migration, no invitation sending."
+  },
+  "legacyStateAfterLiveRegistrationAndCatalogFix": {
+    "originalPlayers": 12,
+    "originalResults": 7,
+    "originalResultXP": 530,
+    "originalPlayerDigest": "7eb6a24f903dbfabae96206f0e86c1fe",
+    "originalResultDigest": "9607dcb596d0f0414beedada657ef985",
+    "scope": "Exclude actual browser-created MQA-* cohort; original synthetic fixtures remain byte-for-byte intact."
+  },
+  "emptyClaimProof": {
+    "scope": "Dedicated monthly QA only; authenticated HTTP path plus trusted database marker/isolated guard",
+    "readOnly": true,
+    "localDatabaseAcceptance": "15 groups passed; eight source categories each deny the empty shortcut, original transfer counter untouched",
+    "remoteProbe": {
+      "empty": true,
+      "anonExecute": false,
+      "authenticatedExecute": false,
+      "existingAnonymousClaimHitsBefore": 23,
+      "existingAnonymousClaimHitsAfter": 23,
+      "novemberPointsBefore": 120,
+      "novemberPointsAfter": 120
+    },
+    "quotas": "No reset or widening; actual nonempty transfers retain original12/hour guard. Root adds independent cheap120/hour QA probe guard."
   }
 }
