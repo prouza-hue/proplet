@@ -67,6 +67,9 @@ def load_settings() -> Settings:
     vercel_env = _env("VERCEL_ENV").lower()
     vercel_git_commit_ref = _env("VERCEL_GIT_COMMIT_REF")
     live_player_preview = live_player_preview_enabled()
+    monthly_preview = vercel_env == "preview" and vercel_git_commit_ref == "codex/monthly-competition-202611"
+    if monthly_preview and _env("SUPABASE_URL").rstrip("/") not in {"", "https://eanzztstmwlamwfdskbf.supabase.co"}:
+        raise RuntimeError("Monthly competition preview requires the isolated test database")
     gen4_preview_branch = "agent/v3340-medium-calibration-v3"
     gen4_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == gen4_preview_branch
     gen5_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == "feat/gen5-lab"
@@ -89,7 +92,9 @@ def load_settings() -> Settings:
         # Preserve the historical parsing exactly: URL only lost trailing
         # slashes and the secret was not whitespace-normalized.
         supabase_url="" if playtest_preview else os.environ.get("SUPABASE_URL", "").rstrip("/"),
-        supabase_secret_key="" if playtest_preview else os.environ.get("SUPABASE_SECRET_KEY", ""),
+        # A monthly preview must never inherit the project's production secret.
+        supabase_secret_key=(os.environ.get("PROPLET_MONTHLY_TEST_KEY", "") if monthly_preview else
+                             "" if playtest_preview else os.environ.get("SUPABASE_SECRET_KEY", "")),
         vapid_public_key="" if playtest_preview else _env("VAPID_PUBLIC_KEY"),
         vapid_private_key="" if playtest_preview else _env("VAPID_PRIVATE_KEY"),
         vapid_subject=_env("VAPID_SUBJECT", "https://proplet-nine.vercel.app"),
