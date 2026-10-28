@@ -8,3 +8,7 @@
 @media(max-width:540px){.collection-grid{gap:8px}.collection-award{padding:8px 0 12px}.collection-award img{height:154px;margin-bottom:9px}.collection-award strong{font-size:16px}.collection-award>span{font-size:13px}.collection-award small{font-size:11px}.monthly-panels{margin-bottom:15px}.award-quote{font-size:17px}}
 @media(max-width:360px){.collection-grid{gap:5px}.collection-award img{height:126px}.collection-award strong{font-size:14px}.collection-award>span{font-size:12px}.collection-award small{font-size:10px}.rank-list li:has(.award-thumb){grid-template-columns:36px minmax(0,1fr) auto}.rank-list .rank .award-thumb,.rank-list .rank .award-thumb img{width:36px}}
 @media(max-height:480px) and (min-width:600px){.monthly-panels{margin-bottom:10px}.collection-award img{height:140px}.collection-grid{margin-bottom:14px}.detail-art{height:170px;margin-block:0 8px}#awardDetailTitle{font-size:22px}.award-quote{font-size:16px;margin-bottom:10px}}
+
+/* A character illustrates the prize; the ordinal communicates the ranking. */
+.rank-list li,.rank-list li:has(.award-thumb){grid-template-columns:68px minmax(0,1fr) auto}.rank-list .rank{display:flex;align-items:center;gap:5px}.rank-number{font-size:16px;font-weight:650;min-width:18px}.rank-list .rank .award-thumb,.rank-list .rank .award-thumb img{width:40px}
+@media(max-width:360px){.rank-list li,.rank-list li:has(.award-thumb){grid-template-columns:58px minmax(0,1fr) auto}.rank-list .rank{gap:3px}.rank-list .rank .award-thumb,.rank-list .rank .award-thumb img{width:34px}}
