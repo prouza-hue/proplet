@@ -555,6 +555,17 @@
       ]
     },
     {
+      "id": "20261028-monthly-competition",
+      "order": 510,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028003751_monthly_competition.sql",
+      "type": "migration",
+      "status": "prepared-isolated-preview-only-production-disabled",
+      "sha256": "b54f32ecc7507e56e653c23914eac278a912597062892df99de5cfab51db51bb",
+      "supersedes": [],
+      "replaced_rpc_definitions": []
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

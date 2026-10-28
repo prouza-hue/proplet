@@ -1,0 +1,999 @@
+{
+  "syntheticOnly": true,
+  "source": "real-postgresql-acceptance-snapshot",
+  "onlineBackend": false,
+  "generatedAt": "2026-10-28T00:43:03.748396+00:00",
+  "scenarios": {
+    "empty": {
+      "me": {
+        "days": [],
+        "rank": null,
+        "points": 0,
+        "validDays": 0,
+        "countedDays": 0,
+        "sharedRank": false
+      },
+      "month": "2026-10",
+      "badges": [],
+      "status": "open",
+      "enabled": true,
+      "endDate": "2026-11-01",
+      "closesAt": "2026-11-03T00:00:00+01:00",
+      "isolated": true,
+      "timezone": "Europe/Prague",
+      "standings": [],
+      "startDate": "2026-10-01",
+      "previousPodium": [],
+      "totalPlayers": 0,
+      "limit": 100,
+      "truncated": false,
+      "isolatedScenario": true,
+      "scenarioViewer": true,
+      "scenario": "empty",
+      "dataSource": "real-postgresql-acceptance-snapshot",
+      "onlineBackend": false
+    },
+    "upcoming": {
+      "me": {
+        "days": [],
+        "rank": null,
+        "points": 0,
+        "validDays": 0,
+        "countedDays": 0,
+        "sharedRank": false
+      },
+      "month": "2026-10",
+      "badges": [],
+      "status": "upcoming",
+      "enabled": true,
+      "endDate": "2026-11-01",
+      "closesAt": "2026-11-03T00:00:00+01:00",
+      "isolated": true,
+      "timezone": "Europe/Prague",
+      "standings": [],
+      "startDate": "2026-10-01",
+      "previousPodium": [],
+      "totalPlayers": 0,
+      "limit": 100,
+      "truncated": false,
+      "isolatedScenario": true,
+      "scenarioViewer": true,
+      "scenario": "upcoming",
+      "dataSource": "real-postgresql-acceptance-snapshot",
+      "onlineBackend": false
+    },
+    "under20": {
+      "me": {
+        "days": [
+          {
+            "date": "2026-10-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 1,
+        "points": 120,
+        "validDays": 1,
+        "countedDays": 1,
+        "sharedRank": false
+      },
+      "month": "2026-10",
+      "badges": [],
+      "status": "open",
+      "enabled": true,
+      "endDate": "2026-11-01",
+      "closesAt": "2026-11-03T00:00:00+01:00",
+      "isolated": true,
+      "timezone": "Europe/Prague",
+      "standings": [
+        {
+          "rank": 1,
+          "points": 120,
+          "validDays": 1,
+          "countedDays": 1,
+          "name": "Zkušební hráč 1",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": true,
+          "sharedRank": false
+        }
+      ],
+      "startDate": "2026-10-01",
+      "previousPodium": [],
+      "totalPlayers": 1,
+      "limit": 100,
+      "truncated": false,
+      "isolatedScenario": true,
+      "scenarioViewer": true,
+      "scenario": "under20",
+      "dataSource": "real-postgresql-acceptance-snapshot",
+      "onlineBackend": false
+    },
+    "over20": {
+      "me": {
+        "days": [
+          {
+            "date": "2026-10-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-02",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-03",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-04",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-05",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-06",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-07",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-08",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-09",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-10",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-11",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-12",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-13",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-14",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-15",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-16",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-17",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-18",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-19",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-20",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-21",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-22",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-23",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-24",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-25",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 1,
+        "points": 2400,
+        "validDays": 25,
+        "countedDays": 20,
+        "sharedRank": true
+      },
+      "month": "2026-10",
+      "badges": [],
+      "status": "open",
+      "enabled": true,
+      "endDate": "2026-11-01",
+      "closesAt": "2026-11-03T00:00:00+01:00",
+      "isolated": true,
+      "timezone": "Europe/Prague",
+      "standings": [
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 20,
+          "countedDays": 20,
+          "name": "Zkušební hráč 3",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
+          "sharedRank": true
+        },
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 25,
+          "countedDays": 20,
+          "name": "Zkušební hráč 1",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": true,
+          "sharedRank": true
+        },
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 20,
+          "countedDays": 20,
+          "name": "Zkušební hráč 2",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
+          "sharedRank": true
+        },
+        {
+          "rank": 4,
+          "points": 100,
+          "validDays": 1,
+          "countedDays": 1,
+          "name": "Zkušební hráč 4",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
+          "sharedRank": false
+        }
+      ],
+      "startDate": "2026-10-01",
+      "previousPodium": [],
+      "totalPlayers": 4,
+      "limit": 100,
+      "truncated": false,
+      "isolatedScenario": true,
+      "scenarioViewer": true,
+      "scenario": "over20",
+      "dataSource": "real-postgresql-acceptance-snapshot",
+      "onlineBackend": false
+    },
+    "ties": {
+      "me": {
+        "days": [
+          {
+            "date": "2026-10-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-02",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-03",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-04",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-05",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-06",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-07",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-08",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-09",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-10",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-11",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-12",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-13",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-14",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-15",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-16",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-17",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-18",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-19",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-20",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-21",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-22",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-23",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-24",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-25",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 1,
+        "points": 2400,
+        "validDays": 25,
+        "countedDays": 20,
+        "sharedRank": true
+      },
+      "month": "2026-10",
+      "badges": [],
+      "status": "open",
+      "enabled": true,
+      "endDate": "2026-11-01",
+      "closesAt": "2026-11-03T00:00:00+01:00",
+      "isolated": true,
+      "timezone": "Europe/Prague",
+      "standings": [
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 20,
+          "countedDays": 20,
+          "name": "Zkušební hráč 3",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
+          "sharedRank": true
+        },
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 25,
+          "countedDays": 20,
+          "name": "Zkušební hráč 1",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": true,
+          "sharedRank": true
+        },
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 20,
+          "countedDays": 20,
+          "name": "Zkušební hráč 2",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
+          "sharedRank": true
+        },
+        {
+          "rank": 4,
+          "points": 100,
+          "validDays": 1,
+          "countedDays": 1,
+          "name": "Zkušební hráč 4",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
+          "sharedRank": false
+        }
+      ],
+      "startDate": "2026-10-01",
+      "previousPodium": [],
+      "totalPlayers": 4,
+      "limit": 100,
+      "truncated": false,
+      "isolatedScenario": true,
+      "scenarioViewer": true,
+      "scenario": "ties",
+      "dataSource": "real-postgresql-acceptance-snapshot",
+      "onlineBackend": false
+    },
+    "provisional": {
+      "me": {
+        "days": [
+          {
+            "date": "2026-10-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-02",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-03",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-04",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-05",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-06",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-07",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-08",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-09",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-10",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-11",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-12",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-13",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-14",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-15",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-16",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-17",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-18",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-19",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-20",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-21",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-22",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-23",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-24",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-25",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 1,
+        "points": 2400,
+        "validDays": 25,
+        "countedDays": 20,
+        "sharedRank": true
+      },
+      "month": "2026-10",
+      "badges": [],
+      "status": "provisional",
+      "enabled": true,
+      "endDate": "2026-11-01",
+      "closesAt": "2026-11-03T00:00:00+01:00",
+      "isolated": true,
+      "timezone": "Europe/Prague",
+      "standings": [
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 20,
+          "countedDays": 20,
+          "name": "Zkušební hráč 3",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
+          "sharedRank": true
+        },
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 25,
+          "countedDays": 20,
+          "name": "Zkušební hráč 1",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": true,
+          "sharedRank": true
+        },
+        {
+          "rank": 3,
+          "points": 2380,
+          "validDays": 20,
+          "countedDays": 20,
+          "name": "Zkušební hráč 2",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
+          "sharedRank": false
+        }
+      ],
+      "startDate": "2026-10-01",
+      "previousPodium": [],
+      "totalPlayers": 3,
+      "limit": 100,
+      "truncated": false,
+      "isolatedScenario": true,
+      "scenarioViewer": true,
+      "scenario": "provisional",
+      "dataSource": "real-postgresql-acceptance-snapshot",
+      "onlineBackend": false
+    },
+    "closed": {
+      "me": {
+        "days": [
+          {
+            "date": "2026-10-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-02",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-03",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-04",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-05",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-06",
+            "clean": false,
+            "points": 100,
+            "counted": false
+          },
+          {
+            "date": "2026-10-07",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-08",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-09",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-10",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-11",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-12",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-13",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-14",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-15",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-16",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-17",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-18",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-19",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-20",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-21",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-22",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-23",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-24",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-10-25",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 1,
+        "points": 2400,
+        "validDays": 25,
+        "countedDays": 20,
+        "sharedRank": true
+      },
+      "month": "2026-10",
+      "badges": [
+        {
+          "rank": 1,
+          "month": "2026-10",
+          "points": 2400,
+          "shared": true
+        }
+      ],
+      "status": "closed",
+      "enabled": true,
+      "endDate": "2026-11-01",
+      "closesAt": "2026-11-03T00:00:00+01:00",
+      "isolated": true,
+      "timezone": "Europe/Prague",
+      "standings": [
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 20,
+          "countedDays": 20,
+          "name": "Zkušební hráč 3",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
+          "sharedRank": true
+        },
+        {
+          "rank": 1,
+          "points": 2400,
+          "validDays": 25,
+          "countedDays": 20,
+          "name": "Zkušební hráč 1",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": true,
+          "sharedRank": true
+        },
+        {
+          "rank": 3,
+          "points": 2380,
+          "validDays": 20,
+          "countedDays": 20,
+          "name": "Zkušební hráč 2",
+          "avatar": "🙂",
+          "anonymous": false,
+          "isMine": false,
+          "sharedRank": false
+        }
+      ],
+      "startDate": "2026-10-01",
+      "previousPodium": [],
+      "totalPlayers": 3,
+      "limit": 100,
+      "truncated": false,
+      "isolatedScenario": true,
+      "scenarioViewer": true,
+      "scenario": "closed",
+      "dataSource": "real-postgresql-acceptance-snapshot",
+      "onlineBackend": false
+    }
+  }
+}

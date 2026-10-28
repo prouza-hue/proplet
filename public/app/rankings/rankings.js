@@ -50,7 +50,7 @@
     let navigation=container.querySelector('.ranking-view-tabs');
     if(!navigation){
       navigation=doc.createElement('nav');navigation.className='ranking-view-tabs';navigation.setAttribute('aria-label','Pohled pořadí');
-      for(const [view,label] of [['daily','Výzva'],['xp','XP'],['weekly','Týdenní soutěž']]){
+      for(const [view,label] of [['daily','Výzva'],['xp','XP'],['weekly','Týdenní soutěž'],['monthly','Měsíční soutěž']]){
         const button=doc.createElement('button');button.type='button';button.dataset.rankingView=view;button.textContent=label;
         button.addEventListener('click',()=>onSelect?.(view));navigation.append(button);
       }
@@ -99,6 +99,7 @@
     }
     function openView(view){
       if(view==='weekly'){openWeeklyView();return}
+      if(view==='monthly'){const open=globalThis.PropletMonthlyCompetition?.open;if(typeof open==='function'){interactionVersion++;activeAnchor=null;pointerAnchor=null;layoutObserver?.disconnect();if(viewportTail)viewportTail.style.height='0px';open();}return}
       if(!['daily','xp'].includes(view))return;
       rankingView=view;interactionVersion++;activeAnchor=null;pointerAnchor=null;layoutObserver?.disconnect();
       if(viewportTail)viewportTail.style.height='0px';

@@ -27,6 +27,7 @@ from backend import analytics as product_analytics
 from backend import measurement
 from backend.launch_report import build_launch_report
 from backend import rankings as ranking_queries
+from backend import monthly_competition
 from backend import results as result_domain
 from backend import archive as archive_domain
 from backend import referrals as referral_domain
@@ -145,7 +146,7 @@ request_guard_context = ContextVar("proplet_request_guard", default=None)
 
 
 def isolated_fair_play_preview():
-    return (VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF in {"fix/fair-play-progress", free_order.BRANCH, "work/daily-specials-integrated-20261012"}
+    return (VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF in {"fix/fair-play-progress", free_order.BRANCH, "work/daily-specials-integrated-20261012", "codex/monthly-competition-202611"}
             and SUPABASE_URL.rstrip("/") == "https://eanzztstmwlamwfdskbf.supabase.co")
 
 
@@ -4832,6 +4833,58 @@ def leave_team(request: Request, authorization: Optional[str] = Header(default=N
     new_solo = make_solo_family_code()
     db_update("players", {"id": player["id"]}, {"family_code": new_solo, "team_joined_at": None})
     return {"ok": True, "familyCode": None, "leagueName": None}
+
+
+def monthly_competition_available() -> bool:
+    if os.environ.get("PROPLET_MONTHLY_ENABLED", "").lower() not in {"true", "1"}:
+        return False
+    if VERCEL_ENV == "preview":
+        return (VERCEL_GIT_COMMIT_REF == "codex/monthly-competition-202611"
+                and SUPABASE_URL == "https://eanzztstmwlamwfdskbf.supabase.co"
+                and bool(SUPABASE_SECRET_KEY))
+    return VERCEL_ENV == "production" and supabase_ready()
+
+
+@app.get("/api/competition/monthly")
+def monthly_competition_state(
+    request: Request,
+    month: Optional[str] = Query(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$"),
+    scenario: Optional[str] = Query(default=None, pattern=r"^(upcoming|empty|under20|over20|ties|provisional|closed)$"),
+    authorization: Optional[str] = Header(default=None),
+):
+    if scenario:
+        isolated_preview = (VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF == "codex/monthly-competition-202611"
+                            and SUPABASE_URL == "https://eanzztstmwlamwfdskbf.supabase.co")
+        local_qa = not VERCEL_ENV and os.environ.get("PROPLET_MONTHLY_LOCAL_QA") == "true"
+        if not (isolated_preview or local_qa):
+            raise HTTPException(404, "Izolovaný scénář není dostupný")
+        path = ROOT / "data" / "monthly-preview-scenarios.json"
+        if not path.is_file():
+            raise HTTPException(503, "Izolované scénáře zatím nejsou připravené")
+        value = json.loads(path.read_text(encoding="utf-8")).get("scenarios", {}).get(scenario)
+        if not isinstance(value, dict):
+            raise HTTPException(404, "Izolovaný scénář není dostupný")
+        return JSONResponse({**value, "isolatedScenario": scenario, "scenarioViewer": True}, headers={"Cache-Control": "no-store"})
+    if not monthly_competition_available():
+        return JSONResponse({"enabled": False, "reason": "disabled"}, headers={"Cache-Control": "no-store"})
+    enforce_rate_limit(request, "monthly_read", limit=300, window_seconds=3600)
+    viewer = _ranking_viewer(authorization)
+    value = monthly_competition.state(
+        rpc=db_rpc, player_id=str(viewer["id"]) if viewer else None,
+        month=month + "-01" if month else None,
+        players=lambda ids: db_select_bounded("players", columns="id,name,avatar,public_rankings", filters={"id": "in.(" + ",".join(ids) + ")"}),
+        identity=_ranking_display_identity,
+    )
+    return JSONResponse(value, headers={"Cache-Control": "no-store"})
+
+
+@app.get("/api/cron/monthly-competition")
+def monthly_competition_close(authorization: Optional[str] = Header(default=None)):
+    if not monthly_competition_available():
+        raise HTTPException(404, "Měsíční soutěž není aktivní")
+    if not CRON_SECRET or not hmac.compare_digest(authorization or "", f"Bearer {CRON_SECRET}"):
+        raise HTTPException(403, "Neplatné ověření uzávěrky")
+    return monthly_competition.finalize(rpc=db_rpc)
 
 
 @app.get("/api/rankings/xp")

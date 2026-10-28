@@ -1,0 +1,65 @@
+/* Monthly points are supplied by the confirmed-results server ledger, never by XP or local progress. */
+(()=>{'use strict';
+const host=document.createElement('section');host.id='screen-monthly';host.className='screen';host.setAttribute('aria-label','Měsíční soutěž');document.querySelector('.app-footer').before(host);
+const root=host.attachShadow({mode:'open'});
+root.innerHTML='<link rel="stylesheet" href="/ranking-navigation.css?v=monthly1"><link rel="stylesheet" href="/monthly-competition.css?v=monthly1"><div class="wrap"><h1>Pořadí</h1><div id="navigation"></div><p id="scenarioNotice" class="notice" hidden></p><div class="month-head"><div><h2 id="monthLabel">Měsíční soutěž</h2><span class="status" id="status"></span></div><div class="month-nav"><button type="button" id="previousMonth" aria-label="Předchozí měsíc">‹</button><button type="button" id="nextMonth" aria-label="Následující měsíc">›</button></div></div><div id="content" aria-live="polite" aria-busy="false"></div></div>';
+const $=s=>root.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>Math.max(0,Number(v)||0),fmt=v=>num(v).toLocaleString('cs-CZ');
+const countedDaysLabel=value=>{const n=num(value);return `${fmt(n)} ${n===1?'započtený den':n>=2&&n<=4?'započtené dny':'započtených dnů'}`;};
+const profile=()=>{const p=getProfile();return p?.id&&p?.token?{...p}:null;};
+const identity=p=>JSON.stringify([p?.id,p?.token]);
+const currentMonth=()=>{const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit'}).formatToParts(new Date()).map(x=>[x.type,x.value]));return p.year+'-'+p.month;};
+// The server also enforces the first season. October is an upcoming November view.
+const latestMonth=()=>[currentMonth(),'2026-11'].sort().at(-1);
+const requestedScenario=new URLSearchParams(location.search).get('monthlyScenario');
+const isolatedScenario=['upcoming','empty','under20','over20','ties','provisional','closed'].includes(requestedScenario)?requestedScenario:null;
+let month=latestMonth(),data=null,sequence=0,inflight=null,loadedAt=0,loadedKey='',expanded=false;
+function monthLabel(value){return new Date(value+'-15T12:00:00Z').toLocaleDateString('cs-CZ',{month:'long',year:'numeric',timeZone:'Europe/Prague'});}
+function dateLabel(value){return new Date(String(value).slice(0,10)+'T12:00:00Z').toLocaleDateString('cs-CZ',{day:'numeric',month:'numeric',timeZone:'Europe/Prague'});}
+function closeLabel(value){const d=new Date(value);return Number.isNaN(d.valueOf())?'':d.toLocaleString('cs-CZ',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Prague'});}
+function shiftMonth(value,delta){const d=new Date(value+'-15T12:00:00Z');d.setUTCMonth(d.getUTCMonth()+delta);return d.toISOString().slice(0,7);}
+function mountNavigation(){window.PropletRankings?.mountViewNavigation($('#navigation'),{selected:'monthly',onSelect:view=>{if(view!=='monthly')rankingsOrchestration().openView(view);}});}
+function updateHeading(value=month){const label=monthLabel(value);$('#monthLabel').textContent=label.charAt(0).toUpperCase()+label.slice(1);$('#previousMonth').disabled=month<='2026-11';$('#nextMonth').disabled=month>=latestMonth();}
+function loading(){updateHeading();$('#status').textContent='';$('#content').setAttribute('aria-busy','true');$('#content').innerHTML='<p class="loading" role="status">Načítám měsíční pořadí…</p>';}
+function failure(){data=null;$('#content').setAttribute('aria-busy','false');$('#status').textContent='';$('#content').innerHTML=`<div class="error"><h3>${navigator.onLine===false?'Jsi offline':'Pořadí se nepodařilo načíst'}</h3><p>${navigator.onLine===false?'Pořadí a potvrzené body načteme po připojení. Rozehranou výzvu můžeš dokončit i offline.':'Potvrzené body zůstávají na serveru. Zkus to prosím znovu.'}</p><button class="text-button" data-retry>Zkusit znovu</button></div>`;}
+async function load(force=false){const p=profile(),key=month+':'+identity(p);if(!force&&inflight?.key===key)return inflight.promise;if(!force&&data&&loadedKey===key&&Date.now()-loadedAt<30000){render();return;}const request=++sequence;loading();const requestedMonth=month;const promise=(async()=>{try{const value=await api('/api/competition/monthly?month='+encodeURIComponent(requestedMonth)+(isolatedScenario?'&scenario='+encodeURIComponent(isolatedScenario):''),{authProfile:p});if(request!==sequence||key!==month+':'+identity(profile()))return;data=value;loadedAt=Date.now();loadedKey=key;render();}catch{if(request===sequence&&key===month+':'+identity(profile()))failure();}})().finally(()=>{if(inflight?.request===request)inflight=null;});inflight={key,request,promise};return promise;}
+const medal=rank=>({1:'/rewards/printshop/medaile.svg',2:'/rewards/printshop/medal-2.svg',3:'/rewards/printshop/medal-3.svg'}[rank]);
+function row(r,mine=false){const rank=num(r.rank);return `<li class="${mine?'mine':''}"><span class="rank">${medal(rank)?`<img src="${medal(rank)}" alt="${rank}. místo">`:fmt(rank)+'.'}</span><div><div class="player-name">${esc(r.name||'Propletač')}${mine?'<small>ty</small>':''}</div><div class="player-meta">${countedDaysLabel(r.countedDays)}</div></div><span class="points">${fmt(r.points)}<small>bodů</small></span></li>`;}
+function personal(me,p,status){if(!p)return '<article class="personal"><h3>Tvoje místo v měsíční soutěži</h3><p>S účtem uvidíš své potvrzené body a započtené dny.</p><button class="primary" data-account>Uložit postup</button></article>';
+const points=num(me?.points),days=Math.min(20,num(me?.countedDays)),valid=num(me?.validDays),rank=num(me?.rank);return `<article class="personal"><div class="personal-top"><div><h3>Tvoje soutěžní body</h3><div class="personal-score"><strong>${fmt(points)}</strong><span>/ 2 400 bodů</span></div></div><div class="personal-rank">${rank?fmt(rank)+'. místo':'—'}<small>${rank?(me?.sharedRank?'společné umístění':'v měsíčním pořadí'):'zatím bez výsledku'}</small></div></div><div class="progress"><div class="progress-label"><span>Započtené dny <strong>${days} / 20</strong></span><small>${valid>20?fmt(valid)+' platných dnů':'nejlepších 20 dnů'}</small></div><div class="track" role="progressbar" aria-label="Započtené dny" aria-valuenow="${days}" aria-valuemin="0" aria-valuemax="20"><i style="width:${days/20*100}%"></i></div></div><p>${status==='closed'?'Měsíc je uzavřený. Toto jsou konečné výsledky.':status==='provisional'?'Výsledky jsou předběžné do uzávěrky.':valid>=20?'Další lepší den může nahradit slabší výsledek.':valid?'Další Denní výzva může přidat až 120 bodů.':'První platná Denní výzva přidá 100 bodů, bez nápovědy 120.'}</p></article>`;}
+function daysDetail(me){const days=Array.isArray(me?.days)?me.days:[];if(!days.length)return '';return `<details class="details"><summary>Rozpis tvých dnů</summary><ul class="days">${days.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(d=>`<li class="${d.counted?'':'excluded'}"><span>${esc(dateLabel(d.date))}<small>${num(d.points)===120?'Bez nápovědy':'S nápovědou'}${d.counted?' · započteno':' · mimo nejlepší dvacítku'}</small></span><b>${fmt(d.points)} bodů</b></li>`).join('')}</ul></details>`;}
+function rules(){return '<details class="details"><summary>Pravidla a odznaky</summary><p>Počítá se první platné dokončení základní Denní výzvy v den vydání: 100 soutěžních bodů a dalších 20 bez nápovědy. Do skóre vstupuje nejlepších 20 dnů měsíce, nejvýše 2 400 bodů.</p><p>Rychlost ani XP nerozhodují. Extra, Tajenka, volná hra, Archiv, trénink a opakování soutěžní body nepřidávají.</p><p>Měsíc se řídí časem Europe/Prague. Po konci měsíce následuje 48 hodin na kontrolu výsledků a reklamace. Do té doby je pořadí předběžné.</p><p>Při shodě bodů platí společná místa, například 1–1–3. Všichni na prvním, druhém a třetím místě získají měsíční odznak. Odznaky nepřidávají XP.</p></details>';}
+function render(){if(!data)return;updateHeading();$('#content').setAttribute('aria-busy','false');
+const verifiedScenario=data.scenarioViewer===true&&typeof data.isolatedScenario==='string';
+$('#scenarioNotice').hidden=!verifiedScenario;$('#scenarioNotice').textContent=verifiedScenario?'Izolovaný scénář · ukázkoví hráči. Body a odznaky se nikomu nepřipisují.'+(data.onlineBackend===false?' Snímek z databázového testu; online soutěžní databáze není připojená.':''):'';
+const displayedMonth=verifiedScenario&&/^\d{4}-\d{2}$/.test(data.month)?data.month:month;
+if(verifiedScenario){updateHeading(displayedMonth);$('#previousMonth').disabled=true;$('#nextMonth').disabled=true;}
+const status=data.status||'upcoming',p=profile()||(verifiedScenario?{id:'scenario-viewer'}:null),me=data.me,standings=Array.isArray(data.standings)?data.standings:[];
+$('#status').textContent=({upcoming:'První sezóna',open:'Průběžné pořadí',provisional:'Předběžné výsledky',closed:'Konečné výsledky'}[status]||'Průběžné pořadí');
+if(data.enabled===false){$('#status').textContent='';$('#content').innerHTML=`<div class="empty"><h3>${data.reason==='policy-pending'?'Pravidla čekají na potvrzení':'Měsíční soutěž zatím není dostupná'}</h3><p>${data.reason==='non-production'||data.reason==='disabled'?'Soutěžní backend v tomto prostředí není aktivní. Nezobrazujeme ukázkové výsledky jako skutečné.':'Potvrzené pořadí se zde nyní nezobrazuje.'}</p><button class="text-button" data-retry>Zkusit znovu</button></div>${rules()}`;return;}
+const visible=expanded?standings:standings.slice(0,5),mineOutside=!expanded&&standings.slice(5).find(r=>r.isMine===true);
+const provisional=status==='provisional'?`<p class="notice">Uzávěrka ${esc(closeLabel(data.closesAt))} českého času. Výsledky ještě procházejí kontrolou.</p>`:'';
+const upcoming=status==='upcoming'?'<div class="empty"><img class="empty-art" src="/rewards/printshop/medaile.svg" alt=""><h3>Začínáme 1. listopadu</h3><p>První měsíční soutěž otevře listopadová Denní výzva. Každý začíná od nuly.</p></div>':personal(me,p,status);
+const list=standings.length?`<div class="section-head"><h3>Pořadí jednotlivců</h3><small>Soutěžní body</small></div><ol class="rank-list">${visible.map(r=>row(r,r.isMine===true)).join('')}${mineOutside?row(mineOutside,true):''}</ol>${standings.length>5?`<button class="text-button" data-expand aria-expanded="${expanded}">${expanded?'Zobrazit první pětici':data.truncated?'Zobrazit prvních '+fmt(data.limit||100)+' míst a tvoje':'Zobrazit celé pořadí ('+fmt(standings.length)+')'}</button>`:''}`:status!=='upcoming'?'<div class="empty"><h3>Zatím bez výsledků</h3><p>Po prvním potvrzeném dokončení Denní výzvy se tu objeví měsíční pořadí.</p></div>':'';
+const podium=Array.isArray(data.previousPodium)?data.previousPodium:[];
+const previous=podium.length?`<section class="previous"><h3>Minulé pódium</h3><ol class="rank-list">${podium.map(r=>row(r,false)).join('')}</ol></section>`:'';
+const awards=Array.isArray(data.badges)?data.badges:[];
+const badge=awards.find(b=>b.month===displayedMonth||!b.month);
+const earned=badge&&medal(num(badge.rank))?`<div class="award"><img src="${medal(num(badge.rank))}" alt=""><div><strong>Tvůj měsíční odznak · ${fmt(badge.rank)}. místo</strong><small>${esc(monthLabel(displayedMonth))}</small></div></div>`:'';
+const offline=navigator.onLine===false?'<p class="notice">Jsi offline. Zobrazuje se poslední načtené pořadí; nové body ověříme po připojení.</p>':'';
+$('#content').innerHTML=offline+provisional+upcoming+earned+list+daysDetail(me)+rules()+previous;
+}
+function changeMonth(delta){const next=shiftMonth(month,delta);if(next<'2026-11'||next>latestMonth())return;month=next;data=null;expanded=false;load(true);}
+$('#previousMonth').onclick=()=>changeMonth(-1);$('#nextMonth').onclick=()=>changeMonth(1);
+root.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-retry'))load(true);if(b.hasAttribute('data-account'))openProfileModal('create');if(b.hasAttribute('data-expand')){expanded=!expanded;render();$('#content [data-expand]')?.focus({preventScroll:true});}});
+function openMonthly(){nav('monthly');}
+ROUTE_SCREENS.add('monthly');mountNavigation();
+document.addEventListener('proplet:screen-changed',e=>{if(e.detail.screen==='monthly'){document.querySelector('.bottom-nav [data-nav="leaderboard"]')?.classList.add('active');mountNavigation();load();}});
+function accountChanged(){sequence++;data=null;loadedAt=0;inflight=null;if(currentScreen==='monthly')load(true);}
+document.addEventListener('proplet:account-changed',accountChanged);
+document.addEventListener('proplet:profile-refreshed',()=>{if(loadedKey&&loadedKey!==month+':'+identity(profile()))accountChanged();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentScreen==='monthly')load();});
+window.addEventListener('online',()=>{if(currentScreen==='monthly')load(true);});
+window.PropletMonthlyCompetition={open:openMonthly};
+document.addEventListener('proplet:ready',()=>{if(new URLSearchParams(location.search).get('open')==='monthly')openMonthly();},{once:true});
+})();
