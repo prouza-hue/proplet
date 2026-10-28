@@ -1,0 +1,2982 @@
+{
+  "runId": "5a3327",
+  "origin": "https://proplet-git-codex-monthly-competi-a7b681-pavel-prouzas-projects.vercel.app",
+  "databaseRef": "eanzztstmwlamwfdskbf",
+  "branch": "codex/monthly-competition-202611",
+  "syntheticAccountsOnly": true,
+  "interceptedMonthlyResultsCatalog": false,
+  "directLedgerWrites": false,
+  "checks": [
+    {
+      "name": "final stale-cache XP/UI parity and canonical row migration; November/D unchanged",
+      "evidence": {
+        "points": 2840,
+        "authority": true,
+        "marker": 1,
+        "row": 15,
+        "simulated": true
+      }
+    }
+  ],
+  "timeline": [],
+  "gameResults": [],
+  "screenshots": [],
+  "blockedRequests": [],
+  "pageErrors": [],
+  "httpErrors": [],
+  "requestFailures": [],
+  "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-final-quick-b1c792a-20261028\\e2e-prior-attempt-1793189232451385300.json",
+  "resumed": true,
+  "priorChecks": [
+    {
+      "name": "partial resume validated only actual named QA actors and captured days",
+      "evidence": {
+        "ownParticipants": 1,
+        "totalPlayers": 1,
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184184138677700.json"
+      }
+    },
+    {
+      "name": "guest reads actual isolated month without own results",
+      "evidence": {
+        "me": null,
+        "month": "2026-11",
+        "badges": [],
+        "status": "open",
+        "enabled": true,
+        "endDate": "2026-12-01",
+        "closesAt": "2026-12-02T23:00:00+00:00",
+        "isolated": true,
+        "revision": null,
+        "timezone": "Europe/Prague",
+        "standings": [
+          {
+            "rank": 1,
+            "points": 120,
+            "validDays": 1,
+            "countedDays": 1,
+            "name": "Záhadný bobr",
+            "avatar": "🦫",
+            "anonymous": true,
+            "isMine": false,
+            "sharedRank": false
+          }
+        ],
+        "startDate": "2026-11-01",
+        "previousPodium": [],
+        "totalPlayers": 1,
+        "limit": 100,
+        "truncated": false
+      }
+    },
+    {
+      "name": "actual authenticated browser session restored without a new anonymous identity",
+      "evidence": {
+        "role": "A",
+        "id": "37268dc5-4380-413a-ac15-b9dc8332571c",
+        "name": "MQA-5a3327-A"
+      }
+    },
+    {
+      "name": "actual authenticated browser session restored without a new anonymous identity",
+      "evidence": {
+        "role": "B",
+        "id": "166420c4-a4eb-4783-8a9c-01d15ac7b9f8",
+        "name": "MQA-5a3327-B"
+      }
+    },
+    {
+      "name": "actual authenticated browser session restored without a new anonymous identity",
+      "evidence": {
+        "role": "C",
+        "id": "2566c354-6bc0-42d4-84d1-e40246611c1f",
+        "name": "MQA-5a3327-C"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-01",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-01",
+          "elapsedMs": 5906,
+          "moves": 9,
+          "completedAt": "2026-11-01T11:00:09.830698+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184184138677700.json"
+      }
+    },
+    {
+      "name": "native UI clean daily → official result → 120 monthly points",
+      "evidence": {
+        "state": {
+          "days": [
+            {
+              "date": "2026-11-01",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            }
+          ],
+          "rank": 1,
+          "points": 120,
+          "validDays": 1,
+          "countedDays": 1,
+          "sharedRank": false
+        },
+        "previouslyObserved": true
+      }
+    },
+    {
+      "name": "exact public result replay is idempotent",
+      "evidence": {
+        "ok": true,
+        "firstCompletion": true,
+        "awardedPoints": 100,
+        "dailyGenerationUpgrade": false,
+        "transferredSlot": false,
+        "stats": {
+          "points": 100,
+          "resultXp": 100,
+          "rewardXp": 0,
+          "cleanDaily": 1,
+          "bestDailyMs": 5906,
+          "cleanSolves": 1,
+          "rescuedDays": 0,
+          "currentStreak": 1,
+          "longestStreak": 1,
+          "otherRewardXp": 0,
+          "accountBonusXp": 0,
+          "dailyCompleted": 1,
+          "totalCompleted": 1,
+          "discoveredWords": 0,
+          "wordDiscoveryXp": 0,
+          "xpAuthoritative": true,
+          "gen4RewardPolicy": "per-board",
+          "tajenkaCompleted": 0,
+          "gen4ReturnBonusXp": 0,
+          "mozkomorCompleted": 0,
+          "gen4RewardRepairXp": 0,
+          "freeHistoryCompleted": {
+            "easy": 0,
+            "hard": 0,
+            "medium": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "wordDiscoveryRewards": 0,
+          "dailySpecialCompleted": 0,
+          "accountRewardsIncluded": true,
+          "dailyChallengeCompleted": 1,
+          "totalChallengeCompleted": 1,
+          "gen4ReturnBonusAwardedNow": 0,
+          "freeCompleted": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freeTransferred": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freePlayedCurrent": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freePlayedGen2": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freeBasePlayedCurrent": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "mozkomorUnlocked": true,
+          "earnedBadges": [
+            {
+              "days": 1,
+              "icon": "🥉",
+              "name": "První zářez"
+            }
+          ],
+          "nextBadge": {
+            "days": 3,
+            "icon": "❤️",
+            "name": "Srdcař"
+          }
+        },
+        "statsWarning": null
+      }
+    },
+    {
+      "name": "actual replayed Daily completion does not add a monthly day or points",
+      "evidence": {
+        "days": [
+          {
+            "date": "2026-11-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 1,
+        "points": 120,
+        "validDays": 1,
+        "countedDays": 1,
+        "sharedRank": false
+      }
+    },
+    {
+      "name": "actual Extra and training completions add no monthly points",
+      "evidence": {
+        "days": [
+          {
+            "date": "2026-11-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 1,
+        "points": 120,
+        "validDays": 1,
+        "countedDays": 1,
+        "sharedRank": false
+      }
+    },
+    {
+      "name": "hinted basic daily100; genuine free and Archive completions add no monthly points",
+      "evidence": {
+        "days": [
+          {
+            "date": "2026-11-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-11-02",
+            "clean": false,
+            "points": 100,
+            "counted": true
+          }
+        ],
+        "rank": 1,
+        "points": 220,
+        "validDays": 2,
+        "countedDays": 2,
+        "sharedRank": false
+      }
+    },
+    {
+      "name": "synthetic player chose anonymous ranking through real privacy dialog",
+      "evidence": {
+        "playerId": "166420c4-a4eb-4783-8a9c-01d15ac7b9f8",
+        "publicRankings": false
+      }
+    },
+    {
+      "name": "real offline queue synchronized retaining original completion",
+      "evidence": {
+        "role": "A",
+        "completion": "2026-11-03T11:00:08.436Z",
+        "receivedDay": "2026-11-04",
+        "receipt": {
+          "ok": true,
+          "firstCompletion": true,
+          "awardedPoints": 100,
+          "dailyGenerationUpgrade": false,
+          "transferredSlot": false,
+          "stats": null,
+          "statsWarning": null
+        }
+      }
+    },
+    {
+      "name": "partial resume validated only actual named QA actors and captured days",
+      "evidence": {
+        "ownParticipants": 3,
+        "totalPlayers": 3,
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "guest reads actual isolated month without own results",
+      "evidence": {
+        "me": null,
+        "month": "2026-11",
+        "badges": [],
+        "status": "open",
+        "enabled": true,
+        "endDate": "2026-12-01",
+        "closesAt": "2026-12-02T23:00:00+00:00",
+        "isolated": true,
+        "revision": null,
+        "timezone": "Europe/Prague",
+        "standings": [
+          {
+            "rank": 1,
+            "points": 360,
+            "validDays": 3,
+            "countedDays": 3,
+            "name": "Nenápadný jezevec",
+            "avatar": "🦡",
+            "anonymous": true,
+            "isMine": false,
+            "sharedRank": false
+          },
+          {
+            "rank": 2,
+            "points": 340,
+            "validDays": 3,
+            "countedDays": 3,
+            "name": "Záhadný bobr",
+            "avatar": "🦫",
+            "anonymous": true,
+            "isMine": false,
+            "sharedRank": false
+          },
+          {
+            "rank": 3,
+            "points": 100,
+            "validDays": 1,
+            "countedDays": 1,
+            "name": "Rychlý mýval",
+            "avatar": "🦝",
+            "anonymous": true,
+            "isMine": false,
+            "sharedRank": false
+          }
+        ],
+        "startDate": "2026-11-01",
+        "previousPodium": [],
+        "totalPlayers": 3,
+        "limit": 100,
+        "truncated": false
+      }
+    },
+    {
+      "name": "optional prompt deferred through its real visible control",
+      "evidence": {
+        "dialog": "#archiveExperienceModal"
+      }
+    },
+    {
+      "name": "actual authenticated browser session restored without a new anonymous identity",
+      "evidence": {
+        "role": "A",
+        "id": "37268dc5-4380-413a-ac15-b9dc8332571c",
+        "name": "MQA-5a3327-A"
+      }
+    },
+    {
+      "name": "actual authenticated browser session restored without a new anonymous identity",
+      "evidence": {
+        "role": "B",
+        "id": "166420c4-a4eb-4783-8a9c-01d15ac7b9f8",
+        "name": "MQA-5a3327-B"
+      }
+    },
+    {
+      "name": "synthetic player chose anonymous ranking through real privacy dialog",
+      "evidence": {
+        "playerId": "2566c354-6bc0-42d4-84d1-e40246611c1f",
+        "publicRankings": false
+      }
+    },
+    {
+      "name": "actual authenticated browser session restored without a new anonymous identity",
+      "evidence": {
+        "role": "C",
+        "id": "2566c354-6bc0-42d4-84d1-e40246611c1f",
+        "name": "MQA-5a3327-C"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-01",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-01",
+          "elapsedMs": 5906,
+          "moves": 9,
+          "completedAt": "2026-11-01T11:00:09.830698+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "native UI clean daily → official result → 120 monthly points",
+      "evidence": {
+        "state": {
+          "days": [
+            {
+              "date": "2026-11-01",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-02",
+              "clean": false,
+              "points": 100,
+              "counted": true
+            },
+            {
+              "date": "2026-11-03",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            }
+          ],
+          "rank": 2,
+          "points": 340,
+          "validDays": 3,
+          "countedDays": 3,
+          "sharedRank": false
+        },
+        "previouslyObserved": true
+      }
+    },
+    {
+      "name": "exact public result replay is idempotent",
+      "evidence": {
+        "ok": true,
+        "firstCompletion": true,
+        "awardedPoints": 100,
+        "dailyGenerationUpgrade": false,
+        "transferredSlot": false,
+        "stats": {
+          "points": 540,
+          "resultXp": 540,
+          "rewardXp": 0,
+          "cleanDaily": 2,
+          "bestDailyMs": 2860,
+          "cleanSolves": 4,
+          "rescuedDays": 0,
+          "currentStreak": 3,
+          "longestStreak": 3,
+          "otherRewardXp": 0,
+          "accountBonusXp": 0,
+          "dailyCompleted": 3,
+          "totalCompleted": 5,
+          "discoveredWords": 0,
+          "wordDiscoveryXp": 0,
+          "xpAuthoritative": true,
+          "gen4RewardPolicy": "per-board",
+          "tajenkaCompleted": 0,
+          "gen4ReturnBonusXp": 500,
+          "mozkomorCompleted": 0,
+          "gen4RewardRepairXp": 0,
+          "freeHistoryCompleted": {
+            "easy": 2,
+            "hard": 0,
+            "medium": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "wordDiscoveryRewards": 0,
+          "dailySpecialCompleted": 1,
+          "accountRewardsIncluded": true,
+          "dailyChallengeCompleted": 4,
+          "totalChallengeCompleted": 6,
+          "gen4ReturnBonusAwardedNow": 0,
+          "freeCompleted": {
+            "easy": 2,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freeTransferred": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freePlayedCurrent": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freePlayedGen2": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freeBasePlayedCurrent": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "mozkomorUnlocked": true,
+          "earnedBadges": [
+            {
+              "days": 1,
+              "icon": "🥉",
+              "name": "První zářez"
+            },
+            {
+              "days": 3,
+              "icon": "❤️",
+              "name": "Srdcař"
+            }
+          ],
+          "nextBadge": {
+            "days": 5,
+            "icon": "⭐",
+            "name": "Pětka"
+          }
+        },
+        "statsWarning": null
+      }
+    },
+    {
+      "name": "previous actual UI replay and queue acknowledgment retained",
+      "evidence": {
+        "role": "A",
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json",
+        "actualState": {
+          "days": [
+            {
+              "date": "2026-11-01",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-02",
+              "clean": false,
+              "points": 100,
+              "counted": true
+            },
+            {
+              "date": "2026-11-03",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            }
+          ],
+          "rank": 2,
+          "points": 340,
+          "validDays": 3,
+          "countedDays": 3,
+          "sharedRank": false
+        }
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-01",
+        "mode": "daily_special",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily-special:2026-11-01:mozkokalypsa",
+          "elapsedMs": 10638,
+          "moves": 14,
+          "completedAt": "2026-11-01T11:30:07.982165+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-01",
+        "mode": "starter",
+        "status": {
+          "synced": true,
+          "challengeKey": "starter:starter-v1",
+          "elapsedMs": 2864,
+          "moves": 3,
+          "completedAt": "2026-11-01T11:30:19.293744+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "actual Extra and training completions add no monthly points",
+      "evidence": {
+        "days": [
+          {
+            "date": "2026-11-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-11-02",
+            "clean": false,
+            "points": 100,
+            "counted": true
+          },
+          {
+            "date": "2026-11-03",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 2,
+        "points": 340,
+        "validDays": 3,
+        "countedDays": 3,
+        "sharedRank": false
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "B",
+        "day": "2026-11-01",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-01",
+          "elapsedMs": 6280,
+          "moves": 9,
+          "completedAt": "2026-11-01T11:30:36.177936+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "C",
+        "day": "2026-11-01",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-01",
+          "elapsedMs": 7434,
+          "moves": 9,
+          "completedAt": "2026-11-01T11:30:51.619892+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-02",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-02",
+          "elapsedMs": 4021,
+          "moves": 5,
+          "completedAt": "2026-11-02T11:00:11.861523+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-02",
+        "mode": "free",
+        "status": {
+          "synced": true,
+          "challengeKey": "free:g6-refresh-easy-001",
+          "elapsedMs": 4219,
+          "moves": 4,
+          "completedAt": "2026-11-02T11:00:25.757977+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-02",
+        "mode": "archive",
+        "status": {
+          "synced": true,
+          "challengeKey": "free:g3-e-001",
+          "elapsedMs": 3153,
+          "moves": 6,
+          "completedAt": "2026-11-02T11:00:38.581579+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "hinted basic daily100; genuine free and Archive completions add no monthly points",
+      "evidence": {
+        "days": [
+          {
+            "date": "2026-11-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-11-02",
+            "clean": false,
+            "points": 100,
+            "counted": true
+          },
+          {
+            "date": "2026-11-03",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 2,
+        "points": 340,
+        "validDays": 3,
+        "countedDays": 3,
+        "sharedRank": false
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "B",
+        "day": "2026-11-02",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-02",
+          "elapsedMs": 3142,
+          "moves": 5,
+          "completedAt": "2026-11-02T11:00:53.952013+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-03",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-03",
+          "elapsedMs": 2860,
+          "moves": 4,
+          "completedAt": "2026-11-03T11:00:08.436+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "B",
+        "day": "2026-11-03",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-03",
+          "elapsedMs": 3258,
+          "moves": 4,
+          "completedAt": "2026-11-03T11:00:08.14109+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184744340814400.json"
+      }
+    },
+    {
+      "name": "partial resume validated only actual named QA actors and captured days",
+      "evidence": {
+        "ownParticipants": 3,
+        "totalPlayers": 3,
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "guest reads actual isolated month without own results",
+      "evidence": {
+        "me": null,
+        "month": "2026-11",
+        "badges": [],
+        "status": "open",
+        "enabled": true,
+        "endDate": "2026-12-01",
+        "closesAt": "2026-12-02T23:00:00+00:00",
+        "isolated": true,
+        "revision": null,
+        "timezone": "Europe/Prague",
+        "standings": [
+          {
+            "rank": 1,
+            "points": 360,
+            "validDays": 3,
+            "countedDays": 3,
+            "name": "Nenápadný jezevec",
+            "avatar": "🦡",
+            "anonymous": true,
+            "isMine": false,
+            "sharedRank": false
+          },
+          {
+            "rank": 2,
+            "points": 340,
+            "validDays": 3,
+            "countedDays": 3,
+            "name": "Záhadný bobr",
+            "avatar": "🦫",
+            "anonymous": true,
+            "isMine": false,
+            "sharedRank": false
+          },
+          {
+            "rank": 3,
+            "points": 100,
+            "validDays": 1,
+            "countedDays": 1,
+            "name": "Rychlý mýval",
+            "avatar": "🦝",
+            "anonymous": true,
+            "isMine": false,
+            "sharedRank": false
+          }
+        ],
+        "startDate": "2026-11-01",
+        "previousPodium": [],
+        "totalPlayers": 3,
+        "limit": 100,
+        "truncated": false
+      }
+    },
+    {
+      "name": "actual authenticated browser session restored without a new anonymous identity",
+      "evidence": {
+        "role": "A",
+        "id": "37268dc5-4380-413a-ac15-b9dc8332571c",
+        "name": "MQA-5a3327-A"
+      }
+    },
+    {
+      "name": "actual authenticated browser session restored without a new anonymous identity",
+      "evidence": {
+        "role": "B",
+        "id": "166420c4-a4eb-4783-8a9c-01d15ac7b9f8",
+        "name": "MQA-5a3327-B"
+      }
+    },
+    {
+      "name": "actual authenticated browser session restored without a new anonymous identity",
+      "evidence": {
+        "role": "C",
+        "id": "2566c354-6bc0-42d4-84d1-e40246611c1f",
+        "name": "MQA-5a3327-C"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-01",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-01",
+          "elapsedMs": 5906,
+          "moves": 9,
+          "completedAt": "2026-11-01T11:00:09.830698+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "native UI clean daily → official result → 120 monthly points",
+      "evidence": {
+        "state": {
+          "days": [
+            {
+              "date": "2026-11-01",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-02",
+              "clean": false,
+              "points": 100,
+              "counted": true
+            },
+            {
+              "date": "2026-11-03",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            }
+          ],
+          "rank": 2,
+          "points": 340,
+          "validDays": 3,
+          "countedDays": 3,
+          "sharedRank": false
+        },
+        "previouslyObserved": true
+      }
+    },
+    {
+      "name": "exact public result replay is idempotent",
+      "evidence": {
+        "ok": true,
+        "firstCompletion": true,
+        "awardedPoints": 100,
+        "dailyGenerationUpgrade": false,
+        "transferredSlot": false,
+        "stats": {
+          "points": 540,
+          "resultXp": 540,
+          "rewardXp": 0,
+          "cleanDaily": 2,
+          "bestDailyMs": 2860,
+          "cleanSolves": 4,
+          "rescuedDays": 0,
+          "currentStreak": 3,
+          "longestStreak": 3,
+          "otherRewardXp": 0,
+          "accountBonusXp": 0,
+          "dailyCompleted": 3,
+          "totalCompleted": 5,
+          "discoveredWords": 0,
+          "wordDiscoveryXp": 0,
+          "xpAuthoritative": true,
+          "gen4RewardPolicy": "per-board",
+          "tajenkaCompleted": 0,
+          "gen4ReturnBonusXp": 500,
+          "mozkomorCompleted": 0,
+          "gen4RewardRepairXp": 0,
+          "freeHistoryCompleted": {
+            "easy": 2,
+            "hard": 0,
+            "medium": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "wordDiscoveryRewards": 0,
+          "dailySpecialCompleted": 1,
+          "accountRewardsIncluded": true,
+          "dailyChallengeCompleted": 4,
+          "totalChallengeCompleted": 6,
+          "gen4ReturnBonusAwardedNow": 0,
+          "freeCompleted": {
+            "easy": 2,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freeTransferred": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freePlayedCurrent": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freePlayedGen2": {
+            "easy": 1,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "freeBasePlayedCurrent": {
+            "easy": 0,
+            "medium": 0,
+            "hard": 0,
+            "hardcore": 0,
+            "mozkomor": 0,
+            "mozkokalypsa": 0
+          },
+          "mozkomorUnlocked": true,
+          "earnedBadges": [
+            {
+              "days": 1,
+              "icon": "🥉",
+              "name": "První zářez"
+            },
+            {
+              "days": 3,
+              "icon": "❤️",
+              "name": "Srdcař"
+            }
+          ],
+          "nextBadge": {
+            "days": 5,
+            "icon": "⭐",
+            "name": "Pětka"
+          }
+        },
+        "statsWarning": null
+      }
+    },
+    {
+      "name": "previous actual UI replay and queue acknowledgment retained",
+      "evidence": {
+        "role": "A",
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json",
+        "actualState": {
+          "days": [
+            {
+              "date": "2026-11-01",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-02",
+              "clean": false,
+              "points": 100,
+              "counted": true
+            },
+            {
+              "date": "2026-11-03",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            }
+          ],
+          "rank": 2,
+          "points": 340,
+          "validDays": 3,
+          "countedDays": 3,
+          "sharedRank": false
+        }
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-01",
+        "mode": "daily_special",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily-special:2026-11-01:mozkokalypsa",
+          "elapsedMs": 10638,
+          "moves": 14,
+          "completedAt": "2026-11-01T11:30:07.982165+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-01",
+        "mode": "starter",
+        "status": {
+          "synced": true,
+          "challengeKey": "starter:starter-v1",
+          "elapsedMs": 2864,
+          "moves": 3,
+          "completedAt": "2026-11-01T11:30:19.293744+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "actual Extra and training completions add no monthly points",
+      "evidence": {
+        "days": [
+          {
+            "date": "2026-11-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-11-02",
+            "clean": false,
+            "points": 100,
+            "counted": true
+          },
+          {
+            "date": "2026-11-03",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 2,
+        "points": 340,
+        "validDays": 3,
+        "countedDays": 3,
+        "sharedRank": false
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "B",
+        "day": "2026-11-01",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-01",
+          "elapsedMs": 6280,
+          "moves": 9,
+          "completedAt": "2026-11-01T11:30:36.177936+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "C",
+        "day": "2026-11-01",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-01",
+          "elapsedMs": 7434,
+          "moves": 9,
+          "completedAt": "2026-11-01T11:30:51.619892+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-02",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-02",
+          "elapsedMs": 4021,
+          "moves": 5,
+          "completedAt": "2026-11-02T11:00:11.861523+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-02",
+        "mode": "free",
+        "status": {
+          "synced": true,
+          "challengeKey": "free:g6-refresh-easy-001",
+          "elapsedMs": 4219,
+          "moves": 4,
+          "completedAt": "2026-11-02T11:00:25.757977+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-02",
+        "mode": "archive",
+        "status": {
+          "synced": true,
+          "challengeKey": "free:g3-e-001",
+          "elapsedMs": 3153,
+          "moves": 6,
+          "completedAt": "2026-11-02T11:00:38.581579+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "hinted basic daily100; genuine free and Archive completions add no monthly points",
+      "evidence": {
+        "days": [
+          {
+            "date": "2026-11-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-11-02",
+            "clean": false,
+            "points": 100,
+            "counted": true
+          },
+          {
+            "date": "2026-11-03",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 2,
+        "points": 340,
+        "validDays": 3,
+        "countedDays": 3,
+        "sharedRank": false
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "B",
+        "day": "2026-11-02",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-02",
+          "elapsedMs": 3142,
+          "moves": 5,
+          "completedAt": "2026-11-02T11:00:53.952013+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "A",
+        "day": "2026-11-03",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-03",
+          "elapsedMs": 2860,
+          "moves": 4,
+          "completedAt": "2026-11-03T11:00:08.436+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "resumed previously observed genuine result",
+      "evidence": {
+        "role": "B",
+        "day": "2026-11-03",
+        "mode": "daily",
+        "status": {
+          "synced": true,
+          "challengeKey": "daily:2026-11-03",
+          "elapsedMs": 3258,
+          "moves": 4,
+          "completedAt": "2026-11-03T11:00:08.14109+00:00"
+        },
+        "priorEvidence": "C:\\Users\\prouz\\.codex\\.chatgpt-projects\\g-p-6aac5023adc48191bd66be037edff741\\monthly-e2e-live-20261028\\e2e-prior-attempt-1793184965658661000.json"
+      }
+    },
+    {
+      "name": "optional prompt deferred through its real visible control",
+      "evidence": {
+        "dialog": "#archiveExperienceModal"
+      }
+    },
+    {
+      "name": "actual Tajenka completion adds no monthly points",
+      "evidence": {
+        "days": [
+          {
+            "date": "2026-11-01",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-11-02",
+            "clean": false,
+            "points": 100,
+            "counted": true
+          },
+          {
+            "date": "2026-11-03",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-11-04",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-11-05",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-11-06",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          },
+          {
+            "date": "2026-11-07",
+            "clean": true,
+            "points": 120,
+            "counted": true
+          }
+        ],
+        "rank": 1,
+        "points": 820,
+        "validDays": 7,
+        "countedDays": 7,
+        "sharedRank": false
+      }
+    },
+    {
+      "name": "real22days best20 cap and 1–1–3 shared ranking",
+      "evidence": {
+        "A": {
+          "days": [
+            {
+              "date": "2026-11-01",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-02",
+              "clean": false,
+              "points": 100,
+              "counted": false
+            },
+            {
+              "date": "2026-11-03",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-04",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-05",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-06",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-07",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-08",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-09",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-10",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-11",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-12",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-13",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-14",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-15",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-16",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-17",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-18",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-19",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-20",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-21",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-22",
+              "clean": true,
+              "points": 120,
+              "counted": false
+            }
+          ],
+          "rank": 1,
+          "points": 2400,
+          "validDays": 22,
+          "countedDays": 20,
+          "sharedRank": true
+        },
+        "B": {
+          "days": [
+            {
+              "date": "2026-11-01",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-02",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-03",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-04",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-05",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-06",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-07",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-08",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-09",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-10",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-11",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-12",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-13",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-14",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-15",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-16",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-17",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-18",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-19",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            },
+            {
+              "date": "2026-11-20",
+              "clean": true,
+              "points": 120,
+              "counted": true
+            }
+          ],
+          "rank": 1,
+          "points": 2400,
+          "validDays": 20,
+          "countedDays": 20,
+          "sharedRank": true
+        },
+        "C": {
+          "days": [
+            {
+              "date": "2026-11-01",
+              "clean": false,
+              "points": 100,
+              "counted": true
+            }
+          ],
+          "rank": 3,
+          "points": 100,
+          "validDays": 1,
+          "countedDays": 1,
+          "sharedRank": false
+        }
+      }
+    },
+    {
+      "name": "real offline queue synchronized retaining original completion",
+      "evidence": {
+        "role": "A",
+        "completion": "2026-11-30T11:00:09.369Z",
+        "receivedDay": "2026-12-02",
+        "receipt": {
+          "ok": true,
+          "firstCompletion": true,
+          "awardedPoints": 100,
+          "dailyGenerationUpgrade": false,
+          "transferredSlot": false,
+          "stats": null,
+          "statsWarning": null
+        }
+      }
+    },
+    {
+      "name": "48h cutoff, genuine deferred offline delivery, frozen late sync and idempotent zero-XP badges",
+      "evidence": {
+        "close": {
+          "qaNow": "2026-12-02T23:00:01.211657+00:00",
+          "qaDate": "2026-12-03",
+          "result": {
+            "enabled": true,
+            "finalized": 1
+          },
+          "enabled": true,
+          "anchorAt": "2026-10-28T11:12:22.527408+00:00",
+          "isolated": true,
+          "clockActive": true,
+          "databaseRef": "eanzztstmwlamwfdskbf",
+          "branch": "codex/monthly-competition-202611"
+        },
+        "A": {
+          "me": {
+            "days": [
+              {
+                "date": "2026-11-01",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-02",
+                "clean": false,
+                "points": 100,
+                "counted": false
+              },
+              {
+                "date": "2026-11-03",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-04",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-05",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-06",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-07",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-08",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-09",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-10",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-11",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-12",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-13",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-14",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-15",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-16",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-17",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-18",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-19",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-20",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-21",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-22",
+                "clean": true,
+                "points": 120,
+                "counted": false
+              },
+              {
+                "date": "2026-11-30",
+                "clean": true,
+                "points": 120,
+                "counted": false
+              }
+            ],
+            "rank": 1,
+            "points": 2400,
+            "validDays": 23,
+            "countedDays": 20,
+            "sharedRank": true
+          },
+          "month": "2026-11",
+          "badges": [
+            {
+              "rank": 1,
+              "month": "2026-11",
+              "points": 2400,
+              "shared": true
+            }
+          ],
+          "status": "closed",
+          "enabled": true,
+          "endDate": "2026-12-01",
+          "closesAt": "2026-12-02T23:00:00+00:00",
+          "isolated": true,
+          "revision": 1,
+          "timezone": "Europe/Prague",
+          "standings": [
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 20,
+              "countedDays": 20,
+              "name": "Nenápadný jezevec",
+              "avatar": "🦡",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 23,
+              "countedDays": 20,
+              "name": "MQA-5a3327-A",
+              "avatar": "🙂",
+              "anonymous": false,
+              "isMine": true,
+              "sharedRank": true
+            },
+            {
+              "rank": 3,
+              "points": 100,
+              "validDays": 1,
+              "countedDays": 1,
+              "name": "Rychlý mýval",
+              "avatar": "🦝",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": false
+            }
+          ],
+          "startDate": "2026-11-01",
+          "previousPodium": [],
+          "totalPlayers": 3,
+          "limit": 100,
+          "truncated": false
+        },
+        "B": {
+          "me": {
+            "days": [
+              {
+                "date": "2026-11-01",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-02",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-03",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-04",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-05",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-06",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-07",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-08",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-09",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-10",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-11",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-12",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-13",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-14",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-15",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-16",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-17",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-18",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-19",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-20",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              }
+            ],
+            "rank": 1,
+            "points": 2400,
+            "validDays": 20,
+            "countedDays": 20,
+            "sharedRank": true
+          },
+          "month": "2026-11",
+          "badges": [
+            {
+              "rank": 1,
+              "month": "2026-11",
+              "points": 2400,
+              "shared": true
+            }
+          ],
+          "status": "closed",
+          "enabled": true,
+          "endDate": "2026-12-01",
+          "closesAt": "2026-12-02T23:00:00+00:00",
+          "isolated": true,
+          "revision": 1,
+          "timezone": "Europe/Prague",
+          "standings": [
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 20,
+              "countedDays": 20,
+              "name": "MQA-5a3327-B",
+              "avatar": "🙂",
+              "anonymous": false,
+              "isMine": true,
+              "sharedRank": true
+            },
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 23,
+              "countedDays": 20,
+              "name": "Záhadný bobr",
+              "avatar": "🦫",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 3,
+              "points": 100,
+              "validDays": 1,
+              "countedDays": 1,
+              "name": "Rychlý mýval",
+              "avatar": "🦝",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": false
+            }
+          ],
+          "startDate": "2026-11-01",
+          "previousPodium": [],
+          "totalPlayers": 3,
+          "limit": 100,
+          "truncated": false
+        },
+        "C": {
+          "me": {
+            "days": [
+              {
+                "date": "2026-11-01",
+                "clean": false,
+                "points": 100,
+                "counted": true
+              }
+            ],
+            "rank": 3,
+            "points": 100,
+            "validDays": 1,
+            "countedDays": 1,
+            "sharedRank": false
+          },
+          "month": "2026-11",
+          "badges": [
+            {
+              "rank": 3,
+              "month": "2026-11",
+              "points": 100,
+              "shared": false
+            }
+          ],
+          "status": "closed",
+          "enabled": true,
+          "endDate": "2026-12-01",
+          "closesAt": "2026-12-02T23:00:00+00:00",
+          "isolated": true,
+          "revision": 1,
+          "timezone": "Europe/Prague",
+          "standings": [
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 20,
+              "countedDays": 20,
+              "name": "Nenápadný jezevec",
+              "avatar": "🦡",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 23,
+              "countedDays": 20,
+              "name": "Záhadný bobr",
+              "avatar": "🦫",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 3,
+              "points": 100,
+              "validDays": 1,
+              "countedDays": 1,
+              "name": "MQA-5a3327-C",
+              "avatar": "🙂",
+              "anonymous": false,
+              "isMine": true,
+              "sharedRank": false
+            }
+          ],
+          "startDate": "2026-11-01",
+          "previousPodium": [],
+          "totalPlayers": 3,
+          "limit": 100,
+          "truncated": false
+        },
+        "xpBeforeBadge": {
+          "A": 2740,
+          "B": 2000,
+          "C": 100
+        },
+        "xpAfterBadge": {
+          "A": 2740,
+          "B": 2000,
+          "C": 100
+        },
+        "lateOfflineXp": 200
+      }
+    },
+    {
+      "name": "real UI account created",
+      "evidence": {
+        "role": "D",
+        "id": "c0df1b16-c07a-4a4e-a911-4a70e40f7868",
+        "name": "MQA-5a3327-D"
+      }
+    },
+    {
+      "name": "fresh registered December account ready for independent QA",
+      "evidence": {
+        "id": "c0df1b16-c07a-4a4e-a911-4a70e40f7868",
+        "name": "MQA-5a3327-D",
+        "state": {
+          "me": {
+            "days": [],
+            "rank": null,
+            "points": 0,
+            "validDays": 0,
+            "countedDays": 0,
+            "sharedRank": false
+          },
+          "month": "2026-12",
+          "badges": [],
+          "status": "open",
+          "enabled": true,
+          "endDate": "2027-01-01",
+          "closesAt": "2027-01-02T23:00:00+00:00",
+          "isolated": true,
+          "revision": null,
+          "timezone": "Europe/Prague",
+          "standings": [],
+          "startDate": "2026-12-01",
+          "previousPodium": [
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 20,
+              "countedDays": 20,
+              "name": "Maskovaný králík",
+              "avatar": "🐰",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 23,
+              "countedDays": 20,
+              "name": "Tajemný gekon",
+              "avatar": "🦎",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 3,
+              "points": 100,
+              "validDays": 1,
+              "countedDays": 1,
+              "name": "Kosmický delfín",
+              "avatar": "🐬",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": false
+            }
+          ],
+          "totalPlayers": 0,
+          "limit": 100,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "name": "actual authenticated browser session restored without a new anonymous identity",
+      "evidence": {
+        "role": "D",
+        "id": "c0df1b16-c07a-4a4e-a911-4a70e40f7868",
+        "name": "MQA-5a3327-D"
+      }
+    },
+    {
+      "name": "fresh registered December account ready for independent QA",
+      "evidence": {
+        "id": "c0df1b16-c07a-4a4e-a911-4a70e40f7868",
+        "name": "MQA-5a3327-D",
+        "state": {
+          "me": {
+            "days": [],
+            "rank": null,
+            "points": 0,
+            "validDays": 0,
+            "countedDays": 0,
+            "sharedRank": false
+          },
+          "month": "2026-12",
+          "badges": [],
+          "status": "open",
+          "enabled": true,
+          "endDate": "2027-01-01",
+          "closesAt": "2027-01-02T23:00:00+00:00",
+          "isolated": true,
+          "revision": null,
+          "timezone": "Europe/Prague",
+          "standings": [],
+          "startDate": "2026-12-01",
+          "previousPodium": [
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 20,
+              "countedDays": 20,
+              "name": "Maskovaný králík",
+              "avatar": "🐰",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 23,
+              "countedDays": 20,
+              "name": "Tajemný gekon",
+              "avatar": "🦎",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 3,
+              "points": 100,
+              "validDays": 1,
+              "countedDays": 1,
+              "name": "Kosmický delfín",
+              "avatar": "🐬",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": false
+            }
+          ],
+          "totalPlayers": 0,
+          "limit": 100,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "name": "optional prompt deferred through its real visible control",
+      "evidence": {
+        "dialog": "#archiveExperienceModal"
+      }
+    },
+    {
+      "name": "actual closed November award persists after fresh-device login; December open",
+      "evidence": {
+        "november": [
+          {
+            "rank": 1,
+            "month": "2026-11",
+            "points": 2400,
+            "shared": true
+          }
+        ],
+        "december": {
+          "days": [],
+          "rank": null,
+          "points": 0,
+          "validDays": 0,
+          "countedDays": 0,
+          "sharedRank": false
+        }
+      }
+    },
+    {
+      "name": "optional prompt deferred through its real visible control",
+      "evidence": {
+        "dialog": "#mk100LaunchPreview"
+      }
+    },
+    {
+      "name": "actual authenticated browser session restored without a new anonymous identity",
+      "evidence": {
+        "role": "A",
+        "id": "37268dc5-4380-413a-ac15-b9dc8332571c",
+        "name": "MQA-5a3327-A"
+      }
+    },
+    {
+      "name": "final runtime genuine Dec3 Daily adds120 through UI/publicAPI, keeps D0 and November frozen",
+      "evidence": {
+        "decemberA": {
+          "me": {
+            "days": [
+              {
+                "date": "2026-12-03",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              }
+            ],
+            "rank": 1,
+            "points": 120,
+            "validDays": 1,
+            "countedDays": 1,
+            "sharedRank": false
+          },
+          "month": "2026-12",
+          "badges": [
+            {
+              "rank": 1,
+              "month": "2026-11",
+              "points": 2400,
+              "shared": true
+            }
+          ],
+          "status": "open",
+          "enabled": true,
+          "endDate": "2027-01-01",
+          "closesAt": "2027-01-02T23:00:00+00:00",
+          "isolated": true,
+          "revision": null,
+          "timezone": "Europe/Prague",
+          "standings": [
+            {
+              "rank": 1,
+              "points": 120,
+              "validDays": 1,
+              "countedDays": 1,
+              "name": "MQA-5a3327-A",
+              "avatar": "🙂",
+              "anonymous": false,
+              "isMine": true,
+              "sharedRank": false
+            }
+          ],
+          "startDate": "2026-12-01",
+          "previousPodium": [
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 20,
+              "countedDays": 20,
+              "name": "Maskovaný králík",
+              "avatar": "🐰",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 23,
+              "countedDays": 20,
+              "name": "MQA-5a3327-A",
+              "avatar": "🙂",
+              "anonymous": false,
+              "isMine": true,
+              "sharedRank": true
+            },
+            {
+              "rank": 3,
+              "points": 100,
+              "validDays": 1,
+              "countedDays": 1,
+              "name": "Kosmický delfín",
+              "avatar": "🐬",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": false
+            }
+          ],
+          "totalPlayers": 1,
+          "limit": 100,
+          "truncated": false
+        },
+        "decemberD": {
+          "me": {
+            "days": [],
+            "rank": null,
+            "points": 0,
+            "validDays": 0,
+            "countedDays": 0,
+            "sharedRank": false
+          },
+          "month": "2026-12",
+          "badges": [],
+          "status": "open",
+          "enabled": true,
+          "endDate": "2027-01-01",
+          "closesAt": "2027-01-02T23:00:00+00:00",
+          "isolated": true,
+          "revision": null,
+          "timezone": "Europe/Prague",
+          "standings": [
+            {
+              "rank": 1,
+              "points": 120,
+              "validDays": 1,
+              "countedDays": 1,
+              "name": "Tajemný gekon",
+              "avatar": "🦎",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": false
+            }
+          ],
+          "startDate": "2026-12-01",
+          "previousPodium": [
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 20,
+              "countedDays": 20,
+              "name": "Maskovaný králík",
+              "avatar": "🐰",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 23,
+              "countedDays": 20,
+              "name": "Tajemný gekon",
+              "avatar": "🦎",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 3,
+              "points": 100,
+              "validDays": 1,
+              "countedDays": 1,
+              "name": "Kosmický delfín",
+              "avatar": "🐬",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": false
+            }
+          ],
+          "totalPlayers": 1,
+          "limit": 100,
+          "truncated": false
+        },
+        "november": {
+          "me": {
+            "days": [
+              {
+                "date": "2026-11-01",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-02",
+                "clean": false,
+                "points": 100,
+                "counted": false
+              },
+              {
+                "date": "2026-11-03",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-04",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-05",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-06",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-07",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-08",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-09",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-10",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-11",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-12",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-13",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-14",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-15",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-16",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-17",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-18",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-19",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-20",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-21",
+                "clean": true,
+                "points": 120,
+                "counted": true
+              },
+              {
+                "date": "2026-11-22",
+                "clean": true,
+                "points": 120,
+                "counted": false
+              },
+              {
+                "date": "2026-11-30",
+                "clean": true,
+                "points": 120,
+                "counted": false
+              }
+            ],
+            "rank": 1,
+            "points": 2400,
+            "validDays": 23,
+            "countedDays": 20,
+            "sharedRank": true
+          },
+          "month": "2026-11",
+          "badges": [
+            {
+              "rank": 1,
+              "month": "2026-11",
+              "points": 2400,
+              "shared": true
+            }
+          ],
+          "status": "closed",
+          "enabled": true,
+          "endDate": "2026-12-01",
+          "closesAt": "2026-12-02T23:00:00+00:00",
+          "isolated": true,
+          "revision": 1,
+          "timezone": "Europe/Prague",
+          "standings": [
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 20,
+              "countedDays": 20,
+              "name": "Nenápadný jezevec",
+              "avatar": "🦡",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": true
+            },
+            {
+              "rank": 1,
+              "points": 2400,
+              "validDays": 23,
+              "countedDays": 20,
+              "name": "MQA-5a3327-A",
+              "avatar": "🙂",
+              "anonymous": false,
+              "isMine": true,
+              "sharedRank": true
+            },
+            {
+              "rank": 3,
+              "points": 100,
+              "validDays": 1,
+              "countedDays": 1,
+              "name": "Rychlý mýval",
+              "avatar": "🦝",
+              "anonymous": true,
+              "isMine": false,
+              "sharedRank": false
+            }
+          ],
+          "startDate": "2026-11-01",
+          "previousPodium": [],
+          "totalPlayers": 3,
+          "limit": 100,
+          "truncated": false
+        },
+        "result": {
+          "ok": true,
+          "firstCompletion": true,
+          "awardedPoints": 100,
+          "dailyGenerationUpgrade": false,
+          "transferredSlot": false,
+          "stats": null,
+          "statsWarning": null
+        },
+        "xpBefore": 2740,
+        "xpAfter": 2840
+      }
+    }
+  ],
+  "storageOriginMigrations": [
+    {
+      "role": "A",
+      "source": "https://proplet-1vi83xfxh-pavel-prouzas-projects.vercel.app",
+      "target": "https://proplet-git-codex-monthly-competi-a7b681-pavel-prouzas-projects.vercel.app",
+      "databaseRef": "eanzztstmwlamwfdskbf",
+      "branch": "codex/monthly-competition-202611"
+    },
+    {
+      "role": "B",
+      "source": "https://proplet-1vi83xfxh-pavel-prouzas-projects.vercel.app",
+      "target": "https://proplet-git-codex-monthly-competi-a7b681-pavel-prouzas-projects.vercel.app",
+      "databaseRef": "eanzztstmwlamwfdskbf",
+      "branch": "codex/monthly-competition-202611"
+    },
+    {
+      "role": "C",
+      "source": "https://proplet-1vi83xfxh-pavel-prouzas-projects.vercel.app",
+      "target": "https://proplet-git-codex-monthly-competi-a7b681-pavel-prouzas-projects.vercel.app",
+      "databaseRef": "eanzztstmwlamwfdskbf",
+      "branch": "codex/monthly-competition-202611"
+    }
+  ],
+  "resumedAccounts": [
+    {
+      "role": "A",
+      "id": "37268dc5-4380-413a-ac15-b9dc8332571c",
+      "name": "MQA-5a3327-A"
+    },
+    {
+      "role": "B",
+      "id": "166420c4-a4eb-4783-8a9c-01d15ac7b9f8",
+      "name": "MQA-5a3327-B"
+    },
+    {
+      "role": "C",
+      "id": "2566c354-6bc0-42d4-84d1-e40246611c1f",
+      "name": "MQA-5a3327-C"
+    },
+    {
+      "role": "D",
+      "id": "c0df1b16-c07a-4a4e-a911-4a70e40f7868",
+      "name": "MQA-5a3327-D"
+    }
+  ],
+  "sourceSha": "b1c792a14449cd088b8d3d0352c62d803ee4ecd9",
+  "clockMutations": false,
+  "gameplayWrites": false,
+  "initialHealth": {
+    "monthlyPreview": {
+      "isolated": true,
+      "databaseRef": "eanzztstmwlamwfdskbf",
+      "branch": "codex/monthly-competition-202611",
+      "qaNow": "2026-12-03T12:54:41.050909+01:00"
+    },
+    "serverNow": "2026-12-03T12:54:41.050909+01:00",
+    "rpcTransport": "postgrest",
+    "historicalFreeRewardsEnabled": true,
+    "archiveEnabled": true,
+    "atomicResultEnabled": true,
+    "date": "2026-12-03",
+    "puzzleFile": true,
+    "puzzleSource": "data/puzzles.json",
+    "gen4CandidatePreview": false,
+    "gen5CandidatePreview": false,
+    "gen4CandidateReadOnly": false,
+    "gen4ReleaseStatus": "released",
+    "version": "4.10.0",
+    "adminStatic": true,
+    "adminEntry": "/admin.html",
+    "adminDelivery": "vercel-public-static",
+    "vocabularyVersion": 2,
+    "vocabularyTierCounts": {
+      "A": 510,
+      "B": 750,
+      "C": 1567,
+      "D": 320
+    },
+    "freeGeneration": 4,
+    "freeLevelsPerDifficulty": 300,
+    "dailyGeneration": 4,
+    "dailyGeneration2From": "2026-08-13",
+    "dailyGeneration3From": "2026-08-17",
+    "dailyRotationBaseDate": "2026-08-24",
+    "dailyCadence": {
+      "weekdays": [
+        "easy",
+        "easy",
+        "medium",
+        "medium",
+        "medium",
+        "hard",
+        "hard"
+      ],
+      "counts": {
+        "easy": 105,
+        "medium": 156,
+        "hard": 104
+      }
+    },
+    "dailyMigration": {
+      "strategy": "calendar-week-monday-boundary",
+      "leaderboard": "primary-generation-only",
+      "history": "preserved",
+      "cachedClients": "legacy-generation-accepted"
+    },
+    "freeMigration": {
+      "strategy": "fresh-generation-progress",
+      "xpPolicy": "once-per-current-board",
+      "activeGeneration": 4,
+      "playerFacingGenerationLabels": false,
+      "inProgressLegacyFinishAllowed": true,
+      "returningPlayerBonusXp": 500,
+      "retroactiveCurrentGenerationXp": true
+    },
+    "tieredDailyFrom": "2026-08-13",
+    "freeTieredFromVersion": "3.16",
+    "freeFreezeCutoffs": null,
+    "uxSprint": "3.20",
+    "gameFeelSprint": "3.21",
+    "darkModeSprint": "3.22",
+    "darkFoundTextHotfix": true,
+    "darkFoundChipTextHotfix": true,
+    "boardFit2DHotfix": true,
+    "foldWebPwaLayoutUnified": true,
+    "tabletGameLayoutBreakpointPx": 600,
+    "themeModes": [
+      "auto",
+      "light",
+      "dark"
+    ],
+    "themePreferenceScope": "device",
+    "orientationBlocking": true,
+    "foldResponsiveReflow": true,
+    "starterPuzzle": true,
+    "starterXp": 10,
+    "tajenkaWeeksPrepared": 37,
+    "tajenkaRewardXp": 200,
+    "tajenkaReleaseEnabled": true,
+    "tajenkaFirstSaturday": "2026-08-29",
+    "tajenkaCurrentWeek": 26,
+    "tajenkaLiveNow": true,
+    "starterHintOptional": true,
+    "starterHintOfferIdleSeconds": 10,
+    "accountWithoutTeam": true,
+    "accountNudgeCompletions": [
+      1,
+      4,
+      10
+    ],
+    "launchReadinessSprint": "3.23",
+    "publicErrorDetails": false,
+    "apiDocsPublic": false,
+    "requestBodyLimitKb": 64,
+    "secondarySessionDays": 180,
+    "securityHeaders": true,
+    "accountExport": true,
+    "accountDeletion": true,
+    "supportChannel": true,
+    "launchDashboard": true,
+    "newPlayerFunnelVersion": 2,
+    "singleMemberTeams": true,
+    "xpEconomyVersion": 4,
+    "wordDiscoveryXp": 1,
+    "wordDiscoveryBoardXpLimit": null,
+    "wordDiscoveryDailyXpLimit": null,
+    "mozkomorXp": 150,
+    "rankingsVersion": 2,
+    "rollingContentVersion": 2,
+    "rollingContentReleaseEnabled": true,
+    "rollingContentCadence": "weekly",
+    "rollingContentFirstRelease": "2026-08-31",
+    "rollingContentReservedThrough": "2026-11-23",
+    "rollingContentAvailableCounts": {
+      "easy": 417,
+      "medium": 416,
+      "hard": 416,
+      "hardcore": 316
+    },
+    "freeBaseLevelCounts": {
+      "easy": 400,
+      "medium": 400,
+      "hard": 400,
+      "hardcore": 300,
+      "mozkomor": 150,
+      "mozkokalypsa": 100
+    },
+    "mozkomorUnlock": {
+      "requiresDifficulty": null,
+      "requiresCurrentBaseLevels": 0,
+      "persistentOnceEarned": false,
+      "levels": 150,
+      "xpPerFirstCompletion": 150
+    },
+    "notificationsV2Migration": true,
+    "pushOpenTrackingMigration": false,
+    "freeXp": {
+      "easy": 15,
+      "medium": 25,
+      "hard": 50,
+      "hardcore": 100,
+      "mozkomor": 150,
+      "mozkokalypsa": 200
+    },
+    "dailyXp": 100,
+    "ok": true,
+    "database": true,
+    "accountMigration": true,
+    "featuresMigration": true,
+    "qualityMigration": true,
+    "playtestMigration": true,
+    "globalLeagueMigration": true,
+    "uxMigration": true,
+    "profilesMigration": true,
+    "analyticsV2Migration": true,
+    "anonymousAnalyticsMigration": true,
+    "anonymousAnalytics": true,
+    "freeGeneration2Migration": true,
+    "freeProgressionMigration": true,
+    "stableFreeLevelSlots": true,
+    "starterMigration": true,
+    "adminMigration": true,
+    "securityMigration": true,
+    "xpMigration": true,
+    "rankingsV2Migration": true,
+    "helperSystem": true,
+    "pushConfigured": false,
+    "cronConfigured": false
+  },
+  "status": "PASS"
+}
