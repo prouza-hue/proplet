@@ -11,7 +11,7 @@ function fixture(environment='preview'){
  const handlers={},frames=[];let player={id:'one',token:'private'},data=eligible(),fail=false;
  let doc;
  class Node{
-  constructor(tag){this.tagName=tag.toUpperCase();this.children=[];this.attrs={};this.events={};this.hidden=false;this.checked=false;this.value='';this._text='';this.classList={contains:()=>false};}
+  constructor(tag){this.tagName=tag.toUpperCase();this.children=[];this.attrs={};this.dataset={};this.events={};this.hidden=false;this.checked=false;this.value='';this._text='';this.classList={contains:()=>false,add(){}};}
   setAttribute(k,v){this.attrs[k]=String(v);if(k==='id')this.id=v;if(k==='value')this.value=v;if(k==='hidden')this.hidden=true;}
   getAttribute(k){return this.attrs[k]??null;}
   removeAttribute(k){delete this.attrs[k];}
@@ -29,7 +29,7 @@ function fixture(environment='preview'){
    const match=selector.match(/^(\w+)?(?:\[([^=\]]+)(?:="?([^"\]]+)"?)?\])?(:checked)?$/);if(!match)return false;
    return (!match[1]||this.tagName===match[1].toUpperCase())&&(!match[2]||(match[2] in this.attrs&&(match[3]===undefined||this.attrs[match[2]]===match[3])))&&(!match[4]||this.checked);}
   querySelectorAll(selector){const out=[];for(const node of this.children){if(node.matches(selector))out.push(node);out.push(...node.querySelectorAll(selector));}return out;}
-  querySelector(selector){return this.querySelectorAll(selector)[0]||null;}
+  querySelector(selector){if(selector.startsWith(':scope > '))return this.children.find(node=>node.matches(selector.slice(9)))||null;return this.querySelectorAll(selector)[0]||null;}
   addEventListener(name,fn){this.events[name]=fn;}
   focus(){doc.activeElement=this;}
   showModal(){this.open=true;}
@@ -94,6 +94,7 @@ async function main(){
   install(win);await tick();for(const frame of frames)frame();assert.equal(created,0);assert.equal(calls,p?1:0);
  }
  const f=fixture();install(f.win);await f.flush();
+ assert.equal(f.doc.querySelector('#visualPlaytestInvite'),null,'preview exposes feedback only, never a production invitation');
  const entry=f.footer.children[0];assert.equal(entry.textContent,'Zpětná vazba k vzhledu');assert.equal(f.doc.body.querySelector('dialog'),null,'no automatic form');
  entry.focus();entry.onclick();let dialog=f.doc.body.querySelector('dialog'),form=dialog.querySelector('form'),error=form.querySelector('[role=alert]');
  assert.equal(dialog.getAttribute('aria-labelledby'),dialog.querySelector('h2').id);assert.equal(f.doc.activeElement,dialog.querySelector('h2'));
@@ -113,11 +114,28 @@ async function main(){
  const prod=fixture('production');install(prod.win);await prod.flush();await prod.flush();
  const daily=prod.doc.querySelector('#screen-daily'),hero=daily.querySelector('.daily-hero'),invite=daily.querySelector('#visualPlaytestInvite');assert(invite);assert.equal(hero.nextElementSibling,invite);
  const nativeSource=fs.readFileSync('public/app/archive/experience.js','utf8');
- const ordering=nativeSource.slice(nativeSource.indexOf(' const ordered='),nativeSource.indexOf(' // Tail nodes have one owner'));
+ const nativeStart=nativeSource.indexOf(' const ordered='),nativeEnd=nativeSource.indexOf(' // Tail nodes have one owner');
+ if(nativeStart>=0&&nativeEnd>nativeStart){
+ const ordering=nativeSource.slice(nativeStart,nativeEnd);
  const nativeOrder=()=>vm.runInNewContext(ordering,{root:daily,q:selector=>prod.doc.querySelector(selector),referral:null,tajenkaSolved:false,tajenka:null,competition:null,games:daily.querySelector('#axHomeGames')});
  daily.append(invite);nativeOrder();assert.equal(hero.nextElementSibling,invite,'native layout itself places invitation immediately after the hero');
  for(let i=0;i<3;i++){nativeOrder();prod.handlers['proplet:screen-changed']();await prod.flush();assert.equal(hero.nextElementSibling,invite);}
  const nativeNodes=daily.children.filter(node=>node!==invite);invite.remove();nativeOrder();assert.deepEqual(daily.children,nativeNodes,'absent pilot preserves the normal layout');
+ }else{
+  // Studio deliberately has a different Today owner. Exercise its real state-
+  // dependent order rather than claiming the production prefix still exists.
+  assert.match(nativeSource,/window\.PropletHomeLayout\?\.orderDailyNodes\?\.\(\)/,'unknown Archive ordering owner must fail explicitly');
+  const homeSource=fs.readFileSync('public/home-layout.js','utf8');
+  const start=homeSource.indexOf('  function orderDailyNodes(){'),end=homeSource.indexOf('  function applyLayout(){',start);
+  assert(start>=0&&end>start,'Studio must expose the known canonical Today ordering function');
+  const preview=fixture();install(preview.win);await preview.flush();const screen=preview.doc.querySelector('#screen-daily'),previewHero=screen.querySelector('.daily-hero');
+  for(const id of ['tajenkaPreviewCard','studioExtraCard','axHomeCompetitions']){const node=preview.doc.createElement('section');node.id=id;screen.append(node);}
+  const ctx={document:preview.doc};vm.createContext(ctx);vm.runInContext(homeSource.slice(start,end),ctx);
+  ctx.orderDailyNodes();assert.equal(previewHero.nextElementSibling.id,'studioExtraCard');assert.equal(previewHero.nextElementSibling.nextElementSibling.id,'tajenkaPreviewCard');
+  previewHero.dataset.studioState='complete';ctx.orderDailyNodes();assert.equal(previewHero.nextElementSibling.id,'axHomeFree');assert.equal(previewHero.nextElementSibling.nextElementSibling.id,'axHomeCompetitions');
+  const stable=[...screen.children];ctx.orderDailyNodes();preview.handlers['proplet:screen-changed']();await preview.flush();assert.deepEqual(screen.children,stable,'pilot feedback does not interfere with Studio ordering');
+  assert.equal(preview.doc.querySelector('#visualPlaytestInvite'),null);assert.equal(preview.footer.children[0].textContent,'Zpětná vazba k vzhledu');
+ }
  console.log('PASS visual pilot: server-only eligibility, reservation, snooze/decline visibility, reviewer, no-token link, feedback/edit/error, auth races and ineligible no UI');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});
