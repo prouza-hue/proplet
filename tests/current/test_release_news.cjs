@@ -43,3 +43,6 @@ f.controls.play.onclick();assert.equal(f.dialog.open,false);assert.equal(f.scree
 settings.onclick();f.controls.monthly.onclick();assert.equal(f.monthly,1,'primary delegates to the real monthly opener exactly once');assert.equal(f.screen,'monthly');assert.equal(f.dialog.open,false);
 const away=fixture('?showNews=1');install(away.win);away.win.nav('free');away.ready();assert.equal(away.dialog,undefined);away.win.nav('daily');away.flush();assert(away.dialog.open,'pending explicit request appears only after reaching Today');
 console.log('PASS release news: production denied, no unsolicited display/storage/transport, readiness/game/modal guards, native monthly action, Settings reopen, Escape and focus restore');
+
+// The subscriber must exist before app boot can emit proplet:ready.
+{const html=require("node:fs").readFileSync(require("node:path").join(__dirname,"../../public/index.html"),"utf8");require("node:assert/strict")(html.indexOf('/release-news.js?')<html.indexOf('/app.js?'),"announcement must subscribe before app boot");}
