@@ -68,6 +68,10 @@ def main():
                     continue
             c.execute(path.read_text(encoding='utf8'))
         c.execute('update monthly_competition_settings set isolated=true')
+        c.execute((ROOT/'supabase/tests/monthly_preview_extra.sql').read_text(encoding='utf8'))
+        report['checks'].append('actual official November Extra under monthly QA clock; no monthly points; legacy special policy preserved')
+        c.execute((ROOT/'supabase/tests/monthly_preview_clock.sql').read_text(encoding='utf8'))
+        report['checks'].append('trusted isolated moving clock: online/session/receive time, original offline day, real48h cutoff/badges, unmarked legacy wall clock')
         c.execute((ROOT/'supabase/tests/monthly_admin_corrections.sql').read_text(encoding='utf8'))
         report['checks'].append('compact remote rollback acceptance passed on real local PG: shared podium, service ACL, audit, CAS, removal/regrant, unchanged XP')
         assert c.execute('select enabled,rules_approved,late_sync_policy from monthly_competition_settings').fetchone() == (False, True, 'review-close')

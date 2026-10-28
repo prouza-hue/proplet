@@ -3,6 +3,24 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const source=fs.readFileSync('public/app/monthly/competition.js','utf8');
 const approvedCatalog=JSON.parse(fs.readFileSync('public/rewards/monthly/collections.json','utf8'));
 const tick=()=>new Promise(setImmediate);
+// The trusted isolated clock changes completion timestamps, never Date/performance
+// globally or production results. Its moving offset is retained for offline play.
+const appSource=fs.readFileSync('public/app.js','utf8');
+const clockSource=appSource.slice(appSource.indexOf('let monthlyPreviewClockOffsetMs='),appSource.indexOf('function acceptRuntimeCapabilities'));
+let deviceNow=Date.parse('2026-10-28T12:00:00Z');
+class DeviceDate extends Date{constructor(...args){super(...(args.length?args:[deviceNow]));}static now(){return deviceNow;}}
+const clockContext={Date:DeviceDate};vm.runInNewContext(clockSource,clockContext);
+const qaClock={isolated:true,databaseRef:'eanzztstmwlamwfdskbf',branch:'codex/monthly-competition-202611',qaNow:'2026-11-03T12:00:00Z'};
+assert.equal(clockContext.acceptMonthlyPreviewClock({environment:'production',monthlyPreview:qaClock}),false);
+assert.equal(clockContext.resultCompletedAt(),'2026-10-28T12:00:00.000Z');
+assert.equal(clockContext.acceptMonthlyPreviewClock({environment:'preview',monthlyPreview:{...qaClock,databaseRef:'iopyhluayfszskyqqpuc'}}),false);
+assert.equal(clockContext.acceptMonthlyPreviewClock({environment:'preview',monthlyPreview:{...qaClock,branch:'codex/today-one-screen'}}),false);
+assert.equal(clockContext.acceptMonthlyPreviewClock({environment:'preview',monthlyPreview:qaClock}),true);
+assert.equal(clockContext.resultCompletedAt(),'2026-11-03T12:00:00.000Z');deviceNow+=5000;
+assert.equal(clockContext.resultCompletedAt(),'2026-11-03T12:00:05.000Z');
+assert.equal(DeviceDate.now(),Date.parse('2026-10-28T12:00:05Z'),'device/global clock is unchanged');
+assert.equal(clockContext.acceptMonthlyPreviewClock({environment:'production'}),false);
+assert.equal(clockContext.resultCompletedAt(),'2026-10-28T12:00:05.000Z');
 function fixture(search='',catalogAvailable=true){
   const documentEvents=new Map(),windowEvents=new Map(),rootEvents=new Map(),pending=[],calls=[],nodes=new Map();
   const element=()=>({innerHTML:'',textContent:'',disabled:false,open:false,isConnected:true,attrs:{},listeners:new Map(),addEventListener(n,f){this.listeners.set(n,f);},setAttribute(k,v){this.attrs[k]=v;},focus(){this.focused=true;},showModal(){this.open=true;},close(){this.open=false;this.listeners.get('close')?.();}});
@@ -22,6 +40,12 @@ function fixture(search='',catalogAvailable=true){
   return {context,root,nodes,pending,calls,navs,open:()=>context.window.PropletMonthlyCompetition.open(),setProfile:p=>{profile=p;documentEvents.get('proplet:account-changed')?.();},click:attribute=>rootEvents.get('click')({target:{closest:()=>({hasAttribute:n=>n===attribute})}}),clickData:dataset=>{const button={...element(),dataset,hasAttribute:()=>false};rootEvents.get('click')({target:{closest:()=>button}});return button;},content:()=>nodes.get('#content').innerHTML};
 }
 (async()=>{
+  clockContext.acceptMonthlyPreviewClock({environment:'preview',monthlyPreview:qaClock});
+  const offlineStamp=clockContext.resultCompletedAt();
+  clockContext.puzzleDB={datedDaily:true};clockContext.datedDaily=()=>({refresh:async()=>({monthlyPreview:{...qaClock,qaNow:'2026-11-03T10:00:00Z'}})});
+  vm.runInNewContext(appSource.match(/async function refreshDatedDaily\(\)\{[^\n]+\}/)[0],clockContext);
+  await clockContext.refreshDatedDaily();
+  assert.equal(clockContext.resultCompletedAt(),offlineStamp,'cached/offline descriptor cannot reset the moving completion clock to its old fetch time');
   const f=fixture();f.open();assert.equal(f.calls.length,1);assert(f.calls[0].url.startsWith('/api/competition/monthly?month='));assert.equal(f.calls[0].options.authProfile,null);
   f.pending[0].resolve({enabled:true,status:'upcoming',standings:[]});await tick();assert(f.content().includes('Začínáme 1. listopadu'));assert(!f.content().includes('player-name'),'no fictional players in first season');
   f.setProfile({id:'mine',token:'session-one'});const standings=Array.from({length:6},(_,i)=>({isMine:i===5,name:i===5?'Vlastní účet':'Hráč <'+i+'>',rank:i<2?1:i+1,points:2400-i*100,countedDays:20,validDays:21}));

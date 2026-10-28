@@ -579,6 +579,61 @@
       ]
     },
     {
+      "id": "20261028-monthly-isolated-preview-clock",
+      "order": 530,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028085718_monthly_isolated_preview_clock.sql",
+      "type": "migration",
+      "status": "prepared-isolated-preview-only-production-disabled",
+      "sha256": "348e5b268a6889ae902e3efc0d9e016934e567b6a783d037baed964b78976a2b",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_submit_result_v1",
+        "public.proplet_submit_daily_special_v1",
+        "public.proplet_play_session_v1",
+        "public.proplet_player_stats_v1",
+        "public.proplet_account_snapshot_v1",
+        "public.proplet_monthly_now_v1"
+      ]
+    },
+    {
+      "id": "20261028-monthly-preview-special-clock",
+      "order": 540,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028094820_monthly_preview_special_clock_policy.sql",
+      "type": "migration",
+      "status": "prepared-isolated-preview-only-production-disabled",
+      "sha256": "c046fd151fc2ad4b879c7e25627fa0fc61bd49ae8cbb8c4934b972cfb1ed2164",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_submit_daily_special_v1"
+      ]
+    },
+    {
+      "id": "20261028-monthly-preview-difficulty-parity",
+      "order": 550,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028095102_monthly_preview_difficulty_parity.sql",
+      "type": "migration",
+      "status": "isolated-preview-parity-only",
+      "sha256": "1754779fe383695ad870bf5155e35ae1f65ecf4d83816a0a5882d4889c4900aa",
+      "supersedes": [],
+      "replaced_rpc_definitions": []
+    },
+    {
+      "id": "20261028-monthly-preview-extra-xp-parity",
+      "order": 560,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028095256_monthly_preview_extra_xp_parity.sql",
+      "type": "migration",
+      "status": "isolated-preview-parity-only",
+      "sha256": "d8522d8049d033d20fe35fad604619b9637b4edafeb020613413ddfb5e6acd8e",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_submit_daily_special_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

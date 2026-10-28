@@ -13,6 +13,7 @@ on:
       - 'public/ranking-navigation.css'
       - 'vercel.json'
       - 'supabase/migrations/*monthly*.sql'
+      - 'supabase/tests/monthly*.sql'
       - 'tools/test_monthly_competition_db.py'
       - 'tests/current/test_monthly_competition*'
       - '.github/workflows/monthly-competition.yml'

@@ -28,6 +28,7 @@ from backend import measurement
 from backend.launch_report import build_launch_report
 from backend import rankings as ranking_queries
 from backend import monthly_competition
+from backend.monthly_preview import MonthlyPreviewControl
 from backend import results as result_domain
 from backend import archive as archive_domain
 from backend import referrals as referral_domain
@@ -59,6 +60,7 @@ from backend.config import (
     VERCEL_ENV,
     VERCEL_GIT_COMMIT_REF,
 )
+from backend.config import monthly_preview_qa_enabled
 from backend.contracts import (
     AccountDeleteConfirm,
     AdminReportUpdate,
@@ -156,7 +158,8 @@ async def launch_safety_middleware(request: Request, call_next):
     path = request.scope["path"]
     if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() or LIVE_PLAYER_PREVIEW) and request.method == "POST" and path == "/api/play-session":
         return JSONResponse({"detail":"Preview nemá oddělené herní úložiště."},status_code=409)
-    if VERCEL_ENV == "preview" and not (LIVE_PLAYER_PREVIEW or (isolated_fair_play_preview() and (path == "/api/anonymous/claim" or VERCEL_GIT_COMMIT_REF == "work/daily-specials-integrated-20261012"))) and request.method == "POST" and path in {"/api/product-event","/api/product-events","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
+    monthly_game_evidence = monthly_qa_enabled() and path in {"/api/attempt/start", "/api/attempt/checkpoint", "/api/attempt/finish", "/api/hint-event", "/api/helper-event", "/api/anonymous/claim"}
+    if VERCEL_ENV == "preview" and not (LIVE_PLAYER_PREVIEW or monthly_game_evidence or (isolated_fair_play_preview() and (path == "/api/anonymous/claim" or VERCEL_GIT_COMMIT_REF == "work/daily-specials-integrated-20261012"))) and request.method == "POST" and path in {"/api/product-event","/api/product-events","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
         return JSONResponse({"ok":True,"ignored":True,"preview":True})
     if ((VERCEL_ENV == "preview" and not (isolated_fair_play_preview() or LIVE_PLAYER_PREVIEW)) or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and path == "/api/result":
         return JSONResponse({"detail":"V testovacím režimu zůstávají výsledky pouze na zařízení."},status_code=409)
@@ -640,6 +643,13 @@ def actor_filters(actor: dict) -> dict:
 
 
 def current_prague_datetime() -> datetime:
+    if monthly_qa_enabled():
+        context = request_guard_context.get()
+        if isinstance(context, dict):
+            if "monthly_qa_now" not in context:
+                value = db_rpc("proplet_monthly_preview_clock_v1", {})
+                context["monthly_qa_now"] = datetime.fromisoformat(str(value).replace("Z", "+00:00")).astimezone(TZ)
+            return context["monthly_qa_now"]
     now = datetime.now(TZ)
     preview_day = os.environ.get("PROPLET_DAILY_SPECIALS_PREVIEW_DATE", "").strip()
     if preview_day:
@@ -647,6 +657,20 @@ def current_prague_datetime() -> datetime:
         selected = date.fromisoformat(preview_day)
         return now.replace(year=selected.year, month=selected.month, day=selected.day)
     return now
+
+
+def monthly_qa_enabled() -> bool:
+    return (monthly_preview_qa_enabled(SUPABASE_URL) and VERCEL_ENV == "preview"
+            and VERCEL_GIT_COMMIT_REF == "codex/monthly-competition-202611"
+            and SUPABASE_URL == "https://eanzztstmwlamwfdskbf.supabase.co")
+
+
+def monthly_preview_capabilities() -> dict:
+    if not monthly_qa_enabled():
+        return {}
+    now = current_prague_datetime()
+    return {"monthlyPreview": {"isolated": True, "databaseRef": "eanzztstmwlamwfdskbf",
+            "branch": VERCEL_GIT_COMMIT_REF, "qaNow": now.isoformat()}, "serverNow": now.isoformat()}
 
 
 def current_prague_date() -> date:
@@ -1590,6 +1614,7 @@ def health():
     puzzle_file = PUZZLES_PATH.exists()
     pdata = load_puzzles() if puzzle_file else {}
     base = {
+        **monthly_preview_capabilities(),
         "rpcTransport": backend_db.postgres_rpc.transport_status(),
         "historicalFreeRewardsEnabled": HISTORICAL_FREE_REWARDS_ENABLED,
         "archiveEnabled": archive_release_enabled(),
@@ -1837,6 +1862,7 @@ def save_free_order(payload: free_order.OrderCommand, request: Request,
 def config():
     p = load_puzzles()
     return {
+        **monthly_preview_capabilities(),
         "badges": BADGES,
         "points": {**POINTS, "starter": STARTER_XP},
         "dictionarySize": p["dictionarySize"],
@@ -3619,7 +3645,7 @@ def payload_completed_at(value: Optional[str]) -> str:
             if dt.tzinfo is None:
                 dt = dt.replace(tzinfo=TZ)
             # Reject absurd timestamps; device clocks can occasionally be wrong.
-            now = datetime.now(TZ)
+            now = current_prague_datetime()
             if datetime(2025, 1, 1, tzinfo=TZ) <= dt.astimezone(TZ) <= now + timedelta(days=1):
                 if os.environ.get("PROPLET_DAILY_SPECIALS_PREVIEW_DATE"):
                     selected = current_prague_date()
@@ -4843,6 +4869,22 @@ def monthly_competition_available() -> bool:
                 and SUPABASE_URL == "https://eanzztstmwlamwfdskbf.supabase.co"
                 and bool(SUPABASE_SECRET_KEY))
     return VERCEL_ENV == "production" and supabase_ready()
+
+
+@app.post("/api/qa/monthly-control")
+def monthly_preview_control(payload: MonthlyPreviewControl, authorization: Optional[str] = Header(default=None)):
+    if not monthly_qa_enabled():
+        raise HTTPException(404, "QA ovládání není dostupné")
+    secret = os.environ.get("PROPLET_MONTHLY_QA_SECRET", "")
+    if not hmac.compare_digest(authorization or "", "Bearer " + secret):
+        raise HTTPException(403, "Neplatné ověření QA ovládání")
+    result = db_rpc("proplet_monthly_preview_control_v1", {
+        "p_action": payload.action, "p_now": payload.now.isoformat() if payload.now else None,
+    })
+    if not isinstance(result, dict):
+        raise HTTPException(503, "QA ovládání je dočasně nedostupné")
+    return JSONResponse({**result, "isolated": True, "databaseRef": "eanzztstmwlamwfdskbf",
+                         "branch": VERCEL_GIT_COMMIT_REF}, headers={"Cache-Control": "no-store"})
 
 
 @app.get("/api/competition/monthly")

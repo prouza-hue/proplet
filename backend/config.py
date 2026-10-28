@@ -33,6 +33,17 @@ def live_player_preview_enabled() -> bool:
     )
 
 
+def monthly_preview_qa_enabled(supabase_url: str | None = None) -> bool:
+    """The QA clock is confined to one branch and its disposable database."""
+    return (
+        _env("VERCEL_ENV") == "preview"
+        and _env("VERCEL_GIT_COMMIT_REF") == "codex/monthly-competition-202611"
+        and (supabase_url if supabase_url is not None else _env("SUPABASE_URL")).rstrip("/") == "https://eanzztstmwlamwfdskbf.supabase.co"
+        and _env("PROPLET_MONTHLY_QA_ENABLED").lower() == "true"
+        and len(_env("PROPLET_MONTHLY_QA_SECRET")) >= 32
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class Settings:
     root: Path
@@ -70,6 +81,9 @@ def load_settings() -> Settings:
     monthly_preview = vercel_env == "preview" and vercel_git_commit_ref == "codex/monthly-competition-202611"
     if monthly_preview and _env("SUPABASE_URL").rstrip("/") not in {"", "https://eanzztstmwlamwfdskbf.supabase.co"}:
         raise RuntimeError("Monthly competition preview requires the isolated test database")
+    if _env("PROPLET_MONTHLY_QA_SECRET") or _env("PROPLET_MONTHLY_QA_ENABLED"):
+        if not monthly_preview_qa_enabled():
+            raise RuntimeError("Monthly QA requires its exact preview branch, isolated database and dedicated secret")
     gen4_preview_branch = "agent/v3340-medium-calibration-v3"
     gen4_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == gen4_preview_branch
     gen5_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == "feat/gen5-lab"
@@ -112,7 +126,7 @@ def load_settings() -> Settings:
         content_catalog_path=data_root / "content_catalog_v334.json",
         tajenka_bank_path=data_root / "tajenka_weekend_v2.json",
         tajenka_release_enabled=(
-            (vercel_env == "production" or live_player_preview)
+            (vercel_env == "production" or live_player_preview or monthly_preview_qa_enabled())
             and _env("PROPLET_TAJENKA_RELEASE_ENABLED", "true").lower() in {"1", "true", "yes"}
         ),
         atomic_result_v1_enabled=(
