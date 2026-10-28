@@ -5,6 +5,7 @@
 
   const BONUS_XP=500;
   let bonusXp=0;
+  let bonusSimulated=false;
   let activeProfileId=null;
   let syncInFlight=false;
   let failedToken=null,retryAt=0;
@@ -23,7 +24,7 @@
   const trackCreateOnce=()=>{if(createIntentTracked)return;createIntentTracked=true;bonusEvent('account_bonus_create_clicked')};
 
   function adjustRankingData(data){
-    if(!data||!Array.isArray(data.players)||data.accountRewardsIncluded===true)return data;
+    if(!data||!Array.isArray(data.players)||data.accountRewardsIncluded===true||data.xpAuthoritative===true||bonusSimulated)return data;
     return {...data,players:data.players.map(row=>({...row,lifetimePoints:Number(row.lifetimePoints||0)+BONUS_XP}))};
   }
 
@@ -36,6 +37,7 @@
     effectiveStats=function(){
       const stats=originalEffectiveStats.apply(this,arguments);
       if(!stats||!hasAccount()||bonusXp<=0)return stats;
+      if(bonusSimulated&&stats.xpAuthoritative===true)return stats;
       const alreadyIncluded=Math.max(0,Number(stats.accountBonusXp||0));
       const missing=Math.max(0,bonusXp-alreadyIncluded);
       if(!missing)return stats;
@@ -90,7 +92,7 @@
   async function syncBonus(){
     patchUiFunctions();
     const p=profile();
-    if(!p?.token){activeProfileId=null;bonusXp=0;failedToken=null;retryAt=0;return}
+    if(!p?.token){activeProfileId=null;bonusXp=0;bonusSimulated=false;failedToken=null;retryAt=0;return}
     const id=String(p.id||p.playerId||p.name||'account');
     if(syncInFlight||activeProfileId===id||(failedToken===p.token&&Date.now()<retryAt))return;
     syncInFlight=true;
@@ -99,8 +101,9 @@
       const data=await api('/api/account-bonus/claim',{method:'POST'});
       activeProfileId=id;
       bonusXp=Math.max(0,Number(data?.bonusXp||0));
-      window.PROPLET_ACCOUNT_BONUS={xp:bonusXp,creationBonusXp:Number(data?.accountCreationBonusXp||BONUS_XP),granted:data?.accountCreationBonusGranted===true,simulated:data?.simulated===true};
-      if(data?.newlyGranted){
+      bonusSimulated=data?.simulated===true;
+      window.PROPLET_ACCOUNT_BONUS={xp:bonusXp,creationBonusXp:Number(data?.accountCreationBonusXp||BONUS_XP),granted:data?.accountCreationBonusGranted===true,simulated:bonusSimulated};
+      if(data?.newlyGranted&&!bonusSimulated){
         bonusEvent('account_bonus_granted');
         try{if(typeof showToast==='function')showToast('🎁 +500 XP za účet!')}catch{}
       }
