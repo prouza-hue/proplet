@@ -43,7 +43,7 @@ function openWeekly(panel='week'){if(currentScreen!=='weekly')entrySource=curren
 // Same four-view navigation as Pořadí; the weekly data/render owner stays here.
 const navigationCss=document.createElement('link');navigationCss.rel='stylesheet';navigationCss.href='/ranking-navigation.css?v=monthly-polish1';root.prepend(navigationCss);
 const refinement=document.createElement('style');refinement.textContent='.hero{display:block}.hero>img,.hero p{display:none}.hero h1{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}.ranking-view-tabs{margin-top:0}.rank-list{border:0;border-radius:0;background:transparent}.rank-list li{grid-template-columns:28px minmax(0,1fr) auto;padding:12px 8px}.rank-list li strong{overflow-wrap:anywhere}.period{margin-top:0}.team{border-top-width:1px}.prize{background:transparent;border-top:1px solid var(--line);border-radius:0;padding-inline:0}@media(max-width:360px){.rank-list li{gap:7px}.rank-list .xp{font-size:14px}}';root.append(refinement);
-$('.hero h1').textContent='Pořadí';
+$('.hero h1').textContent='Soutěže';
 function mountRankingNavigation(){window.PropletRankings?.mountViewNavigation($('#competition'),{selected:'weekly',onSelect:view=>{if(view==='weekly'){tab('week');return;}rankingsOrchestration().openView(view);}});}
 mountRankingNavigation();
 
