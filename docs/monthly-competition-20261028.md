@@ -50,3 +50,10 @@ Opraveno i uchování ověřeného časového posunu po offline restartu a odmí
 Vypnout `PROPLET_MONTHLY_ENABLED` a případně vrátit předchozí ověřený deployment. DB evidenci ponechat zapnutou, aby se neztrácely platné dny. Pokud musela být vypnutá i evidence, obnovit ji reconciliation před uzávěrkou. Nemaže se herní historie ani tabulky. Po uzávěrce běžné doručení snapshot neotevře.
 
 Správce nejprve přezkoumá a opraví či odmítne autoritativní zdrojový výsledek. Potom přes důvěryhodné služební SQL/RPC zavolá `proplet_correct_monthly_competition_v1(p_month,p_player_id,p_day,p_expected_revision,p_idempotency_key,p_operator_ref,p_reason)`. Příkaz nepřijímá počet bodů. Shodné opakování vrací původní potvrzení, konflikt revize vyžaduje novou kontrolu. Jedna transakce přepočítá pořadí i přidání/změnu/odebrání odznaků, bez změny XP, s auditním stavem před a po. Pozdní běžný offline výsledek nesmí omylem odstranit dříve způsobilý soutěžní příspěvek. Audit `proplet_private.monthly_corrections` je pro runtime pouze ke čtení.
+
+
+## Oznámení nového vzhledu a soutěže — kontrolní preview 28. 10.
+
+Schválený společný panel je dostupný přes `/?showNews=1` a v preview Nastavení → Co je nového. Používá novou ikonu soutěží; hlavní akce otevírá skutečnou měsíční soutěž, Jdu hrát a zavření ponechají Dnes. Nevytváří oznámení ani receipt v produkci a neposílá žádná data. Automatické jednorázové zobrazení stávajícím hráčům a synchronizace zhlédnutí napříč zařízeními se zapojí až při samostatně schváleném ostrém vydání.
+
+Nezávislé QA následně dokončilo na syntetickém účtu D Daily 3. 12.: účet již není nulový, má 100 XP a 120 prosincových soutěžních bodů. Čtyři P2 klientské nálezy byly opraveny v preview; produkce i původní playtest zůstaly beze změny.

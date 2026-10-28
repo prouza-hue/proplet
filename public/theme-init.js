@@ -245,9 +245,9 @@
     loadScript('/competitive-sharing-v3331.js?v=analytics2','propletCompetitiveSharing');
     loadScript('/challenge-cta-v3333.js?v=ui-refinement5','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=mk100','propletFooterHotfixV40120');
-    await loadScript('/account-bonus-v3331.js?v=monthly-polish2','propletAccountBonusV3331',{wait:true});
+    await loadScript('/account-bonus-v3331.js?v=monthly-news1','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=ui-refinement1','propletAccountConversionV3331',{wait:true});
-    loadScript('/settings-ia-v40122.js?v=monthly-polish2','propletSettingsIaV40122');
+    loadScript('/settings-ia-v40122.js?v=monthly-news1','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=ui-refinement1','propletSettingsPolishV40122');
     await loadScript('/printshop-release-polish.js?v=ui-refinement1','propletPrintshopReleasePolish',{wait:true});
     await loadScript('/tajenka-release-fix.js?v=ui-refinement5','propletTajenkaReleaseFix',{wait:true});
