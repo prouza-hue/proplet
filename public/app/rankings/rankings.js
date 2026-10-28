@@ -45,11 +45,22 @@
     return out;
   }
 
+  const competitionViewKey='proplet-competition-view-v1';
+  const competitionViews=['daily','xp','weekly','monthly'];
+  let lastCompetitionView=null;
+  function rememberCompetitionView(view){
+    if(!competitionViews.includes(view))return;
+    lastCompetitionView=view;try{globalThis.localStorage?.setItem(competitionViewKey,view)}catch{}
+  }
+  globalThis.document?.addEventListener('proplet:screen-changed',event=>{
+    if(['weekly','monthly'].includes(event.detail?.screen))rememberCompetitionView(event.detail.screen);
+  });
+
   function mountViewNavigation(container,{selected='daily',onSelect}={}){
     const doc=globalThis.document;if(!container||!doc?.createElement)return null;
     let navigation=container.querySelector('.ranking-view-tabs');
     if(!navigation){
-      navigation=doc.createElement('nav');navigation.className='ranking-view-tabs';navigation.setAttribute('aria-label','Pohled pořadí');
+      navigation=doc.createElement('nav');navigation.className='ranking-view-tabs';navigation.setAttribute('aria-label','Pohled soutěží');
       for(const [view,label] of [['daily','Výzva'],['xp','XP'],['weekly','Týdenní soutěž'],['monthly','Měsíční soutěž']]){
         const button=doc.createElement('button');button.type='button';button.dataset.rankingView=view;button.textContent=label;
         button.addEventListener('click',()=>onSelect?.(view));navigation.append(button);
@@ -89,19 +100,27 @@
       if(typeof open!=='function')return false;
       interactionVersion++;activeAnchor=null;pointerAnchor=null;layoutObserver?.disconnect();
       if(viewportTail)viewportTail.style.height='0px';
-      open(panel);return true;
+      rememberCompetitionView('weekly');open(panel);return true;
     }
     function syncViews(){
       const screen=$('#screen-leaderboard');
-      if(screen){screen.classList.add('ranking-single-view');const title=screen.querySelector('.screen-title h1');if(title)title.textContent='Pořadí';mountViewNavigation(screen,{selected:rankingView,onSelect:openView});}
+      if(screen){screen.classList.add('ranking-single-view');const title=screen.querySelector('.screen-title h1');if(title)title.textContent='Soutěže';mountViewNavigation(screen,{selected:rankingView,onSelect:openView});}
       for(const [kind,state] of sections)state.section.hidden=kind!==rankingView;
       const team=$('#rankingTeamCard');if(team)team.hidden=(rankingView==='xp'?rankingXpScope:rankingDailyScope)!=='teams';
     }
+    function openLastView(){
+      install();
+      let view=lastCompetitionView;try{view=view||globalThis.localStorage?.getItem(competitionViewKey)}catch{}
+      if(!competitionViews.includes(view))view=typeof globalThis.PropletMonthlyCompetition?.open==='function'?'monthly':'daily';
+      if(view==='monthly'&&typeof globalThis.PropletMonthlyCompetition?.open!=='function')view='daily';
+      if(view==='weekly'&&typeof (d.openWeekly||globalThis.PropletWeeklyCompetition?.open)!=='function')view='daily';
+      return openView(view);
+    }
     function openView(view){
       if(view==='weekly'){openWeeklyView();return}
-      if(view==='monthly'){const open=globalThis.PropletMonthlyCompetition?.open;if(typeof open==='function'){interactionVersion++;activeAnchor=null;pointerAnchor=null;layoutObserver?.disconnect();if(viewportTail)viewportTail.style.height='0px';open();}return}
+      if(view==='monthly'){const open=globalThis.PropletMonthlyCompetition?.open;if(typeof open==='function'){interactionVersion++;activeAnchor=null;pointerAnchor=null;layoutObserver?.disconnect();if(viewportTail)viewportTail.style.height='0px';rememberCompetitionView('monthly');open();}return}
       if(!['daily','xp'].includes(view))return;
-      rankingView=view;interactionVersion++;activeAnchor=null;pointerAnchor=null;layoutObserver?.disconnect();
+      rememberCompetitionView(view);rankingView=view;interactionVersion++;activeAnchor=null;pointerAnchor=null;layoutObserver?.disconnect();
       if(viewportTail)viewportTail.style.height='0px';
       syncViews();
       if(d.nav&&!$('#screen-leaderboard')?.classList.contains('active')){d.nav('leaderboard');return}
@@ -343,7 +362,7 @@
       return true;
     }
     function openWeeklyTeams({render=true}={}){if(openWeeklyView())return;rankingXpScope='teams';rankingXpPeriod='week';rankingView='xp';if(render)return renderLeaderboard()}
-    return {install,openView,openWeeklyTeams,renderLeaderboard,renderXpRanking,renderDailyRanking,renderRankingPrivacyNote,renderRankingTeamCard,openRankingPrivacyModal,saveRankingVisibility,maybeShowRankingPrivacyNotice,rankingRows,rankingRankBadge,transformRankingPayload,getState:()=>({rankingView,rankingXpScope,rankingXpPeriod,rankingDailyScope,viewportAnchor:activeAnchor?{top:activeAnchor.top,interaction:activeAnchor.interaction,element:activeAnchor.element.className}:null,interactionVersion,lastAnchorInvalidation})};
+    return {install,openView,openLastView,openWeeklyTeams,renderLeaderboard,renderXpRanking,renderDailyRanking,renderRankingPrivacyNote,renderRankingTeamCard,openRankingPrivacyModal,saveRankingVisibility,maybeShowRankingPrivacyNotice,rankingRows,rankingRankBadge,transformRankingPayload,getState:()=>({rankingView,rankingXpScope,rankingXpPeriod,rankingDailyScope,viewportAnchor:activeAnchor?{top:activeAnchor.top,interaction:activeAnchor.interaction,element:activeAnchor.element.className}:null,interactionVersion,lastAnchorInvalidation})};
   }
 
   return {create,transformRankingPayload,mountViewNavigation};

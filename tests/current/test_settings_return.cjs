@@ -13,7 +13,7 @@ vm.createContext(context);vm.runInContext(declarations+navigation,context);
 function visit(screen,scroll){context.currentScreen=screen;screen==='profile'?names.add('active'):names.delete('active');context.window.scrollY=scroll;calls.length=0;scrolls.length=0;}
 function flush(){while(timers.length)timers.shift()();}
 function clickNav(screen){events.click({target:{closest:s=>s==='[data-nav]'?{dataset:{nav:screen}}:null}});context.nav(screen);}
-for(const [screen,label] of [['daily','Dnes'],['free','Hrát'],['archive','Archiv'],['leaderboard','Pořadí'],['profile','Já']]){
+for(const [screen,label] of [['daily','Dnes'],['free','Hrát'],['archive','Archiv'],['leaderboard','Soutěže'],['weekly','Týdenní soutěž'],['monthly','Měsíční soutěž'],['profile','Já']]){
  visit(screen,137);context.openSettings();flush();assert(names.has('settings-open'));assert.equal(back.textContent,'← '+label);assert(back.focused);
  calls.length=0;context.closeSettings();assert(!names.has('settings-open'));assert.equal(context.currentScreen,screen);assert.equal(scrolls.at(-1).top,137);assert(gear.focused);
  assert.equal(calls.length,screen==='profile'?0:1);if(calls.length)assert.equal(calls[0].options.replace,true,'explicit return must not push another forward route');

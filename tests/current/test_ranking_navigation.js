@@ -49,5 +49,29 @@ function fixture(){
   assert(f.xp().includes('XP pořadí se teď nepodařilo načíst.')&&f.xp().includes('syntetická síťová chyba'));assert.equal(f.nodes.get('#xpLeaderboardList').attrs['aria-busy'],'false');
   f.setDate('2026-10-19');const nextDay=f.controller.openView('daily');await tick();assert(f.calls.at(-1).includes('daily_date=2026-10-19'));f.pending.at(-1).resolve(payload('dalsi-den'));await nextDay;
   assert.equal(f.controller.getState().rankingView,'daily');assert(f.daily().includes('dalsi-den'));
+  // Execute a fresh shipped controller per remembered-navigation scenario.
+  const vm=require('node:vm'),fs=require('node:fs');
+  function entryFixture(saved,{monthly=true,weekly=true,blocked=false}={}){
+    const store=new Map(saved?[['proplet-competition-view-v1',saved]]:[]),opened=[],reads=[],events={};
+    const context={module:{exports:{}},document:{addEventListener:(name,fn)=>{events[name]=fn}},
+      localStorage:{getItem:key=>{if(blocked)throw Error('blocked');return store.get(key)},setItem:(key,value)=>{if(blocked)throw Error('blocked');store.set(key,value)}}};
+    if(monthly)context.PropletMonthlyCompetition={open:()=>opened.push('monthly')};
+    if(weekly)context.PropletWeeklyCompetition={open:()=>opened.push('weekly')};
+    vm.runInNewContext(fs.readFileSync('public/app/rankings/rankings.js','utf8'),context);
+    const controller=context.module.exports.create({api:url=>{reads.push(url);return Promise.resolve(payload('entry',2))},pragueDateISO:()=> '2026-11-01'});
+    return {controller,store,opened,reads,events};
+  }
+  let entry=entryFixture();await entry.controller.openLastView();assert.deepEqual(entry.opened,['monthly']);assert.equal(entry.reads.length,0);
+  entry=entryFixture(null,{monthly:false});await entry.controller.openLastView();assert.equal(entry.controller.getState().rankingView,'daily');
+  for(const remembered of ['daily','xp','weekly','monthly']){
+    entry=entryFixture(remembered);await entry.controller.openLastView();
+    assert.equal(entry.store.get('proplet-competition-view-v1'),remembered);
+    assert.equal(entry.opened[0]||entry.controller.getState().rankingView,remembered);
+  }
+  entry=entryFixture('monthly',{monthly:false});await entry.controller.openLastView();assert.equal(entry.controller.getState().rankingView,'daily');
+  entry=entryFixture('weekly',{weekly:false});await entry.controller.openLastView();assert.equal(entry.controller.getState().rankingView,'daily');
+  entry=entryFixture('untrusted');await entry.controller.openLastView();assert.deepEqual(entry.opened,['monthly']);
+  entry=entryFixture(null,{blocked:true});await entry.controller.openView('xp');await entry.controller.openLastView();assert.equal(entry.controller.getState().rankingView,'xp');
+  entry=entryFixture();entry.events['proplet:screen-changed']({detail:{screen:'weekly'}});await entry.controller.openLastView();assert.deepEqual(entry.opened,['weekly'],'direct screen navigation is remembered');
   console.log('PASS single ranking view, weekly route reuse, teams today/all, own row, cached scope changes, period/account races, errors and Prague date');
 })().catch(error=>{console.error(error);process.exitCode=1});

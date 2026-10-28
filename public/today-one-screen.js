@@ -51,8 +51,7 @@
   const difficultyCount=document.querySelectorAll('#difficultyCards .cp-card').length;
   const free={key:'free',title:resume?'Rozehráno':'Volná hra',detail:resume?text(resume.querySelector('strong')).replace(/^Rozehráno:\s*/,'').replace(/^Rozehráno v Archivu\s*·?\s*/,'Archiv · '):difficultyCount?difficultyCount+' obtížností':'',art:resume?icon(resume):'/difficulty/printshop/easy.webp',target:resume?'#'+resume.id:q('#axHomeFree .ax-card-action')?'#axHomeFree .ax-card-action':'.bottom-nav [data-nav="free"]',label:resume?text(resume):'Volná hra. Vybrat obtížnost.',kind:complete?'free next':'free'};
   complete?tiles.unshift(free):tiles.push(free);
-  const team=q('#axHomeCompetitions .ax-card-action');
-  tiles.push({key:'team',title:team?'Soutěž':'Pořadí',detail:team?'Týdenní':'',art:'/rewards/team-victories/first-imprint.webp',target:team?'#axHomeCompetitions .ax-card-action':'.bottom-nav [data-nav="leaderboard"]',label:team?'Otevřít týdenní soutěž':'Otevřít pořadí',kind:'team'});
+  tiles.push({key:'team',title:'Soutěže',detail:'Týdenní · měsíční',art:'/assets/navigation/competitions-v1.webp',target:'.bottom-nav [data-nav="leaderboard"]',label:'Otevřít soutěže. Týdenní a měsíční soutěž.',kind:'team'});
   if(tiles.length<4&&q('#axPlayArchive [data-archive-action="open"]'))tiles.push({key:'archive',title:'Archiv',detail:'800 desek',art:'/assets/archive/archive-letterpress-v2.webp',target:'#axPlayArchive [data-archive-action="open"]',label:'Archiv Propletu. Vybrat z 800 desek.',kind:'archive'});
   const week=[...document.querySelectorAll('#dailyWeekRhythm .daily-week-day')].map(e=>({day:text(e.querySelector('b')),art:e.querySelector('.daily-week-icon')?.getAttribute('src'),extra:e.querySelector('.daily-week-special-mark')?.getAttribute('src'),active:e.classList.contains('active')}));
   const pending=[];

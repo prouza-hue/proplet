@@ -91,4 +91,15 @@ assert.equal(rendered('feature').querySelector('.os-detail').textContent,'✓ Ho
 assert.equal(rendered('feature').querySelector('.os-metrics').textContent,'0:19 · 8 tahů');
 assert.match(rendered('feature').getAttribute('aria-label'),/0:19 · 8 tahů/);
 rendered('feature').click();assert.equal(openedResult,1);assert.equal(played,playsBeforeResult,'completed card never starts another game');
+// All players use the same broad entry; owning a team must not force weekly.
+const competitionNav=new Element('button'),weeklyOnly=new Element('button');let competitionEntries=0,weeklyEntries=0;
+competitionNav.onclick=()=>competitionEntries++;weeklyOnly.onclick=()=>weeklyEntries++;
+selectors.set('.bottom-nav [data-nav="leaderboard"]',competitionNav);
+for(const teamMember of [false,true]){
+ if(teamMember)selectors.set('#axHomeCompetitions .ax-card-action',weeklyOnly);else selectors.delete('#axHomeCompetitions .ax-card-action');
+ repaint();rendered('team').click();
+ assert.equal(rendered('team').querySelector('.os-title').textContent,'Soutěže');
+ assert.equal(rendered('team').querySelector('.os-detail').textContent,'Týdenní · měsíční');
+}
+assert.equal(competitionEntries,2);assert.equal(weeklyEntries,0);
 console.log('PASS one-screen readiness: guarded native actions, separate accessible result metrics, and completed Extra label');
