@@ -7,6 +7,7 @@ from account_auth_core import *  # noqa: F401,F403
 from account_auth_core import install_account_auth as _install_account_auth_core
 from account_bonus_v3331 import install_account_bonus as _install_account_bonus
 from account_integrity_v33210 import install_account_integrity as _install_account_integrity
+from admin_recovery import install_admin_recovery as _install_admin_recovery
 from competitive_sharing_v3331 import install_competitive_sharing as _install_competitive_sharing
 from preview_auth_v334 import install_preview_auth_v334 as _install_preview_auth_v334
 from push_diagnostics_v3329 import install_push_diagnostics as _install_push_diagnostics
@@ -82,6 +83,8 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         supabase_url=services.supabase_url,
         supabase_key=services.supabase_key,
         db_rpc=services.db_rpc,
+        canonical_origin=services.canonical_origin,
+        vercel_env=services.vercel_env,
         tz=services.tz,
         db_select=services.db_select,
         db_select_bounded=services.db_select_bounded,
@@ -175,4 +178,18 @@ def install_account_auth(app, services: AppServices | None = None, **legacy_kwar
         player_stats=services.player_stats,
         tz=services.tz,
     )
+    if services.vercel_env in {"preview", "production"}:
+        _install_admin_recovery(
+            app,
+            supabase_url=services.supabase_url,
+            supabase_key=services.supabase_key,
+            tz=services.tz,
+            db_select=services.db_select,
+            db_rpc=services.db_rpc,
+            auth_player=services.auth_player,
+            enforce_rate_limit=services.enforce_rate_limit,
+            canonical_origin=services.canonical_origin,
+            vercel_env=services.vercel_env,
+            strict_owner_lock=True,
+        )
     _install_preview_auth_v334(app)

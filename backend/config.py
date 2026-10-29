@@ -8,6 +8,7 @@ versioned installers and tests.
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -42,6 +43,28 @@ def monthly_preview_qa_enabled(supabase_url: str | None = None) -> bool:
         and _env("PROPLET_MONTHLY_QA_ENABLED").lower() == "true"
         and len(_env("PROPLET_MONTHLY_QA_SECRET")) >= 32
     )
+ADMIN_PREVIEW_BRANCH = "codex/admin-modernization"
+ADMIN_PREVIEW_DATABASE = "https://eanzztstmwlamwfdskbf.supabase.co"
+ADMIN_PREVIEW_ORIGIN = "https://proplet-git-codex-admin-modernization-pavel-prouzas-projects.vercel.app"
+
+
+def admin_preview_enabled() -> bool:
+    return (_env("VERCEL_ENV").lower() == "preview"
+            and _env("VERCEL_GIT_COMMIT_REF") == ADMIN_PREVIEW_BRANCH)
+
+
+def canonical_origin() -> str:
+    """Use only deployment-owned configuration, never a browser Host/Origin."""
+    if not admin_preview_enabled():
+        return "https://hrajproplet.cz"
+    hostname = _env("VERCEL_URL").lower()
+    if not re.fullmatch(r"proplet-[a-z0-9-]+-pavel-prouzas-projects\.vercel\.app", hostname):
+        # The UI and reads can still be inspected, but email delivery must fail
+        # closed until an actual project deployment supplies its own hostname.
+        return ""
+    # The verified branch alias remains stable across candidate deployments;
+    # callbacks must not depend on a soon-to-be-obsolete per-commit hostname.
+    return ADMIN_PREVIEW_ORIGIN
 
 
 @dataclass(frozen=True, slots=True)
@@ -84,6 +107,12 @@ def load_settings() -> Settings:
     if _env("PROPLET_MONTHLY_QA_SECRET") or _env("PROPLET_MONTHLY_QA_ENABLED"):
         if not monthly_preview_qa_enabled():
             raise RuntimeError("Monthly QA requires its exact preview branch, isolated database and dedicated secret")
+    admin_preview = admin_preview_enabled()
+    if vercel_git_commit_ref == ADMIN_PREVIEW_BRANCH or _env("PROPLET_ADMIN_PREVIEW_ENABLED"):
+        if (not admin_preview
+                or _env("SUPABASE_URL").rstrip("/") != ADMIN_PREVIEW_DATABASE
+                or not _env("PROPLET_MONTHLY_TEST_KEY")):
+            raise RuntimeError("Admin preview requires its exact branch, preview environment and isolated test database credentials")
     gen4_preview_branch = "agent/v3340-medium-calibration-v3"
     gen4_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == gen4_preview_branch
     gen5_candidate_preview = vercel_env == "preview" and vercel_git_commit_ref == "feat/gen5-lab"
@@ -106,13 +135,15 @@ def load_settings() -> Settings:
         # Preserve the historical parsing exactly: URL only lost trailing
         # slashes and the secret was not whitespace-normalized.
         supabase_url="" if playtest_preview else os.environ.get("SUPABASE_URL", "").rstrip("/"),
-        # A monthly preview must never inherit the project's production secret.
-        supabase_secret_key=(os.environ.get("PROPLET_MONTHLY_TEST_KEY", "") if monthly_preview else
+        # Reuse isolated-test credentials for both approved isolated previews.
+        # The generic SUPABASE_SECRET_KEY may point at production and is never
+        # selected for this branch, even when it is inherited by Vercel.
+        supabase_secret_key=(os.environ.get("PROPLET_MONTHLY_TEST_KEY", "") if monthly_preview or admin_preview else
                              "" if playtest_preview else os.environ.get("SUPABASE_SECRET_KEY", "")),
-        vapid_public_key="" if playtest_preview else _env("VAPID_PUBLIC_KEY"),
-        vapid_private_key="" if playtest_preview else _env("VAPID_PRIVATE_KEY"),
+        vapid_public_key="" if playtest_preview or admin_preview else _env("VAPID_PUBLIC_KEY"),
+        vapid_private_key="" if playtest_preview or admin_preview else _env("VAPID_PRIVATE_KEY"),
         vapid_subject=_env("VAPID_SUBJECT", "https://proplet-nine.vercel.app"),
-        cron_secret="" if playtest_preview else _env("CRON_SECRET"),
+        cron_secret="" if playtest_preview or admin_preview else _env("CRON_SECRET"),
         vercel_env=vercel_env,
         vercel_git_commit_ref=vercel_git_commit_ref,
         live_player_preview=live_player_preview,

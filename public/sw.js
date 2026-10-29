@@ -129,6 +129,9 @@ self.addEventListener('fetch',e=>{
   const u=new URL(e.request.url);
   if(u.origin!==self.location.origin)return;
   if(u.pathname.startsWith('/_vercel/'))return;
+  // Administration is an online-only, separately authenticated workspace.
+  // Never serve its shell/modules from a gameplay cache or fall back to '/'.
+  if(/^\/admin(?:\/|\.|$)/.test(u.pathname))return;
   if(u.pathname==='/api/rolling-content'){
     // A package manifest can announce a new release within the same week.
     // Never bind yesterday's cached delta to that fresh manifest. The app
