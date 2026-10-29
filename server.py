@@ -26,6 +26,7 @@ from backend import db as backend_db
 from backend import analytics as product_analytics
 from backend import measurement
 from backend.launch_report import build_launch_report
+from backend.quality_dataset import load_quality_dataset
 from backend import rankings as ranking_queries
 from backend import admin_workspace
 from backend import config as backend_config
@@ -2880,19 +2881,16 @@ def build_quality_report(until=None):
     """
     until = until or datetime.now(TZ)
     cutoff = until - timedelta(days=90)
-    base = {"environment": "in.(production,legacy)", "is_test": "eq.false"}
-    def read(table, time_column="created_at", extra=None):
-        filters = {**base, "and": f"({time_column}.gte.{cutoff.isoformat()},{time_column}.lte.{until.isoformat()})", **(extra or {})}
-        return measurement.pages(db_request, table, filters=filters)
-    attempts = read("analytics_first_attempts", "started_at")
+    dataset = load_quality_dataset(db_rpc, cutoff, until)
+    attempts = dataset["attempts"]
     for attempt in attempts:
         if (parse_timestamp(attempt.get("completed_at")) or until) > until:
             attempt["completed_at"] = None
-    feedback = read("puzzle_feedback", extra={"kind":"eq.difficulty"})
-    word_feedback = read("puzzle_feedback", extra={"kind":"eq.word"})
-    hint_events = read("hint_events")
-    helper_events = read("helper_events")
-    event_counts = db_rpc("proplet_quality_event_counts", {"p_from":cutoff.isoformat(),"p_until":until.isoformat()})
+    feedback = dataset["feedback"]
+    word_feedback = dataset["word_feedback"]
+    hint_events = dataset["hint_events"]
+    helper_events = dataset["helper_events"]
+    event_counts = dataset["event_counts"]
 
     def ts(row):
         raw = row.get("started_at") or ""
