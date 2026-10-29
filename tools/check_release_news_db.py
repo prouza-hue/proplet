@@ -15,7 +15,7 @@ def check_release_news(options):
         c.execute("update monthly_competition_settings set isolated=true,preview_now='2026-10-31 22:59:59+00',preview_anchor_at=null")
         for pid,created in zip(player_ids,['2026-10-01','2026-10-31 23:00:00+00','2026-10-01']):
             c.execute('insert into players(id,name,family_code,token_hash,created_at) values(%s,%s,%s,%s,%s)',
-                (pid,'Release fixture','SOLO_NEWS','fixture-'+pid,created))
+                (pid,'Release '+pid[:8],'SOLO_NEWS','fixture-'+pid,created))
             for index in range(4 if pid==beginner else 5):
                 mode=['free','free','free','tajenka','free'][index]
                 # No Daily date: these synthetic progress rows do not affect monthly scoring.
