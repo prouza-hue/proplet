@@ -84,7 +84,8 @@ jobs:
 
   profile-statistics:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    # Both real browser suites together exceeded five minutes without a failed assertion.
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:

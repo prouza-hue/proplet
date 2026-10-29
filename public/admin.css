@@ -12,3 +12,5 @@ nav a{min-height:44px;border-radius:8px;padding:12px;display:flex;align-items:ce
 @media(max-width:740px){nav a{padding:9px 10px;font-size:14px}.gate{margin:30px 16px}.page-heading{flex-wrap:wrap}.players-table td.check-cell{display:block;text-align:left}.players-table td.check-cell::before{display:none}.players-table td:first-child{display:block}.players-table td:nth-child(2){display:block;text-align:left}.definition-list{grid-template-columns:1fr}.task-row{flex-wrap:wrap}.compare-grid{grid-template-columns:1fr}.pagination>div{width:100%;justify-content:space-between}}
 
 main a{display:inline-flex;align-items:center;min-height:44px}label.check-row{min-width:44px;margin:0}.detail-id code{word-break:break-all}pre{max-width:100%;overflow-x:auto}
+
+@media(max-width:420px){#auditForm .audit-date{flex:1 1 100%;min-width:0}#auditForm .audit-date input{min-width:0;max-width:100%}}

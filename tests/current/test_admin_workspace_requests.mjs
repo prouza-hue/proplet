@@ -51,4 +51,23 @@ confirm({title:'B',html:'Account B',onConfirm:async()=>{}});
 resolveOld();await oldAction;
 assert.equal(dialog.open,true,'late action A cannot close the confirmation for B');
 dismissConfirmation();
-console.log('PASS admin workspace: delayed A→B, detached view, session change, denial, all-scope cancellation, confirmation generations');
+// A submit button loses activeElement when disabled during the server preview.
+// Retain the explicit trigger, re-enable it before opening the native dialog,
+// and restore focus only while the exact player view remains current.
+const body={id:'body'},prepare={id:'prepareRecovery',isConnected:true,disabled:true,focus(){
+    assert.equal(this.disabled,false,'focus must never target a disabled trigger');
+    document.activeElement=this;
+}};
+document.activeElement=body;
+await Promise.resolve(); // stand-in for the completed server preview
+prepare.disabled=false;
+let samePlayer=true;
+confirm({title:'Recovery',html:'Fixed UUID',opener:prepare,canRestoreFocus:()=>samePlayer,onConfirm:async()=>{}});
+dialog.close();
+assert.equal(document.activeElement,prepare,'Escape/close must restore the explicit prepare trigger, not body');
+document.activeElement=body;
+confirm({title:'Recovery',html:'Fixed UUID',opener:prepare,canRestoreFocus:()=>samePlayer,onConfirm:async()=>{}});
+samePlayer=false;
+dialog.close();
+assert.equal(document.activeElement,body,'leaving the selected player must prevent focus restoration into its stale view');
+console.log('PASS admin workspace: delayed A→B, detached view, session change, denial, all-scope cancellation, confirmation generations, disabled-trigger focus');
