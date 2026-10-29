@@ -864,6 +864,10 @@
       {
         "path": "tests/current/test_quality_dataset.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_release_news_backend.py",
+        "runner": "python"
       }
     ]
   },

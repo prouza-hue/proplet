@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'backend/monthly_competition.py'
+      - 'backend/release_news.py'
+      - 'public/release-news*'
       - 'backend/config.py'
       - 'server.py'
       - 'public/app/monthly/**'
@@ -13,8 +15,11 @@ on:
       - 'public/ranking-navigation.css'
       - 'vercel.json'
       - 'supabase/migrations/*monthly*.sql'
+      - 'supabase/migrations/*release_news*.sql'
       - 'supabase/tests/monthly*.sql'
       - 'tools/test_monthly_competition_db.py'
+      - 'tools/check_release_news_db.py'
+      - 'tests/current/test_release_news*'
       - 'tests/current/test_monthly_competition*'
       - '.github/workflows/monthly-competition.yml'
 permissions:

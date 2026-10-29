@@ -659,6 +659,17 @@
       "replaced_rpc_definitions": []
     },
     {
+      "id": "20261029-release-news-receipts",
+      "order": 590,
+      "version": "2026.10.29",
+      "path": "supabase/migrations/20261029120000_release_news_receipts.sql",
+      "type": "migration",
+      "status": "prepared-inactive-isolated-preview",
+      "sha256": "74282623b8d5574cfa46f1e3d89e2403da09631c89a80108131461cf3942ca81",
+      "supersedes": [],
+      "replaced_rpc_definitions": []
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

@@ -43,6 +43,17 @@ def monthly_preview_qa_enabled(supabase_url: str | None = None) -> bool:
         and _env("PROPLET_MONTHLY_QA_ENABLED").lower() == "true"
         and len(_env("PROPLET_MONTHLY_QA_SECRET")) >= 32
     )
+
+
+def release_news_enabled() -> bool:
+    """Explicit opt-in; preview can only access the already isolated monthly QA DB."""
+    if _env("PROPLET_RELEASE_NEWS_ENABLED").lower() != "true":
+        return False
+    if _env("VERCEL_ENV").lower() == "production":
+        return _env("SUPABASE_URL").rstrip("/") == "https://iopyhluayfszskyqqpuc.supabase.co"
+    return monthly_preview_qa_enabled()
+
+
 ADMIN_PREVIEW_BRANCH = "codex/admin-modernization"
 ADMIN_PREVIEW_DATABASE = "https://eanzztstmwlamwfdskbf.supabase.co"
 ADMIN_PREVIEW_ORIGIN = "https://proplet-git-codex-admin-modernization-pavel-prouzas-projects.vercel.app"

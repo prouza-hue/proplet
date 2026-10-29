@@ -332,6 +332,8 @@ def main():
             pass
     report['checks'].append('explicit closed correction: mandatory reason/operator/CAS; unauthorized denied;6 concurrent same-key replays;6 distinct CAS commands only1 wins; injected audit failure rolls back snapshot/ledger/badges')
     report['checks'].append('closed correction atomically downgrades/removes/regrants badges and rank ties; immutable audit/revision; XP unchanged; aftercutoff offline retains eligible original')
+    from tools.check_release_news_db import check_release_news
+    report['checks'].append(check_release_news(options))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report,indent=2),encoding='utf8')
     (ROOT/'data/monthly-preview-scenarios.json').write_text(json.dumps({

@@ -63,7 +63,7 @@ from backend.config import (
     VERCEL_ENV,
     VERCEL_GIT_COMMIT_REF,
 )
-from backend.config import monthly_preview_qa_enabled
+from backend.config import monthly_preview_qa_enabled, release_news_enabled
 from backend.contracts import (
     AccountDeleteConfirm,
     AdminReportUpdate,
@@ -5559,6 +5559,10 @@ install_visual_pilot_push(
 )
 
 admin_workspace.install(globals())
+
+from backend import release_news
+release_news.install(app, auth_player=auth_player, db_rpc=db_rpc,
+                     enforce_rate_limit=enforce_rate_limit, enabled=release_news_enabled)
 
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")

@@ -33,7 +33,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (path, methods, name)
         for path, methods, name in reviewed
-        if path and path not in {"/api/qa/monthly-control", "/api/competition/monthly", "/api/cron/monthly-competition", "/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+        if path and path not in {"/api/release-news", "/api/release-news/claim", "/api/qa/monthly-control", "/api/competition/monthly", "/api/cron/monthly-competition", "/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -49,6 +49,15 @@ assert server.app.docs_url is None
 assert server.app.redoc_url is None
 assert server.app.openapi_url is None
 openapi_contract = server.app.openapi()
+# Validate the exact additive announcement endpoints before preserving the old digest.
+news_paths = {"/api/release-news": {"get"}, "/api/release-news/claim": {"post"}}
+assert {p for p in openapi_contract["paths"] if p.startswith("/api/release-news")} == set(news_paths)
+for news_path, methods in news_paths.items():
+    operation = openapi_contract["paths"].pop(news_path)
+    assert set(operation) == methods
+    for method in methods:
+        assert "requestBody" not in operation[method]
+        assert {(p["name"], p["in"]) for p in operation[method]["parameters"]} == {("authorization", "header")}
 assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 # Release publication changes APP_VERSION without changing the HTTP schema.
 # Normalize only that metadata field back to the characterization baseline;

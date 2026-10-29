@@ -74,7 +74,7 @@ EXPECTED_INSTALLER_ROUTES = (
 route_keys = [
     (method, route.path)
     for route in server.app.routes
-    if route.path and route.path not in {"/api/qa/monthly-control", "/api/competition/monthly", "/api/cron/monthly-competition", "/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+    if route.path and route.path not in {"/api/release-news", "/api/release-news/claim", "/api/qa/monthly-control", "/api/competition/monthly", "/api/cron/monthly-competition", "/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     for method in (route.methods or ())
 ]
 for expected in EXPECTED_INSTALLER_ROUTES:
@@ -84,12 +84,21 @@ reviewed_admin_routes = normalize_admin_routes((route.path, tuple(sorted(route.m
 route_snapshot = sorted(
     (path, methods, name)
     for path, methods, name in reviewed_admin_routes
-    if path and path not in {"/api/qa/monthly-control", "/api/competition/monthly", "/api/cron/monthly-competition", "/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+    if path and path not in {"/api/release-news", "/api/release-news/claim", "/api/qa/monthly-control", "/api/competition/monthly", "/api/cron/monthly-competition", "/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
 )
 # Round III adds exactly four /api/mozkokalypsa3 routes. Removing those
 # additions reproduces the prior 7da3e64c digest, including both weekly-team routes.
 assert _digest(route_snapshot) == "9f8cb87c1786afdfd7bb04be8f595bcb62d8248b8cdedfdeb020cd32f25c6e4b"
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
+# Validate the exact additive announcement endpoints before preserving the old digest.
+news_paths = {"/api/release-news": {"get"}, "/api/release-news/claim": {"post"}}
+assert {p for p in openapi_contract["paths"] if p.startswith("/api/release-news")} == set(news_paths)
+for news_path, methods in news_paths.items():
+    operation = openapi_contract["paths"].pop(news_path)
+    assert set(operation) == methods
+    for method in methods:
+        assert "requestBody" not in operation[method]
+        assert {(p["name"], p["in"]) for p in operation[method]["parameters"]} == {("authorization", "header")}
 # Dedicated isolated QA control is additive, authenticated and not part of the historical public API.
 qa_operation = openapi_contract["paths"].pop("/api/qa/monthly-control")
 assert set(qa_operation) == {"post"}
