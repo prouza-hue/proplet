@@ -42,7 +42,7 @@ Schválena je příprava vydání v pracovní větvi, včetně integrace aktuál
 
 **Dokončeno:** merge `689477c` spojil kandidáta `0b6470d` s produkčním main `84e64aa`. Nové no-scroll UI, měsíční izolace a QA omezení zůstaly zachovány. Převzata je současná administrace, zabezpečená obnova účtů, audit a úplné jednorázové načtení kalibračních dat. Šest konfliktů bylo vyřešeno kombinací obou sad omezení; původní API otisky zůstaly beze změny. Prošlo 13 cílených kontrol integrace (S04/S06, admin prostředí/obnova/workspace/cache, kalibrační dataset, měsíční HTTP/QA, live-preview hranice, release kontrakt, Dnes a návrat z Nastavení) a syntaxe app/SW. Nejde o nový kompletní gate ani browser E2E po sloučení.
 
-**Rozpracováno / čeká:** serverový receipt a automatické oznámení jednou na účet, finální migrace tohoto receipt, sjednocení cache revizí, úplný gate nad zmrazeným kandidátem, CI se skutečným izolovaným PostgreSQL a finální browser kontrola. Starší E2E důkazy výše platí pro své uvedené kandidáty; nenahrazují ověření nově sloučené verze.
+**Rozpracováno / čeká:** serverový receipt a automatické oznámení jednou na účet, ověření migrace tohoto receipt, sjednocení cache revizí, úplný gate nad zmrazeným kandidátem, CI se skutečným izolovaným PostgreSQL a finální browser kontrola. Starší E2E důkazy výše platí pro své uvedené kandidáty; nenahrazují ověření nově sloučené verze.
 
 ### Přesný seznam databázových změn
 
@@ -50,13 +50,15 @@ Zbývající produkční změny oproti main, v pořadí:
 
 1. `supabase/migrations/20261028003751_monthly_competition.sql` — evidence dnů, snapshot, odznaky a služební RPC; výchozí `enabled=false` a `isolated=false`.
 2. `supabase/migrations/20261028005634_monthly_admin_corrections.sql` — schválená politika 48 hodin, revize a auditované opravy; soutěž nezapíná.
-3. Nová migrace jednorázového release receipt — soubor se doplní po dokončení implementace a kontrole. Do té doby není tento bod připraven k aplikaci.
+3. `supabase/migrations/20261029120000_release_news_receipts.sql` — privátní evidence jednorázového oznámení, kampaň `november-2026-release-v1` je výchozí neaktivní. Závisí na `proplet_monthly_now_v1()` z první migrace; aplikace až po dokončení testů a kontrole.
 
 Main `84e64aa` již obsahuje tyto závislosti aktuálního produkčního runtime: `20261028235517_admin_workspace_reads.sql`, `20261028235549_admin_atomic_recovery.sql`, `20261029000850_admin_case_audit_transaction.sql` a `20261029014507_quality_dataset_single_read.sql`. Před vydáním pouze ověřit skutečnou aplikovanou historii/checksumy a dostupnost RPC; samotná přítomnost v Git není důkazem aplikace. Nejsou součástí nové měsíční migrační dávky a nemají se plošně přehrávat. Zejména migrace obnovy účtu záměrně zneplatňuje nedokončené staré odkazy.
 
 **Vyloučit z produkční dávky:** `20261028085718_monthly_isolated_preview_clock.sql`, `20261028094820_monthly_preview_special_clock_policy.sql`, `20261028095102_monthly_preview_difficulty_parity.sql`, `20261028095256_monthly_preview_extra_xp_parity.sql`, `20261028101522_monthly_preview_special_bindings.sql` a `20261028103442_monthly_preview_empty_claim_probe.sql`. Jde o hodiny a paritu izolované testovací databáze. Ani automatický seznam všech datovaných migrací používaný při stavbě prázdné CI databáze není produkční rollout plán.
 
 Produkční runtime používá základní měsíční funkce z prvních dvou migrací. QA ovladač a transportní časové hlavičky mají nadále přesné omezení na měsíční preview a testovací DB; produkce je nesmí aktivovat. Admin a měsíční preview vybírají izolovaný klíč a nepřebírají obecný produkční secret. Produkční `PROPLET_MONTHLY_ENABLED` ani databázové `enabled` při tomto merge nebyly zapnuty.
+
+Oznámení má samostatnou dvojitou aktivaci: `PROPLET_RELEASE_NEWS_ENABLED=true` a `release_news_campaigns.active=true`. SQL navíc vyžaduje datum nejméně 1. 11. 2026 00:00 Europe/Prague, účet vytvořený před touto hranicí a alespoň pět uložených her v běžných režimech. Atomický receipt je unikátní pro kampaň a účet. Ověření v preview vyžaduje stávající přesnou QA hranici měsíční větve; samo o sobě nezapíná produkční oznámení.
 
 ## Produkční spuštění — zatím neprovedeno
 
