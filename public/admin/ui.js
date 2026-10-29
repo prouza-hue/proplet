@@ -4,7 +4,7 @@ export const num=value=>value==null?'—':Number(value).toLocaleString('cs-CZ');
 export const pct=value=>value==null?'—':`${Math.round(Number(value)*100)} %`;
 export const date=(value,time=true)=>{if(!value)return '—';const d=new Date(value);return Number.isNaN(d.getTime())?'—':new Intl.DateTimeFormat('cs-CZ',{timeZone:'Europe/Prague',day:'numeric',month:'numeric',year:'numeric',...(time?{hour:'2-digit',minute:'2-digit'}:{})}).format(d)};
 export const elapsed=value=>value==null?'—':`${Math.floor(value/60000)}:${String(Math.round(value/1000)%60).padStart(2,'0')}`;
-export const diff=value=>({easy:'Snadná',medium:'Střední',hard:'Těžká',hardcore:'Mozkožrout'}[value]||value||'Nezjištěno');
+export const diff=value=>({easy:'Snadná',medium:'Střední',hard:'Těžká',hardcore:'Mozkožrout',mozkomor:'Mozkomor',mozkokalypsa:'Mozkokalypsa'}[value]||value||'Nezjištěno');
 export const statusLabels={ready:'Načteno',empty:'Bez záznamů',partial:'Částečná data',stale:'Zastaralá data',unavailable:'Nedostupné',error:'Chyba',unverified:'Neověřené měření',pending:'Zatím nelze vyhodnotit',historical:'Historická data'};
 export function toast(message){const el=document.getElementById('adminToast');el.textContent=message;clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.textContent='',6500)}
 export function heading(title,description,refresh=true){return `<div class="page-heading"><div><h1>${esc(title)}</h1><p>${esc(description)}</p></div>${refresh?'<button type="button" data-refresh>Obnovit</button>':''}</div>`}
