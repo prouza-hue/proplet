@@ -63,9 +63,9 @@
 - [x] 8.6 Ověřit browser průchody desktop1440/mobil390/úzký320/Fold690, světlo/tmu, klávesnici a fokus, reload a Back/Forward; uložit skutečně prohlédnuté důkazy.
 - [x] 8.7 Dokončit release/cache kontrakt a připravit konkrétní RC, draft PR, preview, výsledky kontrol a rollback zachovávající bezpečnost k rozhodnutí o vydání.
 
-## 9. Produkční vydání — mimo aktuální autorizaci
+## 9. Produkční vydání — schváleno a provedeno 29. 10. 2026
 
-- [ ] 9.1 Po rozhodnutí o vydání znovu ověřit main/RC/prostředí/databázi a provést schválený produkční postup s nedestruktivními migracemi.
-- [ ] 9.2 Ověřit produkční URL, oprávnění, verzi, čerstvost zdrojů a chybové logy bez testovacích mutací skutečných hráčů; zaznamenat datum, SHA/deployment, ověření a otevřené body.
+- [x] 9.1 Po rozhodnutí o vydání znovu ověřit main/RC/prostředí/databázi a provést schválený produkční postup s nedestruktivními migracemi.
+- [x] 9.2 Ověřit produkční URL, oprávnění, verzi, čerstvost zdrojů a chybové logy bez testovacích mutací skutečných hráčů; zaznamenat datum, SHA/deployment, ověření a otevřené body.
 
-Druhá etapa citlivých týmových/identitních oprav není součást tohoto implementačního seznamu. Vyžaduje samostatný konkrétní návrh a akceptační scénáře. Implementační stav odpovídá ověřeným krokům. Produkční úkoly 9.1–9.2 jsou výslovně odložené: uživatel autorizoval samostatnou větev a preview, nikoli main nebo produkci.
+Druhá etapa citlivých týmových/identitních oprav není součást tohoto implementačního seznamu. Vyžaduje samostatný konkrétní návrh a akceptační scénáře. Implementační stav odpovídá ověřeným krokům. Uživatel následně výslovně autorizoval produkční nasazení. Úkoly 9.1–9.2 byly dokončené 29. 10. 2026, včetně čtyř migrací, PR 222/223 a ověření skutečného provozu.

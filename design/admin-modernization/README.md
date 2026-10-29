@@ -1,12 +1,12 @@
 # Návrh nové administrace Propletu
 
-Aktualizováno 29. 10. 2026. Stav: **první etapa implementovaná na samostatné větvi a v izolovaném preview**, draft [PR 222](https://github.com/prouza-hue/proplet/pull/222). [Otevřít skutečný admin](https://proplet-git-codex-admin-modernization-pavel-prouzas-projects.vercel.app/admin.html). Produkce a main se neměnily. Samostatná větev `codex/admin-modernization` vychází z produkčního `1de7389`.
+Aktualizováno 29. 10. 2026. Stav: **první etapa nasazená v produkci po následném schválení uživatelem**, draft [PR 222](https://github.com/prouza-hue/proplet/pull/222). [Otevřít skutečný admin](https://proplet-git-codex-admin-modernization-pavel-prouzas-projects.vercel.app/admin.html). Produkční nasazení proběhlo přes PR 222 a cílenou opravu načítání kvality v PR 223. Ostrý admin: https://hrajproplet.cz/admin.html. Aktuální záznam je v ../../docs/audits/ADMIN-PRODUCTION-20261029.md. Samostatná větev `codex/admin-modernization` vychází z produkčního `1de7389`.
 
 Finální záznam implementace, bezpečnostních oprav a skutečného e-mailového E2E je v `../../docs/audits/ADMIN-MODERNIZATION-20261029.md`. Testovací přihlášení vlastníka je pouze v gitignored `../../work/admin-preview-login.txt`.
 
 ## Přijaté rozhodnutí
 
-Uživatel schválil první etapu včetně PR 118 a bezpečnostních oprav k realizaci, testům a funkčnímu preview. Výslovně zakázal merge na main a produkční nasazení; tento zákaz zůstává zachovaný. Níže je původní rozsah návrhu, dokončený stav je v odkazovaném auditu.
+Uživatel schválil první etapu včetně PR 118 a bezpečnostních oprav k realizaci, testům a funkčnímu preview. V první etapě zakázal merge a produkci; následným přímým pokynem 29. 10. 2026 produkční vydání autorizoval a to bylo provedeno. Níže je původní rozsah návrhu, dokončený stav je v odkazovaném auditu.
 
 ## Co bude admin nabízet
 
