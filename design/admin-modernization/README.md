@@ -1,10 +1,12 @@
 # Návrh nové administrace Propletu
 
-Připraveno 29. 10. 2026. Stav: **návrh a klikací prototyp, připravený k zahájení realizace**. Produkce ani hráčská data se touto přípravou nemění. Samostatná větev `codex/admin-modernization` vychází z produkčního `1de7389`.
+Aktualizováno 29. 10. 2026. Stav: **první etapa implementovaná na samostatné větvi a v izolovaném preview**, draft [PR 222](https://github.com/prouza-hue/proplet/pull/222). [Otevřít skutečný admin](https://proplet-git-codex-admin-modernization-pavel-prouzas-projects.vercel.app/admin.html). Produkce a main se neměnily. Samostatná větev `codex/admin-modernization` vychází z produkčního `1de7389`.
 
-## Doporučené rozhodnutí
+Finální záznam implementace, bezpečnostních oprav a skutečného e-mailového E2E je v `../../docs/audits/ADMIN-MODERNIZATION-20261029.md`. Testovací přihlášení vlastníka je pouze v gitignored `../../work/admin-preview-login.txt`.
 
-Zahájit první etapu: přestavět admin jako provozní a podpůrný nástroj, opravit důvěryhodnost dat a přidat obnovu přístupu z PR 118 s nalezenými opravami. Vydání připravit na samostatné větvi a ověřeném preview. Samotné přijetí tohoto návrhu není pokyn k produkčnímu mergi nebo zásahu do konkrétního hráče.
+## Přijaté rozhodnutí
+
+Uživatel schválil první etapu včetně PR 118 a bezpečnostních oprav k realizaci, testům a funkčnímu preview. Výslovně zakázal merge na main a produkční nasazení; tento zákaz zůstává zachovaný. Níže je původní rozsah návrhu, dokončený stav je v odkazovaném auditu.
 
 ## Co bude admin nabízet
 
@@ -33,14 +35,14 @@ PR 118 je stále otevřený draft. Jeho funkci převzít na dnešní auth zákla
 - `../../openspec/changes/modernize-admin-console/proposal.md`: rozsah a důvody.
 - `../../openspec/changes/modernize-admin-console/design.md`: chování, datové kontrakty, architektura a postup vydání.
 - `../../openspec/changes/modernize-admin-console/specs/`: tři ověřitelné specifikace.
-- `../../openspec/changes/modernize-admin-console/tasks.md`: implementační checklist, všechny úkoly otevřené.
+- `../../openspec/changes/modernize-admin-console/tasks.md`: implementační checklist; první etapa dokončená, produkční úkoly výslovně odložené.
 - `../../openspec/changes/modernize-admin-console/audit.md`: doložené nálezy, zdroje a omezení přístupu.
 
 ## Rozsah další etapy
 
 Změna týmu konkrétního účtu, odpojení staré identity a přiřazení minulých týmových výsledků mají být samostatné transakční operace s náhledem dopadu, kontrolou kolizí, důvodem, potvrzením a auditem. V první etapě je dostupná diagnostika a porovnání. PR 118 tyto opravy sám nepřidává. Automatické slučování, mazání účtů a volný editor XP se nenavrhují.
 
-## Ověření přípravy
+## Ověření původního návrhu
 
 Ověřeno produkční SHA/deployment, veřejný health/config, přihlašovací brána adminu, relevantní chat a PR, aktuální kód a metadata produkčních RPC. Za přihlašovací branou nebyl v této relaci dostupný skutečný přihlášený admin; to nenahrazujeme tvrzením o vizuální kontrole živých metrik.
 

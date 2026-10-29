@@ -60,8 +60,8 @@
 - [x] 8.3 Provést celý e-mail→ověření→obnova hesla v izolovaném prostředí a vyhrazené schránce; žádní produkční hráči jako fixture.
 - [x] 8.4 Ověřit XP s bonusy, stránkování více než 200 záznamů, dohledání vyřízeného supportu, partial-source failure a správné analytics denominátory/nezralé kohorty.
 - [x] 8.5 Zařadit potřebné regrese do aktuálního manifestu/workflow a spustit celý dotčený gate; nepsat testy pouze zrcadlící CSS nebo statické popisky.
-- [ ] 8.6 Ověřit browser průchody desktop1440/mobil390/úzký320/Fold690, světlo/tmu, klávesnici a fokus, reload a Back/Forward; uložit skutečně prohlédnuté důkazy.
-- [ ] 8.7 Dokončit release/cache kontrakt a připravit konkrétní RC, draft PR, preview, výsledky kontrol a rollback zachovávající bezpečnost k rozhodnutí o vydání.
+- [x] 8.6 Ověřit browser průchody desktop1440/mobil390/úzký320/Fold690, světlo/tmu, klávesnici a fokus, reload a Back/Forward; uložit skutečně prohlédnuté důkazy.
+- [x] 8.7 Dokončit release/cache kontrakt a připravit konkrétní RC, draft PR, preview, výsledky kontrol a rollback zachovávající bezpečnost k rozhodnutí o vydání.
 
 ## 9. Produkční vydání — mimo aktuální autorizaci
 
