@@ -772,6 +772,10 @@
       {
         "path": "tools/test_v4018_admin_report_none.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_quality_dataset.py",
+        "runner": "python"
       }
     ]
   },

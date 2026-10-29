@@ -21,7 +21,7 @@ def main():
         parser.error('Only a known disposable loopback fixture database is permitted')
     with psycopg.connect(host='127.0.0.1', port=args.port, user=args.user, dbname=database,
                          password=args.password_file.read_text().strip(), autocommit=True) as connection:
-        for name in ('admin_workspace_database_acceptance.sql','admin_case_audit_database_acceptance.sql'):
+        for name in ('admin_workspace_database_acceptance.sql','admin_case_audit_database_acceptance.sql','quality_dataset_database_acceptance.sql'):
             connection.execute((ROOT/'tests/current'/name).read_text(encoding='utf-8'))
     print('PASS admin workspace SQL: pagination, exact UUID, authoritative rewards, history, ACL and rollback')
 
