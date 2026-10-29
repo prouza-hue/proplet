@@ -17,11 +17,13 @@ Ověřeno 28. 10. 2026. Schválené odznaky byly dohledány v chatu **Dokončen�
 
 | Kolekce | Místo | Odznak | Hláška |
 | --- | --- | --- | --- |
-| Listopad 2026 | 1. | Král listopadu · kaštanový panovník | Korunu mám. Rukavice jsem zase někde nechal. |
-| Listopad 2026 | 2. | Rytíř listopadu · stříbrné brnění s dubovým chocholem | Příště bych prosil nepromokavé brnění. |
-| Listopad 2026 | 3. | Kníže listopadu · žaludový šlechtic | Na pódium dojdu. Do toho listí už ne. |
+| Listopad 2026 | 1. | Král listopadu · kaštanový panovník | K čemu že máte ty špejle? Postavičky jdete dělat? Krále nechte na pokoji! |
+| Listopad 2026 | 2. | Rytíř listopadu · stříbrné brnění s dubovým chocholem | To brnění je moc pěkné, ale mohlo být nepromokavé. |
+| Listopad 2026 | 3. | Kníže listopadu · žaludový šlechtic | Veverka že mě sháněla? Řekněte jí, že jsem na dovolené. |
 | Prosinec 2026 | 1. | Král prosince · perníkový král | Prosím vystavit. Neochutnávat. |
 | Prosinec 2026 | 2. | Rytíř prosince · vykrajovátko se skořicovým mečem | Letos hlídám cukroví. Zatím chybí šest kousků. |
 | Prosinec 2026 | 3. | Kníže prosince · zvoneček | Cinknu jen jednou. Doma už všichni spí. |
 
 Historický chat obsahuje také tehdejší návrh skórování 80/20 a rozstřelů. Tyto části jsou překonané aktuálním zadáním: první platná základní Daily v den vydání, 100/120 bodů, nejlepší dvacítka a společná místa. Obnovení grafiky nemění soutěžní pravidla, backend ani databázi. Nevznikaly žádné nové ilustrace.
+
+Listopadové hlášky upraveny přesně podle uživatelského znění schváleného 29. 10. 2026; prosincové texty a všechny ilustrace zachovány.

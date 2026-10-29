@@ -1,5 +1,5 @@
 {
-  "revision": "monthly-approved-20261014",
+  "revision": "monthly-quotes-approved-20261029",
   "source": {
     "commit": "edca88a6a201890d31c779f0be824288809fc3aa",
     "branch": "preview/monthly-competition-20261014",
@@ -15,7 +15,7 @@
           "rank": 1,
           "role": "king",
           "title": "Král listopadu",
-          "quote": "Korunu mám. Rukavice jsem zase někde nechal.",
+          "quote": "K čemu že máte ty špejle? Postavičky jdete dělat? Krále nechte na pokoji!",
           "asset": "/rewards/monthly/2026-11/king-v1.webp",
           "character": "Kaštanový král se zlatou korunou"
         },
@@ -23,7 +23,7 @@
           "rank": 2,
           "role": "knight",
           "title": "Rytíř listopadu",
-          "quote": "Příště bych prosil nepromokavé brnění.",
+          "quote": "To brnění je moc pěkné, ale mohlo být nepromokavé.",
           "asset": "/rewards/monthly/2026-11/knight-v1.webp",
           "character": "Stříbrný rytíř s chocholem z dubového listí"
         },
@@ -31,7 +31,7 @@
           "rank": 3,
           "role": "prince",
           "title": "Kníže listopadu",
-          "quote": "Na pódium dojdu. Do toho listí už ne.",
+          "quote": "Veverka že mě sháněla? Řekněte jí, že jsem na dovolené.",
           "asset": "/rewards/monthly/2026-11/prince-v1.webp",
           "character": "Žaludový kníže s bronzovou korunkou"
         }
