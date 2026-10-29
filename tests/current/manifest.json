@@ -740,6 +740,38 @@
       {
         "path": "tests/current/test_visual_playtest_ui.cjs",
         "runner": "node"
+      },
+      {
+        "path": "tests/current/test_admin_preview_boundary.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_admin_recovery_security.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_admin_workspace.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_admin_cache_boundary.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_admin_workspace_requests.mjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_admin_workspace_contract.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v317_admin.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_v4018_admin_report_none.py",
+        "runner": "python"
       }
     ]
   },
@@ -763,12 +795,15 @@
   },
   "syntax": {
     "python_globs": [
-      "**/*.py"
+      "**/*.py",
+      "admin_recovery.py",
+      "account_challenges.py"
     ],
     "javascript_globs": [
       "public/**/*.js",
       "tools/**/*.js",
-      "tools/**/*.cjs"
+      "tools/**/*.cjs",
+      "public/admin/*.js"
     ]
   },
   "assets": {
@@ -780,7 +815,13 @@
       "public/puzzles.json",
       "public/valid-words-v3328.txt",
       "public/icon-512.png",
-      "public/favicon.svg"
+      "public/favicon.svg",
+      "public/admin/api.js",
+      "public/admin/players.js",
+      "public/admin/reports.js",
+      "public/admin/router.js",
+      "public/admin/ui.js",
+      "public/admin/workspace.js"
     ],
     "reference_files": [
       "public/index.html",

@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SERVER = (ROOT / "server.py").read_text(encoding="utf-8")
 AUTH = (ROOT / "account_auth_core.py").read_text(encoding="utf-8")
 INTEGRITY = (ROOT / "account_integrity_v33210.py").read_text(encoding="utf-8")
+CHALLENGES = (ROOT / "supabase/migrations/20261028235549_admin_atomic_recovery.sql").read_text(encoding="utf-8")
 
 
 def require(source: str, pattern: str, label: str) -> None:
@@ -43,7 +44,8 @@ require(SERVER, r"Přihlášení vypršelo", "expired-session user message chang
 require(SERVER, r"player_sessions.*delete", "expired/logout session deletion missing")
 
 # Recovery resets every prior session and returns one new token.
-require(AUTH, r"player_sessions.*delete", "recovery no longer invalidates prior sessions")
+require(AUTH, r'challenges.consume\(payload.challenge, "recover_password"', "recovery must use the atomic consume boundary")
+require(CHALLENGES, r"delete from public.player_sessions where player_id=v_ch.player_id", "atomic recovery no longer invalidates prior sessions")
 require(AUTH, r"new_session", "recovery no longer issues a fresh session")
 
 # Team leave keeps historical scoring attribution while ending current membership.

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 import sys
 from unittest.mock import DEFAULT, patch
@@ -38,6 +39,7 @@ assert "AppServices(" in server_source
 
 import server  # noqa: E402
 import account_auth  # noqa: E402
+from admin_workspace_contract import normalize_admin_routes, normalize_admin_workspace  # noqa: E402
 
 
 EXPECTED_INSTALLER_ROUTES = (
@@ -78,10 +80,11 @@ route_keys = [
 for expected in EXPECTED_INSTALLER_ROUTES:
     assert route_keys.count(expected) == 1, f"expected exactly one installed route: {expected}"
 
+reviewed_admin_routes = normalize_admin_routes((route.path, tuple(sorted(route.methods or ())), route.name) for route in server.app.routes if route.path)
 route_snapshot = sorted(
-    (route.path, tuple(sorted(route.methods or ())), route.name)
-    for route in server.app.routes
-    if route.path and route.path not in {"/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+    (path, methods, name)
+    for path, methods, name in reviewed_admin_routes
+    if path and path not in {"/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
 )
 # Round III adds exactly four /api/mozkokalypsa3 routes. Removing those
 # additions reproduces the prior 7da3e64c digest, including both weekly-team routes.
@@ -89,6 +92,8 @@ assert _digest(route_snapshot) == "9f8cb87c1786afdfd7bb04be8f595bcb62d8248b8cded
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
 from google_oauth_contract import normalize_google_oauth
 normalize_google_oauth(openapi_contract)
+# Keep every old route/method/schema hashed; remove only validated admin additions.
+normalize_admin_workspace(openapi_contract)
 # The private visual pilot is additive; its auth/state/RLS boundaries have
 # dedicated HTTP and real PostgreSQL acceptance. Keep the historical digest.
 pilot_paths = {"/api/visual-playtest": {"get", "post"}, "/api/cron/visual-pilot-push": {"get"}}
@@ -285,17 +290,31 @@ installer_names = (
     "_install_competitive_sharing",
     "_install_account_bonus",
     "_install_rescue_limit_v40115",
+    "_install_admin_recovery",
     "_install_preview_auth_v334",
 )
-with patch.multiple(account_auth, **{name: DEFAULT for name in installer_names}) as installers:
-    calls = []
-    for name, installer in installers.items():
-        installer.side_effect = lambda *args, _name=name, **kwargs: calls.append(_name)
-    account_auth.install_account_auth(object(), services=services)
-    assert tuple(calls) == installer_names
-    assert installers["_install_push_diagnostics"].call_args.kwargs["db_rpc"] is None
-    assert installers["_install_word_recognition"].call_args.kwargs["resolved_puzzle"] is None
-    assert installers["_install_word_recognition"].call_args.kwargs["daily_special_discovery_identity"] is None
+# Recovery is intentionally installed only in deployed preview/production.
+# Mock it too: the fake object must never reach its real middleware installer.
+for environment in ("", "preview", "production"):
+    with patch.multiple(account_auth, **{name: DEFAULT for name in installer_names}) as installers:
+        calls = []
+        for name, installer in installers.items():
+            installer.side_effect = lambda *args, _name=name, **kwargs: calls.append(_name)
+        account_auth.install_account_auth(object(), services=replace(services, vercel_env=environment))
+        expected = tuple(name for name in installer_names if environment or name != "_install_admin_recovery")
+        assert tuple(calls) == expected, (environment, calls)
+        assert installers["_install_push_diagnostics"].call_args.kwargs["db_rpc"] is None
+        assert installers["_install_word_recognition"].call_args.kwargs["resolved_puzzle"] is None
+        assert installers["_install_word_recognition"].call_args.kwargs["daily_special_discovery_identity"] is None
+        if environment:
+            recovery = installers["_install_admin_recovery"].call_args.kwargs
+            assert recovery["strict_owner_lock"] is True
+            assert recovery["vercel_env"] == environment
+            assert recovery["db_rpc"] is None
+            assert recovery["auth_player"] is fake
+            assert recovery["canonical_origin"] == "https://hrajproplet.cz"
+        else:
+            installers["_install_admin_recovery"].assert_not_called()
 
 print("PASS: Sprint 06 explicit dependency and route/OpenAPI characterization")
 

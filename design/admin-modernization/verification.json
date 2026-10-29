@@ -1,0 +1,59 @@
+{
+  "preparedOn": "2026-10-29",
+  "timeZone": "Europe/Prague",
+  "kind": "proposal-and-local-prototype",
+  "production": {
+    "sha": "1de738938ff244fc010808daf33aea7def4b6481",
+    "version": "4.09.15",
+    "deployment": "dpl_5Z5Eu9YBNZRRGHSEWJM837jpAVac",
+    "branch": "main",
+    "healthOk": true,
+    "databaseReachable": true,
+    "authenticatedAdminInspected": false,
+    "observedAdminState": "authentication-gate"
+  },
+  "proposal": {
+    "change": "modernize-admin-console",
+    "branch": "codex/admin-modernization",
+    "strictOpenSpecValidation": "pass",
+    "artifactCompletion": "4/4",
+    "implementationCompleted": false,
+    "independentRecoveryReview": "completed; target identity revision and static-shell authorization scope incorporated"
+  },
+  "readOnlyDatabaseChecks": {
+    "project": "iopyhluayfszskyqqpuc",
+    "launchDatasetUsesBoardV2": true,
+    "launchDatasetUsesBoardV3Short": false,
+    "adminUsersHasOffsetParameter": true,
+    "adminUsersSumsResultPoints": true,
+    "adminUsersReferencesAccountRewards": false,
+    "playerStatsReferencesAccountRewards": true,
+    "personalRowsRead": false
+  },
+  "prototype": {
+    "url": "http://127.0.0.1:8907/design/admin-modernization/prototype.html",
+    "localOnly": true,
+    "fixtureData": true,
+    "networkConnections": "blocked by connect-src none",
+    "formSubmission": "blocked by form-action none and intercepted locally",
+    "viewportsChecked": [320, 390, 690, 1440],
+    "allSectionsAt320": "no page horizontal overflow",
+    "browserChecks": ["seven sections", "player search and filters", "player detail", "masked recovery impact with explicit target", "Escape and focus restoration", "light desktop and dark mobile visual inspection", "final seven-step activation funnel visually rechecked at 320 after review; no horizontal overflow"],
+    "consoleErrorsOrWarnings": [],
+    "physicalFoldTested": false,
+    "javascriptSyntax": "pass"
+  },
+  "recoveryPR": {
+    "number": 118,
+    "state": "open draft unmerged",
+    "head": "c92e70f41458118f2cea87cb3490105be1e3fdbf",
+    "patchApplicabilityCheck": "pass without applying",
+    "originalMockSecurityTest": "pass in memory; not full current gate or real email E2E"
+  },
+  "productionCodeChanged": false,
+  "productionDataChanged": false,
+  "emailsSent": false,
+  "remoteBranchesPushed": false,
+  "fullGameGateRun": false,
+  "openImplementationEvidence": ["current event coverage", "actual scheduled-job sources", "dedicated recovery test mailbox", "fresh environment verification before implementation and release"]
+}

@@ -44,7 +44,11 @@ assert (value['rawPlayers'], value['likelyDuplicateRows'], value['canonicalPlaye
 assert value['rows'][0]['canonicalId'] == 'a'
 assert value['rows'][0]['canonicalResults'] == 20001, 'must not truncate counts above raw history cap'
 assert calls == [('proplet_account_integrity_counts', {'p_players': ['a', 'b']})]
-assert set(value) == {'rawPlayers','likelyDuplicateRows','canonicalPlayers','duplicateClusters','rows','definition','prevention'}
+assert set(value) == {'rawPlayers','likelyDuplicateRows','canonicalPlayers','duplicateClusters','rows','definition','prevention','meta'}
+assert value['meta']['source'] == 'players+proplet_account_integrity_counts'
+assert value['meta']['status'] == 'ready' and value['meta']['unit'] == 'accounts'
+assert 'not all accounts belonging to a person' in value['meta']['coverage']
+assert value['meta']['generatedAt'] and value['meta']['period']['timeZone'] == 'Europe/Prague'
 for malformed in (None, answer[:1], [answer[0], answer[0]],
                   [answer[0], dict(answer[1], results=-1)],
                   [answer[0], dict(answer[1], sessions='2')],

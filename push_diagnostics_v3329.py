@@ -450,6 +450,12 @@ def install_push_diagnostics(
         tests.sort(key=lambda row: str(row.get("created_at") or ""), reverse=True)
         return {
             "auditingSinceVersion": "3.32.9",
+            "meta": {"generatedAt": now().isoformat(),
+                     "period": {"from": min((r.get("created_at") for r in logs if r.get("created_at")), default=None),
+                                "to": now().isoformat(), "timeZone": "Europe/Prague"},
+                     "source": "push_subscriptions+push_delivery_log", "status": "ready" if subscriptions or logs else "empty",
+                     "coverage": "Bounded ledger <=20000 rows and subscriptions <=5000 or error; latest 14 daily groups. Provider acceptance does not prove display on device.",
+                     "unit": "subscriptions-and-delivery-events", "definitionVersion": "push-ledger-v1"},
             "cronPath": "/api/cron/daily-push-v2",
             "dailyScheduleUtc": "0 7 * * *",
             "latestDaily": recent_daily[0] if recent_daily else None,

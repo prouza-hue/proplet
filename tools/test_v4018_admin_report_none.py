@@ -38,7 +38,13 @@ def fake_select_all(table: str, **filters):
     raise AssertionError((table, filters))
 
 
-server.db_select_all = fake_select_all
+def fake_rpc(name, body):
+    assert name == "proplet_admin_cases_v1"
+    assert body["p_kind"] == "words" and body["p_status"] == "open"
+    return {"total": 1, "rows": fake_select_all("puzzle_feedback")}
+
+
+server.db_rpc = fake_rpc
 
 report = server.admin_reports("open", "", 100, "Bearer admin")
 assert report["total"] == 1

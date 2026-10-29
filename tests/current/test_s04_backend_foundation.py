@@ -25,13 +25,15 @@ sys.path.insert(0, str(ROOT))
 import server  # noqa: E402
 from backend import db as backend_db  # noqa: E402
 from backend.config import load_settings  # noqa: E402
+from admin_workspace_contract import normalize_admin_routes, normalize_admin_workspace  # noqa: E402
 
 
 def _route_snapshot() -> str:
+    reviewed = normalize_admin_routes((route.path, tuple(sorted(route.methods or ())), route.name) for route in server.app.routes if route.path)
     routes = sorted(
-        (route.path, tuple(sorted(route.methods or ())), route.name)
-        for route in server.app.routes
-        if route.path and route.path not in {"/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+        (path, methods, name)
+        for path, methods, name in reviewed
+        if path and path not in {"/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -55,6 +57,8 @@ assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 openapi_contract = json.loads(json.dumps(openapi_contract))
 from google_oauth_contract import normalize_google_oauth
 normalize_google_oauth(openapi_contract)
+# Validate the exact additive admin routes/optional fields before normalization.
+normalize_admin_workspace(openapi_contract)
 # The private visual pilot is additive; its auth/state/RLS boundaries have
 # dedicated HTTP and real PostgreSQL acceptance. Keep the historical digest.
 pilot_paths = {"/api/visual-playtest": {"get", "post"}, "/api/cron/visual-pilot-push": {"get"}}
@@ -464,6 +468,9 @@ with (
     assert health_fixture.pop('atomicResultEnabled') == server.ATOMIC_RESULT_V1_ENABLED
     assert health_fixture.pop('archiveEnabled') is False
     assert config_fixture.pop('archiveEnabled') is False
+    # Admin environment discovery is an additive public boolean; it never
+    # exposes the backing database or changes the previous config fields.
+    assert config_fixture.pop('adminPreview') is False
     # Keep the Linux production fixture portable to Windows development.
     health_fixture["puzzleSource"] = health_fixture["puzzleSource"].replace("\\", "/")
     # Release publication changes APP_VERSION without changing these response

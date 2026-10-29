@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.15-pilot1';
+const APP_PREVIEW_RELEASE='proplet-v4.09.15-admin-workspace1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 window.PropletClientDiagnostics?.claimErrorListeners?.();
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
