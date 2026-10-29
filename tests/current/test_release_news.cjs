@@ -34,8 +34,8 @@ const plain=fixture();install(plain.win);plain.ready();assert.equal(plain.dialog
 const f=fixture('?showNews=1');install(f.win);assert.equal(f.dialog,undefined,'explicit request waits for native readiness');
 f.playing(true);f.ready();assert.equal(f.dialog,undefined,'must not interrupt a game');f.modal(true);f.playing(false);assert.equal(f.dialog,undefined,'must wait for onboarding or other native modal');
 f.modal(false);assert(f.dialog.open);assert.equal(f.doc.activeElement,f.controls.title);assert.equal(f.dialog.attrs['aria-labelledby'],'releaseNewsTitle');
-assert(f.dialog.innerHTML.includes('id="releaseNewsTitle" tabindex="-1"'));assert(f.dialog.innerHTML.includes('Proplet v novém. A hrajeme o korunu.'));
-assert(f.dialog.innerHTML.includes('Méně hledání, víc hraní.'));assert(f.dialog.innerHTML.includes('nejlepších 20 dnů — rychlost nerozhoduje.'));assert(f.dialog.innerHTML.includes('/assets/navigation/competitions-v1.webp'));
+assert(f.dialog.innerHTML.includes('id="releaseNewsTitle" tabindex="-1"'));assert(f.dialog.innerHTML.includes('Každý měsíc nová soutěž o&nbsp;vládce Propletu.'));
+assert(!f.dialog.innerHTML.includes('Méně hledání, víc hraní.'));assert(f.dialog.innerHTML.includes('čistším designu'));assert(f.dialog.innerHTML.includes('nejlepších 20&nbsp;dnů — rychlost nerozhoduje.'));assert(f.dialog.innerHTML.includes('/assets/navigation/competitions-v1.webp'));
 f.dialog.events.cancel({preventDefault(){}});assert.equal(f.dialog.open,false);assert.equal(f.screen,'daily');assert.equal(f.doc.activeElement,f.feature,'Escape returns focus to the visible Today action');
 f.modal(false);assert.equal(f.dialog.open,false,'reconciliation cannot reopen a dismissed explicit request');
 const settings=f.elements.find(e=>e.id==='releaseNewsSettings');f.win.nav('profile');settings.getClientRects=()=>f.screen==='profile'?[{}]:[];settings.focus();settings.onclick();assert(f.dialog.open);assert.equal(f.screen,'daily','manual Settings entry also leaves closing on Today');

@@ -1,17 +1,19 @@
 /* Only the explicit preview announcement; native screens and controls keep their styles. */
-#releaseNewsDialog{box-sizing:border-box;width:min(480px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;margin:auto;padding:26px;background:var(--td-paper,#fffaf0);color:var(--td-ink,#283a36);border:1px solid var(--td-line,#d7cdbb);border-radius:20px;box-shadow:0 20px 70px #17271c50;font:400 16px/1.5 Outfit,sans-serif;overscroll-behavior:contain}
+#releaseNewsDialog{box-sizing:border-box;width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;margin:auto;padding:26px;background:var(--td-paper,#fffaf0);color:var(--td-ink,#283a36);border:1px solid var(--td-line,#d7cdbb);border-radius:20px;box-shadow:0 20px 70px #17271c50;font:400 16px/1.5 Outfit,sans-serif;overscroll-behavior:contain}
 #releaseNewsDialog::backdrop{background:#18251ca3}
 #releaseNewsDialog .release-news-close{position:absolute;right:8px;top:8px;width:44px;height:44px;border:0;background:none;color:var(--td-ink,#283a36);font:400 27px/1 Outfit,sans-serif;cursor:pointer}
-#releaseNewsDialog .release-news-art{display:block;width:88px;height:88px;object-fit:contain;margin:0 0 14px}
-#releaseNewsTitle{margin:0 18px 20px 0;color:inherit;font:650 30px/1.12 Fraunces,Georgia,serif;letter-spacing:-.025em;text-wrap:balance}
+#releaseNewsDialog .release-news-intro{display:grid;grid-template-columns:168px minmax(0,1fr);align-items:center;gap:18px;margin:4px 0 24px}
+#releaseNewsDialog .release-news-art{display:block;width:168px;height:168px;object-fit:contain;margin:0}
+#releaseNewsTitle{margin:0;color:inherit;font:650 32px/1.16 Fraunces,Georgia,serif;letter-spacing:-.025em;text-wrap:balance}
 #releaseNewsTitle:focus{outline:none}
 #releaseNewsDialog .release-news-copy p{margin:0 0 18px;color:inherit;font:inherit}
-#releaseNewsDialog .release-news-copy strong{display:block;margin-bottom:4px;font-weight:650}
+
 #releaseNewsDialog .release-news-actions{display:grid;gap:6px;margin-top:22px}
 #releaseNewsDialog .release-news-primary{display:flex;justify-content:center;align-items:center;gap:10px;min-height:48px;padding:12px 14px;border:1px solid #264a82;border-radius:10px;background:#315da8;box-shadow:0 3px 0 #233f70;color:#fffaf0;font:600 15px/1.3 Outfit,sans-serif;cursor:pointer;touch-action:manipulation}
 #releaseNewsDialog .release-news-primary:disabled{opacity:.55;cursor:default}
 #releaseNewsDialog .release-news-secondary{min-height:44px;padding:9px 12px;border:0;background:none;color:var(--td-ink,#283a36);font:500 15px/1.4 Outfit,sans-serif;cursor:pointer;touch-action:manipulation}
 #releaseNewsDialog button:focus-visible,#releaseNewsSettings:focus-visible{outline:3px solid var(--td-blue,#315da8);outline-offset:3px}
 #releaseNewsSettings{display:block;min-height:36px;padding:6px 0;border:0;background:none;color:var(--td-blue,#315da8);font:500 14px/1.4 Outfit,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-@media(max-width:359px){#releaseNewsDialog{padding:22px 18px;font-size:15px}#releaseNewsTitle{font-size:27px}#releaseNewsDialog .release-news-primary{font-size:14px}}
-@media(max-height:650px){#releaseNewsDialog{padding-top:20px;padding-bottom:16px;font-size:15px}#releaseNewsDialog .release-news-art{width:64px;height:64px;margin-bottom:10px}#releaseNewsTitle{font-size:27px;margin-bottom:16px}#releaseNewsDialog .release-news-copy p{margin-bottom:14px}#releaseNewsDialog .release-news-actions{margin-top:14px}}
+@media(max-width:480px){#releaseNewsDialog{padding:22px}#releaseNewsDialog .release-news-intro{grid-template-columns:1fr;justify-items:center;gap:12px;margin:0 0 20px}#releaseNewsDialog .release-news-art{width:152px;height:152px}#releaseNewsTitle{font-size:28px;text-align:center;max-width:350px}#releaseNewsDialog .release-news-actions{margin-top:18px}}
+@media(max-width:359px){#releaseNewsDialog{padding:20px 18px;font-size:15px}#releaseNewsDialog .release-news-art{width:128px;height:128px}#releaseNewsTitle{font-size:26px}#releaseNewsDialog .release-news-primary{font-size:14px}}
+@media(max-height:650px) and (min-width:481px){#releaseNewsDialog{padding:20px 24px;font-size:15px}#releaseNewsDialog .release-news-intro{grid-template-columns:124px minmax(0,1fr);margin-bottom:16px}#releaseNewsDialog .release-news-art{width:124px;height:124px}#releaseNewsTitle{font-size:28px}#releaseNewsDialog .release-news-copy p{margin-bottom:12px}#releaseNewsDialog .release-news-actions{margin-top:14px}}
