@@ -177,3 +177,9 @@ html[data-theme=dark] .os-completion-row .os-arrow{color:var(--td-blue)}
  .os-metrics,.os-completion-row .os-arrow{font-size:17px}
 }
 @media(prefers-reduced-motion:reduce){.os-today button:active{transform:none!important}}
+
+/* Only the unfinished base Daily gets a compact primary-action cue.
+   The entire existing card remains the single interactive control. */
+.os-feature:not(.os-complete):not(.os-special){padding-bottom:50px}
+.os-feature:not(.os-complete):not(.os-special)>.os-arrow{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 14px;box-sizing:border-box;bottom:10px;border-radius:8px;background:#315da8;color:#fff8e9;font:650 15px/1.2 Outfit,sans-serif;box-shadow:0 2px 0 #203f74;white-space:nowrap}
+@media(min-width:900px){.os-feature:not(.os-complete):not(.os-special)>.os-arrow{bottom:14px;font-size:16px;padding-inline:18px}}
