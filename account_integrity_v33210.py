@@ -270,6 +270,11 @@ def install_account_integrity(
         rows.sort(key=lambda row: (-row["rows"], row["name"].casefold()))
         return {
             "rawPlayers": len(players),
+            "meta": {"generatedAt": datetime.now(tz).isoformat(),
+                     "period": {"from": None, "to": datetime.now(tz).isoformat(), "timeZone": "Europe/Prague"},
+                     "source": "players+proplet_account_integrity_counts", "status": "ready" if players else "empty",
+                     "coverage": "At most 5000 accounts; complete bounded read or error. Same-name creation bursts <=10s only; not all accounts belonging to a person.",
+                     "unit": "accounts", "definitionVersion": "account-creation-burst-v1"},
             "likelyDuplicateRows": duplicate_rows,
             "canonicalPlayers": len(players) - duplicate_rows,
             "duplicateClusters": len(clusters),

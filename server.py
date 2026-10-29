@@ -27,6 +27,8 @@ from backend import analytics as product_analytics
 from backend import measurement
 from backend.launch_report import build_launch_report
 from backend import rankings as ranking_queries
+from backend import admin_workspace
+from backend import config as backend_config
 from backend import results as result_domain
 from backend import archive as archive_domain
 from backend import referrals as referral_domain
@@ -583,6 +585,12 @@ def require_admin(authorization: Optional[str], *, write: bool = False) -> dict:
     itself. The first owner is created by the v3.17 migration.
     """
     player = auth_player(authorization)
+    # Keep the owner pin at the shared authorization boundary too: historical
+    # aliases such as /api/quality-report are not under /api/admin/.
+    if VERCEL_ENV in {"preview", "production"}:
+        from admin_recovery import ADMIN_OWNER_PLAYER_ID
+        if str(player.get("id") or "") != ADMIN_OWNER_PLAYER_ID:
+            raise HTTPException(403, "Administrace je dostupná pouze vlastníkovi Propletu")
     try:
         rows = db_select("admin_accounts", player_id=player["id"])
     except HTTPException as exc:
@@ -1845,6 +1853,7 @@ def config():
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
         "environment": VERCEL_ENV or "local",
+        "adminPreview": backend_config.admin_preview_enabled(),
         "version": APP_VERSION,
         "archiveEnabled": archive_release_enabled(),
     }
@@ -3296,36 +3305,12 @@ def admin_launch(authorization: Optional[str] = Header(default=None)):
 def admin_support(
     status: str = Query(default="open", max_length=20),
     authorization: Optional[str] = Header(default=None),
+    q: str = "", category: str = "", player_id: Optional[str] = None, id: Optional[str] = None,
+    offset: int = 0, limit: int = 100,
 ):
     require_admin(authorization)
-    filters = {}
-    if status == "open":
-        filters["status"] = "in.(new,reviewing)"
-    elif status != "all":
-        filters["status"] = f"eq.{status}"
-    rows = db_select_bounded(
-        "support_reports",
-        filters=filters,
-        order="created_at.desc,id.desc",
-        max_rows=5000,
-    )
-    player_rows, _ = ranking_queries.entity_context(
-        db_select_bounded,
-        (row.get("player_id") for row in rows),
-        rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
-    )
-    players = {row["id"]: row for row in player_rows if row.get("id")}
-    out = []
-    for row in sorted(rows, key=lambda r: str(r.get("created_at") or ""), reverse=True)[:200]:
-        player = players.get(row.get("player_id"))
-        out.append({
-            "id": row.get("id"), "category": row.get("category"), "message": row.get("message"),
-            "replyTo": row.get("reply_to"), "page": row.get("page"), "appVersion": row.get("app_version"),
-            "status": row.get("status") or "new", "resolutionNote": row.get("resolution_note"),
-            "createdAt": row.get("created_at"),
-            "reportedBy": {"name": player.get("name"), "avatar": player.get("avatar") or "🙂"} if player else None,
-        })
-    return {"reports": out, "total": len(out)}
+    return admin_workspace.cases(globals(), "support", status=status, q=q, category=category,
+        player_id=player_id, case_id=id, offset=offset, limit=limit)
 
 
 @app.patch("/api/admin/support/{report_id}")
@@ -3335,17 +3320,7 @@ def admin_support_update(
     authorization: Optional[str] = Header(default=None),
 ):
     admin = require_admin(authorization, write=True)
-    rows = db_select("support_reports", id=report_id)
-    if not rows:
-        raise HTTPException(404, "Hlášení neexistuje")
-    old = rows[0]
-    values = {"status": payload.status, "resolution_note": " ".join(str(payload.resolution_note or "").strip().split()) or None}
-    if payload.status in ("resolved", "dismissed"):
-        values.update({"reviewed_at": datetime.now(TZ).isoformat(), "reviewed_by": admin["player"]["id"]})
-    else:
-        values.update({"reviewed_at": None, "reviewed_by": None})
-    db_update("support_reports", {"id": report_id}, values)
-    record_admin_audit(admin, "support_report_status", "support_reports", report_id, {"from": old.get("status"), "to": payload.status, "category": old.get("category")})
+    admin_workspace.update_case(globals(), admin, "support", report_id, payload.status, payload.resolution_note)
     return {"ok": True}
 
 
@@ -3391,180 +3366,60 @@ def admin_user_summaries(query: str, limit: int) -> tuple[int, list[dict]]:
 
 @app.get("/api/admin/users")
 def admin_users(
-    q: str = Query(default="", max_length=80),
-    limit: int = Query(default=60, ge=1, le=200),
-    authorization: Optional[str] = Header(default=None),
+    q: str = Query(default="", max_length=80), limit: int = Query(default=60, ge=1, le=200),
+    authorization: Optional[str] = Header(default=None), offset: int = 0, sort: str = "active",
 ):
     require_admin(authorization)
-    needle = " ".join(q.strip().casefold().split())
-    total, rows = admin_user_summaries(needle, limit)
-    return {"total": total, "users": rows}
+    return admin_workspace.users(globals(), q=q, offset=offset, limit=limit, sort=sort)
 
 
 @app.get("/api/admin/users/{player_id}")
 def admin_user_detail(player_id: str, authorization: Optional[str] = Header(default=None)):
     require_admin(authorization)
-    players = db_select("players", id=player_id)
-    if not players:
-        raise HTTPException(404, "Hráč neexistuje")
-    player = players[0]
-    results = db_select("results", player_id=player_id)
-    results.sort(key=lambda row: parse_timestamp(row.get("completed_at")) or datetime.min.replace(tzinfo=TZ), reverse=True)
-    attempts = db_select("puzzle_attempts", player_id=player_id)
-    attempts.sort(key=lambda row: parse_timestamp(row.get("started_at")) or datetime.min.replace(tzinfo=TZ), reverse=True)
-    reports = db_select("puzzle_feedback", player_id=player_id, kind="word")
-    try:
-        session_count = len(db_select("player_sessions", player_id=player_id))
-    except HTTPException:
-        session_count = 0
-    try:
-        push_count = len(db_select("push_subscriptions", player_id=player_id))
-    except HTTPException:
-        push_count = 0
-    return {
-        "user": {
-            "id": player["id"], "name": player.get("name"), "avatar": player.get("avatar") or "🙂",
-            "familyCode": public_family_code(player.get("family_code"), player.get("team_joined_at")),
-            "team": public_team_name(player.get("family_code"), player.get("team_joined_at")) or "Bez týmu",
-            "createdAt": player.get("created_at"), "supportMode": player.get("support_mode") or "none",
-            "hasPassword": bool(player.get("password_hash")), "additionalSessions": session_count, "pushSubscriptions": push_count,
-        },
-        "stats": player_stats(player_id),
-        "latestAppVersion": attempts[0].get("app_version") if attempts else None,
-        "wordReports": {"total": len(reports), "open": sum(1 for row in reports if str(row.get("status") or "new") in ("new", "reviewing"))},
-        "recentResults": [{
-            "puzzleId": row.get("puzzle_id"), "mode": row.get("mode"), "difficulty": row.get("difficulty"),
-            "dailyDate": str(row.get("daily_date"))[:10] if row.get("daily_date") else None,
-            "elapsedMs": row.get("best_elapsed_ms"), "moves": row.get("best_moves"), "points": row.get("points"),
-            "hintsUsed": row.get("hints_used"), "cleanSolve": row.get("clean_solve") is True, "completedAt": row.get("completed_at"),
-        } for row in results[:30]],
-    }
+    return admin_workspace.player_detail(globals(), player_id)
 
 
 @app.get("/api/admin/reports")
 def admin_reports(
-    status: str = Query(default="open", max_length=20),
-    q: str = Query(default="", max_length=80),
-    limit: int = Query(default=100, ge=1, le=300),
-    authorization: Optional[str] = Header(default=None),
+    status: str = Query(default="open", max_length=20), q: str = Query(default="", max_length=80),
+    limit: int = Query(default=100, ge=1, le=300), authorization: Optional[str] = Header(default=None),
+    offset: int = 0, player_id: Optional[str] = None, id: Optional[str] = None,
 ):
     require_admin(authorization)
-    if status not in ("open", "all", "new", "reviewing", "resolved", "dismissed"):
-        raise HTTPException(400, "Neplatný filtr stavu")
-    report_filters = {"kind": "eq.word"}
-    if status == "open":
-        report_filters["status"] = "in.(new,reviewing)"
-    elif status != "all":
-        report_filters["status"] = f"eq.{status}"
-    reports = db_select_bounded(
-        "puzzle_feedback",
-        filters=report_filters,
-        order="created_at.desc,id.desc",
-        max_rows=5000,
-    )
-    player_rows, league_rows = ranking_queries.entity_context(
-        db_select_bounded,
-        (row.get("player_id") for row in reports),
-        rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
-    )
-    players = {row["id"]: row for row in player_rows if row.get("id")}
-    league_names = {
-        norm_family(str(row.get("code") or "")): row.get("name") or row.get("code")
-        for row in league_rows if row.get("code")
-    }
-    needle = " ".join(q.strip().casefold().split())
-    output = []
-    for report in reports:
-        report_status = str(report.get("status") or "new")
-        if status == "open" and report_status not in ("new", "reviewing"):
-            continue
-        if status not in ("open", "all") and report_status != status:
-            continue
-        player = players.get(report.get("player_id"))
-        info = puzzle_info(str(report.get("puzzle_id") or ""))
-        puzzle = (info or {}).get("puzzle") or {}
-        puzzle_meta = puzzle.get("meta") or {}
-        haystack = " ".join((
-            str(report.get("word") or ""), str(report.get("note") or ""), str(report.get("puzzle_id") or ""),
-            str(player.get("name") if player else "anonym"), str(player.get("family_code") if player else ""),
-        )).casefold()
-        if needle and needle not in haystack:
-            continue
-        output.append({
-            "id": report.get("id"), "status": report_status, "word": report.get("word"), "note": report.get("note"),
-            "puzzleId": report.get("puzzle_id"), "challengeKey": report.get("challenge_key"),
-            "mode": (info or {}).get("mode"), "difficulty": (info or {}).get("difficulty"),
-            "level": (info or {}).get("level") or puzzle_meta.get("level"), "legacy": bool((info or {}).get("legacy")),
-            "reportedBy": {
-                "id": player.get("id"), "name": player.get("name"),
-                "team": (
-                    league_names.get(family) or family
-                    if (family := public_family_code(player.get("family_code"), player.get("team_joined_at")))
-                    else None
-                ),
-            } if player else {"id": None, "name": "Anonymní hráč", "team": None},
-            "createdAt": report.get("created_at"), "resolutionNote": report.get("resolution_note"),
-            "reviewedAt": report.get("reviewed_at"), "reviewedBy": report.get("reviewed_by"),
-        })
-    status_order = {"new": 0, "reviewing": 1, "resolved": 2, "dismissed": 3}
-    output.sort(key=lambda row: row.get("createdAt") or "", reverse=True)
-    output.sort(key=lambda row: status_order.get(row["status"], 9))
-    return {"total": len(output), "reports": output[:limit]}
+    return admin_workspace.cases(globals(), "words", status=status, q=q, player_id=player_id,
+        case_id=id, offset=offset, limit=limit)
 
 
 @app.patch("/api/admin/reports/{report_id}")
 def admin_report_update(report_id: str, payload: AdminReportUpdate, authorization: Optional[str] = Header(default=None)):
     admin = require_admin(authorization, write=True)
-    if payload.status not in ("new", "reviewing", "resolved", "dismissed"):
-        raise HTTPException(400, "Neplatný stav hlášení")
-    reports = db_select("puzzle_feedback", id=report_id)
-    if not reports or reports[0].get("kind") != "word":
-        raise HTTPException(404, "Hlášení neexistuje")
-    report = reports[0]
-    note = " ".join(str(payload.resolution_note or "").strip().split()) or None
-    values = {"status": payload.status, "resolution_note": note}
-    if payload.status == "new":
-        values.update({"reviewed_at": None, "reviewed_by": None})
-    else:
-        values.update({"reviewed_at": datetime.now(TZ).isoformat(), "reviewed_by": admin["player"]["id"]})
-    db_update("puzzle_feedback", {"id": report_id}, values)
-    record_admin_audit(admin, "word_report_status", "puzzle_feedback", report_id, {
-        "word": report.get("word"), "puzzleId": report.get("puzzle_id"),
-        "from": str(report.get("status") or "new"), "to": payload.status, "resolutionNote": note,
-    })
-    return {"ok": True, "id": report_id, **values}
+    result = admin_workspace.update_case(globals(), admin, "words", report_id, payload.status, payload.resolution_note)
+    return {"ok": True, "id": result["id"], "status": result["status"],
+            "resolution_note": result.get("resolution_note"), "reviewed_at": result.get("reviewed_at"),
+            "reviewed_by": result.get("reviewed_by")}
 
 
 @app.get("/api/admin/audit")
 def admin_audit(
-    limit: int = Query(default=80, ge=1, le=200),
-    authorization: Optional[str] = Header(default=None),
+    limit: int = Query(default=80, ge=1, le=200), authorization: Optional[str] = Header(default=None),
+    offset: int = 0, action: str = "", target_id: str = "",
+    from_date: Optional[str] = None, to_date: Optional[str] = None,
 ):
     require_admin(authorization)
-    rows = db_select_bounded(
-        "admin_audit_log",
-        order="created_at.desc,id.desc",
-        max_rows=5000,
-    )
-    player_rows, _ = ranking_queries.entity_context(
-        db_select_bounded,
-        (row.get("admin_player_id") for row in rows),
-        rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
-    )
-    players = {row["id"]: row for row in player_rows if row.get("id")}
-    rows.sort(key=lambda row: parse_timestamp(row.get("created_at")) or datetime.min.replace(tzinfo=TZ), reverse=True)
-    return {"entries": [{
-        "id": row.get("id"), "action": row.get("action"), "targetType": row.get("target_type"),
-        "targetId": row.get("target_id"), "details": row.get("details") or {}, "createdAt": row.get("created_at"),
-        "admin": (players.get(row.get("admin_player_id")) or {}).get("name") or "Administrátor",
-    } for row in rows[:limit]]}
+    return admin_workspace.audit(globals(), action=action, target_id=target_id,
+        from_date=from_date, to_date=to_date, offset=offset, limit=limit)
 
 
 @app.get("/api/admin/quality")
 @app.get("/api/quality-report")
 def quality_report(authorization: Optional[str] = Header(default=None)):
     require_admin(authorization)
-    return build_quality_report()
+    result = build_quality_report()
+    result["meta"] = admin_workspace.metadata("quality-first-lifetime-attempts", days=90,
+        coverage="daily/free active bank; calm mode separate; historical data limited",
+        unit="first-lifetime-attempts", supportedModes=["daily", "free"], historicalDataLimited=True,
+        firstLifetimeAttempts=True, excludedCalibration="retired IDs; calm mode; other modes")
+    return result
 
 
 @app.get("/api/admin/quality-history")
@@ -3572,12 +3427,13 @@ def quality_report(authorization: Optional[str] = Header(default=None)):
 def quality_history(authorization: Optional[str] = Header(default=None)):
     require_admin(authorization)
     rows = db_request("GET", "quality_snapshots", params={"select": "week_start,payload,created_at", "order": "week_start.desc", "limit": "12"})
-    return {"snapshots": rows}
+    return {"snapshots": rows, "meta": admin_workspace.metadata("quality_snapshots", days=84,
+        status="ready" if rows else "empty", unit="weekly-snapshots", coverage="last 12 stored snapshots")}
 
 
 @app.post("/api/admin/quality-snapshot")
 def repair_quality_snapshot(authorization: Optional[str] = Header(default=None)):
-    require_admin(authorization)
+    require_admin(authorization, write=True)
     if VERCEL_ENV == 'preview':
         raise HTTPException(409, 'Souhrny lze doplnit pouze v produkci')
     return save_quality_snapshot_if_monday()
@@ -5544,6 +5400,7 @@ install_account_auth(
         telemetry_actor=telemetry_actor,
         app_version=APP_VERSION,
         vercel_env=VERCEL_ENV,
+        canonical_origin=backend_config.canonical_origin(),
     ),
 )
 
@@ -5591,7 +5448,7 @@ install_visual_pilot_push(
     vapid_private=VAPID_PRIVATE_KEY, vapid_subject=VAPID_SUBJECT, logger=logger,
 )
 
+admin_workspace.install(globals())
+
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")
-
-

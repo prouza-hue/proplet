@@ -184,6 +184,23 @@ def core_insert(table, row):
     return row
 
 
+def core_rpc(name, values):
+    # Persistence is a separate atomic service contract now. These fixtures
+    # still characterize which verified player/email the HTTP route selects;
+    # real transactional rollback/concurrency is exercised by the DB suite.
+    if name == "proplet_auth_challenge_issue_v1":
+        assert values["p_purpose"] in {"link_email", "recover_password"}
+        assert values["p_expected_revision"] == 0
+        assert values["p_admin"] is None
+        inserted.append({"player_id": values["p_player"], "email": values["p_email"],
+                         "purpose": values["p_purpose"], "token_hash": values["p_token_hash"]})
+        return {"ok": True, "shouldSend": True, "status": "sending"}
+    assert name == "proplet_auth_challenge_delivery_v1"
+    assert values["p_token_hash"] == inserted[-1]["token_hash"]
+    assert values["p_success"] is True
+    return {"ok": True, "status": "pending"}
+
+
 core_app = FastAPI()
 original_client = account_auth_core.httpx.Client
 account_auth_core.httpx.Client = FakeClient
@@ -195,6 +212,7 @@ try:
         tz=TZ,
         db_select=core_select,
         db_select_bounded=core_bounded_select,
+        db_rpc=core_rpc,
         db_insert=core_insert,
         db_update=lambda *args, **kwargs: None,
         db_delete=lambda *args, **kwargs: None,

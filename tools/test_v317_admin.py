@@ -9,7 +9,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from fastapi.testclient import TestClient
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -86,6 +86,53 @@ server.db_update = fake_update
 server.db_delete = fake_delete
 server.db_request = fake_request
 
+
+def fixture_users(body):
+    needle = (body.get("p_query") or "").casefold()
+    rows = [p for p in tables["players"] if not needle or p["id"] == needle or needle in p["name"].casefold()]
+    output = [{"id": p["id"], "name": p["name"], "avatar": p["avatar"], "family_code": p["family_code"],
+               "team": "Prouza", "has_password": bool(p.get("password_hash")), "points": 0, "created_at": NOW}
+              for p in rows]
+    return {"total": len(output), "users": output[body.get("p_offset", 0):body.get("p_offset", 0) + body.get("p_limit", 60)]}
+
+
+def fake_rpc(name, body):
+    if name in {"proplet_rate_limit", "proplet_request_guard_v1"}:
+        return {"allowed": True}
+    if name == "proplet_auth_player_v1":
+        found = next((p for p in tables["players"] if p["token_hash"] == body["p_token_hash"]), None)
+        return {"expired": False, "player": copy.deepcopy(found)}
+    if name == "proplet_admin_cases_v1":
+        assert body["p_kind"] in {"words", "support"}
+        rows = fake_select("puzzle_feedback", kind="word") if body["p_kind"] == "words" else []
+        if body.get("p_player"):
+            rows = [r for r in rows if r.get("player_id") == body["p_player"]]
+        if body["p_status"] == "open":
+            rows = [r for r in rows if r.get("status", "new") in {"new", "reviewing"}]
+        for row in rows:
+            owner = fake_select("players", id=row.get("player_id"))[0]
+            row["player"] = {"id": owner["id"], "name": owner["name"], "team": "Prouza"}
+        return {"total": len(rows), "rows": rows[body["p_offset"]:body["p_offset"] + body["p_limit"]]}
+    if name == "proplet_admin_case_update_v1":
+        assert body["p_admin"] == ADMIN_ID and body["p_kind"] == "words"
+        row = fake_select("puzzle_feedback", id=body["p_id"])[0]
+        values = {"status": body["p_status"], "resolution_note": body["p_note"], "reviewed_at": NOW, "reviewed_by": ADMIN_ID}
+        fake_update("puzzle_feedback", {"id": body["p_id"]}, values)
+        fake_insert("admin_audit_log", {"action": "word_report_status", "target_id": body["p_id"], "from": row.get("status", "new")})
+        return {"ok": True, "id": body["p_id"], **values}
+    if name == "proplet_admin_users_page_v1":
+        return fixture_users(body)
+    if name == "proplet_admin_player_detail_v1":
+        return {"user": fixture_users({"p_query": body["p_player"]})["users"][0], "stats": {"points": 0},
+                "recentResults": [], "sessionCount": 0, "pushCount": 0}
+    if name == "proplet_admin_overview_v1":
+        return [{"payload": {"players": {"total": len(tables["players"])},
+                              "feedback": {"wordReportsTotal": len(tables["puzzle_feedback"])}}}]
+    raise AssertionError((name, body))
+
+
+server.db_rpc = fake_rpc
+
 admin_auth = f"Bearer {ADMIN_TOKEN}"
 player_auth = f"Bearer {PLAYER_TOKEN}"
 
@@ -107,10 +154,11 @@ except HTTPException as exc:
 
 # Two different words from one board are two reports; submitting the same word updates it.
 base = {"puzzle_id": test_puzzle["id"], "challenge_key": f"free:{test_puzzle['id']}", "kind": "word"}
-server.puzzle_feedback(server.FeedbackCreate(**base, word=word_one, note="První"), admin_auth, None)
-server.puzzle_feedback(server.FeedbackCreate(**base, word=word_two, note="Druhé"), admin_auth, None)
+feedback_request = Request({"type": "http", "method": "POST", "path": "/api/feedback", "headers": []})
+server.puzzle_feedback(server.FeedbackCreate(**base, word=word_one, note="První"), feedback_request, admin_auth, None)
+server.puzzle_feedback(server.FeedbackCreate(**base, word=word_two, note="Druhé"), feedback_request, admin_auth, None)
 assert len(tables["puzzle_feedback"]) == 2
-server.puzzle_feedback(server.FeedbackCreate(**base, word=word_one, note="Aktualizace"), admin_auth, None)
+server.puzzle_feedback(server.FeedbackCreate(**base, word=word_one, note="Aktualizace"), feedback_request, admin_auth, None)
 assert len(tables["puzzle_feedback"]) == 2
 assert next(row for row in tables["puzzle_feedback"] if row["word"] == word_one)["note"] == "Aktualizace"
 
@@ -132,7 +180,7 @@ assert "token_hash" not in repr(users) + repr(detail)
 assert "password_hash" not in repr(users) + repr(detail)
 
 # Admin static route exists and the overview can be built over an empty playtest.
-assert str(server.admin_home().path).endswith("public/admin.html")
+assert server.admin_home().headers["location"] == "/admin.html"
 overview = server.admin_overview(admin_auth)
 assert overview["players"]["total"] == 2
 assert overview["feedback"]["wordReportsTotal"] == 2

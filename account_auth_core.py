@@ -10,6 +10,7 @@ from typing import Optional
 from urllib.parse import urlencode, urlparse
 
 import httpx
+from account_challenges import AtomicChallenges, require_test_mail_recipient
 from backend.referrals import signup_context
 from backend import google_oauth
 
@@ -74,6 +75,8 @@ def install_account_auth(
     league_name_for,
     db_select_bounded=None,
     db_rpc=None,
+    canonical_origin: Optional[str] = None,
+    vercel_env: str = "",
 ):
     """Install the additive v3.31.8 identity bridge.
 
@@ -111,6 +114,23 @@ def install_account_auth(
         host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or "").strip()
         if not host:
             raise HTTPException(400, "Neplatná adresa aplikace")
+        if vercel_env == "production":
+            if canonical_origin != "https://hrajproplet.cz":
+                raise HTTPException(503, "Bezpečná adresa ověření není připravená")
+            deployed_host = os.environ.get("VERCEL_URL", "").lower()
+            production_hosts = {"hrajproplet.cz", "www.hrajproplet.cz", "proplet-nine.vercel.app"}
+            if re.fullmatch(r"proplet-[a-z0-9-]+-pavel-prouzas-projects\.vercel\.app", deployed_host):
+                production_hosts.add(deployed_host)
+            if host not in production_hosts:
+                raise HTTPException(400, "Neplatná adresa aplikace")
+            return f"https://{host}"
+        if vercel_env == "preview" and os.environ.get("PROPLET_ADMIN_PREVIEW_ENABLED") == "true":
+            expected = str(canonical_origin or "").rstrip("/")
+            if not re.fullmatch(r"https://proplet-[a-z0-9-]+-pavel-prouzas-projects\.vercel\.app", expected):
+                raise HTTPException(503, "Bezpečná adresa ověření není připravená")
+            if host != urlparse(expected).netloc:
+                raise HTTPException(400, "Neplatná adresa aplikace")
+            return expected
         allowed = (
             host in {"hrajproplet.cz", "www.hrajproplet.cz", "proplet-nine.vercel.app"}
             or host.endswith("-pavel-prouzas-projects.vercel.app")
@@ -176,49 +196,19 @@ def install_account_auth(
             payload["token"] = token
         return payload
 
-    def challenge_row(raw_token: str, purpose: Optional[str] = None) -> dict:
-        token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
-        rows = db_select("account_auth_challenges", token_hash=token_hash)
-        if not rows:
-            raise HTTPException(400, "Odkaz je neplatný nebo už byl použit")
-        row = rows[0]
-        if purpose and row.get("purpose") != purpose:
-            raise HTTPException(400, "Odkaz nepatří k této akci")
-        if row.get("used_at"):
-            raise HTTPException(400, "Odkaz už byl použit")
-        try:
-            expiry = datetime.fromisoformat(str(row.get("expires_at") or "").replace("Z", "+00:00"))
-        except Exception:
-            raise HTTPException(400, "Odkaz vypršel")
-        now = datetime.now(tz)
-        if expiry.tzinfo is None:
-            expiry = expiry.replace(tzinfo=tz)
-        if expiry <= now:
-            raise HTTPException(400, "Odkaz vypršel. Vyžádej si nový.")
-        return row
+    challenges = AtomicChallenges(db_rpc)
 
-    def create_challenge(player_id: str, purpose: str, email: str, minutes: int = 30) -> str:
-        raw = secrets.token_urlsafe(32)
-        now = datetime.now(tz)
-        # Supersede older unfinished challenges of the same kind for this player.
-        for old in db_select("account_auth_challenges", player_id=player_id):
-            if old.get("purpose") == purpose and not old.get("used_at"):
-                try:
-                    db_update("account_auth_challenges", {"id": old["id"]}, {"used_at": now.isoformat()})
-                except HTTPException:
-                    pass
-        db_insert("account_auth_challenges", {
-            "id": str(uuid.uuid4()),
-            "player_id": player_id,
-            "purpose": purpose,
-            "email": email,
-            "token_hash": hashlib.sha256(raw.encode()).hexdigest(),
-            "created_at": now.isoformat(),
-            "expires_at": (now + timedelta(minutes=minutes)).isoformat(),
-        })
-        return raw
+    def create_challenge(player_id: str, purpose: str, email: str) -> tuple[str, dict]:
+        players = db_select("players", id=player_id)
+        if not players:
+            raise HTTPException(404, "Hráč neexistuje")
+        # The SQL function rechecks this monotonic revision under the player row
+        # lock. Never re-create a challenge with individual REST writes.
+        revision = int(players[0].get("auth_identity_revision") or 0)
+        return challenges.issue(player_id, purpose, email, revision)
 
     def send_magic_link(email: str, redirect_to: str, *, create_user: bool) -> None:
+        require_test_mail_recipient(email, supabase_url)
         # Supabase's signInWithOtp endpoint sends a one-time Magic Link when the
         # Magic Link template contains ConfirmationURL (the hosted default).
         auth_request(
@@ -230,6 +220,7 @@ def install_account_auth(
         )
 
     def send_recovery_link(email: str, redirect_to: str) -> None:
+        require_test_mail_recipient(email, supabase_url)
         # Use GoTrue's dedicated recovery endpoint so the password-recovery
         # template and recovery-specific rate limits are used instead of a
         # generic Magic Link email.
@@ -297,18 +288,20 @@ def install_account_auth(
         enforce_rate_limit(request, "account_email_link", limit=5, window_seconds=3600)
         player = auth_player(authorization)
         email = norm_email(payload.email)
+        callback_origin = public_origin(request)
         owner = verified_email_owner(email, exclude_player=player["id"])
         if owner:
             raise HTTPException(409, "Tento e-mail už používá jiný účet")
-        challenge = create_challenge(player["id"], "link_email", email)
-        redirect_to = f"{public_origin(request)}/?auth=email-link&challenge={challenge}"
+        challenge, issued = create_challenge(player["id"], "link_email", email)
+        if issued.get("alreadyVerified"):
+            return {"ok": True, "alreadyVerified": True, "message": "Tento e-mail už je ověřený."}
+        redirect_to = f"{callback_origin}/?auth=email-link&challenge={challenge}"
         try:
             send_magic_link(email, redirect_to, create_user=True)
         except HTTPException:
-            # Do not leave a live challenge when delivery failed.
-            row = challenge_row(challenge, "link_email")
-            db_update("account_auth_challenges", {"id": row["id"]}, {"used_at": datetime.now(tz).isoformat()})
+            challenges.delivery(challenge, success=False)
             raise
+        challenges.delivery(challenge, success=True)
         return {"ok": True, "message": "Poslali jsme ověřovací odkaz. Otevři ho ve svém e-mailu."}
 
     @app.post("/api/account/email/verify")
@@ -316,39 +309,33 @@ def install_account_auth(
         enforce_rate_limit(request, "account_email_verify", limit=12, window_seconds=3600)
         if not payload.challenge:
             raise HTTPException(400, "Chybí ověřovací odkaz")
-        row = challenge_row(payload.challenge, "link_email")
         user = auth_user(payload.accessToken)
-        email = str(user.get("email") or "").casefold()
-        if email != str(row.get("email") or "").casefold():
-            raise HTTPException(401, "Ověřovací e-mail nesedí")
-        owner = verified_email_owner(email, exclude_player=row["player_id"])
-        if owner:
-            raise HTTPException(409, "Tento e-mail už používá jiný účet")
-        now = datetime.now(tz).isoformat()
-        db_update("players", {"id": row["player_id"]}, {"email": email, "email_verified_at": now})
-        db_update("account_auth_challenges", {"id": row["id"]}, {"used_at": now, "verified_auth_user_id": user.get("id")})
-        player = db_select("players", id=row["player_id"])[0]
-        return {"ok": True, "profile": player_payload(player, new_session(player["id"])), "message": "E-mail je ověřený. Účet už lze obnovit."}
+        consumed = challenges.consume(payload.challenge, "link_email", user)
+        player = db_select("players", id=consumed["playerId"])[0]
+        return {"ok": True, "alreadyVerified": bool(consumed.get("alreadyVerified")), "profile": player_payload(player, new_session(player["id"])), "message": "E-mail je ověřený. Účet už lze obnovit."}
 
     @app.post("/api/auth/recovery/start")
     def recovery_start(payload: RecoveryStart, request: Request):
         enforce_rate_limit(request, "password_recovery_ip", limit=8, window_seconds=3600)
         email = norm_email(payload.email)
+        callback_origin = public_origin(request)
         # Deliberately generic response: never disclose whether an email is registered.
         owner = verified_email_owner(email)
         if not owner:
             return {"ok": True, "message": "Pokud je e-mail propojený s účtem, poslali jsme odkaz pro obnovení."}
-        challenge = create_challenge(owner["id"], "recover_password", email)
-        redirect_to = f"{public_origin(request)}/?auth=recover&challenge={challenge}"
+        challenge, issued = create_challenge(owner["id"], "recover_password", email)
+        redirect_to = f"{callback_origin}/?auth=recover&challenge={challenge}"
         try:
             send_recovery_link(email, redirect_to)
         except HTTPException:
             # Keep the public response generic even when the provider refuses the address.
             try:
-                row = challenge_row(challenge, "recover_password")
-                db_update("account_auth_challenges", {"id": row["id"]}, {"used_at": datetime.now(tz).isoformat()})
+                challenges.delivery(challenge, success=False)
             except HTTPException:
                 pass
+        else:
+            # A delivery/audit commit failure leaves the challenge inactive.
+            challenges.delivery(challenge, success=True)
         return {"ok": True, "message": "Pokud je e-mail propojený s účtem, poslali jsme odkaz pro obnovení."}
 
     @app.post("/api/auth/recovery/check")
@@ -356,37 +343,20 @@ def install_account_auth(
         enforce_rate_limit(request, "password_recovery_check", limit=15, window_seconds=3600)
         if not payload.challenge:
             raise HTTPException(400, "Chybí obnovovací odkaz")
-        row = challenge_row(payload.challenge, "recover_password")
         user = auth_user(payload.accessToken)
-        if str(user.get("email") or "").casefold() != str(row.get("email") or "").casefold():
-            raise HTTPException(401, "Obnovovací odkaz nesedí")
+        challenges.check(payload.challenge, "recover_password", str(user["email"]).strip().casefold())
         return {"ok": True, "resetReady": True}
 
     @app.post("/api/auth/recovery/reset")
     def recovery_reset(payload: RecoveryReset, request: Request):
         enforce_rate_limit(request, "password_recovery_reset", limit=8, window_seconds=3600)
-        row = challenge_row(payload.challenge, "recover_password")
         user = auth_user(payload.accessToken)
-        email = str(user.get("email") or "").casefold()
-        if email != str(row.get("email") or "").casefold():
-            raise HTTPException(401, "Obnovovací odkaz nesedí")
-        players = db_select("players", id=row["player_id"])
-        if not players or not players[0].get("email_verified_at") or str(players[0].get("email") or "").casefold() != email:
-            raise HTTPException(401, "Účet už k tomuto e-mailu není připojený")
-        player = players[0]
-        now = datetime.now(tz).isoformat()
-        # Reset is also a session-security event: invalidate original + additional sessions.
-        db_update("players", {"id": player["id"]}, {
-            "password_hash": hash_password(payload.password),
-            "token_hash": hashlib.sha256(secrets.token_urlsafe(32).encode()).hexdigest(),
-        })
-        for session in db_select("player_sessions", player_id=player["id"]):
-            try:
-                db_delete("player_sessions", id=session["id"])
-            except HTTPException:
-                pass
-        db_update("account_auth_challenges", {"id": row["id"]}, {"used_at": now, "verified_auth_user_id": user.get("id")})
-        player = db_select("players", id=player["id"])[0]
+        consumed = challenges.consume(payload.challenge, "recover_password", user,
+            password_hash=hash_password(payload.password),
+            session_token_hash=hashlib.sha256(secrets.token_urlsafe(32).encode()).hexdigest())
+        # Password, primary token, additional sessions and challenge consumption
+        # commit together. A failed session delete rolls the entire reset back.
+        player = db_select("players", id=consumed["playerId"])[0]
         return {"ok": True, "profile": player_payload(player, new_session(player["id"])), "message": "Heslo je změněné a ostatní přihlášení byla odpojena."}
 
     def google_transaction(request: Request, player=None, authorization=""):
