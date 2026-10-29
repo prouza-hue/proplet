@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import {createRequestScope,api,onDenied,cancelAll} from '../../public/admin/api.js';
 import {load,confirm,dismissConfirmation} from '../../public/admin/ui.js';
+// Import every shipped view as a real ES module as well as exercising requests.
+// A syntax-only script check can miss a malformed nested template in module mode.
+await Promise.all(['workspace','players','reports','router'].map(name=>import(`../../public/admin/${name}.js`)));
 
 let token='owner-session';
 globalThis.localStorage={getItem:()=>JSON.stringify({token})};

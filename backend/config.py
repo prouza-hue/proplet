@@ -26,6 +26,7 @@ def _env(name: str, default: str = "") -> str:
 
 ADMIN_PREVIEW_BRANCH = "codex/admin-modernization"
 ADMIN_PREVIEW_DATABASE = "https://eanzztstmwlamwfdskbf.supabase.co"
+ADMIN_PREVIEW_ORIGIN = "https://proplet-git-codex-admin-modernization-pavel-prouzas-projects.vercel.app"
 
 
 def admin_preview_enabled() -> bool:
@@ -42,7 +43,9 @@ def canonical_origin() -> str:
         # The UI and reads can still be inspected, but email delivery must fail
         # closed until an actual project deployment supplies its own hostname.
         return ""
-    return f"https://{hostname}"
+    # The verified branch alias remains stable across candidate deployments;
+    # callbacks must not depend on a soon-to-be-obsolete per-commit hostname.
+    return ADMIN_PREVIEW_ORIGIN
 
 
 @dataclass(frozen=True, slots=True)

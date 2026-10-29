@@ -3,7 +3,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from backend.config import ADMIN_PREVIEW_DATABASE, canonical_origin, load_settings
+from backend.config import ADMIN_PREVIEW_DATABASE, ADMIN_PREVIEW_ORIGIN, canonical_origin, load_settings
 
 
 class AdminPreviewBoundaryTests(unittest.TestCase):
@@ -21,7 +21,7 @@ class AdminPreviewBoundaryTests(unittest.TestCase):
             self.assertEqual(settings.supabase_secret_key, "isolated-test-key")
             self.assertEqual(settings.vapid_private_key, "")
             self.assertEqual(settings.cron_secret, "")
-            self.assertEqual(canonical_origin(), "https://proplet-qa-pavel-prouzas-projects.vercel.app")
+            self.assertEqual(canonical_origin(), ADMIN_PREVIEW_ORIGIN)
 
     def test_missing_wrong_database_or_production_environment_fails_before_client_creation(self):
         valid = {

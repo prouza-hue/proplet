@@ -468,6 +468,9 @@ with (
     assert health_fixture.pop('atomicResultEnabled') == server.ATOMIC_RESULT_V1_ENABLED
     assert health_fixture.pop('archiveEnabled') is False
     assert config_fixture.pop('archiveEnabled') is False
+    # Admin environment discovery is an additive public boolean; it never
+    # exposes the backing database or changes the previous config fields.
+    assert config_fixture.pop('adminPreview') is False
     # Keep the Linux production fixture portable to Windows development.
     health_fixture["puzzleSource"] = health_fixture["puzzleSource"].replace("\\", "/")
     # Release publication changes APP_VERSION without changing these response
