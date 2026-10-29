@@ -179,7 +179,11 @@ installers = ("_install_account_auth_core", "_install_push_diagnostics", "_insta
               "_install_rescue_limit_v40115", "_install_preview_auth_v334")
 for enabled in (False, True):
     with patch.multiple(account_auth, **{name: DEFAULT for name in installers}) as mocked:
-        account_auth.install_account_auth(object(), services=replace(services, live_player_preview=enabled))
+        # The real admin recovery installer also registers its security middleware.
+        app = FastAPI()
+        account_auth.install_account_auth(app, services=replace(services, live_player_preview=enabled))
+        assert app.user_middleware
+        assert any(route.path == "/api/admin/users/{player_id}/recovery-email" for route in app.routes)
         for name in ("_install_word_recognition", "_install_competitive_sharing", "_install_account_bonus"):
             assert mocked[name].call_args.kwargs["live_player_preview"] is enabled
             assert mocked[name].call_args.kwargs["vercel_env"] == "preview"
