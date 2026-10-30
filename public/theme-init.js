@@ -40,9 +40,21 @@
       document.body.prepend(screen);
     };
     mountBootScreen();
+    document.addEventListener('error',event=>{if(event.target?.matches?.('link[rel="stylesheet"]'))event.target.dataset.loadFailed='1';},true);
 
-    window.__PROPLET_REVEAL_CURRENT_UI=()=>{
+    let revealRetry=0,homeFallback=false;
+    window.__PROPLET_REVEAL_CURRENT_UI=(error=false)=>{
       if(revealed)return;
+      // Native home modules used to reveal the page before its final projection.
+      // Head styles settle before DOMContentLoaded; font loading must settle too.
+      const parsed=document.readyState!=='loading';
+      const styled=[...document.querySelectorAll('link[rel="stylesheet"]')].every(link=>link.sheet||link.dataset.loadFailed==='1');
+      const oneScreen=!document.body?.classList.contains('today-one-screen')||document.body.classList.contains('one-screen-ready');
+      const home=document.documentElement.dataset.archiveReady==='1'||homeFallback;
+      if(!error&&(!parsed||!styled||!oneScreen||!home||document.fonts?.status==='loading')){
+        if(!revealRetry)revealRetry=setTimeout(()=>{revealRetry=0;window.__PROPLET_REVEAL_CURRENT_UI();},50);
+        return;
+      }
       revealed=true;
       const loader=document.getElementById('propletBootScreen');
       root.classList.add('proplet-current-ui-ready');
@@ -72,7 +84,7 @@
       if(++readyChecks<180)setTimeout(revealWhenCanonicalHomeReady,50);
     };
     setTimeout(revealWhenCanonicalHomeReady,25);
-    setTimeout(()=>window.__PROPLET_REVEAL_CURRENT_UI?.(),6500);
+    setTimeout(()=>{homeFallback=true;window.__PROPLET_REVEAL_CURRENT_UI?.();},6500);
   }
 
   try{
@@ -196,7 +208,7 @@
     css.rel='stylesheet';css.href=href;css.dataset[key]='1';
     let retries=0;
     css.addEventListener('error',()=>{
-      if(retries>=2)return;
+      if(retries>=2){css.dataset.loadFailed='1';return;}
       const attempt=++retries;
       setTimeout(()=>{
         const retryUrl=new URL(href,location.href);
@@ -228,6 +240,7 @@
   };
 
   const loadExtras=async()=>{
+    loadScript('/challenge-cta-v3333.js?v=result-sticker1','propletChallengeCtaV3333');
     await loadScript('/runtime-meta.js?v=40915','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=studio-recovery1','propletHomeLayout');
@@ -243,7 +256,6 @@
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=analytics2','propletCompetitiveSharing');
-    loadScript('/challenge-cta-v3333.js?v=ui-refinement5','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=mk100','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=ui-refinement1','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=ui-refinement1','propletAccountConversionV3331',{wait:true});

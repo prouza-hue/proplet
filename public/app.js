@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.15-ui-pilot1';
+const APP_PREVIEW_RELEASE='proplet-v4.09.15-ui-pilot2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -2813,8 +2813,8 @@ async function loadPuzzleDatabaseWithRecovery(){
  }
 }
 function showPuzzleBootError(){
- // Preserve the shell and consent DOM. Replacing body also removed its CSS.
- window.__PROPLET_REVEAL_CURRENT_UI?.();
+ // Fatal data errors must remain actionable even if home cannot be projected.
+ window.__PROPLET_REVEAL_CURRENT_UI?.(true);
  document.querySelectorAll('.app-shell,.bottom-nav').forEach(element=>{element.inert=true;element.setAttribute('aria-hidden','true')});
  const panel=document.createElement('main');panel.id='puzzleBootError';
  panel.style.cssText='position:fixed;inset:0;z-index:350;overflow:auto;background:var(--bg,#f7f2e8);color:var(--ink,#332d28);padding: max(48px,env(safe-area-inset-top)) 24px 200px;font:16px/1.5 system-ui;text-align:center';
