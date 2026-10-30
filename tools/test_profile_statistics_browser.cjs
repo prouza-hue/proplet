@@ -85,7 +85,12 @@ async function omitStatistics(ctx){
    const {page,errors}=await pageIn(ctx);await openProfile(page);
    if(mode==='guest'){
     assert.equal(await page.locator('#profileCreateBtn').count(),1);
-    assert.equal(await page.evaluate(()=>!!window.PropletProfileStatistics),false);
+    // Guests now see their local statistics and recover the same dependency.
+    await openStatistics(page);
+    assert.equal(await page.evaluate(()=>!!window.PropletProfileStatistics),true);
+    assert.equal(await page.evaluate(()=>getProfile()),null);
+    assert.equal(await page.locator('.profile-ledger-count').first().innerText(),'0');
+    assert.match(await page.locator('#profileCard').innerText(),/Postup je uložený v tomto zařízení/);
    }else if(mode==='delayed'){
     await page.locator('[data-profile-statistics-status]').waitFor();
     assert.match(await page.locator('#profileCard').innerText(),/Fixture Player/);

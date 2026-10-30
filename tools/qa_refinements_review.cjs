@@ -24,6 +24,14 @@ async function boot(context,mode,theme,word){
  await page.waitForFunction(()=>window.PropletRefinementsReview?.ready===true||window.PropletRefinementsReview?.error);
  assert.equal(await page.evaluate(()=>window.PropletRefinementsReview.error),null);
  assert.equal(await page.evaluate(()=>document.documentElement.dataset.theme),theme);
+ await page.locator('#propletBootScreen').waitFor({state:'detached'});
+ if(mode==='hints'){
+  // The fixture can open its chooser while the shell is still hidden. Exercise
+  // the real visible opener so focus restoration starts from a user-reachable control.
+  await page.locator('#closeHintModal').click();
+  await page.locator('#hintBtn').click();
+  await page.locator('#hintModal').waitFor({state:'visible'});
+ }
  await settle(page);return page;
 }
 async function noOverflow(page,label){
@@ -56,14 +64,16 @@ async function noOverflow(page,label){
   await rankings.locator('#xpLeaderboardList').locator('..').screenshot({path:path.join(artifacts,`xp-${viewport.width}-${theme}.png`)});
   await context.close();
  }
- // A short landscape viewport still exposes every hint choice and the close control.
+ // A short desktop window still exposes every hint choice and keyboard control.
+ // Touch phones at this aspect ratio intentionally show the rotate-phone guard.
  {
-  const context=await browser.newContext({viewport:{width:1000,height:440},screen:{width:1000,height:768},hasTouch:true,serviceWorkers:'block',reducedMotion:'reduce'});
+  const context=await browser.newContext({viewport:{width:1000,height:440},screen:{width:1000,height:768},hasTouch:false,serviceWorkers:'block',reducedMotion:'reduce'});
   const page=await boot(context,'hints','dark');
   assert(await page.locator('#hintModal .hint-card').evaluate(el=>el.scrollHeight<=el.clientHeight+1),'all choices fit short landscape');
   await page.locator('#hintModal [data-hint-level="3"]').focus();await page.keyboard.press('Tab');
   assert.equal(await page.locator('#closeHintModal').evaluate(el=>el===document.activeElement),true,'hint focus wraps to close');
   await page.keyboard.press('Escape');assert.equal(await page.locator('#hintModal').isVisible(),false,'Escape closes hint');
+  await page.waitForFunction(()=>document.activeElement===document.querySelector('#hintBtn'));
   assert.equal(await page.locator('#hintBtn').evaluate(el=>el===document.activeElement),true,'focus returns to native opener');
   await context.close();
  }
