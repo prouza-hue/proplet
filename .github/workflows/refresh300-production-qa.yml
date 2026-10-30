@@ -1,4 +1,4 @@
-name: Refresh 300 production UI
+name: Free-play preferences and history
 on:
   pull_request:
     branches: [main]

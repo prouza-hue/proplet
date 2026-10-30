@@ -115,35 +115,8 @@ async function shot(page,selector,name){
   pass('Real analytics queue distinguishes native handoff, cancel, failure and clipboard outcomes once without invite PII');
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Real invitation transport creates own invite URL');
-  s=await boot(browser);
-  await s.page.waitForFunction(()=>tajenkaPuzzle?.id);
-  await s.page.evaluate(fixturePuzzle=>{
-   window.PROPLET_RUNTIME_ENV='production';
-   Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.__nativeShare=data}});
-   const date=pragueDateISO(),p={id:'test-daily-share',difficulty:'easy',rows:fixturePuzzle.rows,cols:fixturePuzzle.cols,letters:fixturePuzzle.letters,answers:fixturePuzzle.answers,meta:{}},state=getState();
-   datedDaily().remember({schemaVersion:1,dailyDate:date,serverToday:date,puzzleId:p.id,puzzle:p,bankVersion:'test-daily',contentHash:'a'.repeat(64),challengeKey:'daily:'+date,validUntil:new Date(Date.now()+86400000).toISOString()});
-   state.completed['daily:'+date]={puzzleId:p.id,mode:'daily',dailyDate:date,elapsedMs:45000,moves:7,cleanSolve:true,completedAt:new Date().toISOString()};
-   saveState(state);
-   const ts=tajenkaState();ts.completions=ts.completions||{};
-   ts.completions[tajenkaPuzzle.id]={puzzleId:tajenkaPuzzle.id,elapsedMs:60000,moves:8,cleanSolve:true,completedAt:new Date().toISOString()};
-   saveTajenkaState(ts);renderDaily();renderTajenkaEntry();
-  },fixture.tajenka);
-  for(const selector of ['#shareDailyBtn','#screen-daily [data-tajenka-share]']){
-   await s.page.locator(selector).waitFor({state:'visible'});
-   // Compare with the source button's own original handler, not the last result.
-   await s.page.evaluate(sel=>{PropletReferrals.model.ready=false;window.__nativeShare=null;document.querySelector(sel).click()},selector);
-   await s.page.waitForFunction(()=>window.__nativeShare);
-   const baseline=await s.page.evaluate(()=>window.__nativeShare);
-   await s.page.evaluate(()=>{PropletReferrals.model.ready=true;window.__nativeShare=null;currentGame={mode:'free',puzzle:{id:'wrong-stale-result',difficulty:'easy',meta:{level:999}},finished:true}});
-   await s.page.locator(selector).click();
-   await s.page.waitForFunction(()=>window.__nativeShare);
-   assert.deepEqual(await s.page.evaluate(()=>window.__nativeShare),baseline,'result share remains direct despite referral availability and stale game');
-   assert.equal(await s.page.locator('#referralDialog:not(.hidden)').count(),0,'sharing a result does not open acquisition choices');
-   // Tajenka's button is rebuilt by renderDaily; delegation must survive that.
-   await s.page.evaluate(()=>renderDaily());
-  }
-  assert.deepEqual(s.errors,[]);await s.ctx.close();
-  pass('Daily and rebuilt Tajenka directly preserve canonical board share despite referral availability and stale result');
+  // Direct Today share buttons were intentionally removed from the visible UI.
+  // Native result sharing, the chooser and explicit Profile invites are exercised below.
   s=await boot(browser,{guest:false,paid:false,announcement:false});
   await s.page.waitForFunction(()=>!!getProfile()?.id&&PropletReferrals.model.ready&&!PropletReferrals.model.incoming);
   await s.page.evaluate(()=>startFree('easy'));

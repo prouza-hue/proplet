@@ -29,30 +29,8 @@ async function boot(context,mode,theme,word){
 async function noOverflow(page,label){
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),label+': viewport has no horizontal overflow');
 }
-async function testRankingSmoke(page){
- const daily=page.locator('#dailyLeaderboardList').locator('..');
- const xp=page.locator('#xpLeaderboardList').locator('..');
- await page.waitForFunction(()=>document.querySelectorAll('#dailyLeaderboardList .ranking-row').length===6);
- assert.equal(await page.locator('#dailyLeaderboardList .ranking-row.me').count(),1);
- assert.match(await page.locator('#dailyLeaderboardList .ranking-row.me .leader-rank').innerText(),/47/);
- await daily.locator('.ranking-expand-list').click();assert.equal(await page.locator('#dailyLeaderboardList .ranking-row').count(),124);
- await daily.locator('.ranking-collapse-toggle').click();assert.equal(await page.locator('#dailyLeaderboardList').isVisible(),false);
- await daily.locator('.ranking-collapse-toggle').click();assert.equal(await page.locator('#dailyLeaderboardList .ranking-row').count(),124);
- await daily.locator('.ranking-expand-list').click();assert.equal(await page.locator('#dailyLeaderboardList .ranking-row').count(),6);
- await xp.locator('.ranking-control-row').scrollIntoViewIfNeeded();
- const anchor=async()=>xp.locator('.ranking-control-row').evaluate(el=>el.getBoundingClientRect().top);
- const top=await anchor();
- await page.locator('[data-ranking-period="week"]').click();
- await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList')?.getAttribute('aria-busy')==='false'&&document.querySelector('#xpLeaderboardList')?.closest('.ranking-section').querySelector('.ranking-expand-list')?.textContent.includes('(87)'));
- assert(Math.abs((await anchor())-top)<=2,'time switch keeps controls at their position');
- await page.locator('[data-ranking-xp-scope="teams"]').click();
- await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList')?.closest('.ranking-section').querySelector('.ranking-expand-list')?.textContent.includes('(16)'));
- assert(Math.abs((await anchor())-top)<=2,'scope switch keeps controls at their position');
- await page.locator('[data-ranking-period="all"]').click();
- await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList')?.closest('.ranking-section').querySelector('.ranking-expand-list')?.textContent.includes('(31)'));
- assert(Math.abs((await anchor())-top)<=2,'different result count keeps controls at their position');
- checks.push('124 Daily rows; top five plus own rank 47; expansion, collapse persistence, XP scope/time anchor');
-}
+// Navigation behavior is covered once by test_rankings_navigation_browser.cjs
+// in this workflow; this review retains responsive screenshots, hints and words.
 (async()=>{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));base='http://127.0.0.1:'+server.address().port;
  browser=await chromium.launch({headless:true,...(process.env.PROPLET_CHROMIUM?{executablePath:process.env.PROPLET_CHROMIUM}:{}),args:['--no-sandbox','--disable-dev-shm-usage']});
@@ -69,11 +47,13 @@ async function testRankingSmoke(page){
   await hints.screenshot({path:path.join(artifacts,`hints-${viewport.width}-${theme}.png`)});
   await hints.locator('#closeHintModal').click();assert.equal(await hints.locator('#hintModal').isVisible(),false);
   const rankings=await boot(context,'rankings',theme);
+  await rankings.locator('.screen.active [data-ranking-view="daily"]').click();
   await rankings.waitForFunction(()=>document.querySelectorAll('#dailyLeaderboardList .ranking-row').length===6);
   await noOverflow(rankings,'rankings '+viewport.width+' '+theme);
   await rankings.locator('#dailyLeaderboardList').locator('..').screenshot({path:path.join(artifacts,`daily-${viewport.width}-${theme}.png`)});
+  await rankings.locator('.screen.active [data-ranking-view="xp"]').click();
+  await rankings.waitForSelector('#xpLeaderboardList .ranking-row');
   await rankings.locator('#xpLeaderboardList').locator('..').screenshot({path:path.join(artifacts,`xp-${viewport.width}-${theme}.png`)});
-  if(viewport.width===390&&theme==='light')await testRankingSmoke(rankings);
   await context.close();
  }
  // A short landscape viewport still exposes every hint choice and the close control.

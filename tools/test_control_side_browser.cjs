@@ -9,7 +9,11 @@ assert(['localhost','127.0.0.1'].includes(new URL(base).hostname),'loopback requ
 const errors=[],checks=[];let server,browser;
 const artifacts=path.join(root,'artifacts/control-side');fs.mkdirSync(artifacts,{recursive:true});
 const settle=page=>page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))});
-const ready=page=>page.waitForFunction(()=>window.__sideBootReady===true&&typeof puzzleDB!=='undefined'&&puzzleDB?.free?.hard?.[0]&&document.querySelector('#gameSideToggle'));
+const ready=async page=>{
+ await page.waitForFunction(()=>window.__sideBootReady===true&&typeof puzzleDB!=='undefined'&&puzzleDB?.free?.hard?.[0]&&document.querySelector('#gameSideToggle'));
+ // Real users cannot start a game until the final shell is visible.
+ await page.locator('#propletBootScreen').waitFor({state:'detached'});
+};
 async function gesture(page,points,duringDrag){
   const touch=await page.evaluate(()=>navigator.maxTouchPoints>0);
   const cdp=touch?await page.context().newCDPSession(page):null;

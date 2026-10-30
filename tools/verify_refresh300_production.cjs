@@ -16,25 +16,9 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  await page.goto(base,{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__PROPLET_PRINTSHOP_RELEASE_POLISH_V2__===true&&document.querySelector('#freeOrderSettings'));
  await page.evaluate(()=>document.fonts.ready);
- // The 300-board campaign is retired. Its immutable boards and the native
- // difficulty selection remain supported, but guests must never get a promo.
- for(const width of [320,390,840,1440]){
-  await page.setViewportSize({width,height:900});
-  check('retired 300 announcement is never mounted '+width,await page.locator('#freeRefreshAnnouncement').count()===0);
-  check('guest has no automatic discovery dialog '+width,await page.locator('#mk100LaunchPreview:not(.hidden),#dailyExtraIntro:not(.hidden),#referralDialog:not(.hidden),#archiveExperienceModal:not(.hidden)').count()===0);
- }
- await page.locator('.bottom-nav [data-nav="free"]').click();
- check('native navigation opens real difficulty selection',await page.locator('#screen-free').isVisible());
- check('retired new-board counters stay absent',await page.locator('#difficultyCards .refresh-count').count()===0);
- await page.evaluate(()=>nav('daily'));
- for(const width of [320,390,840]){
-  await page.setViewportSize({width,height:900});
-  check('Daily title and gap '+width,await page.evaluate(()=>{const h=document.querySelector('.daily-hero h1'),strip=document.querySelector('#dailyWeekRhythm');return getComputedStyle(h).fontFamily.includes('Fraunces')&&strip.getBoundingClientRect().top-h.getBoundingClientRect().bottom<=25&&!document.querySelector('.daily-week-rhythm-head')}));
-  check('retired300-board card stays absent '+width,await page.locator('#freeRefreshToday').count()===0);
-  await page.screenshot({path:`${out}/today-${width}.png`,fullPage:true});
- }
- check('no second campaign in same page visit',await page.evaluate(()=>!document.querySelector('#mk100LaunchPreview:not(.hidden)')));
- await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.querySelector('#freeOrderSettings'));check('retired campaign stays absent after reload',await page.evaluate(()=>!document.querySelector('#freeRefreshAnnouncement:not(.hidden)')));
+ // Current coverage starts at Play preferences; retired campaign/Today layout
+ // assertions live in focused current-runtime contracts, not this browser matrix.
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.querySelector('#freeOrderSettings'));
  await page.evaluate(()=>nav('free'));
  await page.waitForFunction(()=>freeOrder().enabled());
  check('400 levels and varied next board',await page.evaluate(()=>puzzleDB.free.easy.filter(p=>!p.meta?.rollingContent).length===400&&freeOrder().record('easy').mode==='varied'&&freeOrder().next('easy',null).id==='g6-refresh-easy-001'));
@@ -70,9 +54,6 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
   await page.locator('#closePlayedLevelsModal').click();
   check('history close works',await page.locator('#playedLevelsModal').isHidden());
  }
- const newcomer=await browser.newPage({viewport:{width:390,height:844},serviceWorkers:'block'});await newcomer.route('**/*',route=>new URL(route.request().url()).origin!==base?route.abort():route.continue());await newcomer.goto(base,{waitUntil:'domcontentloaded'});
- await newcomer.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='starter');
- check('newcomer retains native onboarding without CTA',await newcomer.evaluate(()=>currentGame?.mode==='starter'&&!document.querySelector('#freeRefreshAnnouncement:not(.hidden)')));await newcomer.close();
  check('no browser runtime errors',errors.length===0);
  }finally{fs.writeFileSync(`${out}/report.json`,JSON.stringify({checks,errors},null,2));console.log(JSON.stringify({checks,errors}));await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});

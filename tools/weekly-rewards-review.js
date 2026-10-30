@@ -11,13 +11,14 @@ const history=[{id:'00000000-0000-0000-0000-000000000103',weekStart:'2026-10-12'
 {id:'00000000-0000-0000-0000-000000000101',weekStart:'2026-09-28',weekEnd:'2026-10-05',teamName:'Písmáci',xp:21900,sharedFirst:false}].slice(0,gold);
 const profile=JSON.parse(localStorage.getItem('proplet-v2-profile'));
 if(profile){profile.familyCode=mode==='no-team'?null:'review-team';profile.leagueName=mode==='no-team'?null:'Sazeči';localStorage.setItem('proplet-v2-profile',JSON.stringify(profile));}
-// Runtime gates are exercised only behind an adapter intercepting every API request.
-Object.defineProperty(window,'PROPLET_RUNTIME_ENV',{configurable:true,get:()=> 'production',set(){}});
+// Model the server's explicit player-preview capability. The preceding archive
+// adapter still intercepts every API request; no production identity is used.
 let seen=false;
 const native=window.fetch;
 window.fetch=(input,options={})=>{
  const u=new URL(typeof input==='string'?input:input.url,location.href),method=String(options.method||'GET').toUpperCase();
  const json=data=>Promise.resolve(new Response(JSON.stringify(data),{headers:{'Content-Type':'application/json'}}));
+ if(u.origin===location.origin&&u.pathname==='/api/config'&&method==='GET')return native(input,options).then(async response=>json({...await response.json(),environment:'preview',livePlayerPreview:true}));
  if(u.origin===location.origin&&u.pathname==='/api/team-victories'&&method==='GET')return json({enabled:true,launchDate:'2026-09-28',team:mode==='no-team'?null:{code:'review-team',name:'Sazeči',totalGold:gold,competitionEligible:true},intro:{eligible:false,seen:true},pendingAward:mode==='victory'&&!seen?history[0]:null,history,previousWeekWinner:mode==='victory'});
  if(u.origin===location.origin&&u.pathname==='/api/team-victories/personal'&&method==='GET')return json({enabled:true,totalGold:gold,history});
  if(u.origin===location.origin&&u.pathname==='/api/team-victories/seen'&&method==='POST'){seen=true;return json({ok:true,firstSeen:true});}

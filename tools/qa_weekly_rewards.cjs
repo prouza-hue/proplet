@@ -50,7 +50,7 @@ const server=http.createServer((req,res)=>{
  assert.match(await page.locator('.tv-personal-history').innerText(),/Sdílené 1. místo/);
  await page.goto(base+'no-team');
  await page.waitForFunction(()=>document.querySelector('#profileTeamVictories')?.textContent.includes('Zlatá parta'));
- assert.match(await page.locator('#profileCard .profile-family').innerText(),/Bez týmu/);
+ assert.equal(await page.evaluate(()=>getProfile()?.familyCode),null,'personal wins remain after leaving the team');
  await page.locator('[data-tv-personal]').click();assert.equal(await page.locator('.tv-personal-history li').count(),3);
  await page.locator('#tvRewardDialog [data-tv-close]').click();
  // An old account's slow response must not populate a new profile.

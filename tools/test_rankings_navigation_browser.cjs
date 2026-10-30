@@ -41,7 +41,10 @@ async function ready(page){
   document.querySelectorAll('.modal').forEach(el=>el.classList.add('hidden'));
   document.querySelector('.release-notes-v3331-backdrop')?.remove();
  });
+ await page.locator('#propletBootScreen').waitFor({state:'detached'});
  await page.locator('[data-nav="leaderboard"]').click();
+ // The competition hub now defaults to Monthly; Daily remains an explicit tab.
+ await page.locator('.screen.active [data-ranking-view="daily"]').click();
  await page.waitForSelector('#dailyLeaderboardList .ranking-row');await settle(page);
 }
 async function run(viewport){
