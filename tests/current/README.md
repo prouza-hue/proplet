@@ -70,3 +70,11 @@ Retired scenarios (2026-10-31):
   metadata so these tests exercise real event gates without external requests.
   Weekly rewards likewise retain their native celebration/history/identity tests;
   their isolated adapter now supplies the explicit live-preview capability.
+- Follow-up browser cleanup removes the obsolete `.order-next` counter check,
+  Printshop's hardcoded default `leaderboard` destination and the referral suite's
+  duplicate result-layout/always-visible-clean-metrics matrix. Current free-order
+  actions, rankings navigation and result/deduplication contracts remain in their
+  dedicated suites. Loyalty and rank-detail browser checks now open their real
+  collection disclosures first; the removed Today rank hero is no longer a target.
+  Referral reward dismissal/eligibility is tested in Profile and invitation signup
+  through the visible Today notice, preserving the actual API and invite-code checks.

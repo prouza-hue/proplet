@@ -59,7 +59,16 @@ async function run(viewport){
  const page=await ctx.newPage();page.setDefaultTimeout(15000);page.on('pageerror',error=>errors.push(error.message));
  page.on('response',response=>{if(response.status()===404)missingAssets.add(new URL(response.url()).pathname)});
  const calls=[],pending=[],waiters=[];let hold=false;
- const next=(kind,period)=>new Promise(resolve=>{const found=pending.find(row=>!row.claimed&&row.kind===kind&&row.period===period);if(found){found.claimed=true;resolve(found)}else waiters.push({kind,period,resolve})});
+ const next=(kind,period)=>new Promise((resolve,reject)=>{
+  const found=pending.find(row=>!row.claimed&&row.kind===kind&&row.period===period);
+  if(found){found.claimed=true;resolve(found);return}
+  const waiter={kind,period,used:false,resolve:row=>{clearTimeout(timer);resolve(row)}};
+  const timer=setTimeout(()=>{
+   waiter.used=true;
+   reject(Error(`Missing ranking request ${kind}/${period} after 15s; observed=${JSON.stringify(calls)}; pending=${JSON.stringify(pending.map(({kind,period,claimed})=>({kind,period,claimed})))}`));
+  },15000);
+  waiters.push(waiter);
+ });
  await page.route('**/*',async route=>{
   const req=route.request(),url=new URL(req.url());
   if(url.origin!==new URL(base).origin)return route.abort();

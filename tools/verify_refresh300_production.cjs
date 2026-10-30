@@ -22,7 +22,6 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  await page.evaluate(()=>nav('free'));
  await page.waitForFunction(()=>freeOrder().enabled());
  check('400 levels and varied next board',await page.evaluate(()=>puzzleDB.free.easy.filter(p=>!p.meta?.rollingContent).length===400&&freeOrder().record('easy').mode==='varied'&&freeOrder().next('easy',null).id==='g6-refresh-easy-001'));
- check('compact next-board information; no card switch',await page.evaluate(()=>document.querySelectorAll('#difficultyCards .order-next').length===6&&!document.querySelector('#difficultyCards select')));
  // A guest remains quiet after a reload; settings stay explicitly accessible.
  await page.locator('#settingsHeaderBtn').click();await page.locator('#freeOrderSettings summary').click();
  check('four opt-outs, endgames excluded',await page.locator('#freeOrderSettings select').count()===4);

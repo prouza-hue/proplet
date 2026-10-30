@@ -38,6 +38,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
   assert.equal(await page.evaluate(()=>JSON.stringify(getState())),baseline,'opening details is read-only');
   await tamer.tap();await page.evaluate(()=>closeTransientModals());assert.equal(await page.locator('#achievementDetail[open]').count(),0);assert.equal(await page.evaluate(()=>document.body.style.overflow),'');
   // Loyalty uses the same title and story typography without computing stats.
+  await page.locator('.badge-card > summary').click();
   const loyalty=page.locator('#profileBadges [data-streak-detail]');
   assert.equal(await loyalty.count(),10);
   for(let i=0;i<10;i++){

@@ -93,7 +93,8 @@ with sync_playwright() as p:
         assert base['printshopCss'] and base['typographyCss'],base
 
         page.evaluate("window.__propletSmokeSentinel='alive'")
-        for target in ('free','leaderboard','profile','daily'):
+        # Competition-tab defaults and return state have their own current browser suite.
+        for target in ('free','profile','daily'):
             page.locator(f'.bottom-nav [data-nav="{target}"]').click()
             page.wait_for_timeout(250)
             state=page.evaluate("""target=>({

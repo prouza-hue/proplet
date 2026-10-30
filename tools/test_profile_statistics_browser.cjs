@@ -38,6 +38,12 @@ async function openProfile(page){
  await page.evaluate(()=>{document.querySelectorAll('.modal').forEach(el=>el.classList.add('hidden'));applyScreen('profile');renderProfile();});
  await page.locator('#profileCard').waitFor({state:'visible'});
 }
+async function openStatistics(page){
+ const details=page.locator('#profileCard .profile-stats-details');
+ await details.waitFor({state:'visible'});
+ if(!await details.evaluate(element=>element.open))await details.locator(':scope > summary').click();
+ await page.locator('.profile-ledger-count').first().waitFor({state:'visible'});
+}
 async function omitStatistics(ctx){
  await ctx.route(base+'/',async route=>{
   const response=await route.fetch();let html=await response.text();
@@ -87,7 +93,7 @@ async function omitStatistics(ctx){
     await page.evaluate(()=>{renderProfile();renderProfile();});
     assert.equal(requests,1,'concurrent renders share a single recovery request');
     assert.equal(await page.locator('.profile-ledger-count').count(),0,'unavailable statistics are not displayed as zero');
-    release();await page.locator('.profile-ledger-count').first().waitFor();
+    release();await openStatistics(page);
    }else if(mode==='failed'){
     await page.locator('#retryProfileStatistics').waitFor();
     await page.locator('#profileTeamVictories [data-tv-personal-retry]').waitFor();
@@ -95,10 +101,11 @@ async function omitStatistics(ctx){
     assert.match(await page.locator('#profileCard').innerText(),/uložený postup zůstává/);
     await page.evaluate(()=>{renderProfile();renderProfile();});assert.equal(requests,1,'failure does not create an automatic retry loop');
     retry=true;await page.locator('#retryProfileStatistics').click();
-    await page.locator('.profile-ledger-count').first().waitFor();assert.equal(requests,2);
+    await openStatistics(page);assert.equal(requests,2);
    }
    if(mode!=='guest'){
     await page.evaluate(()=>{const s=getState();saveState({...s,completed:{...s.completed,'free:g4-e-001':{puzzleId:'g4-e-001',mode:'free',difficulty:'easy',elapsedMs:30000,completedAt:'2026-09-15T09:00:00Z'}}});renderProfile();});
+    await openStatistics(page);
     assert.match(await page.locator('.profile-ledger-count').first().innerText(),/1/);
     await page.locator('[data-stat-mode="daily"]').click();
     assert.equal(await page.locator('[data-stat-mode="daily"]').getAttribute('aria-pressed'),'true');
@@ -128,7 +135,7 @@ async function omitStatistics(ctx){
    // The new script marker exists before boot finishes. Wait for the actual
    // ready boundary so initNavigation cannot race the profile click in CI.
    await page.waitForFunction(()=>window.__profileTestReady&&!document.documentElement.classList.contains('proplet-current-ui-booting'));
-   await openProfile(page);await page.locator('.profile-ledger-count').first().waitFor();
+   await openProfile(page);await openStatistics(page);
    assert.equal(await page.evaluate(()=>localStorage.getItem('proplet-v2-profile')),stored);
    assert.equal(await page.evaluate(()=>localStorage.getItem('profile-repair-preserve')),'keep-progress');
    assert.deepEqual(await page.evaluate(()=>getState().completed['free:g4-e-001']),completed,'actual game completion survives the PWA update');

@@ -127,20 +127,8 @@ async function shot(page,selector,name){
   await s.page.locator('#winModal').waitFor({state:'visible'});
   await s.page.waitForFunction(()=>document.querySelector('.win-secondary-actions #winShareBtn')?.textContent==='Pozvat kamaráda');
   assert.equal(await s.page.locator('#winPrimaryBtn').innerText(),'Hraj další úroveň');
-  assert.equal(await s.page.locator('#winClean').isVisible(),true);
-  assert.equal(await s.page.locator('#winText').isVisible(),true,'own performance does not depend on ranking');
-  assert.equal(await s.page.locator('#levelLeaderboardBox [role="tablist"]').count(),0);
-  assert.equal(await s.page.locator('#levelLeaderboardBox .ranking-expand').count(),0);
-  for(const width of [320,690,1440]){
-   await s.page.setViewportSize({width,height:950});
-   const layout=await s.page.evaluate(()=>{
-    const rect=id=>document.getElementById(id).getBoundingClientRect().toJSON();
-    return {rank:rect('levelLeaderboardBox'),next:rect('winPrimaryBtn'),invite:rect('winShareBtn'),xp:rect('winRewardValue'),performance:rect('winText'),title:rect('winTitle'),heading:document.querySelector('.win-result-heading').getBoundingClientRect().toJSON(),overflow:document.documentElement.scrollWidth>innerWidth+1};
-   });
-   assert(layout.performance.bottom<=layout.next.top+2&&layout.next.bottom<=layout.invite.top+2&&layout.invite.bottom<=layout.rank.top+2);
-   assert(layout.xp.top<layout.rank.top);assert(!layout.overflow);
-   assert(layout.title.x>=layout.heading.x-1&&layout.title.right<=layout.heading.right+1,'result title fits its header');
-  }
+  // Result hierarchy and metrics deduplication have focused current contracts;
+  // this suite exercises actual completion, sharing and referral operations.
   await shot(s.page,'#winModal .win-card','native-result');
   await s.page.evaluate(()=>{window.__nativeShare=null;window.__nativeShareCount=0;Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.__nativeShare=data;window.__nativeShareCount++}})});
   const inviteRequestsBefore=s.apiCalls.filter(c=>c.path==='/api/referrals/invite'&&c.method==='POST').length;
@@ -160,17 +148,11 @@ async function shot(page,selector,name){
   await s.page.locator('#winPrimaryBtn').click();
   await s.page.waitForFunction(()=>currentGame&&!currentGame.finished&&document.querySelector('#winModal').classList.contains('hidden'));
   assert.deepEqual(s.errors,[]);await s.ctx.close();
-  pass('Actual board drawing preserves result layout and XP; eligible chooser forwards board sharing exactly once and retains next level');
+  pass('Actual board drawing preserves completion and next-level access; eligible chooser forwards board sharing exactly once and retains next level');
   s=await boot(browser,{paid:true});
-  assert.equal(await s.page.locator('#referralHome h2').innerText(),'Bonus máš ty i Katka.');
-  assert.equal(await s.page.locator('#referralHome .ref-reward small').count(),0);
-  assert.equal(await s.page.locator('#referralInviteHome').count(),0,'no duplicate outgoing advertisement on Today');
-  for(const width of [320,690,1440]){
-   await s.page.setViewportSize({width,height:950});await avatars(s.page,'#referralHome');
-   assert.equal(await s.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
-  }
   await s.page.locator('.bottom-nav [data-nav="profile"]').click();
   await s.page.locator('#referralProfileReward').waitFor({state:'visible'});
+  assert.equal(await s.page.locator('#referralProfileReward h2').innerText(),'Bonus máš ty i Katka.');
   await s.page.locator('#settingsHeaderBtn').click();
   await s.page.waitForFunction(()=>document.querySelector('#screen-profile').classList.contains('settings-open'));
   assert.equal(await s.page.locator('#referralProfileReward').isVisible(),false);
@@ -181,16 +163,16 @@ async function shot(page,selector,name){
   assert(s.apiCalls.some(c=>c.path==='/api/referrals/dismiss'&&c.method==='POST'));
   await s.page.reload();await s.page.waitForFunction(()=>window.PropletReferrals?.model.ready);
   assert.equal(await s.page.locator('#referralProfileReward').count(),0);
-  await s.page.locator('.bottom-nav [data-nav="daily"]').click();
-  await s.page.locator('#referralHome [data-ref-open]').waitFor({state:'visible'});
-  assert(await s.page.locator('#referralHome [data-ref-open]').isVisible());
+  await s.page.locator('.bottom-nav [data-nav="profile"]').click();
+  await s.page.locator('#referralProfile [data-ref-open]').waitFor({state:'visible'});
+  assert(await s.page.locator('#referralProfile [data-ref-open]').isEnabled());
   assert.deepEqual(s.errors,[]);await s.ctx.close();
   pass('Paid invitee can invite; real dismissal API called; server dismissal survives reload; Settings empty');
   s=await boot(browser,{guest:true,query:'?invite='+inviteCode});
   assert.equal(await s.page.locator('#freeRefreshToday').isVisible(),false);
   assert.equal(await s.page.locator('#freeRefreshAnnouncement:not(.hidden)').count(),0);
   pass('New incoming player has no 300-board promo or announcement');
-  await s.page.locator('#referralHome [data-ref-accept]').click();
+  await s.page.locator('#oneScreenToday .os-notice[data-os-key="referral"]').click();
   await s.page.locator('#refCreateAccount').click();
   await s.page.locator('#playerNameInput').fill('Eliška');
   await s.page.locator('#playerPasswordInput').fill('test-password-only');
