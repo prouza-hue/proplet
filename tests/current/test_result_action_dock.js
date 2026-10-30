@@ -20,6 +20,7 @@ const modal=make('div','winModal'),card=make('div',null,'win-card');modal.append
 const title=make('h2','winTitle','','Hotovo'),xp=make('div','winXp'),chips=make('div',null,'win-summary-chips'),summary=make('div',null,'win-summary');
 const performance=make('p','winText','','2:34 · 7 tahů · Střední'),clean=make('div','winClean','','2 nápovědy');summary.append(performance,chips);chips.append(xp,clean);
 const extra=make('button','winExtraBtn','hidden','Hraj Extra'),primary=make('button','winPrimaryBtn','primary-btn','Hraj další úroveň'),ranking=make('div','levelLeaderboardBox','','Pořadí se nepodařilo načíst'),secondary=make('div',null,'win-secondary-actions'),share=make('button','winShareBtn'),menu=make('button','winMenuBtn'),details=make('details','winDetails'),badge=make('div','newBadgeBox','','Skutečně získaný úspěch');
+const timing=make('p','winTimingNotice','','Čas se nepodařilo ověřit.');summary.append(timing);const detailHeading=make('summary',null,'','Detaily výsledku');details.append(detailHeading);
 card.append(title,summary,extra,primary,ranking,secondary,badge,details);secondary.append(share,menu);
 const calls=[];const nativeContinue=()=>calls.push('canonical continue'),nativeShare=()=>calls.push('canonical share');primary.onclick=nativeContinue;share.onclick=nativeShare;extra.onclick=()=>calls.push('canonical Extra');
 const source=fs.readFileSync('public/challenge-cta-v3333.js','utf8');
@@ -29,7 +30,8 @@ vm.createContext(ctx);vm.runInContext(appSource.slice(appSource.indexOf('functio
 function setXp(value,detail){if(detail){const strong=make('strong',null,'',value),small=make('small',null,'',detail);xp.replaceChildren(strong,small)}else xp.textContent=value}
 function checkLayout(){
  const header=modal.querySelector('.win-result-heading'),actions=modal.querySelector('#winResultActions');assert(header&&actions);
- assert.equal(header.nextElementSibling,summary,'own performance precedes all optional rankings');
+ assert.equal(header.nextElementSibling,summary,'exceptional notices stay beneath the heading');
+ assert.equal(performance.parentElement,modal.querySelector('.win-performance-detail'));assert.equal(performance.parentElement.parentElement,details,'performance stays accessible in collapsed details even when ranking fails');assert.equal(clean.parentElement,performance.parentElement);assert.equal(details.firstElementChild,detailHeading);assert.equal(timing.parentElement,summary,'timing warning remains visible outside the disclosure');
  assert.equal(actions.nextElementSibling,secondary);assert.equal(secondary.nextElementSibling,badge,'continuation and utility actions precede every award');assert.equal(badge.nextElementSibling,ranking,'earned rewards stay before optional ranking');
  assert.equal(share.parentElement,secondary);assert.equal(xp.parentElement,chips,'canonical economic output stays in its native summary');assert.equal(badge.parentElement,card,'earned awards are retained');
  assert.equal(performance.textContent,'2:34 · 7 tahů · Střední');assert.equal(clean.textContent,'2 nápovědy');
@@ -38,9 +40,10 @@ function checkLayout(){
 }
 setXp('+103 XP','100 základ · +3 bonus');ctx.syncShareCtas();const actions=checkLayout();
 assert.equal(primary.parentElement,actions);assert.equal(primary.onclick,nativeContinue);assert.equal(share.onclick,nativeShare);
-assert.equal(modal.querySelector('#winRewardValue').textContent,'+103 XP');assert.equal(modal.querySelector('#winRewardStatus').textContent,'100 základ · +3 bonus');assert.equal(xp.textContent,'+103 XP100 základ · +3 bonus','presentation never rewrites the reward source');
+assert.equal(modal.querySelector('#winRewardValue').querySelector('strong').textContent,'+103 XP');assert.equal(modal.querySelector('#winRewardValue').querySelector('small').textContent,'100 základ · +3 za slova navíc');assert.equal(modal.querySelector('#winRewardStatus').hidden,true,'bonus detail is inside the sticker, never a second header paragraph');assert.equal(xp.textContent,'+103 XP100 základ · +3 bonus','presentation never rewrites the reward source');
 assert.equal(share.textContent,'Sdílet výsledek');assert(!share.classList.contains('challenge-share-cta'));primary.onclick();share.onclick();assert.deepEqual(calls,['canonical continue','canonical share']);
 ctx.syncShareCtas();assert.equal(checkLayout(),actions,'repeated paint preserves wrappers and native callbacks');
+const byline=make('div',null,'tajenka-result-source','Zdroj: muzeum');performance.after(byline);ctx.syncShareCtas();assert.equal(byline.parentElement,summary,'a source inserted by Tajenka remains visible under its title');byline.remove();
 
 ctx.currentGame={mode:'daily',finished:true};extra.classes.delete('hidden');ctx.syncShareCtas();checkLayout();
 assert.equal(extra.parentElement,actions);assert.equal(primary.parentElement,secondary);assert(primary.classList.contains('result-secondary-action'));assert.equal(primary.textContent,'Zpět na Dnes');assert.equal(menu.hidden,true);
@@ -51,13 +54,13 @@ ctx.currentGame={mode:'free',finished:true,puzzle:{meta:{archiveExperience:true}
 assert.equal(primary.onclick,nativeContinue,'Archive keeps canonical continuation');assert.equal(primary.textContent,'Další archivní deska');assert.equal(menu.hidden,false);assert.equal(modal.querySelector('#winRewardValue').hidden,true);assert.equal(modal.querySelector('#winRewardStatus').textContent,'Odměnu ověřujeme.');
 setXp('+15 XP');ctx.syncShareCtas();assert.equal(modal.querySelector('#winRewardValue').textContent,'+15 XP');assert.equal(modal.querySelector('#winRewardStatus').hidden,true,'server-confirmed amount replaces pending presentation');
 setXp('Tréninkový pokus · 200 XP už máš');ctx.syncShareCtas();assert.equal(modal.querySelector('#winRewardValue').hidden,true);assert.match(modal.querySelector('#winRewardStatus').textContent,/200 XP už máš/);
-setXp('+2 XP','+2 bonusová slova');ctx.syncShareCtas();assert.equal(modal.querySelector('#winRewardValue').textContent,'+2 XP','replay bonus is not discarded or replaced by a guessed base reward');
-setXp('+200 XP · jednou za tuto Tajenku');ctx.currentGame={mode:'tajenka',finished:true};ctx.syncShareCtas();assert.equal(modal.querySelector('#winRewardValue').textContent,'+200 XP');assert.equal(modal.querySelector('#winRewardStatus').textContent,'jednou za tuto Tajenku');
+setXp('+2 XP','+2 bonusová slova');ctx.syncShareCtas();assert.equal(modal.querySelector('#winRewardValue').querySelector('strong').textContent,'+2 XP','replay bonus is not discarded or replaced by a guessed base reward');assert.equal(modal.querySelector('#winRewardValue').querySelector('small').textContent,'+2 za slova navíc');
+setXp('+200 XP · jednou za tuto Tajenku');ctx.currentGame={mode:'tajenka',finished:true};ctx.syncShareCtas();assert.equal(modal.querySelector('#winRewardValue').querySelector('strong').textContent,'+200 XP');assert.equal(modal.querySelector('#winRewardValue').querySelector('small').textContent,'jednou za tuto Tajenku');assert.equal(modal.querySelector('#winRewardStatus').hidden,true);
 ctx.tajenkaRecapOpen=true;primary.textContent='Zavřít';ctx.syncShareCtas();assert.equal(primary.textContent,'Zavřít');assert.equal(primary.onclick,nativeContinue,'saved recap uses its canonical close handling');ctx.tajenkaRecapOpen=false;
 
 // A protected onboarding owner may replace its callback while the result is open.
 ctx.currentGame={mode:'daily',finished:true};ctx.syncShareCtas();const training=()=>calls.push('assigned first game');primary.onclick=training;modal.classes.add('first-steps-win');primary.classes.add('hidden');ctx.syncShareCtas();
-assert.equal(primary.onclick,training);assert(primary.classList.contains('hidden'));assert.equal(title.parentElement,card);assert.equal(xp.parentElement,chips);assert.equal(modal.querySelector('#winRewardValue'),undefined);assert(!modal.querySelector('#winResultActions'));
+assert.equal(primary.onclick,training);assert(primary.classList.contains('hidden'));assert.equal(title.parentElement,card);assert.equal(xp.parentElement,chips);assert.equal(performance.parentElement,summary);assert.equal(clean.parentElement,chips);assert.equal(modal.querySelector('#winRewardValue'),undefined);assert(!modal.querySelector('#winResultActions'));
 modal.classes.delete('first-steps-win');modal.classes.add('starter-win');ctx.currentGame={mode:'starter'};ctx.syncShareCtas();assert.equal(primary.onclick,training);assert.equal(share.parentElement,secondary);
 modal.classes.delete('starter-win');primary.classes.delete('hidden');primary.onclick=nativeContinue;ctx.currentGame={mode:'free',postStarterWarmup:true};ctx.syncShareCtas();assert.equal(primary.onclick,nativeContinue,'post-training choice keeps its canonical handler');
 

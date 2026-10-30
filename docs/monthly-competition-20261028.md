@@ -104,3 +104,14 @@ Správce nejprve přezkoumá a opraví či odmítne autoritativní zdrojový vý
 Schválený společný panel je dostupný přes `/?showNews=1` a v preview Nastavení → Co je nového. Používá novou ikonu soutěží; hlavní akce otevírá skutečnou měsíční soutěž, Jdu hrát a zavření ponechají Dnes. Původní kontrolní panel nevytvářel receipt a neposílal data. Dne 29. 10. je schválena implementace automatického jednorázového zobrazení na účet se serverovou evidencí napříč zařízeními; je implementovaná a ověřená v kandidátu, nikoli nasazená v produkci. Ruční otevření z Nastavení nebo přes `?showNews=1` zůstává oddělené od automatického receipt. Produkční aktivace se provede až podle dokončeného rollout plánu a samostatného oprávnění.
 
 Nezávislé QA následně dokončilo na syntetickém účtu D Daily 3. 12.: účet již není nulový, má 100 XP a 120 prosincových soutěžních bodů. Čtyři P2 klientské nálezy byly opraveny v preview; produkce i původní playtest zůstaly beze změny.
+
+
+## Dotažení načítání, výsledků a typografie — 30. 10. 2026
+
+Podle připomínek ze staršího playtestu 4.09.15 je v kandidátu 4.10.0 opraven první render: finální CSS se načítá v hlavičce ve stejném pořadí kaskády, písma jsou přednačtena a odhalení aplikace čeká na no-scroll projekci, styly a písma. Fatální chyba dat stále odhalí ovladatelnou chybu. Výsledková úprava se načítá před síťově závislými doplňky.
+
+Standardní výsledkovka drží čistý vršek i během načítání/chyby pořadí. Nativní čas, tahy a čistota jsou v existujících Detailech výsledku; zdroj Tajenky a skutečná varování zůstávají viditelná. Celkové XP i dostupný rozpis bonusu za slova jsou v jediném stickeru. Odměnová matematika a serverová data se nemění. Historické rekapitulace používají existující uložené hodnoty; chybějící per-run bonus se neodhaduje.
+
+Fraunces je použito na nadpisy a titulky karet včetně soutěží; běžný text, ovládání, skóre a deska si zachovávají Outfit. Na 320 px je ikona obtížnosti menší, aby se název Mozkokalypsa vešel vedle přehledu bez zmenšování písma.
+
+Ověření: 216 aktuálních testů a 187 asset kontrol prošlo. V izolovaném prohlížeči se zpožděnými CSS a no-scroll skriptem byl první viditelný snímek již kompletní no-scroll, bez mezilehlé verze. Nadpisy bez horizontálního přetékání ověřeny na 320, 390, 768, 832, 1024 a 1440 px; světlý/tmavý Dnes, Hrát, profil a bonusový sticker na mobilu/Foldu. Jde o emulované viewporty, nikoli fyzický Fold. Důkazy mimo Git: `ui-load-polish-20261030/`. Žádné produkční hry ani DB zápisy; změna pouze do preview a plánovaného vydání.

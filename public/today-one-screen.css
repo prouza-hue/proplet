@@ -18,6 +18,7 @@ html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday{display:gri
 .os-today button:disabled{cursor:default}
 .os-today button:not(:disabled):active{transform:translateY(2px);box-shadow:none}
 .os-feature{display:grid;grid-template-columns:minmax(0,1fr) 88px;align-items:center;gap:10px;width:100%;min-height:clamp(124px,23svh,180px);padding:18px 20px 36px;background:var(--os-feature,#f0e5ce);color:var(--os-ink,#293747);border:1px solid color-mix(in srgb,var(--os-ink) 14%,transparent);border-radius:18px;box-shadow:0 4px 0 color-mix(in srgb,var(--os-feature) 85%,#000);}
+.os-title{font-family:Fraunces,Georgia,serif;font-optical-sizing:auto}
 .os-copy{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0;position:relative;z-index:1}
 .os-feature .os-title{font:700 clamp(26px,4vw,36px)/1.1 Fraunces,Georgia,serif;letter-spacing:-.035em;color:inherit}
 .os-feature .os-detail{font-size:14px;line-height:1.35;color:var(--os-muted)}

@@ -12,7 +12,7 @@ html.tiskarna-ui body :is(#levelDetailShareBtn.challenge-share-cta,#shareDailyBt
 html body #winModal #referralWin{max-width:540px;margin:12px auto!important;padding:16px!important}
 html body #winModal #referralWin .ref-result-progress{display:flex;align-items:center;justify-content:space-between;gap:10px}
 html body #winModal #referralWin .ref-steps{margin:12px auto 0}
-html body #winModal #referralWin.ref-earned h3{font:650 22px/1.2 Outfit,sans-serif!important;margin:0 25px 5px!important}
+html body #winModal #referralWin.ref-earned h3{font:650 22px/1.2 Fraunces,Georgia,serif!important;margin:0 25px 5px!important}
 html body #winModal #referralWin.ref-earned .ref-reward{margin-top:10px}
 .ref-choice{margin-top:24px}
 html body #referralDialog .ref-choice .primary-btn{width:100%;min-height:48px;background:#b84835!important;border-color:#8f3426!important;color:#fffaf0!important;box-shadow:0 3px 0 #8f3426!important}
@@ -91,19 +91,22 @@ html:root.tiskarna-ui body :is(#shareDailyBtn.daily-challenge-cta,#levelDetailSh
 
 html:root.tiskarna-ui body :is(#referralHome,#referralInviteHome) [data-ref-open]>span[aria-hidden="true"]{display:none!important}
 
-/* Results use the canonical personal record before any optional ranking request. */
+/* Result headers stay stable; personal records remain in the native details disclosure. */
 html.tiskarna-ui body #winModal.result-compact .win-card{display:flex!important;flex-direction:column!important;gap:0!important;width:min(100%,680px)!important;max-height:calc(100dvh - 32px)!important;padding:24px!important;overflow-y:auto!important;scroll-padding-block:16px}
 html.tiskarna-ui body #winModal.result-compact .win-card>*{order:initial!important;flex-shrink:0}
 html.tiskarna-ui body #winModal.result-compact [hidden]{display:none!important}
 html.tiskarna-ui body #winModal.result-compact .win-result-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;margin:0 0 14px}
-html.tiskarna-ui body #winModal.result-compact #winTitle{min-width:0;text-align:left!important;margin:0!important;font:650 clamp(24px,3.2vw,32px)/1.15 Outfit,sans-serif!important;letter-spacing:-.025em!important;overflow-wrap:anywhere}
+html.tiskarna-ui body #winModal.result-compact #winTitle{min-width:0;text-align:left!important;margin:0!important;font:650 clamp(24px,3.2vw,32px)/1.15 Fraunces,Georgia,serif!important;letter-spacing:-.025em!important;overflow-wrap:anywhere}
 html.tiskarna-ui body #winModal.result-compact #winRewardValue{max-width:150px;justify-self:end}
-/* Canonical XP remains available to its owners; the two read-only mirrors never award points. */
+html.tiskarna-ui body #winModal.result-compact #winRewardValue strong{font:inherit}
+html.tiskarna-ui body #winModal.result-compact #winRewardValue small{display:block;max-width:100%;margin-top:5px;font:550 12px/1.3 Outfit,sans-serif;letter-spacing:0;white-space:normal;text-align:center;color:inherit}
+html.tiskarna-ui body #winModal.result-compact .win-performance-detail{margin:0 0 12px}
+/* Canonical XP remains available to its owners; the read-only mirror never awards points. */
 html.tiskarna-ui body #winModal.result-compact :is(#winBadge,#winXp){display:none!important}
 html.tiskarna-ui body #winModal.result-compact .win-summary{display:block!important;margin:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;text-align:left!important}
 html.tiskarna-ui body #winModal.result-compact #winText{display:block!important;margin:0!important;font:500 17px/1.45 Outfit,sans-serif!important;color:var(--ink)!important}
 html.tiskarna-ui body #winModal.result-compact #winText:empty{display:none!important}
-html.tiskarna-ui body #winModal.result-compact .win-summary-chips{display:block!important;margin:6px 0 0!important}
+html.tiskarna-ui body #winModal.result-compact .win-summary-chips{display:block!important;margin:0!important}
 html.tiskarna-ui body #winModal.result-compact #winClean:not(.hidden){display:block!important;width:auto!important;margin:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;font:400 15px/1.4 Outfit,sans-serif!important;color:var(--muted)!important;text-align:left!important}
 /* Deduplicate only confirmed, currently visible own rows. Reward and timing
    notices remain independent even when these two performance lines are hidden. */
@@ -171,3 +174,5 @@ html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .
  html.tiskarna-ui body #winModal.result-compact .mini-leader-row{min-height:56px!important;padding:10px 12px!important}
  html.tiskarna-ui body #winModal.result-compact #winResultActions>:is(#winExtraBtn,#winPrimaryBtn){min-height:56px!important;font-size:18px!important}
 }
+
+html.tiskarna-ui body #winModal #referralWin :is(.ref-result-invite h3,h3){font-family:Fraunces,Georgia,serif!important}

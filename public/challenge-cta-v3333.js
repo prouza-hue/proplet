@@ -25,9 +25,9 @@
   function rewardPresentation(source){
     const strong=source?.querySelector('strong'),small=source?.querySelector('small');
     const headline=(strong?.textContent||source?.textContent||'').trim();
-    const detail=(small?.textContent||'').trim();
+    const detail=(small?.textContent||'').trim().replace(/(\+\s*\d+) bonus(?:ová slova)?$/,'$1 za slova navíc');
     const numeric=headline.match(/^(\+\s*[0-9][0-9\s\u00a0,.]*\s*XP)(?:\s*[·–—]\s*(.+))?$/i);
-    if(numeric)return {value:numeric[1].trim(),status:[numeric[2],detail].filter(Boolean).join(' · ')};
+    if(numeric)return {value:numeric[1].trim(),detail:[numeric[2],detail].filter(Boolean).join(' · '),status:''};
     if(headline==='XP'&&detail==='Ověřujeme')return {value:'',status:'Odměnu ověřujeme.'};
     return {value:'',status:[headline,detail].filter(Boolean).join(' · ')};
   }
@@ -36,7 +36,10 @@
     const source=$('#winXp'),value=$('#winRewardValue'),status=$('#winRewardStatus');
     if(!source||!value||!status)return;
     const presentation=rewardPresentation(source);
-    setText(value,presentation.value);setText(status,presentation.status);
+    let amount=value.querySelector('strong'),detail=value.querySelector('small');
+    if(!amount||!detail){amount=document.createElement('strong');detail=document.createElement('small');value.replaceChildren(amount,detail)}
+    setText(amount,presentation.value);setText(detail,presentation.detail||'');detail.hidden=!presentation.detail;
+    setText(status,presentation.status);
     value.hidden=!presentation.value;status.hidden=!presentation.status;
   }
 
@@ -77,6 +80,32 @@
     const box=$('#levelLeaderboardBox'),tajenkaRecap=box?.resultContext?.kind==='tajenka'&&box.resultContext.recap;
     const protectedFlow=modal.classList.contains('starter-win')||modal.classList.contains('first-steps-win')||(!tajenkaRecap&&game?.postStarterWarmup);
     setClass(modal,'result-metrics-in-ranking',!protectedFlow&&ownRowRepresentsResult(box,game));
+  }
+
+  // Keep the header stable while rankings load. Native result facts remain
+  // accessible in the existing disclosure, including offline or failed rankings.
+  function syncPerformanceDetails(modal,summary){
+    const game=typeof currentGame==='undefined'?null:currentGame;
+    const recap=modal.classList.contains('tajenka-daily-result');
+    const protectedFlow=modal.classList.contains('starter-win')||modal.classList.contains('first-steps-win')||(!recap&&game?.postStarterWarmup);
+    const standard=!protectedFlow&&(recap||['daily','daily_special','free','tajenka'].includes(game?.mode));
+    const details=$('#winDetails'),text=$('#winText'),clean=$('#winClean'),chips=summary.querySelector('.win-summary-chips');
+    let performance=modal.querySelector('.win-performance-detail');
+    if(!standard||!details){
+      if(text&&text.parentElement!==summary)summary.prepend(text);
+      if(clean&&chips&&clean.parentElement!==chips)chips.append(clean);
+      performance?.remove();return;
+    }
+    if(!performance){
+      performance=document.createElement('div');performance.className='win-performance-detail';
+      const heading=details.querySelector('summary');if(heading)heading.after(performance);else details.prepend(performance);
+    }
+    if(text&&text.parentElement!==performance)performance.append(text);
+    if(clean&&clean.parentElement!==performance)performance.append(clean);
+    // Tajenka's source and exceptional timing/reward notices are not result metrics.
+    const source=modal.querySelector('.tajenka-result-source');
+    if(source&&source.parentElement!==summary)summary.prepend(source);
+    if(text?.textContent)details.classList.remove('hidden');
   }
 
   function referralChoiceAvailable(){
@@ -139,6 +168,7 @@
       setClass(xp,'xp-sticker',false);
       restorePrimaryHandler(primary);setClass(primary,'result-secondary-action',false);if(menu)menu.hidden=false;
       $('#winRewardStatus')?.remove();
+      syncPerformanceDetails(modal,summary);
       if(summary.nextElementSibling!==primary)summary.after(primary);
       if(win.parentElement!==secondary)secondary.prepend(win);
       const oldActions=$('#winResultActions');if(oldActions){for(const child of [...oldActions.children])oldActions.before(child);oldActions.remove()}
@@ -169,6 +199,7 @@
     if(ranking&&rankingAnchor.nextElementSibling!==ranking)rankingAnchor.after(ranking);
     modal.querySelector('.win-main-actions')?.remove();
     syncRewardPresentation();
+    syncPerformanceDetails(modal,summary);
   }
 
   function setChallengeContent(el){
