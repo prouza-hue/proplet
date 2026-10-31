@@ -165,8 +165,15 @@ class LivePreview(unittest.TestCase):
                 with self.assertRaises(HTTPException) as error:
                     server.family_league_settings(Mock(), Mock(), None)
                 self.assertEqual(error.exception.status_code, 400)
-            with patch.object(server, "public_family_code", return_value=None):
+            # Current leave handler uses the atomic RPC, even for an already-solo
+            # account. The fixture must never fall through to a real transport.
+            with patch.object(server, "db_rpc", return_value={"ok": True, "changed": False}) as leave:
+                db.reset_mock()
                 self.assertEqual(server.leave_team(Mock(), None)["familyCode"], None)
+                self.assertEqual(leave.call_args.args[0], "proplet_team_leave_v1")
+                self.assertEqual(leave.call_args.args[1]["p_player"], "fixture-player")
+                self.assertIsNone(leave.call_args.args[1]["p_expected_family"])
+                db.assert_not_called()
 
 
 if __name__ == "__main__":
