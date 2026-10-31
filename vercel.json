@@ -1,89 +1,42 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "python tools/build_vercel.py",
-  "regions": [
-    "arn1"
-  ],
-  "env": {
-    "PROPLET_ATOMIC_RESULT_V1_ENABLED": "true",
-    "PROPLET_FREE_ORDER_ENABLED": "true",
-    "PROPLET_MOZKOKALYPSA_ENABLED": "true",
-    "PROPLET_DATED_DAILY_ENABLED": "true",
-    "PROPLET_HISTORICAL_FREE_REWARDS_ENABLED": "true",
-    "PROPLET_ARCHIVE_ENABLED": "true",
-    "PROPLET_LIVE_PLAYER_PREVIEW_ENABLED": "true",
-    "PROPLET_REFERRALS_ENABLED": "true",
-    "PROPLET_DAILY_SPECIALS_ENABLED": "true"
-  },
-  "crons": [
+  "framework": null,
+  "builds": [
     {
-      "path": "/api/cron/daily-push-v2",
-      "schedule": "0 7 * * *"
-    },
-    {
-      "path": "/api/cron/mozkokalypsa-launch-push",
-      "schedule": "0 8 2 10 *"
-    },
-    {
-      "path": "/api/cron/archive-launch-push",
-      "schedule": "0 6 14 10 *"
-    },
-    {
-      "path": "/api/cron/visual-pilot-push",
-      "schedule": "0 10 28 10 *"
-    },
-    {
-      "path": "/api/cron/monthly-competition",
-      "schedule": "0 23 * * *"
+      "use": "@vercel/static",
+      "src": "public/**"
     }
   ],
-  "headers": [
+  "routes": [
     {
-      "source": "/admin(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        }
-      ]
+      "src": "/(.*)",
+      "headers": {
+        "Content-Security-Policy": "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; worker-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'",
+        "X-Robots-Tag": "noindex, nofollow",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "no-referrer"
+      },
+      "continue": true
     },
     {
-      "source": "/sw.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
+      "src": "/api(?:/.*)?",
+      "status": 404
     },
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://www.facebook.com https://googleusercontent.com https://*.googleusercontent.com; connect-src 'self' https://www.facebook.com https://connect.facebook.net https://hrajproplet.cz https://iopyhluayfszskyqqpuc.supabase.co; font-src 'self' https://fonts.gstatic.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=(), payment=()"
-        },
-        {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=31536000"
-        }
-      ]
+      "src": "/sw.js",
+      "status": 404
+    },
+    {
+      "src": "/",
+      "dest": "/public/patron-preview.html"
+    },
+    {
+      "src": "/index.html",
+      "dest": "/public/patron-preview.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
     }
   ]
 }
