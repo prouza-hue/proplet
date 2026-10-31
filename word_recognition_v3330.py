@@ -410,7 +410,7 @@ def install_word_recognition(
         source = _recognize_source(normalized) if _acceptable(normalized) else None
         if source is None:
             raise HTTPException(400, "Slovo není v recognition lexikonu")
-        if payload.mode not in ("daily", "daily_special", "free"):
+        if payload.mode not in ("daily", "daily_special", "free", "tajenka"):
             raise HTTPException(400, "Odměna platí jen v běžné hře")
 
         if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):

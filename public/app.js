@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.15-ui-pilot2';
+const APP_PREVIEW_RELEASE='proplet-v4.09.15-ui-pilot3';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -798,7 +798,7 @@ function saveGameProgress(){
 }
 function saveTajenkaGameProgress(g=currentGame){
  if(!g||g.mode!=='tajenka'||g.finished)return;
- const state=tajenkaState();state.version=1;state.inProgress={puzzleId:g.puzzle.id,mode:'tajenka',found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,elapsedMs:Math.round(gameElapsed(g)),attemptId:g.attemptId,timingUnverified:!!g.timingUnverified,mergedAttempts:!!g.mergedAttempts,calmMode:!!g.calmMode,savedAt:Date.now()};saveTajenkaState(state);g.lastAutosaveAt=Date.now();
+ const state=tajenkaState();state.version=1;state.inProgress={puzzleId:g.puzzle.id,mode:'tajenka',wordDiscoveryXpAwarded:Math.max(0,Number(g.wordDiscoveryXpAwarded)||0),found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,elapsedMs:Math.round(gameElapsed(g)),attemptId:g.attemptId,timingUnverified:!!g.timingUnverified,mergedAttempts:!!g.mergedAttempts,calmMode:!!g.calmMode,savedAt:Date.now()};saveTajenkaState(state);g.lastAutosaveAt=Date.now();
 }
 function clearGameProgress(mode,puzzle,dailyDate){if(mode==='playtest')return;const s=getState(),key=challengeKey(mode,puzzle,dailyDate);if(s.inProgress?.[key]){delete s.inProgress[key];saveState(s)}}
 function resumableFreePuzzle(diff,list){
@@ -889,7 +889,7 @@ function initNavigation(){
   const screen=e.state?.proplet&&ROUTE_SCREENS.has(e.state.screen)?e.state.screen:'daily';nav(screen,{fromPop:true});
  });
 }
-function transientModals(){return ['archiveExperienceModal','tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement','dailyExtraIntro'].map(id=>document.getElementById(id)).filter(Boolean)}
+function transientModals(){return ['archiveExperienceModal','tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','validWordFailsafeModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement','dailyExtraIntro'].map(id=>document.getElementById(id)).filter(Boolean)}
 function openTransientModal(){return document.querySelector('#achievementDetail[open]')||document.querySelector('#contentReleaseModal[open]')||transientModals().find(el=>!el.classList.contains('hidden'))||null}
 function closeTransientModals(){globalThis.PropletArchiveExperience?.closeModal();window.PropletAchievementDetails?.close();window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();if(typeof dailySpecialUIController!=='undefined')dailySpecialUIController?.closeIntro();transientModals().forEach(el=>el.classList.add('hidden'))}
 function goBackFromGame(){
