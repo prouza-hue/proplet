@@ -1,6 +1,6 @@
 import {api,createRequestScope} from './api.js';
 import {esc,date,heading,table,errorHTML,toast,confirm} from './ui.js';
-const request=(path,options)=>window.PropletPatronApi?.request?window.PropletPatronApi.request(path,options):api(path,options);
+const request=(path,options)=>api(path,options);
 function paymentStatus(i){
  const monthly=i.frequency==='monthly';
  const count=i.paymentCount??(i.status==='confirmed'?1:0);

@@ -892,6 +892,10 @@
       {
         "path": "tests/current/test_patron_preview_qr.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_patron_release_package.py",
+        "runner": "python"
       }
     ]
   },

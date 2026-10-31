@@ -6,8 +6,8 @@ function context(){
  const window={PROPLET_STUDIO_PREVIEW:true,fetch:async()=>({ok:false})};
  const ctx={window,crypto,Uint32Array,URL,location:{href:'https://preview.example/patron-preview.html'},getProfile:()=>player,
   localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},document:{dispatchEvent(){}},Event:class{}};
- vm.runInNewContext(fs.readFileSync('public/vendor/qrcode-generator/dist/qrcode.js','utf8'),ctx);window.qrcode=ctx.qrcode;
- vm.runInNewContext(fs.readFileSync('public/patron-fixtures/patrons.js','utf8'),ctx);return window.PropletPatronApi;
+ vm.runInNewContext(fs.readFileSync('tests/fixtures/patrons/qrcode-generator/dist/qrcode.js','utf8'),ctx);window.qrcode=ctx.qrcode;
+ vm.runInNewContext(fs.readFileSync('tests/fixtures/patrons/patrons.js','utf8'),ctx);return window.PropletPatronApi;
 }
 (async()=>{
  let api=context();const cases=[];
