@@ -54,6 +54,8 @@ Zbývající produkční změny oproti main, v pořadí:
 2. `supabase/migrations/20261028005634_monthly_admin_corrections.sql` — schválená politika 48 hodin, revize a auditované opravy; soutěž nezapíná.
 3. `supabase/migrations/20261029120000_release_news_receipts.sql` — privátní evidence jednorázového oznámení, kampaň `november-2026-release-v1` je výchozí neaktivní. Závisí na `proplet_monthly_now_v1()` z první migrace; aplikace až po dokončení testů a kontrole.
 
+4. `supabase/migrations/20261030230000_team_leave_atomic.sql` — PR #224, atomický odchod z týmu. Přidává pouze služební funkci; aplikovat před serverem. Bez oprav historických účtů.
+
 Produkční závislosti byly 29. 10. ověřeny pouze čtením katalogu na `proplet / iopyhluayfszskyqqpuc` proti kandidátu `fe0f09f`. Nasazení přes MCP použilo jiné časové verze než názvy souborů v Git; prázdný výsledek hledání původních čísel proto neznamená chybějící migrace:
 
 | Zdrojová migrace | Skutečně aplikovaná verze / název |
@@ -115,3 +117,6 @@ Standardní výsledkovka drží čistý vršek i během načítání/chyby pořa
 Fraunces je použito na nadpisy a titulky karet včetně soutěží; běžný text, ovládání, skóre a deska si zachovávají Outfit. Na 320 px je ikona obtížnosti menší, aby se název Mozkokalypsa vešel vedle přehledu bez zmenšování písma.
 
 Ověření: 216 aktuálních testů a 187 asset kontrol prošlo. V izolovaném prohlížeči se zpožděnými CSS a no-scroll skriptem byl první viditelný snímek již kompletní no-scroll, bez mezilehlé verze. Nadpisy bez horizontálního přetékání ověřeny na 320, 390, 768, 832, 1024 a 1440 px; světlý/tmavý Dnes, Hrát, profil a bonusový sticker na mobilu/Foldu. Jde o emulované viewporty, nikoli fyzický Fold. Důkazy mimo Git: `ui-load-polish-20261030/`. Žádné produkční hry ani DB zápisy; změna pouze do preview a plánovaného vydání.
+
+
+31. 10. 2026: do kandidáta integrován PR #224 (167d1e6), včetně rollback/ACL testů. Produkční dávka nově obsahuje čtyři výše uvedené migrace. Historická kontrola z 29. 10. níže popisuje tehdejší tři; novou čtvrtou před vydáním zkontrolovat v katalogu. Žádný produkční zápis ani oprava účtu nebyly při integraci provedeny.

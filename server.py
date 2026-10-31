@@ -4713,19 +4713,22 @@ def leave_team(request: Request, authorization: Optional[str] = Header(default=N
     player = auth_player(authorization)
     if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
         raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
-    family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
-    if not family:
-        return {"ok": True, "familyCode": None, "leagueName": None}
-    now = datetime.now(TZ).isoformat()
     try:
-        memberships = db_select("team_memberships", player_id=player["id"])
+        # Generate before any write. The RPC locks/rechecks the authenticated
+        # player and closes memberships + moves to solo in one transaction.
+        result = db_rpc("proplet_team_leave_v1", {
+            "p_player": player["id"],
+            "p_expected_family": player.get("family_code"),
+            "p_expected_joined_at": player.get("team_joined_at"),
+            "p_new_solo": f"SOLO_{secrets.token_hex(6).upper()}",
+        })
     except HTTPException as exc:
-        raise HTTPException(503, "Změna týmu ještě čeká na databázovou aktualizaci") from exc
-    active = [row for row in memberships if not row.get("left_at")]
-    for membership in active:
-        db_update("team_memberships", {"id": membership["id"]}, {"left_at": now})
-    new_solo = make_solo_family_code()
-    db_update("players", {"id": player["id"]}, {"family_code": new_solo, "team_joined_at": None})
+        # No REST fallback: unavailable SQL must never leave partial state.
+        raise HTTPException(503, "Odchod z týmu se nepodařilo bezpečně potvrdit. Zkus to znovu.") from exc
+    if isinstance(result, dict) and result.get("code") == "conflict":
+        raise HTTPException(409, "Členství se mezitím změnilo. Obnov profil a zkus to znovu.")
+    if not isinstance(result, dict) or result.get("ok") is not True:
+        raise HTTPException(503, "Odchod z týmu se nepodařilo bezpečně potvrdit. Zkus to znovu.")
     return {"ok": True, "familyCode": None, "leagueName": None}
 
 
