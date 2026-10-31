@@ -1,6 +1,6 @@
 import {cancelAll} from './api.js';
 import {dismissConfirmation} from './ui.js';
-const SECTIONS=['overview','players','reports','content','operations','analytics','audit'];
+const SECTIONS=['overview','players','reports','content','operations','analytics','audit','patrons'];
 const fields=['player','team','puzzle','case','kind'];
 let listener=()=>{};
 export function route(){const params=new URLSearchParams(location.search),r={section:SECTIONS.includes(params.get('section'))?params.get('section'):'overview'};for(const key of fields){const value=params.get(key);if(value&&/^[A-Za-z0-9_.:-]{1,120}$/.test(value))r[key]=value}return r}

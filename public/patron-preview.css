@@ -1,6 +1,6 @@
 /* Patron preview borrows the current printshop surfaces and type scale. */
-.patron-preview{--patron-blue:#315d91;--patron-tint:#e7edf4}
-html[data-theme=dark] .patron-preview{--patron-blue:#adcaff;--patron-tint:#364657}
+:root{--patron-blue:#315d91;--patron-tint:#e7edf4}
+html[data-theme=dark] :root{--patron-blue:#adcaff;--patron-tint:#364657}
 #patronDialog,#patronReview{box-sizing:border-box;width:min(610px,calc(100% - 24px));max-height:calc(100dvh - 32px);overflow:auto;margin:auto;border:1px solid var(--td-line,#d8d0c3);border-radius:24px;padding:32px;background:var(--td-paper,#fffcf5);color:var(--td-ink,#253142);box-shadow:0 22px 85px #0005;font:400 16px/1.5 Outfit,sans-serif;scrollbar-width:thin}
 #patronDialog::backdrop,#patronReview::backdrop{background:#15202b99;backdrop-filter:blur(5px)}
 #patronDialog [hidden]{display:none!important}
@@ -105,3 +105,9 @@ html.tiskarna-ui body #patronProfileEntry{display:flex;align-items:center;gap:16
  .patron-supported :is(.leader-name,.result-player-copy)>.patron-label{grid-column:2;grid-row:1}
  .patron-supported :is(.leader-name,.result-player-copy)>small{grid-column:1/-1;grid-row:2}
 }
+
+.patron-bank-details{font-size:13px;margin:0;overflow-wrap:anywhere}.patron-bank-details dt{color:var(--td-muted);font-size:12px}.patron-bank-details dd{margin:0 0 5px}.patron-avatar-native{display:grid;place-items:center;width:56px;height:56px;font-size:36px}.patron-error{color:#a33131!important;padding-top:12px}.patron-today-link{display:block;margin:12px auto;font-size:13px!important;min-height:36px}.patron-offer{display:flex;align-items:center;gap:14px;padding:16px;margin:16px 0;border:1px solid var(--td-line);border-radius:14px;background:var(--td-paper)}.patron-offer>div{flex:1}.patron-offer p{font-size:13px;margin:3px 0 0}.patron-offer button{font-size:13px;min-height:40px}.patron-offer .patron-entry-seal{flex:none}@media(max-width:540px){.patron-offer{flex-wrap:wrap}.patron-offer>div{flex-basis:60%}}
+
+.patron-today-link[hidden]{display:none!important}
+
+#screen-profile.settings-open #patronProfileEntry{display:none!important}

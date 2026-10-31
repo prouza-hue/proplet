@@ -25,11 +25,12 @@ sys.path.insert(0, str(ROOT))
 import server  # noqa: E402
 from backend import db as backend_db  # noqa: E402
 from backend.config import load_settings  # noqa: E402
+from patron_contract import normalize_patron_routes, normalize_patrons
 from admin_workspace_contract import normalize_admin_routes, normalize_admin_workspace  # noqa: E402
 
 
 def _route_snapshot() -> str:
-    reviewed = normalize_admin_routes((route.path, tuple(sorted(route.methods or ())), route.name) for route in server.app.routes if route.path)
+    reviewed = normalize_admin_routes(normalize_patron_routes((route.path, tuple(sorted(route.methods or ())), route.name) for route in server.app.routes if route.path))
     routes = sorted(
         (path, methods, name)
         for path, methods, name in reviewed
@@ -74,6 +75,7 @@ assert qa_schema["additionalProperties"] is False
 from google_oauth_contract import normalize_google_oauth
 normalize_google_oauth(openapi_contract)
 # Validate the exact additive admin routes/optional fields before normalization.
+normalize_patrons(openapi_contract)
 normalize_admin_workspace(openapi_contract)
 # The private visual pilot is additive; its auth/state/RLS boundaries have
 # dedicated HTTP and real PostgreSQL acceptance. Keep the historical digest.

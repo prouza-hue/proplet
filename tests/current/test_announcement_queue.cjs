@@ -62,6 +62,11 @@ function setup({local=storage(),session=storage(),context=returning()}={}){
  assert.equal(manual.queue.acknowledge('news'),true);assert.equal(manual.queue.acknowledge('news'),false);
  assert.equal(acknowledged,1);assert.equal(manual.queue.sessionUsed(),false);
  await manual.queue.kick();assert.deepEqual(manual.state.events,['invite']);
+ // Server-governed recurring offers keep the per-session budget without a permanent receipt.
+ const recurring=setup();recurring.add('support',-20,{repeatable:true});
+ assert.equal(await recurring.queue.kick(),true);assert.equal(await recurring.queue.kick(),false);
+ assert.equal(recurring.local.getItem(receiptKey('support','a')),null);
+ const later=setup({local:recurring.local});later.add('support',-20,{repeatable:true});assert.equal(await later.queue.kick(),true);
  // Denied persistent storage still has an in-memory session/receipt guard.
  const denied={getItem(){throw Error('denied')},setItem(){throw Error('denied')}};
  const fallback=setup({local:denied,session:denied});fallback.add('news',100);assert.equal(await fallback.queue.kick(),true);assert.equal(await fallback.queue.kick(),false);

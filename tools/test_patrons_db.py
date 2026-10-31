@@ -1,0 +1,94 @@
+"""Real patron SQL acceptance, restricted to synthetic loopback databases."""
+import argparse,json,re,secrets
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+from uuid import uuid4
+import psycopg
+from psycopg import sql
+
+ROOT=Path(__file__).resolve().parents[1]
+def main():
+ p=argparse.ArgumentParser(description=__doc__);p.add_argument('--password-file',type=Path,required=True);p.add_argument('--database-report',type=Path);p.add_argument('--port',type=int,default=55432);p.add_argument('--user',default='proplet_test_admin');p.add_argument('--minimal',action='store_true');a=p.parse_args()
+ opts=dict(host='127.0.0.1',port=a.port,user=a.user,password=a.password_file.read_text().strip(),autocommit=True)
+ if a.minimal:
+  name='proplet_test_patron_'+secrets.token_hex(5)
+  with psycopg.connect(**opts,dbname='postgres') as c:c.execute(sql.SQL('create database {}').format(sql.Identifier(name)))
+ else:
+  report=json.loads(a.database_report.read_text());name=report.get('database','')
+  if report.get('host')!='127.0.0.1' or not re.fullmatch('proplet_test_[a-z0-9_]{1,50}',name):p.error('Only disposable loopback fixture databases permitted')
+ opts['dbname']=name
+ with psycopg.connect(**opts) as c:
+  if a.minimal:
+   c.execute("""do $$begin if not exists(select from pg_roles where rolname='anon') then create role anon;end if;if not exists(select from pg_roles where rolname='authenticated') then create role authenticated;end if;if not exists(select from pg_roles where rolname='service_role') then create role service_role bypassrls;end if;end$$;
+   create table public.players(id uuid primary key,name text,family_code text,token_hash text,support_mode text default 'none',public_rankings boolean default true);
+   create table public.results(id uuid primary key,player_id uuid references players(id),puzzle_id text,challenge_key text,mode text,difficulty text,best_elapsed_ms integer,best_moves integer,points integer,completed_at timestamptz);
+   create table public.admin_accounts(player_id uuid primary key,role text,active boolean);
+   grant select,update on public.players to service_role;grant select on public.results,public.admin_accounts to service_role;""")
+   c.execute((ROOT/'supabase/migrations/20261031134258_patron_support.sql').read_text())
+  ids=[str(uuid4()) for _ in range(4)];player,other,child,admin=ids
+  for index,pid in enumerate(ids):c.execute('insert into public.players(id,name,family_code,token_hash,support_mode,public_rankings) values(%s,%s,%s,%s,%s,true)',(pid,'Patron SQL '+str(index),'patron-test',secrets.token_hex(32),'younger' if pid==child else 'none'))
+  # Use the existing schema's required admin columns, if present.
+  cols={r[0] for r in c.execute("select column_name from information_schema.columns where table_schema='public' and table_name='admin_accounts'")}
+  if 'id' in cols:c.execute("insert into public.admin_accounts(id,player_id,role,active) values(%s,%s,'owner',true)",(str(uuid4()),admin))
+  else:c.execute("insert into public.admin_accounts(player_id,role,active) values(%s,'owner',true)",(admin,))
+  def rpc(name,*args,connection=c):
+   return connection.execute(sql.SQL('select public.{}({})').format(sql.Identifier(name),sql.SQL(',').join(sql.Placeholder() for _ in args)),args).fetchone()[0]
+  def seed(pid):
+   for j in range(5):c.execute("insert into public.results(id,player_id,puzzle_id,challenge_key,mode,difficulty,best_elapsed_ms,best_moves,points,completed_at) values(%s,%s,%s,%s,'free','easy',10000,5,15,now()-(%s||' days')::interval)",(str(uuid4()),pid,'patron-'+str(j),'free:patron-'+str(j),j%3))
+  assert rpc('proplet_patron_state_v1',player,False)['canOffer'] is False
+  for pid in (player,other,child):seed(pid)
+  assert rpc('proplet_patron_state_v1',player,False)['canOffer'] is True
+  assert rpc('proplet_patron_state_v1',child,True)['displayGranted'] is False
+  c.execute('set role service_role')
+  request=str(uuid4());first=rpc('proplet_patron_intent_v1',player,request,99)['intent']
+  assert first['status']=='qr_created' and first['reference'].isdigit()
+  assert rpc('proplet_patron_state_v1',player,False)['patron'] is False
+  assert rpc('proplet_patron_intent_v1',player,request,99)['intent']==first
+  assert rpc('proplet_patron_intent_v1',player,request,199)['code']=='idempotency_conflict'
+  assert rpc('proplet_patron_intent_read_v1',other,first['id'])['code']=='not_found'
+  assert rpc('proplet_patron_preferences_v1',player,True,False)['code']=='not_confirmed'
+  c.execute('reset role');c.execute("update public.players set name='Změněné jméno' where id=%s",(player,))
+  assert rpc('proplet_patron_intent_v1',player,request,99)['intent']['nicknameSnapshot']==first['nicknameSnapshot']
+  # Atomic offer claims on the same account across independent device connections.
+  def claim(_):
+   with psycopg.connect(**opts) as conn:return rpc('proplet_patron_state_v1',player,True,connection=conn)
+  with ThreadPoolExecutor(max_workers=2) as pool:claims=list(pool.map(claim,range(2)))
+  assert sum(r['displayGranted'] for r in claims)==1
+  c.execute("update proplet_private.patron_offer_receipts set shown_at=now()-interval '31 days' where player_id=%s",(player,))
+  assert rpc('proplet_patron_state_v1',player,True)['displayGranted'] is True
+  c.execute("update proplet_private.patron_offer_receipts set shown_at=shown_at-interval '31 days' where player_id=%s",(player,))
+  assert rpc('proplet_patron_state_v1',player,True)['displayGranted'] is False
+  c.execute("update proplet_private.patron_offer_receipts set shown_at=shown_at-interval '91 days' where player_id=%s",(player,))
+  assert rpc('proplet_patron_state_v1',player,False)['canOffer'] is True
+  assert rpc('proplet_patron_preferences_v1',player,False,True)['canOffer'] is False
+  assert rpc('proplet_patron_preferences_v1',player,False,False)['canOffer'] is True
+  try:rpc('proplet_patron_confirm_v1',other,first['id'],first['reference'],'forbidden',99,'CZK','5531840001/5500')
+  except psycopg.errors.InsufficientPrivilege:pass
+  else:raise AssertionError('Non-admin confirmed a contribution')
+  # Only matching, received receipts grant the permanent entitlement.
+  confirm=lambda pid,ref,tx,amount=99,account='5531840001/5500',currency='CZK':rpc('proplet_patron_confirm_v1',admin,pid,ref,tx,amount,currency,account)
+  for kw in ({'amount':100},{'currency':'EUR'},{'account':'1/0100'}):assert confirm(first['id'],first['reference'],'test-tx',**kw)['code']=='payment_mismatch'
+  assert confirm(first['id'],'9999999999','test-tx')['code']=='payment_mismatch'
+  assert rpc('proplet_patron_state_v1',player,False)['patron'] is False
+  assert confirm(first['id'],first['reference'],'test-tx')['alreadyConfirmed'] is False
+  assert confirm(first['id'],first['reference'],'test-tx')['alreadyConfirmed'] is True
+  assert confirm(first['id'],first['reference'],'another-tx')['ok'] is False
+  second=rpc('proplet_patron_intent_v1',other,str(uuid4()),99)['intent']
+  assert confirm(second['id'],second['reference'],'test-tx')['code']=='bank_transaction_already_used'
+  state=rpc('proplet_patron_state_v1',player,True);assert state['patron'] and not state['publicBadge'] and not state['displayGranted']
+  assert rpc('proplet_patron_public_ids_v1',ids)['players']==[]
+  rpc('proplet_patron_preferences_v1',player,True,False)
+  assert rpc('proplet_patron_public_ids_v1',ids)['players']==[player]
+  c.execute('update public.players set public_rankings=false where id=%s',(player,));assert rpc('proplet_patron_public_ids_v1',ids)['players']==[]
+  c.execute("update proplet_private.patron_intents set created_at=now()-interval '100 days' where id=%s",(first['id'],))
+  assert not any(i['id']==first['id'] for i in rpc('proplet_patron_admin_list_v1',7,100,None)['items'])
+  assert rpc('proplet_patron_admin_list_v1',7,100,first['reference'])['items'][0]['id']==first['id']
+  assert c.execute('select count(*) from proplet_private.patron_audit where player_id=%s',(player,)).fetchone()[0]==1
+  for role in ('anon','authenticated'):
+   c.execute(sql.SQL('set role {}').format(sql.Identifier(role)))
+   try:rpc('proplet_patron_state_v1',player,False)
+   except psycopg.errors.InsufficientPrivilege:pass
+   else:raise AssertionError('Client role can invoke private patron RPC')
+   c.execute('reset role')
+ print('PASS patron SQL: migration, ownership, idempotence, rename, atomic claims, 3-day/5-board eligibility, 30/90-day limits, opt-out, exact receipt, duplicate bank transaction, audit, private default and ACL; database='+name)
+if __name__=='__main__':main()

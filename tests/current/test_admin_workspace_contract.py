@@ -21,7 +21,9 @@ def rejected(contract):
     raise AssertionError("Normalizer accepted an unapproved admin contract change")
 
 
+from patron_contract import normalize_patrons, normalize_patron_routes
 original = server.app.openapi()
+normalize_patrons(original)
 local = deepcopy(original)
 normalize_admin_workspace(local)
 assert "/api/admin/users" in local["paths"]
@@ -71,6 +73,7 @@ changed["paths"]["/api/admin/users/{player_id}/recovery-email"]["post"]["request
 rejected(changed)
 
 inventory = [(r.path, tuple(sorted(r.methods or ())), r.name) for r in server.app.routes if r.path]
+inventory = normalize_patron_routes(inventory)
 normalized = normalize_admin_routes(inventory)
 assert ("/api/admin/users", ("GET",), "admin_users") in normalized
 try:

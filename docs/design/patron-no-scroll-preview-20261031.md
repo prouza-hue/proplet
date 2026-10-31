@@ -1,35 +1,34 @@
 # Patronství — izolované no-scroll preview
 
-31. 10. 2026. Samostatná větev `codex/patron-no-scroll-preview`, základ `5901a3626cea6d171d9b938080e74a5f7310e5bc`. Není součástí listopadového vydání ani jeho automatizace.
+31. 10. 2026. Větev `codex/patron-no-scroll-preview`, základ `5901a3626cea6d171d9b938080e74a5f7310e5bc`. Samostatný návrh mimo listopadové vydání a jeho naplánovanou automatizaci. Tiskařská dílna, wordmark Fraunces a významy herních ikon jsou zachované.
 
-## Rozsah
+## Rozhodnutí a hotová implementace
 
-Skutečný současný shell Propletu, styly, profil, navigace a výsledkovka jsou doplněné o kompaktní vstup v profilu, jednorázový QR průchod, poděkování a dobrovolnou inkoustovou značku v pořadí. Žádný nový finanční ukazatel na Dnes ani v hlavičce. Částky 99/199 Kč jsou pracovní návrh; vlastní částka 1–100000 Kč je pouze lokální ukázka. Bez karetního předplatného, provozních rozpočtů, finančních cílů a vymyšlených nákladů.
+Jednorázový příspěvek 99 / 199 Kč nebo vlastní celá částka 1–100000 Kč. Stejná trvalá značka pro každou částku, bez XP či herních výhod, veřejná až po výslovném zapnutí. Přihlášení je nutné před přípravou bankovních údajů: neměnná identita hráče je vlastníkem příspěvku i při přejmenování nebo platbě někým jiným. Host má funkční cestu k přihlášení; nepoužívá se zpětné přivlastnění podle jména.
 
-Značka je stejná pro všechny částky a veřejně se zobrazí až po výslovném zapnutí. Nenabízí XP ani jiné herní výhody. Přijetí příspěvku lze simulovat pouze v odděleném ovládání náhledu. Hráčské rozhraní nemá tlačítko, které by potvrzovalo vlastní platbu.
+Ruční vstup je v profilu a jako drobný textový odkaz před patičkou Dnes. Automatická nabídka má nízkou prioritu ve stávající frontě oznámení, začne až po úspěšném dohrání a uzavření výsledku, po minimálně 5 různých dokončených deskách ve 3 aktivních dnech. Nevstupuje do onboardingu, dětského režimu, hry, otevřených dialogů ani oslav. Fronta dodržuje limit jednoho automatického oznámení na relaci. Autoritativní serverový limit je 2 nabídky za klouzavých 90 dní, nejméně 30 dní mezi nimi, společný pro účet. Odmítnutí, ignorování i otevření nabídky se zaznamenávají. Přispěvatelům se automaticky nenabízí; volba „Nenabízet mi podporu Propletu“ je v nastavení a ukládá se k účtu.
 
-## Izolace
+Backend vytváří idempotentní intent s unikátním číselným VS, částkou CZK a snímkem jména. Příjemce `5531840001/5500`, zpráva „NICKNAME podporuje Proplet“, nejvýše 60 znaků. Platitelný SPAYD/QR vzniká pouze z uloženého intentu přihlášeného hráče. Otevření QR nic nepotvrzuje.
 
-`vercel.json` sestavuje výhradně `public/**` pomocí `@vercel/static`. Neobsahuje backend, proměnné ani crony. `/api/*` a `/sw.js` vracejí 404. Kořen odkazuje na `patron-preview.html`; `index.html` hry zůstává zdrojovým podkladem beze změny.
+Nativní administrace má sekci **Podpora Propletu**: posledních 7 dní, nejvýše 100 příprav, pravdivý stav „Vygeneroval platební údaje“, vyhledání starší přípravy podle přesného VS. Oprávněný owner/editor podle výpisu ručně ověří účet příjemce, CZK, částku a VS a doplní jedinečné bankovní ID transakce. Potvrzení je atomické, opakovatelné bez druhého přiznání, auditované identitou správce. Jedna transakce nesmí potvrdit dva příspěvky. Přezdívka ani jméno bankovního plátce nejsou párovací klíč. Souběžné nabídky zamykají stejný účet. Tabulky a RPC jsou dostupné pouze aplikační roli serveru, klientské role nemají přímý přístup.
 
-První dva skripty stránky jsou původní izolátor a fixture adaptér z no-scroll návrhu. Adaptér má samostatný storage prefix, modelový účet a lokální API odpovědi. Izolátor blokuje odchozí API/externí požadavky, analytické beacony, service worker, sdílení a další externí transporty. CSP dovoluje pouze vlastní statické zdroje; formuláře nesmí odesílat data. Tato větev nesmí být sloučena celá do produkce: její statická hostingová konfigurace je určená jen k posouzení.
+## Náhled a izolace
 
-QR je znovu vytvořený standardním generátorem z explicitního neplatebního textu původního preview. Vstupní payload byl ověřen. Obsahuje pouze `PROPLET-PREVIEW-NEPLATIT`; nejsou přítomné bankovní údaje. Zkopírovaný text je rovněž výslovně ukázkový. Skutečné platby, párování a entitlements nejsou implementované.
+Hráčská stránka `/patron-preview.html?state=complete` používá skutečný modul `/app/patrons.js`. Pouze oddělený fixture adaptér nahrazuje jeho API lokálním syntetickým úložištěm. Stejný admin modul jako nativní administrace je na `/patron-admin-preview.html?state=complete`. Tlačítko „Náhled patronství“ otevře scénáře, reset, posun modelového času o 31 dní a odkaz na modelového správce. Modelový účet má 5 historických dokončení. Potvrzení se provádí ve správci; v hráčském průchodu není tlačítko pro potvrzení vlastní platby. Obě stránky se stejným originem a `state=complete` sdílejí ukázkový registr; produkční úložiště nepoužívají.
 
-## Náhledy
+Náhled ukazuje schválené číslo příjemce, ale číselné VS je syntetické. QR obsahuje výhradně `PROPLET-PREVIEW-NEPLATIT`, nikoli platební instrukci; kopírované údaje výslovně začínají „UKÁZKA — NEPLAŤTE“. V náhledu neplaťte. Platitelný QR vyžaduje samostatně schválenou aktivaci skutečného backendu.
 
-- `/patron-preview.html?state=complete&theme=light&view=offer`
-- `?state=complete&theme=dark&view=result`
-- `?state=complete&theme=light&view=ranking`
-- `?state=complete&theme=light&view=profile`
+`vercel.json` publikuje pouze `public/**` pomocí `@vercel/static`, bez backendu, cronů a databázových změn. `/api/*` a `/sw.js` vracejí 404. Kořen a `/index.html` se mapují na izolovanou hráčskou stránku. Izolátor je před všemi nativními skripty, blokuje odchozí API, externí transporty, analytiku a service worker; CSP povoluje jen vlastní statické zdroje. Celá větev se nesmí sloučit do produkce se svou hostingovou konfigurací.
 
-Tlačítko „Náhled patronství“ otevírá oddělené scénáře, potvrzení příspěvku, návrat do výchozího stavu a změnu motivu. Poděkování a volba veřejné značky se uchovávají pouze v izolovaném lokálním úložišti náhledu.
+## Ověření
 
-## Kontroly
+- HTTP testy: vypnutá funkce, nepřihlášený hráč, podvržený vlastník, typy a limity částky, idempotence, nepřístupný cizí intent, role správce, platební pole, poškozená RPC odpověď, neaktivní backend v prostředí preview a ochrana SPAYD proti vložení dalšího pole.
+- Skutečná migrace na nové izolované lokální PostgreSQL databázi: vlastnictví, přejmenování, idempotence, 5 desek / 3 dny, dvě souběžné relace, cooldown 30 dní a 2/90 dní, opt-out, přesné párování, opakované potvrzení, duplicitní bankovní transakce, audit, výchozí soukromí, vyhledání starého VS a ACL klientských rolí. Lokálně použit minimální syntetický základ, plný migrační řetězec ověřuje stávající CI job s přidanou patron acceptance.
+- Prošly klientské testy první nabídky až po výsledku a asynchronního přiznání zobrazení, fronta oznámení, pořadí a jeho rozbalení, modulové kontrakty, historické HTTP/OpenAPI kontrakty S04/S06, admin kontrakt, plán migrací a konzistence vydání.
+- Browser CUA: ruční vstup → syntetický intent a QR; native admin modul odmítl chybnou částku a přijal správný modelový převod; osobní poděkování se správným avatarem a vypnutou veřejnou značkou; nabídka až po zavření úspěšného výsledku; mobilní šířka 390 px bez vodorovného přetékání; preference v nativním nastavení. Dřívější designová kontrola základního návrhu pokrývá 320 / 390 / 768 / 1440 px. Nejde o test fyzického telefonu.
 
-Syntaxe modulu a fixture, validita JSON, guard před všemi nativními skripty, zákaz API/SW/cronů, nulové fetch volání samotného patron modulu, neplatební kopírované údaje a zachované runtime soubory jsou ověřené. Vizuální a interakční kontrolu provádí rodičovský úkol v browseru na mobilu, Foldu a desktopu; nepředstavuje test fyzického telefonu. Herní ekonomika, serverové funkce a produkční data se nemění.
+## Otevřené body před aktivací
 
-Ilustrace `/assets/support/patron-letterpress-v1.webp` vznikla přes imagegen v rodičovském úkolu; nový inkoustový otisk srdce je oddělený od získaných herních odznaků.
+Produkční databáze ani platby nebyly aktivovány. `PROPLET_PATRONS_ENABLED` je výchozí vypnuté a prostředí Vercel preview je vždy odmítnuté. Před produkční aktivací je třeba schválit aplikaci migrace do určené databáze, projít plný databázový CI gate, koordinovat běžné vydání a PWA cache revize a ověřit skutečný autentizovaný průchod. Žádná bankovní oprávnění ani tajné údaje nebyly přidány. Automatické bankovní napojení není implementováno; další možnosti a nezjištěné podmínky RB API popisuje `patron-bank-options-20261031.md`.
 
-
-Rodičovský browser QC: 390 px nabídka, vlastní částka 150 Kč → QR → kopírování → návrat; 320 px tmavý QR bez vodorovného přetékání (svislý obsah dostupný scrollováním); 768 px tmavé pořadí po výslovném zapnutí veřejné značky; profil; 1440 px tmavá nabídka. Opraven předčasný text poděkování v QR kroku, fokus při otevření a změně kroku, individuální poděkování konkrétnímu podporovateli a fixture avatar Matěje. Veřejná značka je výchozí vypnutá. Jde o emulované viewporty a lokální syntetická data, žádné skutečné přijetí platby.
+Ilustrace `/assets/support/patron-letterpress-v1.webp` pochází ze schváleného imagegen návrhu. Inkoustové srdce zůstává oddělené od získaných herních odznaků.

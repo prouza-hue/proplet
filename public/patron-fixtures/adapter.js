@@ -20,7 +20,7 @@ const scenario = {
  referral: reviewParams.get('account')==='guest'?'guest':reviewParams.get('account')==='incoming'?'incoming':'member',
  announcement:'none'
 };
-const fixtureState=['ready','done','complete'].includes(reviewParams.get('state'))?reviewParams.get('state'):'ready';
+const fixtureState=['ready','done','complete'].includes(reviewParams.get('state'))?reviewParams.get('state'):'complete';
 const prefix = 'proplet:patron-review:20261031:v2:' + scenario.extra + ':' + scenario.referral + ':' + fixtureState + ':';
 // Keep native Storage identity. WindowProxy property replacement is not reliable
 // across all embedded-browser realms; app controllers must see these same methods.
@@ -40,7 +40,7 @@ Object.defineProperties(storagePrototype,{
 const local=nativeStorage,session=nativeSession;
 // This harness controls its own scenarios; do not inherit Archive's older demo progress.
 local.setItem('ax-seeded','1');
-session.setItem('proplet:announcements:session:v1','1');
+// Patron offers obey the native session budget and start only after a reviewed result.
 // An explicit invitation review link opens the visible offer; native dismissal
 // remains intact for normal navigation and all production sessions.
 if(linkedReferral==='member')session.removeItem('proplet:referral-offer-hidden:v1:archive-review');
@@ -76,6 +76,7 @@ const extraReceipt='proplet:daily-extra-intro:v1:account:'+profileId;
 if(scenario.announcement!=='extra')local.setItem(extraReceipt,'1');else local.removeItem(extraReceipt);
 // Guest mode has no invitation or real account.
 local.setItem('proplet:archive-release-seen:v1:'+profileId,'1');
+local.setItem('proplet:announcement:archive-extra-v1:account:'+profileId,'1');
 const selectedTheme=reviewParams.get('theme');if(['light','dark'].includes(selectedTheme))save('proplet-v3-settings',{...read('proplet-v3-settings',{}),theme:selectedTheme});
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json','cache-control':'no-store'}});
 const net=window.fetch.bind(window);
@@ -175,13 +176,14 @@ function sessionCommand(body){
  sessions[id]=saved;save(key,sessions);return json({...saved,verified:false,reviewOnly:true});
 }
 async function seedState(){
- if(fixtureState==='ready'||local.getItem('studio-state-seeded'))return;
+ if(fixtureState==='ready')return;
  const descriptors=[await modelDaily()];if(fixtureState==='complete'&&scenario.extra!=='live')descriptors.push((await specialResponse()).special);
  const value=getState();value.completed||={};value.inProgress||={};
  for(const descriptor of descriptors){
   const special=descriptor.mode==='daily_special',mode=special?'daily_special':'daily';
   value.completed[descriptor.challengeKey]={puzzleId:descriptor.puzzleId,challengeKey:descriptor.challengeKey,mode,difficulty:descriptor.puzzle.difficulty,dailyDate:today(),elapsedMs:94000,moves:descriptor.puzzle.answers.length,points:special?200:100,hintsUsed:0,wrongAttempts:0,maxHintLevel:0,attemptId:'studio-seeded-'+mode,completedAt:today()+'T10:00:00Z',cleanSolve:true,timingUnverified:true,contentHash:descriptor.contentHash,official:true,rewardEligible:true};
  }
+ if(fixtureState==='complete')for(const date of ['2026-10-18','2026-10-19','2026-10-20']){const key='daily:'+date;if(!value.completed[key])value.completed[key]={...value.completed[descriptors[0].challengeKey],challengeKey:key,dailyDate:date,completedAt:date+'T10:00:00Z'};}
  saveState(value);local.setItem('studio-state-seeded','1');renderDaily();renderFree();renderProfile();
 }
 
