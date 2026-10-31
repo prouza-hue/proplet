@@ -111,3 +111,14 @@ html.tiskarna-ui body #patronProfileEntry{display:flex;align-items:center;gap:16
 .patron-today-link[hidden]{display:none!important}
 
 #screen-profile.settings-open #patronProfileEntry{display:none!important}
+
+/* Compact support choice: one message, one amount, one action. */
+#patronDialog .patron-amounts .patron-amount>span{display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box;text-align:center!important;padding:10px 6px!important;line-height:1.25!important;min-height:56px;white-space:normal}
+#patronDialog .patron-intro{margin-bottom:22px}
+#patronDialog .patron-perk-details{margin:18px 0 20px;border:0;padding:0;background:none}
+#patronDialog .patron-perk-details>summary{display:flex;align-items:center;gap:9px;min-height:44px;cursor:pointer;font:500 14px/1.35 Outfit,sans-serif;list-style:none;color:var(--patron-blue)}
+#patronDialog .patron-perk-details>summary::-webkit-details-marker{display:none}
+#patronDialog .patron-perk-details>summary .patron-entry-seal{width:24px;height:24px}
+#patronDialog .patron-perk-details>summary>span:last-child{margin-left:auto}
+#patronDialog .patron-perk-details .patron-keepsake{margin:6px 0 0;padding:12px 0}
+#patronDialog .patron-perk-details p{font-size:13px}

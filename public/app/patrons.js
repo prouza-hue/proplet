@@ -30,11 +30,11 @@
  function render(){
   const dialog=$('#patronDialog');if(!dialog)return;let content='';
   if(model.step==='offer'){
-   content=heading('Držme Proplet ve hře.','Proplet tvořím já, Pavel. Tvůj příspěvek pomůže s provozem a další péčí o hru.')+
-    '<p class="patron-fair">Hraní zůstává zdarma. Podpora nepřidává herní výhody.</p>'+
-    '<form id="patronForm"><fieldset><legend>Kolik chceš jednorázově přispět?</legend><div class="patron-amounts">'+['99','199','custom'].map(v=>`<label class="patron-amount"><input type="radio" name="amount" value="${v}" ${model.selected===v?'checked':''}><span>${v==='custom'?'Jiná částka':money(Number(v))}</span></label>`).join('')+'</div></fieldset>'+
+   content=heading('Držme Proplet ve hře.','Pomoz mi s provozem a dalším rozvojem hry. Díky, Pavel.')+
+
+    '<form id="patronForm"><fieldset><legend>Jednorázový příspěvek</legend><div class="patron-amounts">'+['99','199','custom'].map(v=>`<label class="patron-amount"><input type="radio" name="amount" value="${v}" ${model.selected===v?'checked':''}><span>${v==='custom'?'Jiná částka':money(Number(v))}</span></label>`).join('')+'</div></fieldset>'+
     `<label class="patron-custom" ${model.selected==='custom'?'':'hidden'}>Částka v Kč<input name="custom" id="patronCustom" inputmode="numeric" type="number" min="1" max="100000" step="1" value="${model.selected==='custom'?model.amount:99}"></label>`+
-    '<div class="patron-keepsake patron-perk"><div class="patron-mini-person"><span class="patron-avatar-demo"><span class="patron-avatar-native" data-player-avatar="'+esc(profile()?.avatar||'🙂')+'">'+esc(profile()?.avatar||'🙂')+'</span><i>'+heart+'</i></span><span class="patron-label-static">Podporovatel</span></div><div><strong>Tvoje značka podpory</strong><p>Dobrovolně u jména, bez zveřejnění částky. Stejná pro každého, kdo přispěje.</p></div></div>'+
+    '<details class="patron-perk-details"><summary><span class="patron-entry-seal">'+heart+'</span> Značka podporovatele <span aria-hidden="true">⌄</span></summary><div class="patron-keepsake patron-perk"><div class="patron-mini-person"><span class="patron-avatar-demo"><span class="patron-avatar-native" data-player-avatar="'+esc(profile()?.avatar||'🙂')+'">'+esc(profile()?.avatar||'🙂')+'</span><i>'+heart+'</i></span></div><p>Dobrovolně u jména, bez zveřejnění částky. Hra zůstává zdarma a podpora nepřidává herní výhody.</p></div></details>'+
     `<button class="primary-btn patron-primary" type="submit" ${model.pending?'disabled':''}>${model.pending?'Připravuji QR…':model.authenticated?'Zobrazit QR na '+money(model.amount):'Přihlásit se a připravit QR'} <span aria-hidden="true">→</span></button><p class="patron-preview-note">${preview?'Ukázka průchodu. V tomto náhledu nelze platit.':model.authenticated?'Zobrazení QR není platba. Převod zadáš ve své bance.':'Přihlášení bezpečně propojí příspěvek s tvým účtem.'}</p></form>`;
   }else if(model.step==='qr'){
    const intent=model.intent,payment=model.payment;if(!intent||!payment){model.step='offer';render();return;}
