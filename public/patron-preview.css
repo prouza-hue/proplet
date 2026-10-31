@@ -122,3 +122,18 @@ html.tiskarna-ui body #patronProfileEntry{display:flex;align-items:center;gap:16
 #patronDialog .patron-perk-details>summary>span:last-child{margin-left:auto}
 #patronDialog .patron-perk-details .patron-keepsake{margin:6px 0 0;padding:12px 0}
 #patronDialog .patron-perk-details p{font-size:13px}
+
+.patron-frequency{margin:0 0 18px!important;padding:0!important;border:0;min-width:0}
+.patron-frequency>div{display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:12px;background:color-mix(in srgb,var(--td-ink) 6%,var(--td-paper));gap:4px}
+.patron-frequency label{position:relative;min-width:0;cursor:pointer}
+.patron-frequency input{position:absolute;opacity:0;width:1px;height:1px}
+.patron-frequency span{display:flex;align-items:center;justify-content:center;min-height:44px;font:600 15px/1.25 Outfit,sans-serif;border-radius:9px;text-align:center;padding:8px;box-sizing:border-box}
+.patron-frequency input:checked+span{background:var(--td-paper);color:var(--patron-blue);box-shadow:0 1px 4px #0002}
+.patron-frequency input:focus-visible+span{outline:3px solid var(--td-blue);outline-offset:2px}
+.patron-start{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 0;font-size:14px}
+.patron-start input{max-width:170px;min-width:0;font:inherit;padding:8px;border:1px solid var(--td-line);border-radius:8px;background:var(--td-paper);color:var(--td-ink)}
+#patronDialog .patron-frequency-note{font-size:12px;margin:6px 0 0}
+#patronDialog .patron-perk{margin:18px 0 22px;padding:0;background:none;grid-template-columns:68px minmax(0,1fr);gap:14px}
+#patronDialog .patron-perk p{font-size:13px;margin-top:4px}
+#patronDialog .patron-perk strong{font-size:19px}
+#patronDialog .patron-mini-person{gap:6px}

@@ -75,6 +75,49 @@ def main():
   assert confirm(first['id'],first['reference'],'another-tx')['ok'] is False
   second=rpc('proplet_patron_intent_v1',other,str(uuid4()),99)['intent']
   assert confirm(second['id'],second['reference'],'test-tx')['code']=='bank_transaction_already_used'
+  # Monthly instructions are immutable; each real bank transaction is a new
+  # ledger entry, while retries must never duplicate receipts or entitlement.
+  today=c.execute("select (statement_timestamp() at time zone 'Europe/Prague')::date").fetchone()[0]
+  from datetime import timedelta
+  for zone in ('Pacific/Kiritimati','Etc/GMT+12'):
+   c.execute(sql.SQL('set time zone {}').format(sql.Literal(zone)))
+   assert rpc('proplet_patron_intent_v1',other,str(uuid4()),199,'monthly',today)['ok']
+   assert rpc('proplet_patron_intent_v1',other,str(uuid4()),199,'monthly',today-timedelta(days=1))['code']=='invalid_first_payment_date'
+  c.execute('reset time zone')
+  monthly_request=str(uuid4())
+  monthly=rpc('proplet_patron_intent_v1',other,monthly_request,199,'monthly',today)['intent']
+  assert monthly['frequency']=='monthly' and monthly['firstPaymentDate']==today.isoformat()
+  assert monthly['paymentCount']==0 and monthly['totalConfirmedCzk']==0
+  assert rpc('proplet_patron_intent_v1',other,monthly_request,199,'monthly',today)['intent']==monthly
+  assert rpc('proplet_patron_intent_v1',other,monthly_request,199,'once',None)['code']=='idempotency_conflict'
+  assert rpc('proplet_patron_intent_v1',other,monthly_request,199,'monthly',today+timedelta(days=1))['code']=='idempotency_conflict'
+  assert rpc('proplet_patron_intent_read_v1',player,monthly['id'])['code']=='not_found'
+  for frequency,day in [('monthly',None),('monthly',today-timedelta(days=1)),('once',today)]:
+   assert rpc('proplet_patron_intent_v1',other,str(uuid4()),199,frequency,day)['code']=='invalid_first_payment_date'
+  assert confirm(monthly['id'],monthly['reference'],'test-tx',amount=199)['code']=='bank_transaction_already_used'
+  assert confirm(monthly['id'],first['reference'],'monthly-1',amount=199)['code']=='payment_mismatch'
+  assert confirm(monthly['id'],monthly['reference'],'monthly-1',amount=99)['code']=='payment_mismatch'
+  assert confirm(monthly['id'],monthly['reference'],'monthly-1',amount=199)['alreadyConfirmed'] is False
+  # Exercise independent concurrent retries of the same second receipt.
+  def monthly_retry(_):
+   with psycopg.connect(**opts) as conn:
+    conn.execute('set role service_role')
+    return rpc('proplet_patron_confirm_v1',admin,monthly['id'],monthly['reference'],'monthly-2',199,'CZK','5531840001/5500',connection=conn)
+  with ThreadPoolExecutor(max_workers=2) as pool:receipts=list(pool.map(monthly_retry,range(2)))
+  assert sum(not r['alreadyConfirmed'] for r in receipts)==1
+  assert all(r['intent']['paymentCount']==2 and r['intent']['totalConfirmedCzk']==398 for r in receipts)
+  assert confirm(monthly['id'],monthly['reference'],'monthly-1',amount=199)['alreadyConfirmed'] is True
+  assert rpc('proplet_patron_state_v1',other,False)['patron'] is True
+  assert c.execute('select count(*) from proplet_private.patron_entitlements where player_id=%s',(other,)).fetchone()[0]==1
+  assert c.execute('select count(*) from proplet_private.patron_audit where intent_id=%s',(monthly['id'],)).fetchone()[0]==2
+  ledger=rpc('proplet_patron_admin_list_v1',7,100,monthly['reference'])['items'][0]
+  assert ledger['paymentCount']==2 and len(ledger['payments'])==2
+  assert {r['bankTransactionId'] for r in ledger['payments']}=={'monthly-1','monthly-2'}
+  assert 'payments' not in rpc('proplet_patron_intent_read_v1',other,monthly['id'])['intent']
+  # The date may be historical on later retrieval/retry. Simulate a past
+  # immutable creation as fixture owner; the application role cannot edit it.
+  c.execute("update proplet_private.patron_intents set first_payment_date=%s where id=%s",(today-timedelta(days=1),monthly['id']))
+  assert rpc('proplet_patron_intent_v1',other,monthly_request,199,'monthly',today-timedelta(days=1))['ok']
   state=rpc('proplet_patron_state_v1',player,True);assert state['patron'] and not state['publicBadge'] and not state['displayGranted']
   assert rpc('proplet_patron_public_ids_v1',ids)['players']==[]
   rpc('proplet_patron_preferences_v1',player,True,False)
@@ -90,5 +133,5 @@ def main():
    except psycopg.errors.InsufficientPrivilege:pass
    else:raise AssertionError('Client role can invoke private patron RPC')
    c.execute('reset role')
- print('PASS patron SQL: migration, ownership, idempotence, rename, atomic claims, 3-day/5-board eligibility, 30/90-day limits, opt-out, exact receipt, duplicate bank transaction, audit, private default and ACL; database='+name)
+ print('PASS patron SQL: migration, ownership, immutable once/monthly/date, Prague calendar, repeated monthly receipts, concurrent receipt retry, permanent entitlement, monthly audit/ledger, rename, atomic claims, 3-day/5-board eligibility, 30/90-day limits, opt-out, exact receipt, duplicate bank transaction, private default and ACL; database='+name)
 if __name__=='__main__':main()

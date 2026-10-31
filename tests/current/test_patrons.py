@@ -22,8 +22,8 @@ class PatronHttpTests(unittest.TestCase):
    self.calls.append((name,args))
    if name=='proplet_patron_intent_v1':
     key=(args['p_player'],args['p_request']);old=self.intents.get(key)
-    if old and old['amountCzk']!=args['p_amount']:return {'ok':False,'code':'idempotency_conflict'}
-    if not old:self.intents[key]={'id':str(uuid4()),'reference':'1000000001','amountCzk':args['p_amount'],'account':patrons.ACCOUNT,'currency':'CZK','message':'Původní jméno podporuje Proplet','status':'qr_created'}
+    if old and (old['amountCzk'],old['frequency'],old['firstPaymentDate'])!=(args['p_amount'],args['p_frequency'],args['p_first_payment_date']):return {'ok':False,'code':'idempotency_conflict'}
+    if not old:self.intents[key]={'id':str(uuid4()),'reference':'1000000001','amountCzk':args['p_amount'],'frequency':args['p_frequency'],'firstPaymentDate':args['p_first_payment_date'],'account':patrons.ACCOUNT,'currency':'CZK','message':'Původní jméno podporuje Proplet','status':'qr_created'}
     return {'ok':True,'intent':self.intents[key]}
    if name=='proplet_patron_intent_read_v1':return {'ok':False,'code':'not_found'}
    return {'ok':True,'patron':False,'publicBadge':False}
@@ -61,6 +61,23 @@ class PatronHttpTests(unittest.TestCase):
   self.assertEqual(self.calls[-1][1]['p_actor'],'admin')
   self.client.get('/api/admin/patrons?reference=1000000001',headers=h)
   self.assertEqual(self.calls[-1][1]['p_reference'],'1000000001')
+ def test_monthly_schedule_validation_and_immutable_qr(self):
+  headers={'Authorization':'Bearer player-a'}
+  body={'requestId':str(uuid4()),'amountCzk':99,'frequency':'monthly','firstPaymentDate':'2030-11-01'}
+  response=self.client.post('/api/patrons/intents',json=body,headers=headers)
+  self.assertEqual(response.status_code,200)
+  first=response.json()
+  self.assertIn('*FRQ:1M*DT:20301101',first['payment']['spd'])
+  self.assertEqual(first,self.client.post('/api/patrons/intents',json=body,headers=headers).json())
+  for change in ({'firstPaymentDate':'2030-11-02'},{'frequency':'once','firstPaymentDate':None}):
+   self.assertEqual(self.client.post('/api/patrons/intents',json={**body,**change},headers=headers).status_code,409)
+  for change in ({'firstPaymentDate':None},{'firstPaymentDate':'2030-02-30'},{'firstPaymentDate':'20301101'},{'firstPaymentDate':20301101},{'frequency':'weekly'},{'frequency':'once'}):
+   self.assertEqual(self.client.post('/api/patrons/intents',json={**body,**change},headers=headers).status_code,422)
+  # Never turn a malformed stored schedule into a payable one-time QR.
+  for change in ({'firstPaymentDate':None},{'firstPaymentDate':'2030-02-30'},{'frequency':'weekly'}):
+   with self.assertRaises(HTTPException):patrons.payment_data({**first['intent'],**change})
+  once=self.client.post('/api/patrons/intents',json={'requestId':str(uuid4()),'amountCzk':99},headers=headers).json()
+  self.assertNotIn('*FRQ:',once['payment']['spd']);self.assertNotIn('*DT:',once['payment']['spd'])
  def test_malformed_rpc_and_preview_fail_closed(self):
   self.rpc.side_effect=None;self.rpc.return_value={'ok':True,'intent':None}
   response=self.client.post('/api/patrons/intents',json={'requestId':str(uuid4()),'amountCzk':99},headers={'Authorization':'Bearer player-a'})

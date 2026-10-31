@@ -11,16 +11,19 @@ create table proplet_private.patron_intents(
  request_id uuid not null,
  reference text not null unique default nextval('proplet_private.patron_reference_seq')::text check(reference ~ '^[1-9][0-9]{0,9}$'),
  amount_czk integer not null check(amount_czk between 1 and 100000),
+ frequency text not null default 'once' check(frequency in('once','monthly')),
+ first_payment_date date,
  currency text not null default 'CZK' check(currency='CZK'),
  recipient_account text not null default '5531840001/5500' check(recipient_account='5531840001/5500'),
  nickname_snapshot text not null,
  message text not null,
  created_at timestamptz not null default now(),
- unique(player_id,request_id)
+ unique(player_id,request_id),
+ check((frequency='once' and first_payment_date is null) or (frequency='monthly' and first_payment_date is not null and isfinite(first_payment_date)))
 );
 create table proplet_private.patron_payments(
  id uuid primary key default gen_random_uuid(),
- intent_id uuid not null unique references proplet_private.patron_intents(id),
+ intent_id uuid not null references proplet_private.patron_intents(id),
  bank_account text not null check(bank_account='5531840001/5500'),
  bank_transaction_id text not null check(length(bank_transaction_id) between 1 and 120),
  reference text not null,
@@ -49,6 +52,7 @@ create table proplet_private.patron_offer_receipts(
 );
 create index patron_offer_player_time on proplet_private.patron_offer_receipts(player_id,shown_at desc);
 create index patron_intents_created on proplet_private.patron_intents(created_at desc);
+create index patron_payments_intent on proplet_private.patron_payments(intent_id,confirmed_at);
 create table proplet_private.patron_audit(
  id bigint generated always as identity primary key,
  actor_id uuid not null references public.players(id),
@@ -74,26 +78,35 @@ create function public.proplet_patron_intent_json_v1(p_intent uuid) returns json
 language sql stable security invoker set search_path='' as $$
  select jsonb_build_object('id',i.id,'reference',i.reference,'amountCzk',i.amount_czk,
  'currency',i.currency,'account',i.recipient_account,'nicknameSnapshot',i.nickname_snapshot,'message',i.message,
- 'createdAt',i.created_at,'status',case when r.id is null then 'qr_created' else 'confirmed' end,
- 'confirmedAt',r.confirmed_at)
- from proplet_private.patron_intents i left join proplet_private.patron_payments r on r.intent_id=i.id where i.id=p_intent;
+ 'frequency',i.frequency,'firstPaymentDate',i.first_payment_date,
+ 'createdAt',i.created_at,'status',case when r.n=0 then 'qr_created' else 'confirmed' end,
+ 'confirmedAt',r.first_at,'lastConfirmedAt',r.last_at,'paymentCount',r.n,'totalConfirmedCzk',r.total)
+ from proplet_private.patron_intents i cross join lateral (
+  select count(*) n,min(confirmed_at) first_at,max(confirmed_at) last_at,coalesce(sum(amount_czk),0) total
+  from proplet_private.patron_payments where intent_id=i.id
+ ) r where i.id=p_intent;
 $$;
 
-create function public.proplet_patron_intent_v1(p_player uuid,p_request uuid,p_amount integer) returns jsonb
+create function public.proplet_patron_intent_v1(p_player uuid,p_request uuid,p_amount integer,p_frequency text default 'once',p_first_payment_date date default null) returns jsonb
 language plpgsql security invoker set search_path='' as $$
 declare p public.players%rowtype;i proplet_private.patron_intents%rowtype;n text;
 begin
- if p_request is null or p_amount is null or p_amount not between 1 and 100000 then raise exception 'invalid intent' using errcode='22023';end if;
+ if p_request is null or p_amount is null or p_amount not between 1 and 100000 or p_frequency is null or p_frequency not in('once','monthly') then raise exception 'invalid intent' using errcode='22023';end if;
  select * into p from public.players where id=p_player for update;
  if not found then return jsonb_build_object('ok',false,'code','not_found');end if;
  select * into i from proplet_private.patron_intents where player_id=p_player and request_id=p_request;
  if found then
-  if i.amount_czk<>p_amount then return jsonb_build_object('ok',false,'code','idempotency_conflict');end if;
+  if i.amount_czk<>p_amount or i.frequency<>p_frequency or i.first_payment_date is distinct from p_first_payment_date then return jsonb_build_object('ok',false,'code','idempotency_conflict');end if;
   return jsonb_build_object('ok',true,'intent',public.proplet_patron_intent_json_v1(i.id));
  end if;
+ -- Validate only new instructions: retrying an immutable request remains valid
+ -- after its original first-payment date has passed. Calendar is Prague's.
+ if (p_frequency='once' and p_first_payment_date is not null) or (p_frequency='monthly' and
+  (p_first_payment_date is null or not isfinite(p_first_payment_date) or p_first_payment_date<(statement_timestamp() at time zone 'Europe/Prague')::date)) then
+  return jsonb_build_object('ok',false,'code','invalid_first_payment_date');end if;
  n:=left(coalesce(nullif(btrim(p.name),''),'Hráč'),80);
- insert into proplet_private.patron_intents(player_id,request_id,amount_czk,nickname_snapshot,message)
- values(p_player,p_request,p_amount,n,left(regexp_replace(n,'[[:cntrl:]]','','g'),60-length(' podporuje Proplet'))||' podporuje Proplet') returning * into i;
+ insert into proplet_private.patron_intents(player_id,request_id,amount_czk,frequency,first_payment_date,nickname_snapshot,message)
+ values(p_player,p_request,p_amount,p_frequency,p_first_payment_date,n,left(regexp_replace(n,'[[:cntrl:]]','','g'),60-length(' podporuje Proplet'))||' podporuje Proplet') returning * into i;
  return jsonb_build_object('ok',true,'intent',public.proplet_patron_intent_json_v1(i.id));
 end;$$;
 create function public.proplet_patron_intent_read_v1(p_player uuid,p_intent uuid) returns jsonb
@@ -165,13 +178,15 @@ begin
   or p_bank_tx is null or p_bank_tx !~ '^[A-Za-z0-9_.:/-]{1,120}$' then
   return jsonb_build_object('ok',false,'code','payment_mismatch');end if;
  perform 1 from public.players where id=i.player_id for update;
- select * into r from proplet_private.patron_payments where intent_id=i.id;
+ select * into r from proplet_private.patron_payments where bank_account=p_account and bank_transaction_id=p_bank_tx;
  if found then
-  if r.bank_account=p_account and r.bank_transaction_id=p_bank_tx then
+  if r.intent_id=i.id then
    return jsonb_build_object('ok',true,'alreadyConfirmed',true,'patron',true,'intent',public.proplet_patron_intent_json_v1(i.id));
   end if;
-  return jsonb_build_object('ok',false,'code','already_confirmed_different_receipt');
+  return jsonb_build_object('ok',false,'code','bank_transaction_already_used');
  end if;
+ if i.frequency='once' and exists(select 1 from proplet_private.patron_payments where intent_id=i.id) then
+  return jsonb_build_object('ok',false,'code','already_confirmed_different_receipt');end if;
  begin
   insert into proplet_private.patron_payments(intent_id,bank_account,bank_transaction_id,reference,amount_czk,currency,confirmed_by)
   values(i.id,p_account,p_bank_tx,p_reference,p_amount,p_currency,p_actor) returning * into r;
@@ -186,7 +201,10 @@ declare items jsonb;
 begin
  if p_days is null or p_days not between 1 and 90 or p_limit is null or p_limit not between 1 and 200 then raise exception 'invalid pagination' using errcode='22023';end if;
  select coalesce(jsonb_agg(row order by created_at desc),'[]'::jsonb) into items from (
-  select public.proplet_patron_intent_json_v1(i.id)||jsonb_build_object('playerId',i.player_id,'currentNickname',p.name) row,i.created_at
+  select public.proplet_patron_intent_json_v1(i.id)||jsonb_build_object('playerId',i.player_id,'currentNickname',p.name,
+   'payments',coalesce((select jsonb_agg(jsonb_build_object('id',r.id,'bankTransactionId',r.bank_transaction_id,
+    'amountCzk',r.amount_czk,'confirmedAt',r.confirmed_at,'confirmedBy',r.confirmed_by) order by r.confirmed_at,r.id)
+    from proplet_private.patron_payments r where r.intent_id=i.id),'[]'::jsonb)) row,i.created_at
   from proplet_private.patron_intents i join public.players p on p.id=i.player_id
   where (p_reference is not null and i.reference=p_reference) or (p_reference is null and i.created_at>=statement_timestamp()-make_interval(days=>p_days)) order by i.created_at desc limit p_limit
  ) page;

@@ -2,11 +2,12 @@
 from __future__ import annotations
 import io
 import os
+from datetime import date
 from typing import Optional, Literal
 from urllib.parse import quote
 from uuid import UUID
 from fastapi import Header, HTTPException, Query, Request, Response
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, model_validator
 
 ACCOUNT = '5531840001/5500'
 CURRENCY = 'CZK'
@@ -37,6 +38,16 @@ def payment_data(intent):
     if len(message)>60 or not message.endswith(' podporuje Proplet') or any(ord(c)<32 for c in message):
         raise HTTPException(503,'Platební údaje nejsou dostupné')
     spd=f'SPD*1.0*ACC:{IBAN}*AM:{amount}.00*CC:CZK*X-VS:{ref}*MSG:{quote(message,safe=" ")}'
+    frequency=intent.get('frequency','once')
+    first=intent.get('firstPaymentDate')
+    if frequency not in ('once','monthly') or (frequency=='once' and first is not None):
+        raise HTTPException(503,'Platební údaje nejsou dostupné')
+    if frequency=='monthly':
+        try:
+            if not isinstance(first,str) or len(first)!=10 or date.fromisoformat(first).isoformat()!=first:raise ValueError()
+        except ValueError as exc:raise HTTPException(503,'Platební údaje nejsou dostupné') from exc
+        # Standing order, not direct debit: the player authorizes it in their bank.
+        spd+=f'*FRQ:1M*DT:{first.replace("-","")}'
     import qrcode
     from qrcode.image.svg import SvgPathImage
     image=qrcode.make(spd,image_factory=SvgPathImage,box_size=8,border=4)
@@ -48,6 +59,15 @@ class Body(BaseModel):
 class IntentBody(Body):
     requestId: UUID
     amountCzk: StrictInt=Field(ge=1,le=100000)
+    frequency: Literal['once','monthly']='once'
+    firstPaymentDate: Optional[str]=Field(default=None,pattern=r'^\d{4}-\d{2}-\d{2}$')
+    @model_validator(mode='after')
+    def schedule(self):
+        if self.frequency=='monthly':
+            if self.firstPaymentDate is None:raise ValueError('Měsíční podpora vyžaduje datum první platby')
+            date.fromisoformat(self.firstPaymentDate)
+        elif self.firstPaymentDate is not None:raise ValueError('Jednorázová podpora nemá datum trvalého příkazu')
+        return self
 class PreferenceBody(Body):
     publicBadge: StrictBool
     offersDisabled: StrictBool
@@ -90,7 +110,7 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
     @app.post('/api/patrons/intents')
     def create_intent(body:IntentBody,request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
         headers(response);p=account(authorization);enforce_rate_limit(request,'patron_intent',limit=20,window_seconds=3600)
-        value=run('proplet_patron_intent_v1',{'p_player':p['id'],'p_request':str(body.requestId),'p_amount':body.amountCzk})
+        value=run('proplet_patron_intent_v1',{'p_player':p['id'],'p_request':str(body.requestId),'p_amount':body.amountCzk,'p_frequency':body.frequency,'p_first_payment_date':body.firstPaymentDate})
         return {**value,'payment':payment_data(value.get('intent'))}
 
     @app.get('/api/patrons/intents/{intent_id}')
