@@ -50,6 +50,7 @@ const server=http.createServer(async(req,res)=>{
     return setTimeout(()=>json(res,200,{ok:true,synthetic:true}),controls.eventDelayMs);
    }
    if(p==='/api/config')return json(res,200,config);
+   if(p==='/api/patrons'&&req.method==='GET')return json(res,200,{enabled:false});
    if(p==='/api/daily-special'&&req.method==='GET')return json(res,200,{schemaVersion:1,serverToday:config.date,validUntil:config.date+'T23:59:59+02:00',special:null,schedule:[]});
    if(p==='/api/daily'&&req.method==='GET'){
     // The Gen6 release reads dated Daily through HTTP. Model the published
