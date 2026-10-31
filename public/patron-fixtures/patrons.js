@@ -3,14 +3,26 @@
  'use strict';if(!window.PROPLET_STUDIO_PREVIEW)throw Error('Patron fixtures require isolation');
  window.PROPLET_PATRON_PREVIEW=true;
  const KEY='patron-server-fixture-v1',ACCOUNT='5531840001/5500';
- const fresh=()=>({sequence:8800000000,intents:[],receipts:[],preferences:{},bankTransactions:{},scenario:'eligible',offset:0});
+ const fresh=()=>({intents:[],receipts:[],preferences:{},bankTransactions:{},scenario:'eligible',offset:0});
  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY))||fresh()}catch{return fresh()}};
  const write=s=>localStorage.setItem(KEY,JSON.stringify(s));
  const now=s=>Date.now()+(s.offset||0),who=()=>typeof getProfile==='function'?getProfile():JSON.parse(localStorage.getItem('proplet-v2-profile')||'null');
  const error=(status,message)=>{const e=new Error(message);e.status=status;throw e};
  const prefs=(s,id)=>s.preferences[id]||{publicBadge:false,offersDisabled:false};
  function state(s){const p=who(),id=p?.id,pr=prefs(s,id);const patron=s.intents.some(i=>i.playerId===id&&i.status==='confirmed');const recent=s.receipts.filter(r=>r.playerId===id&&r.at>now(s)-90*86400000);const cool=recent.some(r=>r.at>now(s)-30*86400000);return {enabled:true,authenticated:!!p?.token,patron,publicBadge:patron&&pr.publicBadge,offersDisabled:pr.offersDisabled,canOffer:!!p?.token&&!patron&&!pr.offersDisabled&&!cool&&recent.length<2&&s.scenario==='eligible'&&p.supportMode!=='younger',offerCount90d:recent.length};}
- const payment=i=>({iban:null,spd:null,qrSvg:null,synthetic:true,qrUrl:'/patron-demo-qr.png',account:ACCOUNT});
+ // Same BBAN and SPAYD escaping as backend/patrons.py; input is the persisted model intent.
+ const bban='5500'+'000000'+'5531840001',IBAN='CZ'+String(98-Number(BigInt(bban+'123500')%97n)).padStart(2,'0')+bban;
+ const spaydQuote=value=>encodeURIComponent(value).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase()).replace(/%20/g,' ');
+ function payment(i){
+  let spd=`SPD*1.0*ACC:${IBAN}*AM:${i.amountCzk}.00*CC:CZK*X-VS:${i.reference}*MSG:${spaydQuote(i.message)}`;
+  if(i.frequency==='monthly')spd+=`*FRQ:1M*DT:${i.firstPaymentDate.replace(/-/g,'')}`;
+  const qr=window.qrcode(0,'M');qr.addData(spd,'Byte');qr.make();
+  return {iban:IBAN,spd,qrSvg:qr.createSvgTag({cellSize:8,margin:32}),synthetic:true,account:ACCOUNT};
+ }
+ function testReference(s){
+  // Preview-local TEST namespace only; these references are not registered in production.
+  let reference;do{reference='99'+String(crypto.getRandomValues(new Uint32Array(1))[0]%100000000).padStart(8,'0')}while(s.intents.some(i=>i.reference===reference));return reference;
+ }
  async function request(url,options={}){const u=new URL(url,location.href),method=options.method||'GET',body=typeof options.body==='string'?JSON.parse(options.body):options.body||{},s=read(),p=who();
   if(u.pathname==='/api/patrons'&&method==='GET')return state(s);
   if(u.pathname.startsWith('/api/admin/patrons'))return admin(u.pathname,{...options,body,reference:u.searchParams.get('reference')});
@@ -18,7 +30,7 @@
   if(u.pathname==='/api/patrons/intents'&&method==='POST'){
    if(!Number.isInteger(body.amountCzk)||body.amountCzk<1||body.amountCzk>100000||typeof body.requestId!=='string')error(400,'Neplatná částka nebo požadavek.');
    const frequency=body.frequency||'once',firstPaymentDate=body.firstPaymentDate||null;if(!['once','monthly'].includes(frequency)||(frequency==='monthly'&&!/^\d{4}-\d{2}-\d{2}$/.test(firstPaymentDate||''))||(frequency==='once'&&firstPaymentDate))error(400,'Neplatná četnost nebo datum.');let i=s.intents.find(i=>i.playerId===p.id&&i.requestId===body.requestId);if(i&&(i.amountCzk!==body.amountCzk||(i.frequency||'once')!==frequency||(i.firstPaymentDate||null)!==firstPaymentDate))error(409,'Požadavek už patří jiné částce.');
-   if(!i){const suffix=' podporuje Proplet';i={id:crypto.randomUUID(),requestId:body.requestId,playerId:p.id,nicknameSnapshot:p.name,currentNickname:p.name,amountCzk:body.amountCzk,frequency,firstPaymentDate,paymentCount:0,totalConfirmedCzk:0,payments:[],currency:'CZK',account:ACCOUNT,reference:String(++s.sequence),message:String(p.name||'Hráč').slice(0,60-suffix.length)+suffix,createdAt:new Date(now(s)).toISOString(),status:'qr_created'};s.intents.push(i);write(s);}
+   if(!i){const suffix=' podporuje Proplet';i={id:crypto.randomUUID(),requestId:body.requestId,playerId:p.id,nicknameSnapshot:p.name,currentNickname:p.name,amountCzk:body.amountCzk,frequency,firstPaymentDate,paymentCount:0,totalConfirmedCzk:0,payments:[],currency:'CZK',account:ACCOUNT,reference:testReference(s),message:Array.from(String(p.name||'Hráč').replace(/[\x00-\x1f\x7f]/g,'')).slice(0,60-suffix.length).join('')+suffix,createdAt:new Date(now(s)).toISOString(),status:'qr_created'};s.intents.push(i);write(s);}
    return {intent:i,payment:payment(i)};
   }
   if(u.pathname.startsWith('/api/patrons/intents/')&&method==='GET'){const i=s.intents.find(i=>i.id===u.pathname.split('/').pop()&&i.playerId===p.id);if(!i)error(404,'Příprava nebyla nalezena.');return {intent:i,payment:payment(i)};}

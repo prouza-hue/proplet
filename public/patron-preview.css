@@ -29,8 +29,8 @@ html[data-theme=dark] :root{--patron-blue:#adcaff;--patron-tint:#364657}
 #patronDialog .patron-primary{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:54px;padding:13px 16px;border-radius:11px;background:#315da8;color:#fff9ed;border:1px solid #244b89;box-shadow:0 3px 0 #213f73;font:600 17px/1.3 Outfit,sans-serif;cursor:pointer}
 #patronDialog .patron-preview-note{font-size:12px;text-align:center;margin-top:14px}
 #patronDialog .patron-back{font:500 14px Outfit,sans-serif;color:var(--patron-blue);background:none;border:0;padding:6px 0;min-height:36px;margin-bottom:10px;cursor:pointer}
-.patron-qr{display:grid;grid-template-columns:184px minmax(0,1fr);gap:22px;align-items:center;margin:20px 0}
-.patron-qr>img{background:#fff;border-radius:12px;border:8px solid #fff;box-sizing:border-box;image-rendering:pixelated}
+.patron-qr{display:grid;grid-template-columns:256px minmax(0,1fr);gap:22px;align-items:center;margin:20px 0}
+.patron-qr>img{width:256px;height:256px;max-width:100%;background:#fff;border-radius:0;image-rendering:pixelated}
 #patronDialog .patron-qr strong{display:block;font-size:15px;margin-bottom:8px}
 #patronDialog .patron-qr p{font-size:14px}
 #patronDialog .patron-qr .patron-qr-hint{margin-top:14px;font-size:13px}
@@ -80,8 +80,7 @@ html.tiskarna-ui body #patronProfileEntry{display:flex;align-items:center;gap:16
  #patronDialog .patron-keepsake strong{font-size:18px}
  #patronDialog .patron-keepsake p{font-size:13px}
  #patronDialog .patron-primary{font-size:16px}
- .patron-qr{grid-template-columns:128px minmax(0,1fr);gap:14px}
- .patron-qr>img{width:128px;height:128px}
+ .patron-qr{grid-template-columns:1fr;justify-items:center;gap:14px}
  .patron-qr-actions{grid-template-columns:1fr}
  #patronProfileEntry strong{font-size:21px}
 }
@@ -91,7 +90,6 @@ html.tiskarna-ui body #patronProfileEntry{display:flex;align-items:center;gap:16
  .patron-art{width:70px;height:92px}
  #patronDialog h2{font-size:24px}
  .patron-qr{grid-template-columns:1fr;justify-items:center;text-align:center}
- .patron-qr>img{width:154px;height:154px}
 }
 
 #patronTitle:focus{outline:none}
