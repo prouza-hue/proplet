@@ -38,3 +38,12 @@ Vytvoření ani načtení QR nepřidá značku ani XP. Modelový správce nadál
 Produkční databáze ani platby nebyly aktivovány. `PROPLET_PATRONS_ENABLED` je výchozí vypnuté a prostředí Vercel preview je vždy odmítnuté. Před produkční aktivací je třeba schválit aplikaci migrace do určené databáze, projít plný databázový CI gate, koordinovat běžné vydání a PWA cache revize a ověřit skutečný autentizovaný průchod. Žádná bankovní oprávnění ani tajné údaje nebyly přidány. Automatické bankovní napojení není implementováno; další možnosti a nezjištěné podmínky RB API popisuje `patron-bank-options-20261031.md`.
 
 Ilustrace `/assets/support/patron-letterpress-v1.webp` pochází ze schváleného imagegen návrhu. Inkoustové srdce zůstává oddělené od získaných herních odznaků.
+
+
+## Synchronizace náhledu s kandidátem vydání — 1. 11. 2026
+
+Náhled používá totožný nativní hráčský modul a CSS jako připravený kandidát `aec7236fe966930f45eabc0f3825cf8dda489e2e`. Pouze izolovaný fixture překládá běžné požadavky `fetch` do lokálních modelových dat. Ovládání náhledu je oddělené: zachytí i situaci, kdy nativní událost připravenosti proběhla před načtením posledního skriptu. Úvodní scénář počká na vykreslený profil a obnovení stavu. Testovací upozornění i vstup do ovládání jsou dostupné uvnitř otevřeného dialogu včetně QR; tlačítko v pozadí je při modálním zobrazení nepřístupné.
+
+CUA v místním prohlížeči ověřilo nabídku, vlastní poděkování, soukromou historii dvou modelových měsíčních převodů a vypnutou veřejnou značku. Na odděleném modelovém účtu ověřilo první návštěvu → čekání 48 hodin → dostupnost; pozdější novinky → nové čekání 48 hodin → stále čeká při 0/2 a 1/2 deskách → dostupnost při 2/2. QR zobrazuje upozornění „TESTOVACÍ NÁHLED — platbu neodesílej“. Test skutečného nativního fetch bridge potvrdil vlastnictví modelového intentu, soukromou historii, veřejnou značku výchozí vypnutou a jediné přiznání poděkování ze dvou souběžných požadavků. Prošel cílený test nativního klienta a osm nezávisle dekódovaných QR obrazů.
+
+Jde o statický náhled, nikoli produkční aktivaci. Produkční databáze, listopadové vydání ani bankovní oprávnění se touto synchronizací nemění.
