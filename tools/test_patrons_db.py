@@ -21,7 +21,8 @@ def main():
   if a.minimal:
    c.execute("""do $$begin if not exists(select from pg_roles where rolname='anon') then create role anon;end if;if not exists(select from pg_roles where rolname='authenticated') then create role authenticated;end if;if not exists(select from pg_roles where rolname='service_role') then create role service_role bypassrls;end if;end$$;
    create table public.players(id uuid primary key,name text,family_code text,token_hash text,support_mode text default 'none',public_rankings boolean default true,created_at timestamptz default now()-interval '10 days');
-   create table public.results(id uuid primary key,player_id uuid references players(id),puzzle_id text,challenge_key text,mode text,difficulty text,best_elapsed_ms integer,best_moves integer,points integer,completed_at timestamptz,unique(player_id,challenge_key));
+   create unique index players_family_name_ci on public.players(family_code,lower(name));
+   create table public.results(id uuid primary key,player_id uuid references players(id),puzzle_id text,challenge_key text,mode text check(mode in('daily','daily_special','free','starter','tajenka')),difficulty text,best_elapsed_ms integer,best_moves integer,points integer,completed_at timestamptz,unique(player_id,challenge_key));
    create table public.admin_accounts(player_id uuid primary key,role text,active boolean);
    grant select,update on public.players to service_role;grant select on public.results,public.admin_accounts to service_role;""")
    c.execute("create function public.proplet_monthly_now_v1() returns timestamptz language sql as $$select statement_timestamp()$$")
@@ -52,7 +53,7 @@ def main():
 
   def new_player():
    pid=str(uuid4())
-   c.execute("insert into public.players(id,name,family_code,token_hash) values(%s,'News SQL','patron-test',%s)",(pid,secrets.token_hex(32)))
+   c.execute("insert into public.players(id,name,family_code,token_hash) values(%s,%s,'patron-test',%s)",(pid,'News SQL '+pid[:8],secrets.token_hex(32)))
    seed(pid)
    return pid
   def news(pid,hours=0):
@@ -80,7 +81,7 @@ def main():
   c.execute("update public.results set completed_at=completed_at-interval '4 days' where player_id=%s",(late,))
   assert rpc('proplet_patron_state_v1',late,False)['offerWaitReason']=='post_news_boards'
   post_news_board(late,0);post_news_board(late,0)
-  post_news_board(late,1,'weekly')
+  post_news_board(late,1,'starter')
   state=rpc('proplet_patron_state_v1',late,False)
   assert state['postAnchorBoards']==1 and not state['canOffer']
   post_news_board(late,1)
@@ -243,5 +244,82 @@ def main():
    except psycopg.errors.InsufficientPrivilege:pass
    else:raise AssertionError('Client role can invoke private patron RPC')
    c.execute('reset role')
+  http_acceptance(opts,new_player(),new_player(),admin)
  print('PASS patron SQL: migration, ownership, immutable once/monthly/date, Prague calendar, repeated monthly receipts, concurrent receipt retry, permanent entitlement, account-wide exactly-once thanks claim, private bounded personal payment history, monthly audit/ledger, rename, atomic claims/news receipt race, balanced preset eligibility, durable first-visit 48h fallback, news priority + 48h + two distinct ordinary boards, late receipt reset, 3-day/5-board eligibility, 30/90-day limits, opt-out, exact receipt, duplicate bank transaction, private default and ACL; database='+name)
+
+def http_acceptance(opts,owner,other,admin):
+ """Real native HTTP handlers over the disposable SQL schema, no mocked RPC."""
+ import sys
+ sys.path.insert(0,str(ROOT))
+ from fastapi import FastAPI,HTTPException
+ from fastapi.testclient import TestClient
+ from backend import patrons
+ app=FastAPI();enabled=[True];rpc_calls=[]
+ identities={'Bearer sql-owner':owner,'Bearer sql-other':other,'Bearer sql-admin':admin}
+ def auth(value):
+  pid=identities.get(value)
+  if not pid:raise HTTPException(401,'test authentication required')
+  return {'id':pid,'name':'HTTP synthetic account'}
+ def require_admin(value,write=False):
+  p=auth(value)
+  if p['id']!=admin:raise HTTPException(403,'admin required')
+  return {'player':p,'role':'owner'}
+ def call(name,args):
+  rpc_calls.append(name)
+  with psycopg.connect(**opts) as db:
+   db.execute('set role service_role')
+   fields=sql.SQL(',').join(sql.SQL('{}=>{}').format(sql.Identifier(k),sql.Placeholder()) for k in args)
+   return db.execute(sql.SQL('select public.{}({})').format(sql.Identifier(name),fields),list(args.values())).fetchone()[0]
+ patrons.install(app,auth_player=auth,require_admin=require_admin,db_rpc=call,enforce_rate_limit=lambda *a,**k:None,enabled=lambda:enabled[0])
+ client=TestClient(app);h={'Authorization':'Bearer sql-owner'};oh={'Authorization':'Bearer sql-other'};ah={'Authorization':'Bearer sql-admin'}
+ body={'requestId':str(uuid4()),'amountCzk':99}
+ assert client.post('/api/patrons/intents',json=body).status_code==401
+ assert client.post('/api/patrons/intents',json={**body,'playerId':other},headers=h).status_code==422
+ response=client.post('/api/patrons/intents',json=body,headers=h);assert response.status_code==200,response.text
+ created=response.json();intent=created['intent'];payment=created['payment'];path='/api/patrons/intents/'+intent['id']
+ assert intent['account']=='5531840001/5500'
+ with psycopg.connect(**opts) as db:assert str(db.execute('select player_id from proplet_private.patron_intents where id=%s',(intent['id'],)).fetchone()[0])==owner
+ assert intent['message']==intent['nicknameSnapshot']+' podporuje Proplet'
+ assert payment['iban']=='CZ5355000000005531840001' and '*X-VS:'+intent['reference']+'*MSG:' in payment['spd']
+ # Decode the actual production encoder's QR generated from this SQL-owned intent.
+ import io,resvg_py,zxingcpp
+ from PIL import Image
+ png=resvg_py.svg_to_bytes(svg_string=payment['qrSvg'],width=256,height=256,dpi=96.0,background='#ffffff')
+ decoded=zxingcpp.read_barcode(Image.open(io.BytesIO(png)).convert('RGB'))
+ assert decoded and decoded.text==payment['spd']
+ assert client.post('/api/patrons/intents',json=body,headers=h).json()==created
+ assert client.post('/api/patrons/intents',json={**body,'amountCzk':199},headers=h).status_code==409
+ assert client.get(path,headers=oh).status_code==404
+ with psycopg.connect(**opts) as db:db.execute("update public.players set name='HTTP renamed' where id=%s",(owner,))
+ assert client.get(path,headers=h).json()==created
+ assert not client.get('/api/patrons',headers=h).json()['patron']
+ assert client.get('/api/admin/patrons',headers=h).status_code==403
+ receipt={'intentId':intent['id'],'reference':intent['reference'],'bankTransactionId':'http-synthetic-'+str(uuid4()),'amountCzk':99,'currency':'CZK','recipientAccount':'5531840001/5500'}
+ assert client.post('/api/admin/patrons/confirm',json=receipt,headers=h).status_code==403
+ for changes in ({'amountCzk':100},{'reference':'9999999999'}):
+  assert client.post('/api/admin/patrons/confirm',json={**receipt,**changes},headers=ah).status_code==409
+ for changes in ({'currency':'EUR'},{'recipientAccount':'1/0100'}):
+  assert client.post('/api/admin/patrons/confirm',json={**receipt,**changes},headers=ah).status_code==422
+ confirmed=client.post('/api/admin/patrons/confirm',json=receipt,headers=ah)
+ assert confirmed.status_code==200,confirmed.text
+ assert not confirmed.json()['alreadyConfirmed']
+ assert client.post('/api/admin/patrons/confirm',json=receipt,headers=ah).json()['alreadyConfirmed']
+ # A real transaction ID can never grant an entitlement to a different account.
+ second=client.post('/api/patrons/intents',json={'requestId':str(uuid4()),'amountCzk':99},headers=oh).json()['intent']
+ assert client.post('/api/admin/patrons/confirm',json={**receipt,'intentId':second['id'],'reference':second['reference']},headers=ah).status_code==409
+ state=client.get('/api/patrons',headers=h).json();assert state['patron'] and state['thanksPending'] and not state['publicBadge']
+ assert len(state['contributions'])==1 and set(state['contributions'][0])=={'id','amountCzk','frequency','confirmedAt'}
+ assert client.get('/api/patrons',headers=oh).json()['contributions']==[]
+ assert client.post('/api/patrons/thanks/claim',headers=h).json()['displayGranted']
+ assert not client.post('/api/patrons/thanks/claim',headers=h).json()['displayGranted']
+ assert not client.get('/api/patrons',headers=h).json()['thanksPending']
+ assert client.post('/api/patrons/preferences',json={'publicBadge':True,'offersDisabled':True},headers=h).json()['publicBadge']
+ rows=client.get('/api/admin/patrons?reference='+intent['reference'],headers=ah).json()['items']
+ assert rows[0]['id']==intent['id'] and rows[0]['paymentCount']==1
+ enabled[0]=False;before=len(rpc_calls)
+ assert client.get('/api/patrons',headers=h).json()=={'enabled':False}
+ assert client.post('/api/patrons/intents',json=body,headers=h).status_code==503
+ assert len(rpc_calls)==before
+ print('PASS native patron HTTP + real SQL: authenticated immutable QR decoded, owner/rename binding, admin authority, exact matching, idempotence, duplicate bank ID denial, private history, account thanks, opt-in and default-OFF without database calls')
+
 if __name__=='__main__':main()
