@@ -21,7 +21,6 @@ expected_version = version_match.group(1)
 index = (root / "public" / "index.html").read_text(encoding="utf-8")
 app = (root / "public" / "app.js").read_text(encoding="utf-8")
 sw = (root / "public" / "sw.js").read_text(encoding="utf-8")
-challenge_css = (root / "public" / "challenge-cta-v3333.css").read_text(encoding="utf-8")
 preview_auth = (root / "preview_auth_v334.py").read_text(encoding="utf-8")
 account_auth = (root / "account_auth.py").read_text(encoding="utf-8")
 migration = (root / "SUPABASE_MIGRATION_V3_34_GEN4_ARCHIVE.sql").read_text(encoding="utf-8")
@@ -142,16 +141,9 @@ assert "gen4ReturningBonusXp:500" in runtime
 assert "releaseModalCohortsV4011:true" in runtime
 assert "pwaResumeUpdateCheckV4012:true" in runtime
 assert "dailyHeroCtaParityV40119:true" in runtime
-assert "Upleteno s ❤️</span>" in index
-assert "rodinné dovolené" not in index
-assert "linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%)" in challenge_css
-assert "#winModal .win-main-actions .challenge-share-cta" in challenge_css
-assert "font-size:15px!important" in challenge_css
-assert "font-size:16px!important" in challenge_css
-assert ".daily-hero #shareDailyBtn.daily-challenge-cta" in challenge_css
-assert "min-height:50px" in challenge_css
-assert "padding:12px 16px" in challenge_css
-assert "border-radius:14px" in challenge_css
+# Historical footer wording and giant result-CTA styling were intentionally retired.
+# Current result_action_dock/result_summary_visibility and release_contract tests
+# own the approved result hierarchy and current asset/cache contract.
 assert "self.skipWaiting()" in sw
 assert "client.navigate(target)" in sw
 assert "'/puzzles.json'" not in re.search(r"const SHELL=\[(.*?)\];", sw, re.S).group(1)

@@ -1,0 +1,30 @@
+'use strict';
+// Execute the native weekly renderer with read-only state fixtures: catalogue is not ownership.
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const source=fs.readFileSync('public/app/weekly/competition.js','utf8').replace(/\r\n/g,'\n');
+const render=source.slice(source.indexOf('function render(){'),source.indexOf("\nroot.addEventListener('click'"));
+assert(render.startsWith('function render(){'));
+const nodes=new Map(),$=selector=>{if(!nodes.has(selector))nodes.set(selector,{innerHTML:'',textContent:''});return nodes.get(selector)};
+const context={$,num:value=>Math.max(0,Number(value)||0),fmt:value=>String(value||0),esc:value=>String(value??''),weekLabel:()=> 'fixture week',retry:'<button data-retry>Retry</button>',data:null};
+vm.createContext(context);
+for(const name of ['assets','names','thresholds'])vm.runInContext('const '+name+'='+source.match(new RegExp(name+'=(\\[[^\\]]+\\])'))[1]+';',context);
+vm.runInContext(render,context);
+function paint(profile,victories){context.data={profile,victories,rankings:{teams:[]}};context.render();return $('#shelf').innerHTML}
+const guest=paint(null,null);
+assert.equal((guest.match(/data-trophy=/g)||[]).length,4,'Guest can inspect all existing trophy illustrations');
+assert(!/class="trophy locked"/.test(guest),'Catalogue art stays in full colour without a team');
+assert(!guest.includes('✓')&&!guest.includes('class="earned"'),'Catalogue must not imply ownership');
+assert.equal($('#cabinetTab').textContent,'Trofeje');
+const noTeam=paint({id:'member'},{enabled:true,team:null});
+assert.equal(noTeam,guest,'Signed-in member without a team sees the same ownership-free catalogue');
+const zero=paint({id:'member'},{enabled:true,team:{name:'Actual team',totalGold:0},history:[]});
+assert.equal((zero.match(/class="trophy locked"/g)||[]).length,4,'Real team ownership still shows unearned milestones');
+assert(!zero.includes('✓'));assert.equal($('#cabinetTab').textContent,'Vitrína týmu');
+const earned=paint({id:'member'},{enabled:true,team:{name:'Actual team',totalGold:3},history:[]});
+assert.equal((earned.match(/✓ Získáno/g)||[]).length,2,'Three confirmed wins unlock only the existing first two milestones');
+assert.equal((earned.match(/class="trophy locked"/g)||[]).length,2);
+const failed=paint({id:'member'},null);
+assert.equal(failed,'','Load failure must not impersonate a zero-win team or public catalogue');
+assert($('#cabinetIntro').innerHTML.includes('data-retry'));
+assert.equal($('#history').innerHTML,'');
+console.log('PASS weekly trophy catalogue: full-colour guest/no-team art without ownership, real-team milestones retained, failed read remains unavailable');

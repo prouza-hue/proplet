@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-28",
+  "projectRef": "eanzztstmwlamwfdskbf",
+  "projectName": "proplet-s08b-atomic-result-test",
+  "syntheticOnly": true,
+  "productionTouched": false,
+  "migrationVersion": "20261028004956",
+  "migrationName": "monthly_competition_isolated_prepared",
+  "sourcePath": "supabase/migrations/20261028003751_monthly_competition.sql",
+  "sourceSha256": "b54f32ecc7507e56e653c23914eac278a912597062892df99de5cfab51db51bb",
+  "applied": ["monthly additive schema/RPC/trigger migration only"],
+  "checks": ["65 authoritative atomic-RPC Daily completions", "best20 of25 gives2400", "120 clean /100 hint scoring independent of987 XP", "1-1-3 tied places", "durable receipt replay", "48h close", "3 badges exactly once on repeated close", "anon/authenticated RPC denial", "all test writes rolled back"],
+  "afterRollback": {"players":12,"qaPlayers":0,"days":0,"rounds":0,"badges":0,"enabled":false,"rulesApproved":false,"lateSyncPolicy":null,"isolated":true,"previewNow":null},
+  "limitations": ["Underlying isolated schema is historical custom preview through2026-10-12, not current production parity", "No offline RPC wrappers; referral/weekly/current reward schemas absent", "Full schema replay was deliberately not attempted because custom preview migrations are not directly equivalent to registry history", "Remote check invokes existing atomic result RPC via Supabase management SQL; it is not public online API acceptance", "No service-role key available to connect new Vercel branch to this database"]
+}

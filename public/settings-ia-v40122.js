@@ -9,6 +9,8 @@
   const setClass=(el,name,on)=>{if(el)el.classList.toggle(name,!!on)};
   const gearSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"></path></svg>';
   let scheduled=false;
+  let returnContext=null,opening=0;
+  const screenNames={daily:'Dnes',free:'Hrát',archive:'Archiv',leaderboard:'Soutěže',weekly:'Týdenní soutěž',monthly:'Měsíční soutěž',profile:'Já'};
 
   function profile(){try{return typeof getProfile==='function'?getProfile():null}catch{return null}}
   function profileScreen(){return q('#screen-profile')}
@@ -32,7 +34,7 @@
     let head=q('#profileSettingsHeader',screen);
     if(!head){
       head=document.createElement('div');head.id='profileSettingsHeader';head.className='profile-settings-header';
-      head.innerHTML='<button id="profileSettingsBack" class="profile-settings-back" type="button">← Já</button><div class="profile-settings-heading"><h1>Nastavení</h1><p>Hraní, vzhled, účet a soukromí.</p></div>';
+      head.innerHTML='<button id="profileSettingsBack" class="profile-settings-back" type="button">← Zpět</button><div class="profile-settings-heading"><h1>Nastavení</h1></div>';
       screen.prepend(head);q('#profileSettingsBack',head).onclick=closeSettings;
     }
   }
@@ -40,6 +42,7 @@
   function polishGameplayCard(){
     const card=q('#soundToggle')?.closest('.settings-card');if(!card)return;
     card.classList.add('settings-gameplay-card');removeEyebrow(card);
+    setText(q('.section-head h2',card),'Hraní');
     q('#wakeLockNote')?.classList.add('settings-copy-pruned');
     const support=q('.support-mode-card',card);if(!support)return;
     support.classList.add('settings-support-polished');
@@ -48,6 +51,7 @@
 
   function polishAppearanceCard(){
     const card=q('.appearance-card');if(!card)return;
+    removeEyebrow(card);setText(q('.section-head h2',card),'Vzhled');
     q('.appearance-copy',card)?.classList.add('settings-copy-pruned');
     q('#themeModeNote',card)?.classList.add('settings-copy-pruned');
   }
@@ -55,9 +59,10 @@
   function polishPushCard(){
     const card=q('.push-card');if(!card)return;
     removeEyebrow(card);
+    setText(q('.section-head h2',card),'Upozornění');
     q(':scope>p.push-copy',card)?.classList.add('settings-copy-pruned');
     const detail=q('.notification-pref-copy>small',card);
-    setText(detail,'Dáme vědět o Denní výzvě a každé pondělí o nové várce úrovní.');
+    setText(detail,'Připomeneme nevyřešenou Denní výzvu a pondělní nové desky.');
     const status=q('#pushStatusText',card),statusText=(status?.textContent||'').trim();
     const redundant=/^(Zapnuto na tomto zařízení|Vypnuto na tomto zařízení)/.test(statusText);
     setClass(status,'settings-status-redundant',redundant);
@@ -66,7 +71,7 @@
   function polishDataCard(){
     const card=q('.trust-card');if(!card)return;
     card.classList.add('settings-data-card');removeEyebrow(card);
-    setText(q('.section-head h2',card),'Data pod kontrolou');
+    setText(q('.section-head h2',card),'Data a soukromí');
     setText(q(':scope>p.muted',card),profile()?.token?'Stáhni svá data nebo trvale smaž účet.':'Informace o soukromí a podmínkách hraní.');
   }
 
@@ -74,7 +79,7 @@
     const hub=q('#profileAccountHub');if(!hub)return;
     const head=q('.profile-account-head',hub);if(!head)return;
     q('.stat-label',head)?.remove();
-    setText(q('strong',head),'Tvůj účet');
+    setText(q('strong',head),'Účet');
   }
 
   function ensureAdminPlacement(){
@@ -120,14 +125,27 @@
   }
 
   function openSettings(){
+    if(!returnContext){
+      const current=typeof currentScreen==='string'?currentScreen:q('.screen.active')?.id?.replace(/^screen-/,'');
+      returnContext={screen:Object.hasOwn(screenNames,current)?current:'daily',scroll:window.scrollY||0};
+    }
+    const ticket=++opening;
     try{if(typeof nav==='function')nav('profile')}catch{}
-    setTimeout(()=>{const screen=profileScreen();if(!screen)return;ensureUi();screen.classList.add('settings-open');syncGuestState();window.scrollTo({top:0,behavior:'auto'});q('#profileSettingsBack')?.focus({preventScroll:true})},20);
+    setTimeout(()=>{const screen=profileScreen();if(ticket!==opening||!returnContext||!screen?.classList.contains('active'))return;ensureUi();setText(q('#profileSettingsBack'),'← '+screenNames[returnContext.screen]);screen.classList.add('settings-open');syncGuestState();window.scrollTo({top:0,behavior:'auto'});q('#profileSettingsBack')?.focus({preventScroll:true})},20);
+  }
+  function leaveSettings(){
+    ++opening;profileScreen()?.classList.remove('settings-open');returnContext=null;
   }
   function closeSettings(){
-    const screen=profileScreen();if(!screen)return;screen.classList.remove('settings-open');window.scrollTo({top:0,behavior:'auto'});q('#settingsHeaderBtn')?.focus({preventScroll:true});
+    const destination=returnContext;leaveSettings();
+    if(destination&&destination.screen!=='profile')try{if(typeof nav==='function')nav(destination.screen,{replace:true})}catch{}
+    window.scrollTo({top:destination?.scroll||0,behavior:'auto'});q('#settingsHeaderBtn')?.focus({preventScroll:true});
   }
 
-  document.addEventListener('click',event=>{const navEl=event.target.closest?.('[data-nav]');if(!navEl||!settingsOpen())return;closeSettings()},true);
+  // Navigation owns its destination. Clear only the sub-view, including a pending
+  // open timeout, and let the original navigation button continue untouched.
+  document.addEventListener('click',event=>{if(event.target.closest?.('[data-nav]')&&(returnContext||settingsOpen()))leaveSettings()},true);
+  document.addEventListener('proplet:screen-changed',event=>{if(event.detail?.screen!=='profile'&&(returnContext||settingsOpen()))leaveSettings()});
 
   const observer=new MutationObserver(()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;ensureUi()})});
   observer.observe(document.documentElement,{subtree:true,childList:true,characterData:false,attributes:false});

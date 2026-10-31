@@ -61,16 +61,16 @@ function ensureModals(){
    <form id="linkGoogleForm"><label>Heslo k Propletu<input id="linkGooglePassword" type="password" autocomplete="current-password" minlength="8" maxlength="128" required></label>
    <div id="linkGoogleMessage" class="account-auth-message" role="status"></div><button id="confirmLinkGoogle" type="submit" class="primary-btn big">Potvrdit a vybrat Google účet</button></form>
   </div></div>
-  <div id="forgotPasswordModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left account-recovery-modal">
-   <button id="closeForgotPassword" class="modal-close" aria-label="Zavřít">×</button><span class="eyebrow">ZÁCHRANA ÚČTU</span><h2>Zapomenuté heslo</h2>
-   <p class="muted">Zadej <b>ověřený e-mail</b> propojený s Propletem. Pošleme ti jednorázový odkaz pro nastavení nového hesla.</p>
+  <div id="forgotPasswordModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="forgotPasswordTitle"><div class="modal-card left account-recovery-modal">
+   <button id="closeForgotPassword" class="modal-close" aria-label="Zpět k přihlášení">×</button><h2 id="forgotPasswordTitle">Zapomenuté heslo</h2>
+   <p class="muted">Na ověřený e-mail svého účtu si pošli odkaz pro nové heslo.</p>
    <label>E-mail<input id="forgotEmailInput" type="email" autocomplete="email" inputmode="email" placeholder="ty@example.cz"></label>
-   <div id="forgotPasswordMessage" class="account-auth-message"></div><button id="sendRecoveryBtn" class="primary-btn big">Poslat odkaz</button>
+   <div id="forgotPasswordMessage" class="account-auth-message" role="status" aria-live="polite"></div><button id="sendRecoveryBtn" class="primary-btn big">Poslat odkaz</button>
   </div></div>
-  <div id="resetPasswordModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left account-recovery-modal">
-   <span class="eyebrow">NOVÉ HESLO</span><h2>Účet je ověřený</h2><p class="muted">Teď už jen nastav nové heslo. Ostatní aktivní přihlášení pro jistotu odpojíme.</p>
+  <div id="resetPasswordModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="resetPasswordTitle"><div class="modal-card left account-recovery-modal">
+   <h2 id="resetPasswordTitle">Nastavit nové heslo</h2><p class="muted">Po změně hesla odpojíme ostatní aktivní přihlášení.</p>
    <label>Nové heslo<input id="recoveryPassword" type="password" autocomplete="new-password" minlength="8"></label><label>Znovu<input id="recoveryPassword2" type="password" autocomplete="new-password" minlength="8"></label>
-   <div id="resetPasswordMessage" class="account-auth-message"></div><button id="completeRecoveryBtn" class="primary-btn big">Nastavit nové heslo</button>
+   <div id="resetPasswordMessage" class="account-auth-message" role="status" aria-live="polite"></div><button id="completeRecoveryBtn" class="primary-btn big">Nastavit nové heslo</button>
   </div></div>
   <div id="profileEditModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left profile-edit-modal-card">
    <button id="closeProfileEdit" class="modal-close" aria-label="Zavřít">×</button><h2>Jak ti má Proplet říkat?</h2>
@@ -84,13 +84,14 @@ function ensureModals(){
    <div id="avatarEditMessage" class="account-auth-message" role="status" aria-live="polite"></div>
    <div class="profile-edit-avatar-block"><div id="profileEditGoogleAvatar"></div><div id="profileEditAvatarGrid" class="avatar-grid profile-edit-avatar-grid"></div><small class="field-note">Google fotka je soukromá pro tvoji hlavičku. Ve veřejném pořadí dál používáme zvolený herní avatar.</small></div>
   </div></div>
-  <div id="recoveryEmailModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card left account-recovery-modal">
-   <button id="closeRecoveryEmail" class="modal-close" aria-label="Zavřít">×</button><span class="eyebrow">ZÁCHRANA ÚČTU</span><h2>Přidat e-mail</h2>
+  <div id="recoveryEmailModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="recoveryEmailTitle"><div class="modal-card left account-recovery-modal">
+   <button id="closeRecoveryEmail" class="modal-close" aria-label="Zavřít">×</button><h2 id="recoveryEmailTitle">E-mail pro obnovu</h2>
    <p class="muted">E-mail použijeme pro obnovu zapomenutého hesla a můžeš se jím také přihlašovat. Nejprve ho ověříš kliknutím na odkaz.</p>
    <label>E-mail<input id="recoveryEmailAddInput" type="email" autocomplete="email" inputmode="email" placeholder="ty@example.cz"></label>
-   <div id="recoveryEmailAddMessage" class="account-auth-message"></div><button id="saveRecoveryEmailBtn" class="primary-btn big">Poslat ověřovací odkaz</button>
+   <div id="recoveryEmailAddMessage" class="account-auth-message" role="status" aria-live="polite"></div><button id="saveRecoveryEmailBtn" class="primary-btn big">Poslat ověřovací odkaz</button>
   </div></div>`);
- $('#closeForgotPassword').onclick=()=>closeModal('#forgotPasswordModal');
+ const backToLogin=()=>{closeModal('#forgotPasswordModal');openModal('#profileModal');$('#forgotPasswordBtn')?.focus({preventScroll:true})};
+ $('#closeForgotPassword').onclick=backToLogin;
  $('#closeLinkGoogle').onclick=()=>{$('#linkGooglePassword').value='';closeModal('#linkGoogleModal')};
  $('#linkGoogleForm').onsubmit=startGoogleLink;
  $('#closeProfileEdit').onclick=()=>closeModal('#profileEditModal');
@@ -100,7 +101,9 @@ function ensureModals(){
  $('#completeRecoveryBtn').onclick=completeRecovery;
  $('#saveDisplayNameBtn').onclick=saveDisplayName;
  $('#saveRecoveryEmailBtn').onclick=saveRecoveryEmail;
- ['#forgotPasswordModal','#profileEditModal','#recoveryEmailModal'].forEach(sel=>{$(sel).onclick=e=>{if(e.target===$(sel))closeModal(sel)}});
+ ['#profileEditModal','#recoveryEmailModal'].forEach(sel=>{$(sel).onclick=e=>{if(e.target===$(sel))closeModal(sel)}});
+ $('#forgotPasswordModal').onclick=e=>{if(e.target===$('#forgotPasswordModal'))backToLogin()};
+ $('#forgotPasswordModal').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();backToLogin()}});
  $('#avatarEditModal').onclick=e=>{if(e.target===$('#avatarEditModal'))closeAvatarEditor()};
  $('#avatarEditModal').addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();closeAvatarEditor()}});
 }
@@ -109,27 +112,42 @@ function ensureLoginEnhancements(){
  const modal=$('#profileModal'),save=$('#saveProfileBtn');if(!modal||!save||$('#accountAuthExtras'))return;
  save.insertAdjacentHTML('beforebegin',`
   <div id="accountAuthExtras" class="account-auth-extras">
-   <div id="recoveryEmailField" class="account-email-create hidden"><label>E-mail pro záchranu účtu <span class="optional-tag">nepovinný</span><input id="recoveryEmailInput" type="email" autocomplete="email" inputmode="email" placeholder="ty@example.cz"></label><div class="account-email-warning"><span>🛟</span><div><strong>Doporučujeme ho přidat.</strong><small>Bez ověřeného e-mailu účet funguje normálně, ale zapomenuté heslo nepůjde obnovit.</small></div></div></div>
-   <button id="forgotPasswordBtn" type="button" class="account-forgot-btn">Zapomněl jsem heslo</button><div class="account-auth-divider"><span>nebo</span></div>
+   <div id="recoveryEmailField" class="account-email-create hidden"><details id="recoveryEmailDetails"><summary>Přidat e-mail pro obnovu <span>(nepovinné)</span></summary><label>E-mail<input id="recoveryEmailInput" type="email" autocomplete="email" inputmode="email" placeholder="ty@example.cz" aria-describedby="recoveryEmailCaveat"></label></details><small id="recoveryEmailCaveat">Bez ověřeného e-mailu zapomenuté heslo neobnovíš.</small></div>
+   <button id="forgotPasswordBtn" type="button" class="account-forgot-btn">Zapomenuté heslo?</button>
    <button id="googleLoginBtn" type="button" class="google-auth-btn"><img class="google-g" src="/google-g.svg" alt="" aria-hidden="true"><strong>Pokračovat přes Google</strong></button>
   </div>`);
  const original=save.onclick;
  save.onclick=async function(e){
   const create=$('#profileModeCreate')?.classList.contains('active'),email=$('#recoveryEmailInput')?.value.trim()||'';
-  if(create&&email&&!validEmail(email)){const err=$('#profileFormError');if(err)err.textContent='Zkontroluj prosím e-mailovou adresu.';return}
+  if(create&&email&&!validEmail(email)){const err=$('#profileFormError');if(err)err.textContent='Zkontroluj prosím e-mailovou adresu.';$('#recoveryEmailDetails').open=true;$('#recoveryEmailInput').focus();return}
   const before=profile()?.id||null,result=original?.call(this,e);if(result&&typeof result.then==='function')await result;const after=profile();
   if(create&&email&&after?.id&&after.id!==before){try{await call('/api/account/email/start',{method:'POST',body:{email}});toast('📬 Účet je uložený. Teď ještě potvrď e-mail v doručené poště.')}catch(err){toast(`Účet je uložený, ale e-mail zatím ne: ${err.message}`)}}
  };
  $('#forgotPasswordBtn').onclick=()=>{closeModal('#profileModal');openModal('#forgotPasswordModal');$('#forgotPasswordMessage').textContent='';setTimeout(()=>$('#forgotEmailInput')?.focus(),80)};
  $('#googleLoginBtn').onclick=()=>{location.href='/api/auth/google/start'};
  window.PropletInAppBrowserHelp?.mount($('#googleLoginBtn'));
+ positionLoginFields();
  syncLoginMode();new MutationObserver(syncLoginMode).observe($('#profileModeCreate'),{attributes:true,attributeFilter:['class']});
+}
+function positionLoginFields(){
+ const input=$('#playerPasswordInput'),toggle=$('#profilePasswordToggle'),label=input?.closest('label');
+ if(input&&toggle&&label&&!$('#authPasswordField')){
+  const group=document.createElement('div');group.id='authPasswordField';label.before(group);group.append(label);
+  label.setAttribute('for',input.id);
+  const field=document.createElement('div');field.className='auth-password-control';field.append(input,toggle);group.append(field,$('#forgotPasswordBtn'));
+  const sync=()=>{const shown=input.type==='text';toggle.setAttribute('aria-pressed',String(shown));toggle.setAttribute('aria-label',shown?'Skrýt heslo':'Zobrazit heslo');toggle.title=shown?'Skrýt heslo':'Zobrazit heslo'};
+  sync();new MutationObserver(sync).observe(input,{attributes:true,attributeFilter:['type']});
+ }
+ const legacy=$('#legacyTeamLoginToggle'),chooser=$('#leagueChooser'),save=$('#saveProfileBtn');
+ if(legacy&&chooser&&save&&!$('#authLegacyOptions')){const options=document.createElement('div');options.id='authLegacyOptions';save.after(options);options.append(legacy,chooser);}
+ const error=$('#profileFormError');if(error){error.setAttribute('role','alert');error.setAttribute('aria-live','polite');}
 }
 function syncLoginMode(){
  const create=$('#profileModeCreate')?.classList.contains('active');$('#recoveryEmailField')?.classList.toggle('hidden',!create);$('#forgotPasswordBtn')?.classList.toggle('hidden',!!create);
+ $('#authLegacyOptions')?.classList.toggle('hidden',!!create);
  const inp=$('#playerNameInput');if(inp){inp.placeholder=create?'Jak ti má Proplet říkat?':'Jméno nebo ověřený e-mail';inp.setAttribute('autocomplete',create?'nickname':'username')}
+ const password=$('#playerPasswordInput');if(password)password.placeholder=create?'alespoň 8 znaků':'Heslo';
  const label=inp?.closest('label');if(label){for(const n of [...label.childNodes])if(n.nodeType===Node.TEXT_NODE&&n.textContent.trim()){n.textContent=create?'Přezdívka':'Jméno nebo e-mail';break}}
- const desc=$('#profileModalDesc');if(desc)desc.textContent=create?'Přezdívku můžeš kdykoli změnit. Heslo je povinné; e-mail nepovinný, ale bez něj nepůjde obnovit zapomenuté heslo.':'Přihlas se herním jménem nebo ověřeným e-mailem. Případně použij Google.';
 }
 
 function captureAvatars(card){const found=[...card.querySelectorAll('.avatar-choice')].map(b=>b.dataset.avatar).filter(Boolean);if(found.length)knownAvatars=[...new Set(found)]}

@@ -28,6 +28,8 @@ from backend import measurement
 from backend.launch_report import build_launch_report
 from backend.quality_dataset import load_quality_dataset
 from backend import rankings as ranking_queries
+from backend import monthly_competition
+from backend.monthly_preview import MonthlyPreviewControl
 from backend import admin_workspace
 from backend import config as backend_config
 from backend import results as result_domain
@@ -43,6 +45,7 @@ from backend.config import (
     GEN4_CANDIDATE_PREVIEW,
     GEN5_CANDIDATE_PREVIEW,
     HISTORICAL_FREE_REWARDS_ENABLED,
+    LIVE_PLAYER_PREVIEW,
     GEN4_PREVIEW_BRANCH,
     PUZZLES_PATH,
     PHONE_LANDSCAPE_BLOCKING,
@@ -60,6 +63,7 @@ from backend.config import (
     VERCEL_ENV,
     VERCEL_GIT_COMMIT_REF,
 )
+from backend.config import monthly_preview_qa_enabled, release_news_enabled
 from backend.contracts import (
     AccountDeleteConfirm,
     AdminReportUpdate,
@@ -147,7 +151,7 @@ request_guard_context = ContextVar("proplet_request_guard", default=None)
 
 
 def isolated_fair_play_preview():
-    return (VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF in {"fix/fair-play-progress", free_order.BRANCH, "work/daily-specials-integrated-20261012"}
+    return (VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF in {"fix/fair-play-progress", free_order.BRANCH, "work/daily-specials-integrated-20261012", "codex/monthly-competition-202611"}
             and SUPABASE_URL.rstrip("/") == "https://eanzztstmwlamwfdskbf.supabase.co")
 
 
@@ -155,11 +159,12 @@ def isolated_fair_play_preview():
 async def launch_safety_middleware(request: Request, call_next):
     # Use the ASGI routing path, independent of the untrusted Host header.
     path = request.scope["path"]
-    if VERCEL_ENV == "preview" and not isolated_fair_play_preview() and request.method == "POST" and path == "/api/play-session":
+    if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() or LIVE_PLAYER_PREVIEW) and request.method == "POST" and path == "/api/play-session":
         return JSONResponse({"detail":"Preview nemá oddělené herní úložiště."},status_code=409)
-    if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() and (path == "/api/anonymous/claim" or VERCEL_GIT_COMMIT_REF == "work/daily-specials-integrated-20261012")) and request.method == "POST" and path in {"/api/product-event","/api/product-events","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
+    monthly_game_evidence = monthly_qa_enabled() and path in {"/api/attempt/start", "/api/attempt/checkpoint", "/api/attempt/finish", "/api/hint-event", "/api/helper-event", "/api/anonymous/claim"}
+    if VERCEL_ENV == "preview" and not (LIVE_PLAYER_PREVIEW or monthly_game_evidence or (isolated_fair_play_preview() and (path == "/api/anonymous/claim" or VERCEL_GIT_COMMIT_REF == "work/daily-specials-integrated-20261012"))) and request.method == "POST" and path in {"/api/product-event","/api/product-events","/api/attempt/start","/api/attempt/checkpoint","/api/attempt/finish","/api/hint-event","/api/helper-event","/api/feedback","/api/anonymous/claim"}:
         return JSONResponse({"ok":True,"ignored":True,"preview":True})
-    if ((VERCEL_ENV == "preview" and not isolated_fair_play_preview()) or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and path == "/api/result":
+    if ((VERCEL_ENV == "preview" and not (isolated_fair_play_preview() or LIVE_PLAYER_PREVIEW)) or request.headers.get("x-proplet-test") == "1") and request.method == "POST" and path == "/api/result":
         return JSONResponse({"detail":"V testovacím režimu zůstávají výsledky pouze na zařízení."},status_code=409)
     incoming_id = request.headers.get("x-request-id") or ""
     request_id = re.sub(r"[^A-Za-z0-9_.:-]", "", incoming_id)[:80] or secrets.token_hex(8)
@@ -647,6 +652,13 @@ def actor_filters(actor: dict) -> dict:
 
 
 def current_prague_datetime() -> datetime:
+    if monthly_qa_enabled():
+        context = request_guard_context.get()
+        if isinstance(context, dict):
+            if "monthly_qa_now" not in context:
+                value = db_rpc("proplet_monthly_preview_clock_v1", {})
+                context["monthly_qa_now"] = datetime.fromisoformat(str(value).replace("Z", "+00:00")).astimezone(TZ)
+            return context["monthly_qa_now"]
     now = datetime.now(TZ)
     preview_day = os.environ.get("PROPLET_DAILY_SPECIALS_PREVIEW_DATE", "").strip()
     if preview_day:
@@ -654,6 +666,20 @@ def current_prague_datetime() -> datetime:
         selected = date.fromisoformat(preview_day)
         return now.replace(year=selected.year, month=selected.month, day=selected.day)
     return now
+
+
+def monthly_qa_enabled() -> bool:
+    return (monthly_preview_qa_enabled(SUPABASE_URL) and VERCEL_ENV == "preview"
+            and VERCEL_GIT_COMMIT_REF == "codex/monthly-competition-202611"
+            and SUPABASE_URL == "https://eanzztstmwlamwfdskbf.supabase.co")
+
+
+def monthly_preview_capabilities() -> dict:
+    if not monthly_qa_enabled():
+        return {}
+    now = current_prague_datetime()
+    return {"monthlyPreview": {"isolated": True, "databaseRef": "eanzztstmwlamwfdskbf",
+            "branch": VERCEL_GIT_COMMIT_REF, "qaNow": now.isoformat()}, "serverNow": now.isoformat()}
 
 
 def current_prague_date() -> date:
@@ -895,7 +921,7 @@ def _parse_content_date(value: Optional[str]) -> Optional[date]:
 def effective_content_date(request: Optional[Request] = None, requested: Optional[str] = None) -> date:
     """Production always uses Prague today; preview deployments may simulate a release date."""
     actual = current_prague_date()
-    if VERCEL_ENV == "production":
+    if VERCEL_ENV == "production" or LIVE_PLAYER_PREVIEW:
         return actual
     candidate = requested
     if not candidate and request is not None:
@@ -1421,7 +1447,7 @@ def shared_puzzle(
 def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=37)):
     """Serve one released board without exposing the remaining weekend bank."""
     today = current_prague_date()
-    if VERCEL_ENV == "preview":
+    if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
         selected_week = week or tajenka_week_for(today) or 1
     else:
         if not tajenka_is_live(today):
@@ -1597,6 +1623,7 @@ def health():
     puzzle_file = PUZZLES_PATH.exists()
     pdata = load_puzzles() if puzzle_file else {}
     base = {
+        **monthly_preview_capabilities(),
         "rpcTransport": backend_db.postgres_rpc.transport_status(),
         "historicalFreeRewardsEnabled": HISTORICAL_FREE_REWARDS_ENABLED,
         "archiveEnabled": archive_release_enabled(),
@@ -1844,6 +1871,7 @@ def save_free_order(payload: free_order.OrderCommand, request: Request,
 def config():
     p = load_puzzles()
     return {
+        **monthly_preview_capabilities(),
         "badges": BADGES,
         "points": {**POINTS, "starter": STARTER_XP},
         "dictionarySize": p["dictionarySize"],
@@ -1854,6 +1882,7 @@ def config():
         "rescueBankSize": len(p.get("rescue", [])),
         "pushAvailable": push_ready(),
         "environment": VERCEL_ENV or "local",
+        "livePlayerPreview": LIVE_PLAYER_PREVIEW,
         "adminPreview": backend_config.admin_preview_enabled(),
         "version": APP_VERSION,
         "archiveEnabled": archive_release_enabled(),
@@ -2016,14 +2045,28 @@ def login(payload: PlayerLogin, request: Request):
 
 @app.post("/api/anonymous/claim")
 def claim_anonymous(payload: AnonymousClaim, request: Request, authorization: Optional[str] = Header(default=None)):
+    # Attach anonymous telemetry to the authenticated player. Official results,
+    # XP and leaderboards are never created by this transfer.
+    player = None
+    anon = None
+    if monthly_qa_enabled():
+        # Accelerated isolated QA may authenticate several synthetic browsers.
+        # A server-proven empty transfer is a no-op, not a transfer-quota bypass:
+        # any anonymous session/data retains the ordinary 12/hour guard below.
+        enforce_rate_limit(request, "monthly_empty_claim_probe", limit=120, window_seconds=3600)
+        player = auth_player(authorization)
+        anon = anonymous_hash(payload.anonymous_id)
+        if not anon:
+            raise HTTPException(400, "Chybí anonymní ID")
+        proof = db_rpc("proplet_monthly_preview_empty_claim_v1", {"p_anonymous_hash": anon})
+        if not isinstance(proof, dict) or not isinstance(proof.get("empty"), bool):
+            raise HTTPException(503, "Přenos postupu se nepodařilo ověřit")
+        if proof["empty"]:
+            return {"ok": True, "claimed": {"attempts": 0, "helperEvents": 0, "hintEvents": 0,
+                    "productEvents": 0, "feedback": 0, "pushSubscriptions": 0}}
     enforce_rate_limit(request, "anonymous_claim", limit=12, window_seconds=3600)
-    """Attach anonymous telemetry from this installation to the newly authenticated player.
-
-    This prevents one person from being counted twice after creating/logging into an account.
-    Official results, XP and leaderboards are never created here; only QA telemetry is reassigned.
-    """
-    player = auth_player(authorization)
-    anon = anonymous_hash(payload.anonymous_id)
+    player = player or auth_player(authorization)
+    anon = anon or anonymous_hash(payload.anonymous_id)
     if not anon:
         raise HTTPException(400, "Chybí anonymní ID")
     if play_session_config().get("enabled"):
@@ -2087,7 +2130,7 @@ def set_avatar(payload: AvatarSet, request: Request, authorization: Optional[str
 @app.post("/api/account/welcome")
 def claim_printshop_welcome(request: Request, authorization: Optional[str] = Header(default=None)):
     player = auth_player(authorization)
-    if VERCEL_ENV == "preview":
+    if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
         return {"show": False}
     enforce_rate_limit(request, "welcome_claim", limit=30, window_seconds=3600)
     rows = db_request("PATCH", "players", params={
@@ -2294,7 +2337,7 @@ def set_team_pin(payload: TeamPinSet, request: Request, authorization: Optional[
 def set_team_membership(payload: TeamMembershipSet, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "team_membership", limit=15, window_seconds=600, discriminator=payload.family_code or payload.league_name or payload.mode)
     player = auth_player(authorization)
-    if VERCEL_ENV == "preview":
+    if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
         raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
     current_family = norm_family(str(player.get("family_code") or ""))
     if not is_solo_player(player):
@@ -2653,7 +2696,7 @@ def _fair_play_policy() -> dict:
 
 @app.get("/api/play-session/config")
 def play_session_config():
-    if VERCEL_ENV == "preview" and not isolated_fair_play_preview():
+    if VERCEL_ENV == "preview" and not (isolated_fair_play_preview() or LIVE_PLAYER_PREVIEW):
         return {"enabled": False}
     try:
         policy = _fair_play_policy()
@@ -3470,7 +3513,7 @@ def payload_completed_at(value: Optional[str]) -> str:
             if dt.tzinfo is None:
                 dt = dt.replace(tzinfo=TZ)
             # Reject absurd timestamps; device clocks can occasionally be wrong.
-            now = datetime.now(TZ)
+            now = current_prague_datetime()
             if datetime(2025, 1, 1, tzinfo=TZ) <= dt.astimezone(TZ) <= now + timedelta(days=1):
                 if os.environ.get("PROPLET_DAILY_SPECIALS_PREVIEW_DATE"):
                     selected = current_prague_date()
@@ -4151,7 +4194,7 @@ def family_league(
 def family_league_settings(payload: FamilyLeagueSettings, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "family_league_settings", limit=20, window_seconds=3600)
     player = auth_player(authorization)
-    if VERCEL_ENV == "preview":
+    if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
         raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
     family = norm_family(str(player.get("family_code") or ""))
     if is_solo_player(player):
@@ -4668,22 +4711,93 @@ def team_settings(request: Request, authorization: Optional[str] = Header(defaul
 def leave_team(request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "team_leave", limit=8, window_seconds=3600)
     player = auth_player(authorization)
-    if VERCEL_ENV == "preview":
+    if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
         raise HTTPException(409, "V preview se týmová data z bezpečnostních důvodů nemění")
-    family = public_family_code(player.get("family_code"), player.get("team_joined_at"))
-    if not family:
-        return {"ok": True, "familyCode": None, "leagueName": None}
-    now = datetime.now(TZ).isoformat()
     try:
-        memberships = db_select("team_memberships", player_id=player["id"])
+        # Generate before any write. The RPC locks/rechecks the authenticated
+        # player and closes memberships + moves to solo in one transaction.
+        result = db_rpc("proplet_team_leave_v1", {
+            "p_player": player["id"],
+            "p_expected_family": player.get("family_code"),
+            "p_expected_joined_at": player.get("team_joined_at"),
+            "p_new_solo": f"SOLO_{secrets.token_hex(6).upper()}",
+        })
     except HTTPException as exc:
-        raise HTTPException(503, "Změna týmu ještě čeká na databázovou aktualizaci") from exc
-    active = [row for row in memberships if not row.get("left_at")]
-    for membership in active:
-        db_update("team_memberships", {"id": membership["id"]}, {"left_at": now})
-    new_solo = make_solo_family_code()
-    db_update("players", {"id": player["id"]}, {"family_code": new_solo, "team_joined_at": None})
+        # No REST fallback: unavailable SQL must never leave partial state.
+        raise HTTPException(503, "Odchod z týmu se nepodařilo bezpečně potvrdit. Zkus to znovu.") from exc
+    if isinstance(result, dict) and result.get("code") == "conflict":
+        raise HTTPException(409, "Členství se mezitím změnilo. Obnov profil a zkus to znovu.")
+    if not isinstance(result, dict) or result.get("ok") is not True:
+        raise HTTPException(503, "Odchod z týmu se nepodařilo bezpečně potvrdit. Zkus to znovu.")
     return {"ok": True, "familyCode": None, "leagueName": None}
+
+
+def monthly_competition_available() -> bool:
+    if os.environ.get("PROPLET_MONTHLY_ENABLED", "").lower() not in {"true", "1"}:
+        return False
+    if VERCEL_ENV == "preview":
+        return (VERCEL_GIT_COMMIT_REF == "codex/monthly-competition-202611"
+                and SUPABASE_URL == "https://eanzztstmwlamwfdskbf.supabase.co"
+                and bool(SUPABASE_SECRET_KEY))
+    return VERCEL_ENV == "production" and supabase_ready()
+
+
+@app.post("/api/qa/monthly-control")
+def monthly_preview_control(payload: MonthlyPreviewControl, authorization: Optional[str] = Header(default=None)):
+    if not monthly_qa_enabled():
+        raise HTTPException(404, "QA ovládání není dostupné")
+    secret = os.environ.get("PROPLET_MONTHLY_QA_SECRET", "")
+    if not hmac.compare_digest(authorization or "", "Bearer " + secret):
+        raise HTTPException(403, "Neplatné ověření QA ovládání")
+    result = db_rpc("proplet_monthly_preview_control_v1", {
+        "p_action": payload.action, "p_now": payload.now.isoformat() if payload.now else None,
+    })
+    if not isinstance(result, dict):
+        raise HTTPException(503, "QA ovládání je dočasně nedostupné")
+    return JSONResponse({**result, "isolated": True, "databaseRef": "eanzztstmwlamwfdskbf",
+                         "branch": VERCEL_GIT_COMMIT_REF}, headers={"Cache-Control": "no-store"})
+
+
+@app.get("/api/competition/monthly")
+def monthly_competition_state(
+    request: Request,
+    month: Optional[str] = Query(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$"),
+    scenario: Optional[str] = Query(default=None, pattern=r"^(upcoming|empty|under20|over20|ties|provisional|closed)$"),
+    authorization: Optional[str] = Header(default=None),
+):
+    if scenario:
+        isolated_preview = (VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF == "codex/monthly-competition-202611"
+                            and SUPABASE_URL == "https://eanzztstmwlamwfdskbf.supabase.co")
+        local_qa = not VERCEL_ENV and os.environ.get("PROPLET_MONTHLY_LOCAL_QA") == "true"
+        if not (isolated_preview or local_qa):
+            raise HTTPException(404, "Izolovaný scénář není dostupný")
+        path = ROOT / "data" / "monthly-preview-scenarios.json"
+        if not path.is_file():
+            raise HTTPException(503, "Izolované scénáře zatím nejsou připravené")
+        value = json.loads(path.read_text(encoding="utf-8")).get("scenarios", {}).get(scenario)
+        if not isinstance(value, dict):
+            raise HTTPException(404, "Izolovaný scénář není dostupný")
+        return JSONResponse({**value, "isolatedScenario": scenario, "scenarioViewer": True}, headers={"Cache-Control": "no-store"})
+    if not monthly_competition_available():
+        return JSONResponse({"enabled": False, "reason": "disabled"}, headers={"Cache-Control": "no-store"})
+    enforce_rate_limit(request, "monthly_read", limit=300, window_seconds=3600)
+    viewer = _ranking_viewer(authorization)
+    value = monthly_competition.state(
+        rpc=db_rpc, player_id=str(viewer["id"]) if viewer else None,
+        month=month + "-01" if month else None,
+        players=lambda ids: db_select_bounded("players", columns="id,name,avatar,public_rankings", filters={"id": "in.(" + ",".join(ids) + ")"}),
+        identity=_ranking_display_identity,
+    )
+    return JSONResponse(value, headers={"Cache-Control": "no-store"})
+
+
+@app.get("/api/cron/monthly-competition")
+def monthly_competition_close(authorization: Optional[str] = Header(default=None)):
+    if not monthly_competition_available():
+        raise HTTPException(404, "Měsíční soutěž není aktivní")
+    if not CRON_SECRET or not hmac.compare_digest(authorization or "", f"Bearer {CRON_SECRET}"):
+        raise HTTPException(403, "Neplatné ověření uzávěrky")
+    return monthly_competition.finalize(rpc=db_rpc)
 
 
 @app.get("/api/rankings/xp")
@@ -5398,6 +5512,7 @@ install_account_auth(
         telemetry_actor=telemetry_actor,
         app_version=APP_VERSION,
         vercel_env=VERCEL_ENV,
+        live_player_preview=LIVE_PLAYER_PREVIEW,
         canonical_origin=backend_config.canonical_origin(),
     ),
 )
@@ -5447,6 +5562,10 @@ install_visual_pilot_push(
 )
 
 admin_workspace.install(globals())
+
+from backend import release_news
+release_news.install(app, auth_player=auth_player, db_rpc=db_rpc,
+                     enforce_rate_limit=enforce_rate_limit, enabled=release_news_enabled)
 
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")

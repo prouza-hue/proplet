@@ -38,19 +38,19 @@ for(const level of [1,2,3]){
 function modalFixture(){
  const doc={activeElement:null,querySelector:()=>opener};const listeners=[];const tokens=new Set(['hidden']);
  const button=()=>({hidden:false,disabled:false,isConnected:true,focus(){doc.activeElement=this}});
- const opener=button(),close=button(),title={textContent:''};doc.activeElement=opener;
+ const opener=button(),close=button(),title={textContent:''},consequence={hidden:true};doc.activeElement=opener;
  const choices=[1,2,3].map(level=>{
   const nodes={strong:{textContent:''},small:{textContent:''},'.hint-art':{src:'',getAttribute(){return this.src},setAttribute(_,value){this.src=value}}};
   return Object.assign(button(),{level,querySelector:key=>nodes[key],nodes});
  });
  const modal={ownerDocument:doc,dataset:{},attributes:{},
   classList:{contains:t=>tokens.has(t),remove:t=>tokens.delete(t),add:t=>tokens.add(t),toggle(t,v){v?tokens.add(t):tokens.delete(t)}},
-  addEventListener:(_,fn)=>listeners.push(fn),setAttribute(k,v){this.attributes[k]=v},
-  querySelector(key){return key==='#closeHintModal'?close:key==='#hintTitle'?title:null},
+  addEventListener:(_,fn)=>listeners.push(fn),setAttribute(k,v){this.attributes[k]=v},removeAttribute(k){delete this.attributes[k]},
+  querySelector(key){return key==='#closeHintModal'?close:key==='#hintTitle'?title:key==='#hintConsequence'?consequence:null},
   querySelectorAll(key){return key==='[data-hint-level]'?choices:[close,...choices]},contains(node){return [close,...choices].includes(node)}
  };
  close.click=()=>closeModal(modal);
- return {modal,doc,opener,close,choices,title,listeners,tokens};
+ return {modal,doc,opener,close,choices,title,consequence,listeners,tokens};
 }
 {
  const f=modalFixture();openModal(f.modal);
@@ -66,5 +66,15 @@ function modalFixture(){
  openModal(f.modal,{mode:'tajenka'});assert.equal(f.choices[0].nodes.strong.textContent,'Významová stopa');assert.equal(f.title.textContent,'Jak moc napovědět?');closeModal(f.modal);
  openModal(f.modal,{mode:'starter'});assert.equal(f.tokens.has('starter-hint'),true);assert.equal(f.title.textContent,'Zkus malé postrčení');closeModal(f.modal);
  openModal(f.modal);assert.equal(f.tokens.has('starter-hint'),false);assert.equal(f.listeners.length,1);closeModal(f.modal);
+ // The same chooser is reused across modes: hidden copy must also leave its
+ // accessible description, then return for the next ordinary game.
+ for(const mode of ['free','starter','daily','tajenka','daily_special','training','default']){
+  openModal(f.modal,{mode});
+  const shown=['free','daily','daily_special','default'].includes(mode);
+  assert.equal(f.consequence.hidden,!shown,mode);
+  assert.equal(f.modal.attributes['aria-describedby'],shown?'hintConsequence':undefined,mode);
+  assert.equal(f.choices.length,3);assert.equal(f.doc.activeElement,f.close);
+  closeModal(f.modal);assert.equal(f.doc.activeElement,f.opener);
+ }
 }
 console.log('Hint chooser: scoring, training, Tajenka, targeting, copies, keyboard trap, Escape, focus return PASS');

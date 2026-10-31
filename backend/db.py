@@ -14,7 +14,7 @@ from typing import Any, Callable, Optional
 import httpx
 from fastapi import HTTPException
 
-from .config import settings
+from .config import settings, monthly_preview_qa_enabled
 from . import measurement, postgres_rpc
 from .referrals import signup_invite
 
@@ -69,6 +69,8 @@ def db_request(
     if not supabase_ready(url_base, secret_key):
         raise HTTPException(503, "Supabase ještě není připojený")
     headers = supabase_headers(secret_key)
+    if monthly_preview_qa_enabled(url_base):
+        headers["X-Proplet-Monthly-Preview"] = "codex/monthly-competition-202611"
     if str(method).upper() == "POST" and table == "players":
         # Server-owned provenance for the atomic account-created DB trigger.
         # Never forward arbitrary browser headers or OAuth/user profile data.
@@ -366,6 +368,8 @@ def db_rpc(
     if direct is not postgres_rpc.UNAVAILABLE:
         return direct
     headers = supabase_headers(secret_key)
+    if monthly_preview_qa_enabled(url_base):
+        headers["X-Proplet-Monthly-Preview"] = "codex/monthly-competition-202611"
     url = f"{url_base}/rest/v1/rpc/{function}"
     client = http_client or DEFAULT_HTTP_CLIENT
     try:

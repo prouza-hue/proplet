@@ -101,10 +101,12 @@ async function solve(page,touch=false){
     await page.evaluate(rec=>{const state=getState('onboarding-synthetic');state.completed[rec.challengeKey]=rec;saveState(state,'onboarding-synthetic')},record);
     await page.locator('.onboarding-return-login').click();await page.locator('#playerNameInput').fill('Fixture Player');await page.locator('#playerPasswordInput').fill('fixture-password');await page.locator('#saveProfileBtn').click();
     await page.waitForFunction(()=>getProfile()?.id==='onboarding-synthetic'&&currentScreen==='daily'&&accountProgressAvailable(),null,{timeout:15000});
-    assert.deepEqual(await page.evaluate(key=>getState().completed[key],record.challengeKey),record,'existing account result survives intro login');
+    // Canonical account sync preserves the result and marks its server receipt.
+    const confirmedRecord={...record,serverConfirmed:true};
+    assert.deepEqual(await page.evaluate(key=>getState().completed[key],record.challengeKey),confirmedRecord,'existing account result survives intro login and is server-confirmed');
     assert.equal(await page.evaluate(()=>Object.values(getState().completed).some(r=>r.mode==='starter')),false,'unfinished guest intro awards nothing');
     await eventOnce('onboarding_login_authenticated');await page.reload();await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB&&accountProgressAvailable());
-    assert.deepEqual(await page.evaluate(key=>getState().completed[key],record.challengeKey),record,'account result survives reload');
+    assert.deepEqual(await page.evaluate(key=>getState().completed[key],record.challengeKey),confirmedRecord,'confirmed account result survives reload');
     assert.equal(await page.evaluate(()=>currentGame?.mode==='starter'),false);
    });
    await scenario('shared-invitation',async page=>{

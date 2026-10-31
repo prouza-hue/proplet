@@ -1,13 +1,10 @@
 'use strict';
-// Real historical modules and workers on loopback; every API write is synthetic.
+// Current module guards and real historical worker upgrades on loopback; API writes are synthetic.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const {spawn,execFileSync}=require('node:child_process'),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const {spawn}=require('node:child_process'),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve(__dirname,'..'),base='http://127.0.0.1:18775',legacy='958706b6286a2dd7099fa8e3ceb097b757b507e7';
 const reporterRelease=fs.readFileSync(path.join(root,'public/app/client-diagnostics.js'),'utf8').match(/REPORTER_RELEASE='([^']+)'/)[1];
-const historical=(sha,file)=>execFileSync('git',['show',sha+':public/'+file],{cwd:root,encoding:'utf8',maxBuffer:1024*1024});
-const oldTeam=historical('c2501bc31fcb5c4da4c8fa3d5932ad910c8f432b','team-victories.js');
-const oldHome=historical('1e3e3c0^','home-layout.js');
-const oldHints=historical('07350e5','app/game/hints.js'),beforeAccount=historical('9f8ae24','app/account/account.js'),beforeApp=historical('9f8ae24','app.js');
+const currentTeam=fs.readFileSync(path.join(root,'public/team-victories.js'),'utf8');
 const profile={id:'onboarding-synthetic',name:'Fixture Player',token:'fixture-token-not-a-credential',avatar:'🙂',hasPassword:true,supportMode:'none'};
 const fixture=spawn(process.execPath,['tools/onboarding_fixture_server.cjs'],{cwd:root,env:{...process.env,PORT:'18775',TEST_BASELINE_SHA:legacy},stdio:['ignore','pipe','pipe']});
 let log='';fixture.stdout.on('data',s=>log+=s);fixture.stderr.on('data',s=>log+=s);
@@ -28,24 +25,15 @@ async function hintClose(page){await page.evaluate(()=>{document.querySelector('
 (async()=>{let browser;try{
  for(let i=0;i<100;i++){try{if((await fetch(base+'/api/health')).ok)break}catch{}await new Promise(r=>setTimeout(r,100))}
  browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
- for(const signature of ['renderProfile','closeModal']){
-  await control({reset:true});const ctx=await context(browser);
-  if(signature==='renderProfile'){await ctx.route('**/app/account/account.js*',r=>r.fulfill({contentType:'text/javascript',body:beforeAccount}));await ctx.route('**/team-victories.js*',r=>r.fulfill({contentType:'text/javascript',body:oldTeam}))}
-  else{await ctx.route('**/app.js*',r=>r.fulfill({contentType:'text/javascript',body:beforeApp}));await ctx.route('**/app/game/hints.js*',r=>r.fulfill({contentType:'text/javascript',body:oldHints}))}
-  const {page,errors}=await load(ctx,signature!=='renderProfile');
-  if(signature==='closeModal')await page.evaluate(()=>document.querySelector('#closeHintModal').click());
-  await page.waitForFunction(()=>true);assert(errors.some(e=>e.includes(signature)),JSON.stringify(errors));
-  checks.push('BASELINE actual historical module reproduces '+signature);await ctx.close();
- }
+ // Historical error reproduction is retired. Current malformed-hint and
+ // HomeLayout recovery branches remain in the registered contract unit tests.
  for(const viewport of [{width:1280,height:900},{width:390,height:844},{width:673,height:841}]){
-  console.log('CHECK HomeLayout and input outcomes '+viewport.width);await control({reset:true,firstSteps:true});const ctx=await context(browser,viewport);let homeLoads=0;
-  await ctx.route('**/home-layout.js*',r=>++homeLoads===1?r.fulfill({contentType:'text/javascript',body:oldHome}):r.continue());
+  console.log('CHECK HomeLayout and input outcomes '+viewport.width);await control({reset:true,firstSteps:true});const ctx=await context(browser,viewport);
   const {page,errors}=await load(ctx);
   await page.evaluate(()=>{const s=getState();s.inProgress['free:g4-e-009']={puzzleId:'g4-e-009',mode:'free',difficulty:'easy',found:[],hints:2,moves:3,elapsedMs:2500};saveState(s)});
   const saved=await page.evaluate(()=>({profile:localStorage.getItem('proplet-v2-profile'),state:JSON.stringify(getState())}));
-  await page.evaluate(()=>{window.__propletHomeLayoutInstalled=true;applyScreen('free');renderFree();renderFree();renderFree()});
-  await page.waitForFunction(()=>typeof window.PropletHomeLayout?.renderResumeCard==='function').catch(async error=>{console.log(JSON.stringify({homeLoads,errors,state:await page.evaluate(()=>({release:APP_PREVIEW_RELEASE,attempted:homeLayoutRecoveryAttempted,installed:window.__propletHomeLayoutInstalled,keys:Object.keys(window.PropletHomeLayout||{})}))}));throw error});
-  assert.equal(homeLoads,2,'one shared recovery despite repeated renders and old installed marker');
+  await page.evaluate(()=>{applyScreen('free');renderFree();renderFree();renderFree()});
+  assert.equal(await page.evaluate(()=>typeof window.PropletHomeLayout?.renderResumeCard),'function');
   await page.locator('#freeResumeCard').waitFor();
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'viewport must not overflow');
   assert.deepEqual(await page.evaluate(()=>({profile:localStorage.getItem('proplet-v2-profile'),state:JSON.stringify(getState())})),saved);
@@ -70,17 +58,16 @@ async function hintClose(page){await page.evaluate(()=>{document.querySelector('
   assert.deepEqual(outcomes.map(r=>r.headers['x-proplet-starter-input']),['invalid','cancelled','empty','correct']);
   assert.equal(new Set(outcomes.map(r=>r.headers['x-proplet-starter-run'])).size,4);
   for(const row of outcomes){assert.equal(row.headers['x-proplet-test'],'1')}
-  assert.deepEqual(errors,[]);checks.push('PASS historical HomeLayout recovery and once/run real input outcomes '+viewport.width);await ctx.close();
+  assert.deepEqual(errors,[]);checks.push('PASS current HomeLayout resume and once/run real input outcomes '+viewport.width);await ctx.close();
  }
  for(const viewport of [{width:1280,height:900},{width:390,height:844},{width:673,height:841}]){
-  console.log('CHECK mixed modules '+viewport.width);await control({reset:true});const ctx=await context(browser,viewport);let stale=true;
-  await ctx.route('**/team-victories.js*',r=>stale?r.fulfill({contentType:'text/javascript',body:oldTeam}):r.continue());
-  await ctx.route('**/app/game/hints.js*',r=>stale?r.fulfill({contentType:'text/javascript',body:oldHints}):r.continue());
+  console.log('CHECK current module contract recovery '+viewport.width);await control({reset:true});const ctx=await context(browser,viewport);let stale=true;
+  await ctx.route('**/team-victories.js*',r=>stale?r.fulfill({contentType:'text/javascript',body:currentTeam+'\nwindow.PropletTeamVictories.renderProfile=1;'}):r.continue());
   const {page,errors}=await load(ctx);await profilePage(page);assert.equal(await page.locator('#profileTeamContractStatus button').count(),1);
   const stored=await page.evaluate(()=>localStorage.getItem('proplet-v2-profile'));
   await page.evaluate(()=>{renderProfile();renderProfile()});
   await hintClose(page);
-  // An already-open old modal can still apply a single hint through its valid controller.
+  // The current valid controller charges once; malformed replacement cannot charge.
   const result=await page.evaluate(async()=>{
    const puzzle=puzzleDB.free.easy[0];await startGame(puzzle,'free');
    const before=currentGame,prior=before.hints||0;document.querySelector('#hintModal').classList.remove('hidden');applySmartHint(1);
@@ -92,13 +79,15 @@ async function hintClose(page){await page.evaluate(()=>{document.querySelector('
   assert.equal(rows.filter(r=>r.body.code==='team_victories_contract').length,1,'re-renders do not spam telemetry');
   // Producer identifies app.js; reporter identifies the independently cached
   // diagnostic transport. They need not have the same release suffix.
-  for(const row of rows){assert.equal(row.body.client_release,row.headers['x-proplet-client-release']);assert.equal(row.body.client_release,await page.evaluate(()=>APP_PREVIEW_RELEASE));assert.equal(row.body.reporter_release,reporterRelease);assert.equal(row.body.source_availability,'available');assert.equal(row.body.is_test,true)}
+  // Browser transport marks this isolated run; production-like page JavaScript
+  // cannot read extraHTTPHeaders and correctly reports its own non-preview state.
+  for(const row of rows){assert.equal(row.body.client_release,row.headers['x-proplet-client-release']);assert.equal(row.body.client_release,await page.evaluate(()=>APP_PREVIEW_RELEASE));assert.equal(row.body.reporter_release,reporterRelease);assert.equal(row.body.source_availability,'available');assert.equal(row.headers['x-proplet-test'],'1');assert.equal(row.body.is_test,false)}
   // User-triggered repair uses the existing safe update path, not cache/storage deletion.
   await profilePage(page);stale=false;
   await Promise.all([page.waitForEvent('load'),page.locator('#profileTeamContractStatus button').click()]);
   await page.waitForFunction(()=>window.__contractReady&&!document.documentElement.classList.contains('proplet-current-ui-booting'));
   await profilePage(page);await page.locator('#profileTeamVictories').waitFor();assert.equal(await page.evaluate(()=>localStorage.getItem('proplet-v2-profile')),stored);
-  await hintClose(page);assert.deepEqual(errors,[]);checks.push('PASS mixed historical modules, explicit repair, real hints/profile '+viewport.width);await ctx.close();
+  await hintClose(page);assert.deepEqual(errors,[]);checks.push('PASS current malformed module guard, explicit repair, real hints/profile '+viewport.width);await ctx.close();
  }
  for(const viewport of [{width:1280,height:900},{width:390,height:844},{width:673,height:841}]){
   console.log('CHECK actual 4.09.9 worker upgrade '+viewport.width);await control({reset:true,release:'baseline'});

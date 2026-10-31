@@ -69,17 +69,11 @@ const fs=require('node:fs');
   await page.locator('.achievement-detail-x').click();
   assert(await profile.evaluate(e=>e===document.activeElement),'navigation preserves the original opener');
   await profile.press('Space');await page.locator('.achievement-detail-done').click();
-  // Roadmap cards and the Dnes hero must use the same detail and restore their own focus.
+  // The current collapsed collection exposes the same read-only detail.
+  await page.locator('.level-roadmap-card > summary').click();
   const roadmap=page.locator('.level-step[data-rank-detail="39"]');
   await roadmap.tap();assert.equal(await page.locator('#achievementDetailTitle').textContent(),ranks[39].name);
   await close();assert(await roadmap.evaluate(e=>e===document.activeElement));
-  await page.evaluate(()=>nav('daily'));
-  const hero=page.locator('.rank-hero[data-rank-detail]');
-  await hero.tap();assert.equal(await page.locator('#achievementDetailTitle').textContent(),ranks[38].name);
-  await page.evaluate(()=>history.back());await page.waitForFunction(()=>!document.querySelector('#achievementDetail').open);
-  assert.equal(await page.evaluate(()=>currentScreen),'daily','Android Back closes detail before navigating');
-  await hero.tap();await close();assert(await hero.evaluate(e=>e===document.activeElement));
-  await page.evaluate(()=>nav('profile'));
   // Opening every rank must decode actual artwork and display distinct authored copy.
   const stories=[];
   for(let i=0;i<ranks.length;i++){
@@ -130,7 +124,7 @@ const fs=require('node:fs');
   assert.equal(await page.evaluate(()=>document.body.style.overflow),'');
   assert.deepEqual(errors,[]);
   // No request is ever forwarded for writes; actual attempted requests remain reviewable.
-  fs.writeFileSync(`${out}/rank-details-report.json`,JSON.stringify({status:'PASS',ranks:ranks.length,blockedWrites:writes,checks:['51 unique stories and decoded illustrations','three live touchpoints','previous/next and boundary buttons','light/dark 320/390/690/1440','keyboard focus and Android Back','zero, current, future and maximum XP','rank/loyalty/achievement state isolation','read-only profile/results/queue; all network writes intercepted']},null,2));
+  fs.writeFileSync(`${out}/rank-details-report.json`,JSON.stringify({status:'PASS',ranks:ranks.length,blockedWrites:writes,checks:['51 unique stories and decoded illustrations','profile and expanded roadmap touchpoints','previous/next and boundary buttons','light/dark 320/390/690/1440','keyboard focus and Android Back','zero, current, future and maximum XP','rank/loyalty/achievement state isolation','read-only profile/results/queue; all network writes intercepted']},null,2));
  }catch(error){await page.screenshot({path:`${out}/rank-detail-failure.png`,fullPage:true});throw error}
  finally{await browser.close()}
 })().catch(error=>{console.error(error);process.exitCode=1});

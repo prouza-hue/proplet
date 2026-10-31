@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-28",
+  "projectRef": "eanzztstmwlamwfdskbf",
+  "productionTouched": false,
+  "userApprovedRule": "Publication-day completion received before month end plus 48 hours; corrections/rejections before close; explicit audited administrative corrections after close.",
+  "activationAuthorized": false,
+  "migrationVersion": "20261028010200",
+  "sourcePath": "supabase/migrations/20261028005634_monthly_admin_corrections.sql",
+  "sourceSha256": "016b62c2c4d9f91b55dc9f5f5d01a0443f9764dcd15651defaf68f3fb8d8250e",
+  "remoteRollbackSql": "supabase/tests/monthly_admin_corrections.sql",
+  "remoteChecks": [
+    "actual atomic Daily sources",
+    "shared places 1-1-3-3",
+    "explicit correction/replay/revision conflict",
+    "badge removal and regrant",
+    "two immutable audit entries",
+    "XP unchanged",
+    "anonymous/authenticated denied",
+    "all synthetic writes rolled back"
+  ],
+  "afterRollback": {
+    "players": 12,
+    "days": 0,
+    "rounds": 0,
+    "badges": 0,
+    "corrections": 0,
+    "enabled": false,
+    "rulesApproved": true,
+    "lateSyncPolicy": "review-close",
+    "isolated": true,
+    "previewNow": null
+  },
+  "securityAdvisor": {
+    "monthlyRelated": "RLS enabled with no policies",
+    "intent": "Expected service-only tables. Public roles denied by ACL and RLS; no public policy is intended.",
+    "reference": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+  },
+  "limitations": [
+    "No test key confirmation yet",
+    "Historical test schema still lacks full current API parity",
+    "This SQL verification is not public API end-to-end acceptance"
+  ]
+}

@@ -54,11 +54,35 @@ for(const suffix of ['&auth=google#access_token=private','&Token=private','&refr
 const blocked=browser({consent:'granted',url:landing,historyThrows:true});assert.equal(blocked.scripts.length,0);assert.equal(blocked.events[0].properties.marketingGate,'unknown_parameter');assert(!JSON.stringify(blocked.events).includes('private'));
 assert.equal(browser({consent:'denied'}).events.length,0);
 
-const theme=fs.readFileSync('public/theme-init.js','utf8');const fragment=theme.slice(theme.indexOf('    window.__PROPLET_REVEAL_CURRENT_UI=()=>{'),theme.indexOf('    let readyChecks='));
-const readyEvents=[],appEvents=new Map();const themeWindow={dispatchEvent:event=>readyEvents.push(event.type)};
-const context={window:themeWindow,revealed:false,document:{getElementById:()=>null,addEventListener:(name,fn)=>appEvents.set(name,fn)},root:{classList:{add(){},remove(){}}},bootStyle:{remove(){}},setTimeout(){},Event:class{constructor(type){this.type=type}}};
-vm.runInNewContext(fragment,context);themeWindow.__PROPLET_REVEAL_CURRENT_UI();themeWindow.__PROPLET_REVEAL_CURRENT_UI();assert.equal(themeWindow.__PROPLET_CURRENT_UI_READY,undefined,'a boot fallback/error reveal cannot qualify as a usable game');assert.deepEqual(readyEvents,[]);
-appEvents.get('proplet:ready')();appEvents.get('proplet:ready')();assert.equal(themeWindow.__PROPLET_CURRENT_UI_READY,true);assert.deepEqual(readyEvents,['proplet-ui-ready']);
+const theme=fs.readFileSync('public/theme-init.js','utf8');const fragment=theme.slice(theme.indexOf('    let revealRetry='),theme.indexOf('    let readyChecks='));
+function bootFixture(){
+ const readyEvents=[],appEvents=new Map(),timers=[],classes=new Set(['proplet-current-ui-booting']);let loaderRemoved=false,styleRemoved=false;
+ const bodyClasses=new Set(['today-one-screen','one-screen-ready']),styles=[{sheet:{},dataset:{}}];
+ const document={readyState:'complete',fonts:{status:'loaded'},body:{classList:{contains:name=>bodyClasses.has(name)}},querySelectorAll:()=>styles,documentElement:{dataset:{archiveReady:'1'}},getElementById:id=>id==='propletBootScreen'?{remove(){loaderRemoved=true}}:null,addEventListener:(name,fn)=>appEvents.set(name,fn)};
+ const window={dispatchEvent:event=>readyEvents.push(event.type)};
+ const context={window,revealed:false,document,root:{classList:{add:name=>classes.add(name),remove:name=>classes.delete(name)}},bootStyle:{remove(){styleRemoved=true}},setTimeout(fn,delay){timers.push({fn,delay});return timers.length},Event:class{constructor(type){this.type=type}}};
+ vm.runInNewContext(fragment,context);
+ return {window,document,context,bodyClasses,styles,classes,readyEvents,appEvents,timers,get loaderRemoved(){return loaderRemoved},get styleRemoved(){return styleRemoved}};
+}
+for(const [name,block,unblock] of [
+ ['HTML still parsing',f=>f.document.readyState='loading',f=>f.document.readyState='complete'],
+ ['stylesheet pending',f=>f.styles[0].sheet=null,f=>f.styles[0].sheet={}],
+ ['fonts pending',f=>f.document.fonts.status='loading',f=>f.document.fonts.status='loaded'],
+ ['one-screen projection pending',f=>f.bodyClasses.delete('one-screen-ready'),f=>f.bodyClasses.add('one-screen-ready')],
+ ['canonical home pending',f=>f.document.documentElement.dataset.archiveReady='0',f=>f.document.documentElement.dataset.archiveReady='1']
+]){
+ const f=bootFixture();block(f);f.window.__PROPLET_REVEAL_CURRENT_UI();f.window.__PROPLET_REVEAL_CURRENT_UI();
+ assert.equal(f.context.revealed,false,name+' must not reveal an intermediate design');assert(f.classes.has('proplet-current-ui-booting'));assert.equal(f.timers.length,1,'coalesce repeated early reveal requests');assert.equal(f.timers[0].delay,50);
+ unblock(f);f.timers.shift().fn();assert.equal(f.context.revealed,true,name+' releases when settled');assert(!f.classes.has('proplet-current-ui-booting'));assert(f.classes.has('proplet-current-ui-ready'));assert.equal(f.timers[0].delay,280);
+ f.timers.shift().fn();assert(f.loaderRemoved&&f.styleRemoved,'settled loading screen is removed');assert.deepEqual(f.readyEvents,[],'visual readiness alone never implies a successful game boot');
+}
+const failedStyle=bootFixture();failedStyle.styles[0].sheet=null;failedStyle.styles[0].dataset.loadFailed='1';failedStyle.window.__PROPLET_REVEAL_CURRENT_UI();assert.equal(failedStyle.context.revealed,true,'a terminal CSS error cannot trap the player behind an eternal loader');
+const errorBoot=bootFixture();errorBoot.document.readyState='loading';errorBoot.document.fonts.status='loading';errorBoot.styles[0].sheet=null;errorBoot.bodyClasses.delete('one-screen-ready');errorBoot.document.documentElement.dataset.archiveReady='0';
+errorBoot.window.__PROPLET_REVEAL_CURRENT_UI();assert.equal(errorBoot.context.revealed,false);
+errorBoot.window.__PROPLET_REVEAL_CURRENT_UI(true);assert.equal(errorBoot.context.revealed,true,'explicit native boot errors must remain actionable despite missing design dependencies');assert(!errorBoot.classes.has('proplet-current-ui-booting'));assert.equal(errorBoot.window.__PROPLET_CURRENT_UI_READY,undefined);assert.deepEqual(errorBoot.readyEvents,[]);
+errorBoot.timers.shift().fn();assert.equal(errorBoot.timers.length,1,'a pending retry cannot reveal again after an error');errorBoot.timers.shift().fn();assert(errorBoot.loaderRemoved&&errorBoot.styleRemoved);
+const readyBoot=bootFixture();readyBoot.window.__PROPLET_REVEAL_CURRENT_UI();readyBoot.window.__PROPLET_REVEAL_CURRENT_UI();assert.equal(readyBoot.timers.length,1,'successful reveal is idempotent');assert.equal(readyBoot.window.__PROPLET_CURRENT_UI_READY,undefined,'a visual reveal cannot qualify as a usable game');
+readyBoot.appEvents.get('proplet:ready')();readyBoot.appEvents.get('proplet:ready')();assert.equal(readyBoot.window.__PROPLET_CURRENT_UI_READY,true);assert.deepEqual(readyBoot.readyEvents,['proplet-ui-ready']);
 console.log('PASS opt-in landing, immutable bounded gate, stored consent, SDK/error semantics, withdrawal and UI-ready banner');
 
 (async()=>{

@@ -12,6 +12,7 @@ from datetime import date, timedelta
 
 from fastapi import Header, HTTPException, Request
 from pydantic import BaseModel, ConfigDict
+from backend.config import live_player_preview_enabled
 
 MILESTONES = (
     ('first-print', 'První otisk', 1),
@@ -22,9 +23,8 @@ MILESTONES = (
 
 
 def production_enabled() -> bool:
-    # Preview must not authenticate (legacy auth may refresh session timestamps),
-    # read rewards, or acknowledge anything against a production database.
-    return os.environ.get('VERCEL_ENV') == 'production'
+    # Ordinary previews stay closed; the approved live preview serves real players.
+    return os.environ.get('VERCEL_ENV') == 'production' or live_player_preview_enabled()
 
 
 def _roman(number: int) -> str:

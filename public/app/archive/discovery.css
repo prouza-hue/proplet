@@ -76,6 +76,8 @@ html.tiskarna-ui body.archive-experience #difficultyCards .cp-history::after{con
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-history svg{width:15px;height:15px;margin-left:2px}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-track{grid-column:1/-1;grid-row:2;width:100%;height:4px;margin:0!important}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-play{grid-row:3;--pg-action-bg:var(--accent)}
+html.tiskarna-ui body.archive-experience #difficultyCards .cp-history{flex-direction:column;gap:1px}
+html.tiskarna-ui #screen-archive .ax-board>span{max-width:100%;white-space:normal;text-align:center;overflow-wrap:anywhere}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-xp{font-size:14px!important;line-height:1.4!important;margin:0!important}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-card[data-diff=easy]{--pg-accent:#257966}
 html.tiskarna-ui body.archive-experience #difficultyCards .cp-card[data-diff=medium]{--pg-accent:#315da8}

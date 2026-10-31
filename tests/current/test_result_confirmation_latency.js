@@ -1,5 +1,6 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const source=fs.readFileSync(require('node:path').join(__dirname,'../../public/app.js'),'utf8');
+const capabilities=source.slice(source.indexOf('let livePlayerPreviewEnabled='),source.indexOf('window.PropletClientDiagnostics?.claimErrorListeners'));
 const code=source.slice(source.indexOf('async function syncQueue('),source.indexOf('function mergeRemoteProgress('));
 async function scenario(waitForProfile){
  let release,refreshed=0;
@@ -9,7 +10,7 @@ async function scenario(waitForProfile){
  const context={navigator:{onLine:true},claimTelemetryAfterAuth:async()=>true,GEN4_CANDIDATE_PREVIEW:false,GEN5_CANDIDATE_PREVIEW:false,window:{},location:{search:''},URLSearchParams,
  getProfile:()=>profile,resultQueue:()=>({getQueue:()=>[{}],sync:async()=>result}),accountProfileMatches:()=>true,
  refreshRemoteProfile:()=>{refreshed++;return refresh},syncState:{},renderProfile(){},renderDaily(){},currentScreen:'game'};
- vm.createContext(context);vm.runInContext(code,context);
+ vm.createContext(context);vm.runInContext(capabilities+'\n'+code,context);
  let settled=false;const work=context.syncQueue({waitForProfile}).then(r=>{settled=true;return r});
  await new Promise(resolve=>setImmediate(resolve));
  assert.equal(refreshed,1,'history still refreshes in the background');
@@ -54,4 +55,23 @@ const fetchCode=source.slice(source.indexOf('async function fetchFreeLevelLeader
  const result=await c.syncQueue();
  assert.equal(result.ok,false);assert.equal(result.offline,true);assert.equal(result.left,2);assert.equal(rendered,1);
  console.log('PASS offline sync retains both pending results without network access');
+})().catch(e=>{console.error(e);process.exitCode=1});
+// The empty history returns to the native difficulty chooser, including resume.
+(async()=>{
+ const history=source.slice(source.indexOf('async function openPlayedLevels('),source.indexOf('function localLevelResult('));
+ for(const member of [false,true])for(const resume of [false,true]){
+  const nodes={},started=[];
+  for(const id of ['playedLevelsModal','playedLevelsTitle','playedLevelsMeta','playedLevelsList','playedLevelsStartBtn'])nodes[id]={textContent:'',innerHTML:'',classList:{hidden:true,add(){this.hidden=true},remove(){this.hidden=false}}};
+  const c={DIFF:{easy:{label:'Snadná'}},$:s=>s==='#playedLevelsStartBtn'&&!nodes.playedLevelsList.innerHTML.includes('id="playedLevelsStartBtn"')?null:nodes[s.slice(1)],$$:()=>[],
+   getProfile:()=>member?{id:'synthetic',token:'local-only'}:null,api:async()=>({levels:[],total:1}),accountProfileMatches:()=>true,getQueue:()=>[],mergePendingPlayedLevels:x=>x,
+   getState:()=>({completed:{}}),localFreeSlotState:()=>({actual:new Set(),transferred:new Set()}),sortedFreeBank:()=>[{id:'synthetic-board',meta:{level:1}}],
+   freeProgress:()=>({resume:resume?{}:null}),startFree:diff=>started.push(diff)};
+  vm.createContext(c);vm.runInContext(history,c);await c.openPlayedLevels('easy');
+  assert(nodes.playedLevelsList.innerHTML.includes(resume?'Pokračovat':'Začít hrát'));
+  assert.equal(nodes.playedLevelsModal.classList.hidden,false);
+  assert.deepEqual(started,[],'opening history does not start or complete a game');
+  nodes.playedLevelsStartBtn.onclick();
+  assert.equal(nodes.playedLevelsModal.classList.hidden,true);assert.deepEqual(started,['easy'],'CTA preserves the selected difficulty and native resume behavior');
+ }
+ console.log('PASS empty history guest/member CTA preserves native difficulty/resume without automatic play');
 })().catch(e=>{console.error(e);process.exitCode=1});

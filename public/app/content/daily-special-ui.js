@@ -13,7 +13,7 @@
 
   function create(deps={}){
     const $=deps.$||((selector)=>document.querySelector(selector));
-    let selected='base',day=null,scope=null,dialog=null,dialogReturn=null;
+    let selected='base',explicitSelection=false,day=null,scope=null,previousCompletion=null,dialog=null,dialogReturn=null;
     const introVersion='proplet:daily-extra-intro:v1';
     const introReceipts=new Set();
     let intro=null,introKey=null,introReturn=null,introBackground=[],introOverflow='';
@@ -40,11 +40,11 @@
       if(!intro){
         intro=document.createElement('div');intro.id='dailyExtraIntro';intro.className='modal daily-extra-intro hidden';
         intro.setAttribute('role','dialog');intro.setAttribute('aria-modal','true');intro.setAttribute('aria-labelledby','dailyExtraIntroTitle');intro.setAttribute('aria-describedby','dailyExtraIntroCopy');
-        intro.innerHTML=`<section class="modal-card"><button type="button" class="modal-close" data-extra-close aria-label="Zavřít vysvětlení">×</button><div class="daily-extra-intro-art" aria-hidden="true"><img src="${icon('hardcore')}" width="52" height="52" alt=""><img src="${icon('mozkomor')}" width="52" height="52" alt=""><img src="${icon('mozkokalypsa')}" width="52" height="52" alt=""></div><h2 id="dailyExtraIntroTitle">Dnes je tu i Extra</h2><p id="dailyExtraIntroCopy">Ve středu, v pátek a v neděli přibude těžší deska. Najdeš ji pod tlačítkem <strong>Extra</strong>.</p><p>Je dobrovolná a za první dokončení získáš <strong>200 XP</strong>. Sérii dál udržuje základní Denní výzva.</p><button type="button" class="primary-btn" data-extra-show>Ukázat Extra</button><button type="button" class="text-btn" data-extra-later>Teď ne</button></section>`;
+        intro.innerHTML=`<section class="modal-card"><button type="button" class="modal-close" data-extra-close aria-label="Zavřít vysvětlení">×</button><div class="daily-extra-intro-art" aria-hidden="true"><img src="${icon('hardcore')}" width="52" height="52" alt=""><img src="${icon('mozkomor')}" width="52" height="52" alt=""><img src="${icon('mozkokalypsa')}" width="52" height="52" alt=""></div><h2 id="dailyExtraIntroTitle">Dnes je tu i Extra</h2><p id="dailyExtraIntroCopy">Ve středu, v pátek a v neděli přibude těžší deska. Najdeš ji na stránce <strong>Dnes</strong>.</p><p>Je dobrovolná a za první dokončení získáš <strong>200 XP</strong>. Sérii dál udržuje základní Denní výzva.</p><button type="button" class="primary-btn" data-extra-show>Ukázat Extra</button><button type="button" class="text-btn" data-extra-later>Teď ne</button></section>`;
         document.body.append(intro);
         intro.querySelector('[data-extra-close]').onclick=()=>closeIntro();
         intro.querySelector('[data-extra-later]').onclick=()=>closeIntro();
-        intro.querySelector('[data-extra-show]').onclick=()=>{closeIntro(false);select('special');$('#dailyChallengeSwitch button')?.focus({preventScroll:true})};
+        intro.querySelector('[data-extra-show]').onclick=()=>{closeIntro(false);select('special');$('#playDailyBtn')?.focus({preventScroll:true})};
         intro.onclick=e=>{if(e.target===intro)closeIntro()};
         document.addEventListener('keydown',e=>{
           if(intro.classList.contains('hidden'))return;
@@ -70,26 +70,73 @@
       show:showIntro,close:()=>closeIntro(false,false)
     });
     function scheduleIntro(){announcements?.kick()}
+    function refreshScope(){
+      const today=deps.pragueDateISO(),identity=deps.getProfile?.()?.id||'anonymous';
+      if(today!==day||identity!==scope){selected='base';explicitSelection=false;previousCompletion=null;day=today;scope=identity}
+    }
     function select(kind){
+      refreshScope();
       const special=current();
       selected=kind==='special'&&special.descriptor&&special.puzzle?'special':'base';
+      explicitSelection=true;
       deps.renderBase?.();
       render();
     }
-    function start(){return selected==='special'?deps.startSpecial?.():deps.startDaily?.()}
+    function start(){
+      refreshScope();
+      if(selected==='special')return deps.startSpecial?.();
+      let base=null;try{base=deps.dailyResultState?.(day)}catch{}
+      const special=current();
+      if(!explicitSelection&&base?.active&&(!special.descriptor||!special.puzzle||special.active)&&deps.openFree)return deps.openFree();
+      return deps.startDaily?.();
+    }
     function heading(hero,title,control){
-      let row=title.parentElement;
-      if(!row.classList.contains('daily-title-choice-row')){
-        row=document.createElement('div');row.className='daily-title-choice-row';row.setAttribute('role','group');row.setAttribute('aria-label','Dnešní výzvy');
-        title.before(row);row.append(title,control);
-      }
       title.dataset.dailySpecialTitle='1';
-      let base=title.querySelector('[data-daily-kind="base"]');
-      if(!base){base=document.createElement('button');base.type='button';base.className='daily-base-title';base.dataset.dailyKind='base';base.textContent='Denní výzva';title.replaceChildren(base)}
-      base.onclick=()=>select('base');base.setAttribute('aria-pressed',String(selected==='base'));
       const button=control.querySelector('[data-daily-kind="special"]');
       if(button)button.onclick=()=>select(selected==='special'?'base':'special');
       return button;
+    }
+    function resultCopy(record){
+      const parts=[];
+      if(Number.isFinite(record?.elapsedMs)&&record.elapsedMs>=0){
+        const seconds=Math.floor(record.elapsedMs/1000);
+        parts.push(Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0'));
+      }
+      if(Number.isInteger(record?.moves)&&record.moves>=0)parts.push(record.moves+' '+(record.moves===1?'tah':record.moves>=2&&record.moves<=4?'tahy':'tahů'));
+      return parts.join(' · ');
+    }
+    function renderStudioEntries(base,special,available){
+      const root=$('#screen-daily');if(!root)return;
+      let extra=$('#studioExtraCard');
+      if(available&&selected==='base'){
+        if(!extra){
+          extra=document.createElement('section');extra.id='studioExtraCard';extra.className='studio-secondary-game';
+          extra.innerHTML='<div class="studio-extra-copy"><h2>Extra výzva</h2><p></p></div><img width="92" height="104" alt=""><button type="button" class="text-btn"></button>';
+          root.append(extra);
+        }
+        extra.hidden=false;
+        extra.querySelector('p').innerHTML='<span>'+escape(deps.DIFF?.[special.puzzle.difficulty]?.label||'Extra')+'</span>'+(special.active?'<span>✓ Hotovo</span>':special.descriptor.rewardEligible===false?'<span>Trénink</span>':'<span class="studio-xp">+200 XP</span>');
+        extra.querySelector('img').src=icon(special.puzzle.difficulty);
+        const action=extra.querySelector('button');
+        action.textContent=special.active?'Zobrazit výsledek':special.progress?'Pokračovat v Extra':'Hrát Extra';
+        action.onclick=()=>{select('special');start()};
+      }else if(extra)extra.hidden=true;
+      let result=$('#studioDailyResult');
+      if(base?.active){
+        if(!result){
+          result=document.createElement('section');result.id='studioDailyResult';result.className='studio-daily-result';
+          result.innerHTML='<div><strong>Denní výzva splněna</strong><p class="studio-result-metrics"></p><p class="studio-result-sync" role="status"></p></div><button type="button" class="text-btn">Výsledek</button>';
+          root.append(result);
+        }
+        const hero=$('#screen-daily .daily-hero'),action=$('#playDailyBtn');
+        if(selected==='base'&&hero&&action){if(result.parentElement!==hero)hero.insertBefore(result,action.closest('.daily-main-actions')||action)}
+        else if(result.parentElement!==root)root.prepend(result);
+        result.hidden=false;result.querySelector('.studio-result-metrics').textContent=resultCopy(base.active);
+        const queued=(deps.getQueue?.()||[]).some(row=>row.challengeKey==='daily:'+day),sync=deps.getSyncState?.()||{},status=result.querySelector('.studio-result-sync');
+        status.textContent=queued?(sync.status==='error'?'Výsledek čeká na synchronizaci: '+(sync.error||'zkus to znovu'):'Výsledek čeká na synchronizaci'):!deps.getProfile?.()?.token?'Výsledek je uložený v tomto zařízení':'';
+        status.hidden=!status.textContent;result.classList.toggle('studio-sync-error',queued&&sync.status==='error');
+        result.querySelector('button').onclick=()=>deps.startDaily?.();
+      }else if(result)result.hidden=true;
     }
     function markWeek(){
       const rows=deps.getSchedule?.()||[];
@@ -129,33 +176,44 @@
     function render(){
       const hero=$('#screen-daily .daily-hero'),title=$('#dailyHeroTitle'),control=$('#dailyChallengeSwitch');
       if(!hero||!title||!control)return {selected};
-      const today=deps.pragueDateISO(),identity=deps.getProfile?.()?.id||'anonymous';
-      if(today!==day||identity!==scope){selected='base';day=today;scope=identity}
+      refreshScope();
       const special=current(),available=!!special.descriptor&&!!special.puzzle;
+      let base=null;try{base=deps.dailyResultState?.(day)||null}catch{}
+      const completion={base:!!base?.active,special:!!special.active};
+      if(previousCompletion&&((!previousCompletion.base&&completion.base)||(!previousCompletion.special&&completion.special)))explicitSelection=false;
+      previousCompletion=completion;
+      if(!explicitSelection)selected=base?.active&&available&&!special.active?'special':'base';
       if(!available)selected='base';
       const button=heading(hero,title,control);
-      control.classList.toggle('hidden',!available);hero.classList.toggle('has-daily-special',available);hero.classList.toggle('daily-special-selected',selected==='special');
+      control.classList.toggle('hidden',!available||selected==='base'||!!base?.active);hero.classList.toggle('has-daily-special',available);hero.classList.toggle('daily-special-selected',selected==='special');
+      hero.dataset.studioState=base?.active?(available&&!special.active?'done':'complete'):'before';
+      title.textContent=selected==='special'?'Extra výzva':'Denní výzva';
+      const art=$('#studioDailyArt');if(art)art.src=selected==='special'?icon(special.puzzle.difficulty):'/rewards/printshop/symbol-daily.svg';
+      if(selected==='base'&&base?.puzzle){
+        $('#dailyMeta').innerHTML='<span>'+escape(deps.DIFF?.[base.puzzle.difficulty]?.label||'')+'</span>'+(base.legacy?'':base.active?'<span>✓ Hotovo</span>':'<span class="studio-xp">+100 XP</span>');
+        if(base.active&&!explicitSelection&&(!available||special.active)&&deps.openFree){
+          $('#playDailyBtn').textContent='Vybrat volnou hru';
+        }
+      }
       $('#playDailyBtn')?.classList.remove('daily-special-action');
       if(button){
-        button.setAttribute('aria-pressed',String(selected==='special'));
-        const name=deps.DIFF?.[special.puzzle?.difficulty]?.label||'Speciál';
-        button.setAttribute('aria-label',`${selected==='special'?'Přepnout na základní výzvu':'Přepnout na '+name} · dobrovolně`);
-        const image=$('#dailySpecialTabIcon');if(image&&available)image.src=icon(special.puzzle.difficulty);
-        const status=$('#dailySpecialTabStatus');if(status)status.textContent=special.active?'✓':'';
+        button.removeAttribute('aria-pressed');
+        button.setAttribute('aria-label','Zpět na základní Denní výzvu');
+        button.textContent='Denní výzva';
       }
+      renderStudioEntries(base,special,available);
       markWeek();
       scheduleIntro();
       if(selected!=='special')return {selected};
       const puzzle=special.puzzle,descriptor=special.descriptor,key=descriptor.officialChallengeKey||descriptor.challengeKey;
-      $('#dailyMeta').textContent=deps.DIFF?.[puzzle.difficulty]?.label||'Speciál';
+      $('#dailyMeta').innerHTML='<span>'+escape(deps.DIFF?.[puzzle.difficulty]?.label||'Extra')+'</span>'+(descriptor.rewardEligible===false?'<span>Trénink</span>':special.active?'<span>✓ Hotovo</span>':'<span class="studio-xp">+200 XP</span>');
       const action=$('#playDailyBtn'),done=!!special.active,progress=!!special.progress;
       if(action){
         action.classList.add('daily-special-action');
         const verb=done?'Zobrazit výsledek speciálu':progress?'Pokračovat ve speciálu':'Hrát '+(puzzle.difficulty==='hardcore'?'Mozkožrouta':puzzle.difficulty==='mozkomor'?'Mozkomora':'Mozkokalypsu');
         action.innerHTML=`<span>${escape(verb)}</span>`;
       }
-      // Sharing and sync details stay in the result dialog. The optional entry
-      // uses precisely the same compact hero rows even after it is completed.
+      // The completed base keeps its own summary and sync status when Extra is promoted.
       $('#shareDailyBtn')?.classList.add('hidden');
       const sync=$('#dailySyncStatus');
       if(sync){
@@ -164,6 +222,7 @@
           const profile=deps.getProfile?.(),queued=(deps.getQueue?.()||[]).some(r=>r.challengeKey===key),state=deps.getSyncState?.()||{};
           sync.textContent=!profile?.token?'📱 Výsledek je uložený jen v tomto zařízení':queued?(state.status==='error'?'⚠️ Výsledek čeká na synchronizaci':'☁️ Výsledek čeká na synchronizaci'):'✓ Výsledek speciálu je v cloudu';
           sync.classList.toggle('home-sync-benign',!queued);
+          sync.classList.toggle('hidden',!queued);
         }
       }
       return {selected};

@@ -10,7 +10,10 @@
     "PROPLET_MOZKOKALYPSA_ENABLED": "true",
     "PROPLET_DATED_DAILY_ENABLED": "true",
     "PROPLET_HISTORICAL_FREE_REWARDS_ENABLED": "true",
-    "PROPLET_ARCHIVE_ENABLED": "true"
+    "PROPLET_ARCHIVE_ENABLED": "true",
+    "PROPLET_LIVE_PLAYER_PREVIEW_ENABLED": "true",
+    "PROPLET_REFERRALS_ENABLED": "true",
+    "PROPLET_DAILY_SPECIALS_ENABLED": "true"
   },
   "crons": [
     {
@@ -28,6 +31,10 @@
     {
       "path": "/api/cron/visual-pilot-push",
       "schedule": "0 10 28 10 *"
+    },
+    {
+      "path": "/api/cron/monthly-competition",
+      "schedule": "0 23 * * *"
     }
   ],
   "headers": [

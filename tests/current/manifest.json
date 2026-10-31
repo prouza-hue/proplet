@@ -6,11 +6,83 @@
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
       {
-        "path": "tests/current/test_error_actor_context.py",
+        "path": "tests/current/test_discovery_help.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_tajenka_discovery.py",
         "runner": "python"
       },
       {
-        "path": "tests/current/test_first_input_diagnostics.cjs",
+        "path": "tests/current/test_team_leave_atomic.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_release_news.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_authoritative_local_xp.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_account_bonus_authority.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_monthly_sw_install.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_monthly_preview_control.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_monthly_competition.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_monthly_competition_http.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_monthly_competition_ui.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_ui_playtest_preview.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_tajenka_result_presentation.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_win_awards.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_result_referral_choice.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_result_summary_visibility.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_weekly_catalogue.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_settings_return.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_auth_presentation.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_today_one_screen_readiness.cjs",
         "runner": "node"
       },
       {
@@ -686,6 +758,10 @@
         "runner": "python"
       },
       {
+        "path": "tests/current/test_referral_transport.cjs",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_hint_chooser.js",
         "runner": "node"
       },
@@ -722,11 +798,35 @@
         "runner": "python"
       },
       {
+        "path": "tests/current/test_studio_daily.js",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_studio_live_preview.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_studio_live_rewards.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_studio_live_client.cjs",
+        "runner": "node"
+      },
+      {
         "path": "tests/current/test_google_oauth_binding.py",
         "runner": "python"
       },
       {
         "path": "tests/current/test_google_oauth_callback.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_error_actor_context.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_first_input_diagnostics.cjs",
         "runner": "node"
       },
       {
@@ -775,6 +875,10 @@
       },
       {
         "path": "tests/current/test_quality_dataset.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_release_news_backend.py",
         "runner": "python"
       }
     ]

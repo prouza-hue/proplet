@@ -4,6 +4,8 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('node:http');
 const {chromium}=require('playwright');
 const app=fs.readFileSync('public/app.js','utf8');
+// The release probe consumes server capabilities before checking the worker.
+const capabilities=app.slice(app.indexOf('let livePlayerPreviewEnabled='),app.indexOf('window.PropletClientDiagnostics?.claimErrorListeners'));
 const updater=app.slice(app.indexOf('function canAutomaticallyUpdate('),app.indexOf('function ensureAudio('));
 const worker=fs.readFileSync('public/sw.js','utf8').replace(/const SHELL=\[[\s\S]*?\];/,"const SHELL=['/'];");
 const target=worker.match(/const SHELL_CACHE='([^']+)'/)[1];
@@ -15,6 +17,7 @@ function fixture(release,scenario){
  const $=s=>document.querySelector(s),openTransientModal=()=>null,trackProductEvent=()=>{};
  localStorage.setItem('test-player-progress',localStorage.getItem('test-player-progress')||'keep-me');
  window.PROPLET_RUNTIME_META={canonicalOrigin:location.origin};
+ ${capabilities}
  ${updater}
  document.querySelector('#applyUpdateBtn').onclick=applyPendingUpdate;
  (async()=>{const data=await caches.open('proplet-data-v12-dated-daily');await data.put('/test-player-data',new Response('keep-data'));registerServiceWorker()})();

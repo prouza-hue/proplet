@@ -1,0 +1,25 @@
+{
+  "source": "Observed real public API response from the initial run before the first account completion",
+  "sourceReport": "e2e-prior-attempt-1793181844262965900.json",
+  "origin": "https://proplet-1vi83xfxh-pavel-prouzas-projects.vercel.app",
+  "runId": "5a3327",
+  "interceptedMonthlyResultsCatalog": false,
+  "response": {
+    "me": null,
+    "month": "2026-11",
+    "badges": [],
+    "status": "open",
+    "enabled": true,
+    "endDate": "2026-12-01",
+    "closesAt": "2026-12-02T23:00:00+00:00",
+    "isolated": true,
+    "revision": null,
+    "timezone": "Europe/Prague",
+    "standings": [],
+    "startDate": "2026-11-01",
+    "previousPodium": [],
+    "totalPlayers": 0,
+    "limit": 100,
+    "truncated": false
+  }
+}

@@ -555,6 +555,121 @@
       ]
     },
     {
+      "id": "20261028-monthly-competition",
+      "order": 510,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028003751_monthly_competition.sql",
+      "type": "migration",
+      "status": "prepared-isolated-preview-only-production-disabled",
+      "sha256": "b54f32ecc7507e56e653c23914eac278a912597062892df99de5cfab51db51bb",
+      "supersedes": [],
+      "replaced_rpc_definitions": []
+    },
+    {
+      "id": "20261028-monthly-admin-corrections",
+      "order": 520,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028005634_monthly_admin_corrections.sql",
+      "type": "migration",
+      "status": "prepared-isolated-preview-only-production-disabled",
+      "sha256": "016b62c2c4d9f91b55dc9f5f5d01a0443f9764dcd15651defaf68f3fb8d8250e",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_monthly_state_v1"
+      ]
+    },
+    {
+      "id": "20261028-monthly-isolated-preview-clock",
+      "order": 530,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028085718_monthly_isolated_preview_clock.sql",
+      "type": "migration",
+      "status": "prepared-isolated-preview-only-production-disabled",
+      "sha256": "348e5b268a6889ae902e3efc0d9e016934e567b6a783d037baed964b78976a2b",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_submit_result_v1",
+        "public.proplet_submit_daily_special_v1",
+        "public.proplet_play_session_v1",
+        "public.proplet_player_stats_v1",
+        "public.proplet_account_snapshot_v1",
+        "public.proplet_monthly_now_v1"
+      ]
+    },
+    {
+      "id": "20261028-monthly-preview-special-clock",
+      "order": 540,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028094820_monthly_preview_special_clock_policy.sql",
+      "type": "migration",
+      "status": "prepared-isolated-preview-only-production-disabled",
+      "sha256": "c046fd151fc2ad4b879c7e25627fa0fc61bd49ae8cbb8c4934b972cfb1ed2164",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_submit_daily_special_v1"
+      ]
+    },
+    {
+      "id": "20261028-monthly-preview-difficulty-parity",
+      "order": 550,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028095102_monthly_preview_difficulty_parity.sql",
+      "type": "migration",
+      "status": "isolated-preview-parity-only",
+      "sha256": "1754779fe383695ad870bf5155e35ae1f65ecf4d83816a0a5882d4889c4900aa",
+      "supersedes": [],
+      "replaced_rpc_definitions": []
+    },
+    {
+      "id": "20261028-monthly-preview-extra-xp-parity",
+      "order": 560,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028095256_monthly_preview_extra_xp_parity.sql",
+      "type": "migration",
+      "status": "isolated-preview-parity-only",
+      "sha256": "d8522d8049d033d20fe35fad604619b9637b4edafeb020613413ddfb5e6acd8e",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_submit_daily_special_v1"
+      ]
+    },
+    {
+      "id": "20261028-monthly-preview-special-bindings",
+      "order": 570,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028101522_monthly_preview_special_bindings.sql",
+      "type": "migration",
+      "status": "isolated-preview-catalog-only",
+      "sha256": "27a3e487a0146d55ace3ce9a71b38d2a45fec220730220d8229bddf329655d9b",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_submit_daily_special_v1",
+        "public.proplet_daily_special_identity_guard"
+      ]
+    },
+    {
+      "id": "20261028-monthly-preview-empty-claim-probe",
+      "order": 580,
+      "version": "2026.10.28",
+      "path": "supabase/migrations/20261028103442_monthly_preview_empty_claim_probe.sql",
+      "type": "migration",
+      "status": "isolated-preview-readonly-guard",
+      "sha256": "82ed82cd44eab407bc954bd73c1172d593d8c51d96f77bfc6ecdd8b4c8f38ca0",
+      "supersedes": [],
+      "replaced_rpc_definitions": []
+    },
+    {
+      "id": "20261029-release-news-receipts",
+      "order": 590,
+      "version": "2026.10.29",
+      "path": "supabase/migrations/20261029120000_release_news_receipts.sql",
+      "type": "migration",
+      "status": "prepared-inactive-isolated-preview",
+      "sha256": "74282623b8d5574cfa46f1e3d89e2403da09631c89a80108131461cf3942ca81",
+      "supersedes": [],
+      "replaced_rpc_definitions": []
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

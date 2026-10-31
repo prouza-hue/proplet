@@ -13,6 +13,7 @@ import secrets
 from typing import Optional
 
 from fastapi import Header, HTTPException, Request
+from backend.config import live_player_preview_enabled
 
 PRODUCTION_PROJECT = "iopyhluayfszskyqqpuc"
 CODE_RE = re.compile(r"^[A-Za-z0-9_-]{8,80}$")
@@ -28,6 +29,7 @@ def enabled() -> bool:
     return not (
         os.getenv("VERCEL_ENV", "").lower() == "preview"
         and PRODUCTION_PROJECT in os.getenv("SUPABASE_URL", "")
+        and not live_player_preview_enabled()
     )
 
 

@@ -21,53 +21,48 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
    const config=JSON.parse(fs.readFileSync('tests/fixtures/browser/config.json','utf8'));
    await page.route('**/api/config',r=>r.fulfill({json:{...config,archiveEnabled:true}}));
    await page.route('**/api/play-session/config',r=>r.fulfill({json:{enabled:false}}));
-   const dailyPuzzle=JSON.parse(fs.readFileSync('public/puzzles.json','utf8')).daily[0];
+   const bank=JSON.parse(fs.readFileSync('public/puzzles.json','utf8')),dailyPuzzle=bank.daily[0];
+   const specialPuzzle=structuredClone(bank.free.hardcore[0]);specialPuzzle.id='synthetic-extra-entry';
    const dailyDescriptor={schemaVersion:1,serverToday:'2026-10-21',validUntil:'2026-10-21T22:00:00Z',dailyDate:'2026-10-21',bankVersion:'synthetic-daily',contentHash:'b'.repeat(64),challengeKey:'daily:2026-10-21',puzzleId:dailyPuzzle.id,puzzle:dailyPuzzle,official:true,rewardEligible:true};
    await page.route('**/api/daily',r=>r.fulfill({json:dailyDescriptor}));
-   let descriptor=null;
+   // Publish a single immutable server binding from the first request. A pending
+   // boot refresh returning special:null must not race later fixture injection.
+   const descriptor={schemaVersion:1,serverToday:'2026-10-21',validUntil:'2026-10-21T22:00:00Z',dailyDate:'2026-10-21',difficulty:'hardcore',bankVersion:'synthetic-extra',contentHash:'a'.repeat(64),challengeKey:'daily-special:2026-10-21:hardcore',puzzleId:specialPuzzle.id,puzzle:specialPuzzle,official:true,rewardEligible:true};
    await page.route('**/api/daily-special*',r=>r.fulfill({json:{schemaVersion:1,serverToday:'2026-10-21',validUntil:'2026-10-21T22:00:00Z',special:descriptor,schedule:[]}}));
    await page.goto(url,{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB&&document.querySelectorAll('#difficultyCards [data-play-free]').length>=4&&window.PropletArchiveExperience?.isEnabled());
    await page.waitForFunction(()=>window.__PROPLET_ONBOARDING_MODEL_V3328__&&window.__PROPLET_ONBOARDING_RETURN_V3332__);
-   descriptor=await page.evaluate(async()=>{
+   await page.evaluate(async()=>{
     closeOnboarding(true);closeTransientModals();window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();
     await window.__PROPLET_ENSURE_FULL_PUZZLE_DB?.();
-    const date=pragueDateISO(),p=structuredClone(puzzleDB.free.hardcore[0]);p.id='synthetic-extra-entry';
-    return {schemaVersion:1,serverToday:date,validUntil:'2026-10-21T22:00:00Z',dailyDate:date,difficulty:'hardcore',bankVersion:'synthetic-extra',contentHash:'a'.repeat(64),challengeKey:'daily-special:'+date+':hardcore',puzzleId:p.id,puzzle:p,official:true,rewardEligible:true};
+    await refreshDatedSpecial();nav('daily');renderDaily();closeTransientModals();
    });
-   assert.equal(descriptor.dailyDate,'2026-10-21');
-   await page.evaluate(async d=>{datedSpecial().remember(d);await refreshDatedSpecial();nav('daily');renderDaily();closeTransientModals();},descriptor);
-   await page.locator('#axHomeFree').scrollIntoViewIfNeeded();
-   const icons=page.locator('#axHomeFree [data-home-free]');assert.equal(await icons.count(),6);
-   assert.equal(await icons.first().evaluate(el=>!!el.closest('[aria-hidden="true"]')),false,'interactive icons accessible');
-   for(const theme of ['light','dark']){
-    await page.evaluate(t=>applyTheme(t,{persist:false}),theme);
-    const path=`artifacts/extra-entry/${label}-home-${theme}.png`;await page.locator('#axHomeFree').screenshot({path});report.screenshots.push(path);
-   }
-   for(const diff of ['easy','medium','hard','hardcore','mozkomor','mozkokalypsa']){
-    await page.locator(`#axHomeFree [data-home-free="${diff}"]`).click();
-    await page.waitForFunction(d=>currentScreen==='game'&&currentGame?.mode==='free'&&currentGame.puzzle.difficulty===d,diff);
-    await page.evaluate(()=>{stopTimer();nav('daily');closeTransientModals()});
-   }
-   await page.locator('#axHomeFree [data-archive-action="free"]').click();await page.waitForFunction(()=>currentScreen==='free');
+   const ready=await page.evaluate(()=>({today:pragueDateISO(),special:dailySpecialResultState().descriptor?.puzzleId,active:!!dailySpecialResultState().active,daily:dailyPuzzleFor(pragueDateISO()).id}));
+   assert.deepEqual(ready,{today:'2026-10-21',special:descriptor.puzzleId,active:false,daily:dailyDescriptor.puzzleId},'real native controllers must accept the immutable synthetic API bindings before play');
+   // One-screen Today delegates current entry behavior; its contract is covered
+   // by test_today_one_screen_readiness.cjs. Exercise the actual result CTA here.
    await page.evaluate(async()=>{
     nav('daily');const p=dailyPuzzleFor(pragueDateISO());await startGame(p,'daily',pragueDateISO());
     currentGame.found=p.answers.map((a,i)=>({...a,answerIndex:i,colorIndex:i%COLORS.length}));currentGame.moves=p.answers.length;
     await finishGame();
    });
-   await page.waitForFunction(()=>!document.querySelector('#winModal').classList.contains('hidden')&&!document.querySelector('#winExtraBtn').classList.contains('hidden'));
+   await page.waitForFunction(()=>!document.querySelector('#winModal').classList.contains('hidden')&&!document.querySelector('#winExtraBtn').classList.contains('hidden')).catch(async error=>{console.error('Extra result diagnostics',JSON.stringify(await page.evaluate(()=>({today:pragueDateISO(),game:currentGame&&{mode:currentGame.mode,date:currentGame.dailyDate,finished:currentGame.finished,finishing:currentGame.finishing},special:dailySpecialResultState(),available:winExtraAvailable(),modal:document.querySelector('#winModal').className,button:document.querySelector('#winExtraBtn').className})),null,2));throw error;});
    assert.equal(await page.locator('#winExtraBtn').textContent(),'Hraj Extra');
-   assert.equal(await page.locator('#winPrimaryBtn').textContent(),'Vybrat další hru');
-   assert.equal(await page.locator('#winExtraBtn').evaluate(el=>el.nextElementSibling?.id),'winPrimaryBtn');
+   assert.equal(await page.locator('#winPrimaryBtn').textContent(),'Zpět na Dnes');
+   assert.equal(await page.locator('#winExtraBtn').evaluate(el=>el.parentElement.id),'winResultActions');
+   assert.equal(await page.locator('#winPrimaryBtn').evaluate(el=>el.parentElement.classList.contains('win-secondary-actions')),true,'Daily back action is secondary to Extra');
    const screenshot=`artifacts/extra-entry/${label}-daily-result.png`;await page.locator('#winModal .win-card').screenshot({path:screenshot});report.screenshots.push(screenshot);
    await page.locator('#winExtraBtn').click();await page.waitForFunction(()=>currentScreen==='game'&&currentGame?.mode==='daily_special');
    assert.equal(await page.locator('#winModal').evaluate(el=>el.classList.contains('hidden')),true);
-   await page.evaluate(()=>{saveGameProgress();stopTimer();nav('daily');closeTransientModals();dailySpecialUI().select('special')});
-   assert.equal(await page.locator('#dailySpecialTabStatus').textContent(),'');
+   await page.evaluate(()=>{saveGameProgress();stopTimer();nav('daily');closeTransientModals()});
+   assert.equal(await page.locator('.daily-hero').evaluate(el=>el.classList.contains('daily-special-selected')),true,'completed Daily automatically promotes unfinished Extra');
+   assert.equal(await page.locator('#dailyHeroTitle').textContent(),'Extra výzva');
+   assert.equal(await page.locator('#playDailyBtn').textContent(),'Pokračovat ve speciálu');
+   assert.match(await page.locator('#dailyMeta').textContent(),/Mozkožrout.*200 XP/);
    assert(!(await page.locator('#playDailyBtn').textContent()).includes('Sérii neovlivní'));
    assert.equal(await page.locator('#playDailyBtn small').count(),0);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
-   assert.deepEqual(errors,[]);report.checks.push(label+': six real free starts, browse destination, actual Daily finish -> Extra, progress marker/copy, no overflow/errors');
+   assert.deepEqual(errors,[]);report.checks.push(label+': actual Daily finish -> Extra, automatic promotion and native resume state, no overflow/errors');
    await context.close();
   }
   fs.writeFileSync('artifacts/extra-entry/report.json',JSON.stringify(report,null,2));console.log('PASS '+report.checks.join('; '));

@@ -18,7 +18,9 @@ function has(source,pattern,label){assert(pattern.test(source),label)}
 
 // Characterize the user-visible profile/team contract before ownership moves.
 [
-  'Založ si účet a ulož výsledky + bonus 500 XP',
+  'Hraješ bez účtu',
+  'Ulož si svůj postup',
+  '+500 XP za nový účet',
   'Účet je v cloudu',
   'Tým je volitelný',
   'Vše synchronizováno',
@@ -114,6 +116,39 @@ assert(fs.readFileSync(path.join(root,'public/sw.js'),'utf8').includes('/app/acc
     ['api','/api/team-membership/leave',{}],
     ['update',{familyCode:null,leagueName:null}],
   ],'team leave API/profile mutation order drifted');
+
+  // Exercise the actual profile renderer: navigating to the profile must not
+  // expand or focus the deliberately collapsed roadmap without a user action.
+  const previousStatistics=global.PropletProfileStatistics;
+  global.PropletProfileStatistics=require(path.join(root,'public/app/account/statistics.js'));
+  const disclosure={open:false},renderNodes=new Map(),authModes=[];let roadmapFocus=0;
+  const profileNode=selector=>{
+    if(selector==='#profileCard .profile-stats-details')return null;
+    if(!renderNodes.has(selector))renderNodes.set(selector,{innerHTML:'',textContent:'',dataset:{},classList:{add(){},remove(){},toggle(){}},querySelectorAll:()=>[],querySelector:()=>null,closest:kind=>selector==='#levelRoadmap'&&kind==='details'?disclosure:null,remove(){}});
+    return renderNodes.get(selector);
+  };
+  const localStats={points:500,longestStreak:6,dailyCompleted:2,dailyChallengeCompleted:2};
+  const guestRenderer=factory.create({
+    $:profileNode,$$:()=>[],getProfile:()=>null,getState:()=>({completed:{}}),getQueue:()=>[],
+    currentLocalStats:()=>localStats,effectiveStats:()=>localStats,
+    levelFor:()=>({index:2,current:{name:'Slovolovec',icon:'A',xp:400},next:{name:'Propletač',xp:600}}),
+    LEVELS:[{name:'Nováček',xp:0,icon:'N'},{name:'Slovolovec',xp:400,icon:'A'}],BADGES:[],
+    esc:String,countCz:n=>String(n),renderInstallUI(){},updatePushUI(){},renderAchievementSummary:()=>'',renderAchievements:()=>'',
+    syncAchievementDisclosure(){},toggleProfileAchievementsExpanded(){},focusProfileRoadmap:()=>roadmapFocus++,renderSettings(){},renderPrivacyActions(){},openProfileModal:mode=>authModes.push(mode),
+  });
+  try{
+    guestRenderer.renderProfile({focusRoadmap:true});
+    const guestMarkup=profileNode('#profileCard').innerHTML;
+    assert(guestMarkup.includes('Hraješ bez účtu')&&guestMarkup.includes('Postup je uložený v tomto zařízení.'),'guest save location must remain honest');
+    assert(guestMarkup.includes('+500 XP za nový účet')&&guestMarkup.includes('Ulož si svůj postup'),'approved account reward and save intent remain visible');
+    assert.equal(disclosure.open,false);assert.equal(roadmapFocus,0,'navigation cannot force focus into closed roadmap');
+    assert(profileNode('#levelRoadmap').innerHTML.includes('Slovolovec'),'collapsed roadmap retains the real rank content');
+    disclosure.open=true;disclosure.ontoggle();assert.equal(roadmapFocus,1,'opening the roadmap focuses its current rank');
+    guestRenderer.renderProfile({focusRoadmap:true});assert.equal(disclosure.open,true);assert.equal(roadmapFocus,2,'expanded roadmap can retain the requested focus');
+    await new Promise(resolve=>setTimeout(resolve,0));
+    profileNode('#profileCreateBtn').onclick();profileNode('#profileLoginBtn').onclick();
+    assert.deepStrictEqual(authModes,['create','login'],'guest actions keep canonical account destinations');
+  }finally{global.PropletProfileStatistics=previousStatistics;}
 
   console.log('PASS: Sprint 12A.2 account module owns profile/team UI contracts');
 })().catch(error=>{console.error(error);process.exit(1)});

@@ -1,0 +1,68 @@
+{
+  "observedAtDatabaseUTC": "2026-10-28T11:39:13.251828+00:00",
+  "verificationMode": "Read-only SELECT against the isolated project; no clock control, data writes, or production database access",
+  "projectRef": "eanzztstmwlamwfdskbf",
+  "runtimeCommit": "d42f4a34afd307f8fcdccd8d099d343706b3eba6",
+  "productionDatabaseQueriesInThisVerification": 0,
+  "productionDatabaseWritesInThisVerification": 0,
+  "originalSyntheticFixtures": {
+    "selection": "Existing non-MQA players and their results; no individual credentials or row hashes are exported",
+    "players": 12,
+    "results": 7,
+    "resultXP": 530,
+    "aggregatePlayerDigest": "7eb6a24f903dbfabae96206f0e86c1fe",
+    "aggregateResultDigest": "9607dcb596d0f0414beedada657ef985",
+    "matchesBeforeImplementation": true
+  },
+  "actualBrowserCreatedQAProfiles": 4,
+  "november": {
+    "month": "2026-11-01",
+    "status": "closed",
+    "revision": 1,
+    "closesAtUTC": "2026-12-02T23:00:00+00:00",
+    "finalizedAtQAClockUTC": "2026-12-02T23:00:01.197957+00:00",
+    "standings": [
+      {"role": "A", "rank": 1, "competitionPoints": 2400, "validDays": 23, "countedDays": 20, "rawEligibleDayPoints": 2740},
+      {"role": "B", "rank": 1, "competitionPoints": 2400, "validDays": 20, "countedDays": 20, "rawEligibleDayPoints": 2400},
+      {"role": "C", "rank": 3, "competitionPoints": 100, "validDays": 1, "countedDays": 1, "rawEligibleDayPoints": 100}
+    ],
+    "badges": [
+      {"role": "A", "rank": 1, "points": 2400, "shared": true},
+      {"role": "B", "rank": 1, "points": 2400, "shared": true},
+      {"role": "C", "rank": 3, "points": 100, "shared": false}
+    ],
+    "roundCount": 1,
+    "badgeCount": 3
+  },
+  "december": {
+    "month": "2026-12-01",
+    "status": "open",
+    "closedRoundPresent": false,
+    "roleA": {"competitionPoints": 120, "validDays": 1, "countedDays": 1},
+    "roleD": {"competitionPoints": 0, "validDays": 0, "countedDays": 0},
+    "note": "D is the single additional fresh browser smoke account; it has no results or rewards."
+  },
+  "actualQAExperience": {
+    "A": {"resultXP": 2840, "rewardXP": 0, "totalXP": 2840},
+    "B": {"resultXP": 2000, "rewardXP": 0, "totalXP": 2000},
+    "C": {"resultXP": 200, "rewardXP": 0, "totalXP": 200},
+    "D": {"resultXP": 0, "rewardXP": 0, "totalXP": 0},
+    "realSignupBonusGranted": false,
+    "monthlyBadgeXPGranted": false,
+    "novemberClosureBeforeAfterXPComparison": "Recorded separately by the completed actual browser E2E; this final snapshot independently verifies the authoritative totals."
+  },
+  "settings": {
+    "enabled": true,
+    "isolated": true,
+    "rulesApproved": true,
+    "lateSyncPolicy": "review-close",
+    "launchMonth": "2026-11-01",
+    "previewNowUTC": "2026-12-03T11:00:00+00:00",
+    "previewAnchorAtActualUTC": "2026-10-28T11:12:32.198788+00:00",
+    "movingQAClockDayPrague": "2026-12-03"
+  },
+  "unchangedRemoteBranches": {
+    "main": "1de738938ff244fc010808daf33aea7def4b6481",
+    "codex/today-one-screen": "27e7204dfce5e7743ebf19b1eb2a834b5a817a83"
+  }
+}

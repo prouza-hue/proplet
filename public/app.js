@@ -1,5 +1,61 @@
-const APP_PREVIEW_RELEASE='proplet-v4.09.15-admin-workspace1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.0-monthly-releaseprep6';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
+// A preview may use real player data only after its own server explicitly opts in.
+// This is a UI capability, never authorization; all server write guards remain active.
+let livePlayerPreviewEnabled=false,runtimeCapabilitiesChecked=false,runtimeCapabilitiesFlight=null;
+function previewRuntime(){return window.PROPLET_RUNTIME_ENV==='preview'||window.PROPLET_RUNTIME_META?.environment==='preview'}
+function livePlayerPreview(){return previewRuntime()&&livePlayerPreviewEnabled===true}
+let monthlyPreviewClockOffsetMs=null;
+const MONTHLY_PREVIEW_CLOCK_KEY='proplet-monthly-preview-clock-v1';
+function clearMonthlyPreviewClock(){monthlyPreviewClockOffsetMs=null;try{localStorage.removeItem(MONTHLY_PREVIEW_CLOCK_KEY)}catch{}}
+function restoreMonthlyPreviewClock(){
+ try{
+  if(typeof previewRuntime!=='function'||!previewRuntime())return false;
+  const saved=JSON.parse(localStorage.getItem(MONTHLY_PREVIEW_CLOCK_KEY)||'null'),age=Date.now()-saved?.receivedAt;
+  if(saved?.origin!==location.origin||saved?.databaseRef!=='eanzztstmwlamwfdskbf'||saved?.branch!=='codex/monthly-competition-202611'||!Number.isFinite(saved?.offsetMs)||Math.abs(saved.offsetMs)>100*86400000||!Number.isFinite(age)||age<0||age>86400000)return false;
+  monthlyPreviewClockOffsetMs=saved.offsetMs;return true;
+ }catch{return false}
+}
+restoreMonthlyPreviewClock();
+function acceptMonthlyPreviewClock(config){
+ const clock=config?.monthlyPreview;
+ if(config?.environment!=='preview'||clock?.isolated!==true||clock?.databaseRef!=='eanzztstmwlamwfdskbf'||clock?.branch!=='codex/monthly-competition-202611'){
+  if(clock||config?.environment==='production'||config?.environment==='preview')clearMonthlyPreviewClock();
+  return false;
+ }
+ const stamp=Date.parse(clock.qaNow||config.serverNow||'');
+ if(!Number.isFinite(stamp)){clearMonthlyPreviewClock();return false}
+ monthlyPreviewClockOffsetMs=stamp-Date.now();
+ try{localStorage.setItem(MONTHLY_PREVIEW_CLOCK_KEY,JSON.stringify({origin:location.origin,databaseRef:clock.databaseRef,branch:clock.branch,offsetMs:monthlyPreviewClockOffsetMs,receivedAt:Date.now()}))}catch{}
+ return true;
+}
+function monthlyPreviewNow(){return new Date(Date.now()+(monthlyPreviewClockOffsetMs??0))}
+function resultCompletedAt(){return monthlyPreviewNow().toISOString()}
+function acceptRuntimeCapabilities(config){
+ acceptMonthlyPreviewClock(config);
+ runtimeCapabilitiesChecked=true;
+ livePlayerPreviewEnabled=config?.environment==='preview'&&config?.livePlayerPreview===true;
+ if(config?.environment==='preview')window.PROPLET_RUNTIME_ENV='preview';
+ if(livePlayerPreview()){
+  // Date/content demonstrations must never select future/test content for a real account.
+  CONTENT_PREVIEW_DATE='';TAJENKA_PREVIEW=false;GEN4_CANDIDATE_PREVIEW=false;GEN5_CANDIDATE_PREVIEW=false;
+  refreshTajenkaAvailability();
+ }
+ return livePlayerPreview();
+}
+async function loadRuntimeCapabilities(){
+ if(runtimeCapabilitiesChecked)return livePlayerPreview();
+ if(runtimeCapabilitiesFlight)return runtimeCapabilitiesFlight;
+ runtimeCapabilitiesFlight=(async()=>{
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),3000);
+  try{
+   const response=await fetch('/api/config',{cache:'no-store',signal:controller.signal});
+   if(!response.ok||(response.url&&new URL(response.url,location.origin).origin!==location.origin))throw new Error('runtime-config-unavailable');
+   return acceptRuntimeCapabilities(await response.json());
+  }catch{livePlayerPreviewEnabled=false;runtimeCapabilitiesChecked=false;return false}finally{clearTimeout(timer);runtimeCapabilitiesFlight=null}
+ })();
+ return runtimeCapabilitiesFlight;
+}
 window.PropletClientDiagnostics?.claimErrorListeners?.();
 const RANK_RULES='Čisté vyřešení → méně nápověd → čas → tahy';
 const COLORS=['#7A3B32','#175944','#2E507E','#66500F','#574A8A','#7A3E61','#0F5862','#6B3F19','#3E5918','#1D526A','#6E3D79','#303A78'];
@@ -31,7 +87,7 @@ const MOZKOMOR_QA_PRODUCTION_HOSTS=new Set(['proplet-nine.vercel.app','proplet-p
 const MOZKOMOR_QA_HOST=location.hostname.endsWith('.vercel.app')&&location.hostname.includes('-git-')&&!MOZKOMOR_QA_PRODUCTION_HOSTS.has(location.hostname);
 const MOZKOMOR_QA_PARAM=MOZKOMOR_QA_HOST?new URLSearchParams(location.search).get('mozkomor'):'';
 const MOZKOMOR_QA_PREVIEW=MOZKOMOR_QA_PARAM==='final'||window.PROPLET_RUNTIME_META?.gen5CandidatePreview===true;
-const isMozkomorQaDifficulty=diff=>MOZKOMOR_QA_PREVIEW&&diff==='mozkomor';
+const isMozkomorQaDifficulty=diff=>!livePlayerPreview()&&MOZKOMOR_QA_PREVIEW&&diff==='mozkomor';
 function difficultyIconMarkup(diff,className='difficulty-icon-img'){
  const d=DIFF[diff];return d?`<img class="${className}" src="${d.icon}" alt="" aria-hidden="true" draggable="false">`:'';
 }
@@ -253,10 +309,35 @@ const PROGRESS_GUARD_MOBILE_AWAY_MS=20*1000;
 const $=s=>document.querySelector(s);
 function renderWinBadges(html=''){
  let box=$('#newBadgeBox');
- const card=$('#winModal .win-card');
+ const modal=$('#winModal'),card=$('#winModal .win-card');
  if(!box&&card){box=document.createElement('div');box.id='newBadgeBox';box.className='new-badge-box hidden';const anchor=$('#starterHardActions')||$('#winPrimaryBtn');if(anchor&&card.contains(anchor))anchor.before(box);else card.append(box);}
  if(!box)return;
- box.classList.toggle('hidden',!html);box.innerHTML=html;
+ box.classList.toggle('hidden',!html);box.classList.remove('win-awards-grouped');box.removeAttribute('role');box.removeAttribute('aria-label');delete box.dataset.awardCount;box.innerHTML=html;
+ if(!html||modal?.classList.contains('starter-win')||modal?.classList.contains('first-steps-win'))return;
+ const rows=[...box.querySelectorAll(':scope > .unlock-row')];
+ if(rows.length){
+  // Keep the rare series celebration prominent; all other earned rows retain
+  // their original order, artwork slots and delegated detail identities.
+  const featured=rows.find(row=>row.dataset.achievementDetail?.startsWith('mozkokalypsa-'))||rows[0];
+  box.querySelectorAll(':scope > .unlock-title').forEach(title=>title.remove());
+  box.classList.add('win-awards-grouped');box.dataset.awardCount=String(rows.length);box.setAttribute('role','group');box.setAttribute('aria-label','Nově získané odměny');
+  featured.classList.add('win-award-featured');box.prepend(featured);
+  const others=rows.filter(row=>row!==featured);
+  if(others.length){
+   const details=document.createElement('details');details.className='win-awards-more';
+   const summary=document.createElement('summary');summary.textContent=`Další odměny (${others.length})`;
+   const list=document.createElement('div');list.className='win-awards-list';
+   for(const row of others){row.classList.add('win-award-compact');list.append(row);}
+   details.append(summary,list);box.append(details);
+  }
+ }
+ positionWinBadges();
+}
+function positionWinBadges(){
+ const modal=$('#winModal'),box=$('#newBadgeBox'),card=$('#winModal .win-card');
+ if(!box||!card||box.classList.contains('hidden')||modal?.classList.contains('starter-win')||modal?.classList.contains('first-steps-win'))return;
+ const anchor=card.querySelector('.win-secondary-actions')||$('#winResultActions')||$('#winPrimaryBtn');
+ if(anchor?.parentElement===card&&anchor.nextElementSibling!==box)anchor.after(box);
 }
 const $$=s=>[...document.querySelectorAll(s)];
 let puzzleDB=null;
@@ -327,8 +408,13 @@ let datedDailyController=null;
 let datedSpecialController=null;
 let dailySpecialUIController=null;
 let pendingSpecialInvitation=null;
+async function fetchDatedDaily(url,options){
+ const response=await fetch(url,{...options,...(typeof AbortSignal?.timeout==='function'?{signal:AbortSignal.timeout(8000)}:{})});
+ if(response.ok&&url==='/api/daily'&&previewRuntime())try{const row=await response.clone().json();if(row?.monthlyPreview)acceptMonthlyPreviewClock({environment:'preview',...row})}catch{}
+ return response;
+}
 function datedDaily(){
- if(!datedDailyController)datedDailyController=window.PropletDatedDaily.create({storage:localStorage,dateISO:devicePragueDateISO,fetchFn:(url,options)=>fetch(url,{...options,...(typeof AbortSignal?.timeout==='function'?{signal:AbortSignal.timeout(8000)}:{})})});
+ if(!datedDailyController)datedDailyController=window.PropletDatedDaily.create({storage:localStorage,dateISO:devicePragueDateISO,fetchFn:fetchDatedDaily});
  return datedDailyController;
 }
 async function refreshDatedDaily(){if(!puzzleDB?.datedDaily)return null;return datedDaily().refresh()}
@@ -343,7 +429,7 @@ function dailySpecialUI(){
   $,$$,DIFF,pragueDateISO,formatDateCZ,countCz,getProfile,getAnonymousId,getQueue,getSyncState:()=>syncState,dailyResultState,
   canShowIntro:()=>currentScreen==='daily'&&!onboardingMandatory&&localStorage.getItem(ONBOARD_KEY)==='done'&&!window.PropletFirstSteps?.quiet()&&!openTransientModal(),
   dailySpecialResultState:()=>dailySpecialResultState(),getSchedule:()=>datedSpecial()?.schedule()||[],
-  startGame,showDailyResult,showSpecialResult,startDaily,startSpecial,refreshSpecial:refreshDatedSpecial,showToast,
+  startGame,showDailyResult,showSpecialResult,startDaily,startSpecial,openFree:()=>nav('free'),refreshSpecial:refreshDatedSpecial,showToast,
   renderBase:()=>dailyOrchestration().renderDaily(),
  });
  return dailySpecialUIController;
@@ -426,7 +512,7 @@ function dailyOrchestration(){
   renderDailyWeekRhythm,renderLevelCard,getProfile,getQueue,getSyncState:()=>syncState,
   renderRescueCard:(...args)=>renderRescueCard(...args),renderQuickPlay:(...args)=>renderQuickPlay(...args),renderTajenkaEntry:(...args)=>renderTajenkaEntry(...args),
   showDailyResult:(...args)=>showDailyResult(...args),startGame:(...args)=>startGame(...args),showToast,
-  afterRender:()=>{renderNewContentBanner('#todayNewContentBanner');renderPreviousDailyResume();window.PropletHomeLayout?.applyDailyLayout?.();renderAccountProgressStatus();window.PropletPlaytest?.render();renderDailySpecialUI();globalThis.PropletArchiveExperience?.home()},
+  afterRender:()=>{renderNewContentBanner('#todayNewContentBanner');renderPreviousDailyResume();window.PropletHomeLayout?.applyDailyLayout?.();renderAccountProgressStatus();window.PropletPlaytest?.render();renderDailySpecialUI();globalThis.PropletArchiveExperience?.home();window.PropletHomeLayout?.orderDailyNodes?.()},
  });
  return dailyOrchestrationController;
 }
@@ -436,7 +522,7 @@ function rankingsOrchestration(){
  rankingsOrchestrationController=factory.create({
   $,$$,api,pragueDateISO,ensureRankingProfileState,getProfile,updateAccountProfile,
   esc,countCz,levelFor,fmtTime,adjustAccountRankingData:data=>window.PROPLET_ACCOUNT_BONUS_API?.adjustRankingData?.(data)||data,
-  openProfileModal,openTeamMembershipModal,openFamilyLeagueModal,showToast,
+  nav,openProfileModal,openTeamMembershipModal,openFamilyLeagueModal,showToast,
   canShowRankingPrivacyNotice:()=>{if(window.PropletFirstSteps?.quiet())return false;const stats=effectiveStats();return (stats.totalCompleted>0||stats.tajenkaCompleted>0)&&currentScreen!=='game'&&!document.querySelector('.modal:not(.hidden)')},
  });
  return rankingsOrchestrationController;
@@ -655,6 +741,7 @@ function localFreeSlotState(diff){
  return {actual,legacy:prior,prior,effective,transferred};
 }
 function reconcileLocalGen4Rewards(){
+ if(getProfile()?.stats?.xpAuthoritative===true)return {repairedXp:0,returnBonusXp:Number(getProfile().stats.gen4ReturnBonusXp)||0};
  const state=getState(),rows=Object.values(state.completed||{}),activeGeneration=Number(puzzleDB?.freeGeneration)||1;
  if(activeGeneration<4)return {repairedXp:0,returnBonusXp:0};
  let priorGenerationPlayed=false;const current=[];
@@ -744,7 +831,7 @@ function saveGameProgress(){
 }
 function saveTajenkaGameProgress(g=currentGame){
  if(!g||g.mode!=='tajenka'||g.finished)return;
- const state=tajenkaState();state.version=1;state.inProgress={puzzleId:g.puzzle.id,mode:'tajenka',found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,elapsedMs:Math.round(gameElapsed(g)),attemptId:g.attemptId,timingUnverified:!!g.timingUnverified,mergedAttempts:!!g.mergedAttempts,calmMode:!!g.calmMode,savedAt:Date.now()};saveTajenkaState(state);g.lastAutosaveAt=Date.now();
+ const state=tajenkaState();state.version=1;state.inProgress={puzzleId:g.puzzle.id,mode:'tajenka',wordDiscoveryXpAwarded:Math.max(0,Number(g.wordDiscoveryXpAwarded)||0),found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,elapsedMs:Math.round(gameElapsed(g)),attemptId:g.attemptId,timingUnverified:!!g.timingUnverified,mergedAttempts:!!g.mergedAttempts,calmMode:!!g.calmMode,savedAt:Date.now()};saveTajenkaState(state);g.lastAutosaveAt=Date.now();
 }
 function clearGameProgress(mode,puzzle,dailyDate){if(mode==='playtest')return;const s=getState(),key=challengeKey(mode,puzzle,dailyDate);if(s.inProgress?.[key]){delete s.inProgress[key];saveState(s)}}
 function resumableFreePuzzle(diff,list){
@@ -763,11 +850,21 @@ function currentLocalStats(){
  const tajenkaCompleted=Object.keys(tajenkaState()?.completions||{}).length;
  return {points:rows.reduce((a,r)=>a+(r.points||0),0),totalCompleted:gameRows.length,dailyCompleted:dailyDates.length,dailySpecialCompleted,dailyChallengeCompleted:dailyDates.length+dailySpecialCompleted,freeCompleted:free,freeTransferred,freePlayedGen2,currentStreak:streak,longestStreak:longest,bestDailyMs:dailyTimes.length?Math.min(...dailyTimes):null,cleanSolves:cleanRows.length,cleanDaily:cleanRows.filter(r=>r.mode==='daily').length,rescuedDays:rescueDates.length,tajenkaCompleted,mozkomorCompleted:free.mozkomor,discoveredWords:0};
 }
+function pendingAuthoritativeXp(scope=playerScope()){
+ const state=getState(scope),completed=state.completed||{},confirmed=state.remoteConfirmedChallenges||{},seen=new Set();let pending=0;
+ for(const row of getQueue(scope)){
+  const key=row?.challengeKey;if(!key||seen.has(key)||confirmed[key]===true||completed[key]?.serverConfirmed===true||(row.mode==='tajenka'&&tajenkaState(scope)?.completions?.[row.puzzleId]?.remote===true))continue;
+  seen.add(key);
+  const cap=row.mode==='daily'?100:row.mode==='daily_special'&&row.official!==false&&row.rewardEligible!==false?200:row.mode==='free'?Number(DIFF[row.difficulty]?.xp)||0:row.mode==='starter'?Number(puzzleDB?.starter?.meta?.rewardXp)||10:row.mode==='tajenka'?TAJENKA_REWARD_XP:0;
+  pending+=Math.min(cap,Math.max(0,Number(row.points)||0));
+ }
+ return pending;
+}
 function effectiveStats(){
  const local=currentLocalStats(),remote=getProfile()?.stats;if(!remote)return local;
  const free=Object.fromEntries(Object.keys(DIFF).map(d=>[d,0])),freeTransferred={...free},freePlayedGen2={...free};for(const k of Object.keys(free)){free[k]=Math.max(local.freeCompleted?.[k]||0,remote.freeCompleted?.[k]||0);freeTransferred[k]=Math.max(local.freeTransferred?.[k]||0,remote.freeTransferred?.[k]||0);freePlayedGen2[k]=Math.max(local.freePlayedGen2?.[k]||0,remote.freePlayedGen2?.[k]||0)}
  return {...remote,
-  points:Math.max(local.points||0,remote.points||0),totalCompleted:Math.max(local.totalCompleted||0,remote.totalCompleted||0),
+  points:remote.xpAuthoritative===true?Math.max(0,Number(remote.points)||0)+pendingAuthoritativeXp():Math.max(local.points||0,remote.points||0),totalCompleted:Math.max(local.totalCompleted||0,remote.totalCompleted||0),
   dailyCompleted:Math.max(local.dailyCompleted||0,remote.dailyCompleted||0),freeCompleted:free,freeTransferred,freePlayedGen2,
   dailySpecialCompleted:Math.max(local.dailySpecialCompleted||0,remote.dailySpecialCompleted||0),dailyChallengeCompleted:Math.max(local.dailyChallengeCompleted||0,remote.dailyChallengeCompleted||0),
   currentStreak:Math.max(local.currentStreak||0,remote.currentStreak||0),longestStreak:Math.max(local.longestStreak||0,remote.longestStreak||0),
@@ -835,7 +932,7 @@ function initNavigation(){
   const screen=e.state?.proplet&&ROUTE_SCREENS.has(e.state.screen)?e.state.screen:'daily';nav(screen,{fromPop:true});
  });
 }
-function transientModals(){return ['archiveExperienceModal','tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement','dailyExtraIntro'].map(id=>document.getElementById(id)).filter(Boolean)}
+function transientModals(){return ['archiveExperienceModal','tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','validWordFailsafeModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement','dailyExtraIntro'].map(id=>document.getElementById(id)).filter(Boolean)}
 function openTransientModal(){return document.querySelector('#achievementDetail[open]')||document.querySelector('#contentReleaseModal[open]')||transientModals().find(el=>!el.classList.contains('hidden'))||null}
 function closeTransientModals(){globalThis.PropletArchiveExperience?.closeModal();window.PropletAchievementDetails?.close();window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();if(typeof dailySpecialUIController!=='undefined')dailySpecialUIController?.closeIntro();transientModals().forEach(el=>el.classList.add('hidden'))}
 function goBackFromGame(){
@@ -897,7 +994,7 @@ async function finishRescue(passed){
  const g=currentGame;if(!g||g.mode!=='rescue'||g.rescueFinished)return;g.rescueFinished=true;g.finished=true;stopTimer();releaseGameWakeLock();const elapsed=Math.max(0,Math.round(gameElapsed(g))),profile=getProfile();let ok=passed;
  try{
   if(profile?.token){const r=await api('/api/rescue/finish',{method:'POST',body:JSON.stringify({puzzle_id:g.puzzle.id,completed:!!passed,elapsed_ms:Math.min(120000,elapsed)})});ok=!!r.ok;if(r.stats)saveProfile({...profile,stats:r.stats})}
-  else{const st=getState(),missed=g.dailyDate;st.rescues=st.rescues||{};st.rescues[missed]={...(st.rescues[missed]||{}),status:passed&&elapsed<=30000?'passed':'failed',puzzleId:g.puzzle.id,elapsedMs:elapsed,completedAt:new Date().toISOString()};saveState(st);ok=passed&&elapsed<=30000}
+  else{const st=getState(),missed=g.dailyDate;st.rescues=st.rescues||{};st.rescues[missed]={...(st.rescues[missed]||{}),status:passed&&elapsed<=30000?'passed':'failed',puzzleId:g.puzzle.id,elapsedMs:elapsed,completedAt:resultCompletedAt()};saveState(st);ok=passed&&elapsed<=30000}
  }catch(e){ok=false;showToast(`Záchranu se nepodařilo potvrdit: ${e.message}`)}
  $('#tajenkaWinPhrase')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');$('#winModal').classList.remove('hidden');$('#winAccountBtn')?.classList.add('hidden');$('#winBadge').textContent=ok?'🔥':'💨';$('#winTitle').textContent=ok?'Série zachráněna!':'Série tentokrát padla';$('#winPraise').textContent=ok?'Třicet sekund, žádné výmluvy. Série může dýchat dál.':'Nevadí. I série občas potřebuje nový začátek.';$('#winPraise').classList.remove('hidden');$('#winText').textContent=ok?`Hotovo za ${fmtTime(elapsed)}. Tvoje série pokračuje.`:'Pokus je vyčerpaný. Dnešní výzva může odstartovat novou sérii.';setWinXpDisplay(ok?'Série pokračuje · bez XP':'Nový začátek');$('#winClean').classList.add('hidden');$('#winWords').innerHTML=ok?g.found.map(f=>`<span class="win-word" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join(''):'';renderWinBadges();$('#winReplayBtn').classList.add('hidden');$('#winShareBtn').classList.add('hidden');$('#winMenuBtn').classList.add('hidden');$('#winPrimaryBtn').textContent='Zpět na dnešek';renderWinFeedback();if(ok){confetti();fx('win')}else fx('wrong');await refreshRescueStatus();renderProfile();
 }
@@ -976,7 +1073,7 @@ function renderFree(){
  renderNewContentBanner();
  $('#difficultyCards').innerHTML=Object.entries(DIFF).map(([key,d])=>{
   const {total,done,pct,resume}=freeProgress(key),action=resume?'Pokračovat':done===total&&total?'Zahrát znovu':'Hrát';
-  return `<article class="cp-card" data-diff="${key}"><div class="cp-top">${difficultyIconMarkup(key,'cp-art')}<div class="cp-heading"><h2>${esc(d.label)}</h2><span class="cp-xp">+${d.xp} XP</span></div><button type="button" class="cp-history" data-played-levels="${key}" aria-label="${esc(d.label)}: ${done} z ${total} hotovo, otevřít přehled úrovní"><strong>${done}</strong> / ${total}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg></button></div><div class="cp-track" role="progressbar" aria-label="Postup: ${esc(d.label)}" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><span style="width:${pct}%"></span></div><button type="button" class="cp-play" data-play-free="${key}" aria-label="${action}: ${esc(d.label)}">${action} <span aria-hidden="true">→</span></button></article>`
+  return `<article class="cp-card" data-diff="${key}"><div class="cp-top">${difficultyIconMarkup(key,'cp-art')}<div class="cp-heading"><h2>${esc(d.label)}</h2><span class="cp-xp">+${d.xp} XP</span></div><button type="button" class="cp-history" data-played-levels="${key}" aria-label="Přehled úrovní: ${esc(d.label)}, ${done} z ${total} hotovo"><span class="cp-history-count"><strong>${done}</strong> / ${total}</span><span class="cp-history-label">Přehled <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg></span></button></div><div class="cp-track" role="progressbar" aria-label="Postup: ${esc(d.label)}" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><span style="width:${pct}%"></span></div><button type="button" class="cp-play" data-play-free="${key}" aria-label="${action}: ${esc(d.label)}">${action} <span aria-hidden="true">→</span></button></article>`
  }).join('');
  $$('[data-play-free]').forEach(b=>{b.onclick=e=>{e.stopPropagation();startFree(b.dataset.playFree)};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startFree(b.dataset.playFree)}}});
  $$('[data-played-levels]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.disabled)openPlayedLevels(b.dataset.playedLevels)});
@@ -1062,7 +1159,7 @@ function observeStarterPresentation(g){
  },10000);
 }
 function freshStarterVisit(){
- try{if(window.PROPLET_RUNTIME_META?.gen4CandidatePreview||window.PROPLET_RUNTIME_META?.gen5CandidatePreview)return false;const state=getState();return !getProfile()?.token&&!localStorage.getItem(ONBOARD_KEY)&&!Object.keys(state.completed||{}).length&&!Object.keys(state.inProgress||{}).length}catch{return false}
+ try{if(!livePlayerPreview()&&(window.PROPLET_RUNTIME_META?.gen4CandidatePreview||window.PROPLET_RUNTIME_META?.gen5CandidatePreview))return false;const state=getState();return !getProfile()?.token&&!localStorage.getItem(ONBOARD_KEY)&&!Object.keys(state.completed||{}).length&&!Object.keys(state.inProgress||{}).length}catch{return false}
 }
 let gameLaunchSequence=0;
 async function startGame(puzzle,mode,dailyDate,options={}){
@@ -1278,7 +1375,7 @@ async function finishStarterGame(g){
  $('#tajenkaWinPhrase')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();releaseGameWakeLock();g.starterGuidePath=[];hideStarterHintNudge();renderGameBoard();renderGameHUD();updateGameFeel();
  let starterDaily;try{starterDaily=dailyPuzzleFor(pragueDateISO())}catch{}const hardNext=starterDaily?.difficulty==='hard';g.starterNextHard=hardNext;if(hardNext)trackProductEvent('starter_hard_choice_shown');
  await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);
- const key=challengeKey('starter',g.puzzle,null),state=getState(),old=state.completed[key],rec={puzzleId:g.puzzle.id,challengeKey:key,mode:'starter',difficulty:'easy',dailyDate:null,level:null,contentGeneration:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:old?0:pointsFor('starter','easy',g.puzzle),hintsUsed:0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:0,attemptId:null,cleanSolve:true,completedAt:new Date().toISOString()};
+ const key=challengeKey('starter',g.puzzle,null),state=getState(),old=state.completed[key],rec={puzzleId:g.puzzle.id,challengeKey:key,mode:'starter',difficulty:'easy',dailyDate:null,level:null,contentGeneration:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:old?0:pointsFor('starter','easy',g.puzzle),hintsUsed:0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:0,attemptId:null,cleanSolve:true,completedAt:resultCompletedAt()};
  if(!old)state.completed[key]=rec;saveState(state);if(!old)queueResult(rec);trackProductEvent('starter_completed');trackStarterPhase(g.starterTrace,'completed');
  const winBoard=$('#levelLeaderboardBox');winBoard?.classList.add('hidden');$('#winBadge').textContent='🎓';$('#winTitle').textContent='První Proplet je doma!';$('#winPraise').textContent='';$('#winPraise').classList.add('hidden');$('#winText').textContent='';setWinXpDisplay('Trénink dokončen');const wc=$('#winClean');wc.classList.remove('hidden','hinted');wc.textContent='🎓 Zaškoleno';$('#winWords').innerHTML=g.found.map(f=>`<span class="win-word" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join('');renderWinBadges();const hardActions=$('#starterHardActions');hardActions?.classList.toggle('hidden',!hardNext);
  $('#winReplayBtn').classList.add('hidden');$('#winShareBtn').classList.add('hidden');$('#winMenuBtn').classList.toggle('hidden',hardNext);if(!hardNext)$('#winMenuBtn').textContent='Vybrat volnou hru';$('#winAccountBtn')?.classList.add('hidden');$('#winDetails')?.classList.add('hidden');$('#winFeedback')?.classList.add('hidden');$('#winPrimaryBtn').classList.toggle('hidden',hardNext);if(!hardNext)$('#winPrimaryBtn').textContent='Hrát dnešní výzvu ☀️';$('#winModal').classList.add('starter-win');$('#winModal').classList.remove('hidden');confetti();fx('win');renderDaily();renderFree();renderProfile();
@@ -1287,7 +1384,7 @@ async function finishStarterGame(g){
 async function finishTajenkaGame(g){
  if(!g||g.mode!=='tajenka'||g.finished)return;
  g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();releaseGameWakeLock();renderGameBoard();renderGameHUD();updateGameFeel();
- const state=tajenkaState(),old=tajenkaCompletion(g.puzzle,state),rewardXp=old?0:Number(g.puzzle.meta?.rewardXp)||TAJENKA_REWARD_XP,completion={puzzleId:g.puzzle.id,found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,elapsedMs:Math.round(g.elapsedMs),completedAt:new Date().toISOString(),rewarded:true,rewardXp};state.version=2;state.completions=state.completions||{};state.completions[g.puzzle.id]=completion;state.completed=completion;delete state.inProgress;saveTajenkaState(state);
+ const state=tajenkaState(),old=tajenkaCompletion(g.puzzle,state),rewardXp=old?0:Number(g.puzzle.meta?.rewardXp)||TAJENKA_REWARD_XP,completion={puzzleId:g.puzzle.id,found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,elapsedMs:Math.round(g.elapsedMs),completedAt:resultCompletedAt(),rewarded:true,rewardXp};state.version=2;state.completions=state.completions||{};state.completions[g.puzzle.id]=completion;state.completed=completion;delete state.inProgress;saveTajenkaState(state);
  if(TAJENKA_RELEASE_ENABLED&&!old){const rec={puzzleId:g.puzzle.id,challengeKey:challengeKey('tajenka',g.puzzle,null),mode:'tajenka',difficulty:g.puzzle.difficulty||'medium',dailyDate:null,level:null,contentGeneration:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:rewardXp,hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:null,cleanSolve:(g.hints||0)===0,completedAt:completion.completedAt};queueResult(rec);if(getProfile()?.token)syncQueue({announce:false}).catch(()=>{})}
  trackProductEvent('tajenka_completed');
  await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);
@@ -1320,16 +1417,16 @@ async function finishGame(){
  const g=currentGame,completion={game:g,data:Object.create(null)};await runGameCompletionHooks('before',completion);if(g?.puzzle?.meta?.archiveExperience)globalThis.PropletArchiveExperience.prepareCompletion(g);if(g?.mode==='starter'){const out=await finishStarterGame(g);await runGameCompletionHooks('after',completion);return out}if(g?.mode==='tajenka'){const out=await finishTajenkaGame(g);await runGameCompletionHooks('after',completion);return out}postWinEngagementNudgeShown=false;g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();releaseGameWakeLock();g.starterGuidePath=[];$('#tajenkaWinPhrase')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');renderGameBoard();renderGameHUD();updateGameFeel();await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);if(g.puzzle?.meta?.archiveExperience&&(currentGame!==g||g.archiveScope!==playerScope()))return;const key=challengeKey(g.mode,g.puzzle,g.dailyDate),statsBefore=effectiveStats(),state=getState(),old=state.completed[key];
  const dailyGenerationUpgrade=g.mode==='daily'&&!!old&&old.puzzleId!==g.puzzle.id;
  const dailyReplay=g.mode==='daily'&&!!old&&!dailyGenerationUpgrade,specialPractice=g.mode==='daily_special'&&g.puzzle.meta?.dailySpecialBinding?.rewardEligible===false,specialReplay=g.mode==='daily_special'&&!!old;
- const rec={puzzleId:g.puzzle.id,challengeKey:key,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate,level:g.mode==='free'?Number(g.puzzle.meta?.level)||null:null,contentGeneration:g.mode==='free'?Number(g.puzzle.meta?.contentGeneration)||Number(puzzleDB.freeGeneration)||2:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:pointsFor(g.mode,g.puzzle.difficulty,g.puzzle),hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:g.attemptId||null,cleanSolve:(g.hints||0)===0,completedAt:new Date().toISOString(),...(g.mode==='daily_special'?{contentHash:g.puzzle.meta.dailySpecialBinding.contentHash,officialChallengeKey:g.puzzle.meta.dailySpecialBinding.officialChallengeKey,official:!specialPractice,rewardEligible:!specialPractice}:{}),calmMode:!!g.calmMode,...(g.archiveSolution?{archiveSolution:g.archiveSolution}:{})};
+ const rec={puzzleId:g.puzzle.id,challengeKey:key,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate,level:g.mode==='free'?Number(g.puzzle.meta?.level)||null:null,contentGeneration:g.mode==='free'?Number(g.puzzle.meta?.contentGeneration)||Number(puzzleDB.freeGeneration)||2:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:pointsFor(g.mode,g.puzzle.difficulty,g.puzzle),hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:g.attemptId||null,cleanSolve:(g.hints||0)===0,completedAt:resultCompletedAt(),...(g.mode==='daily_special'?{contentHash:g.puzzle.meta.dailySpecialBinding.contentHash,officialChallengeKey:g.puzzle.meta.dailySpecialBinding.officialChallengeKey,official:!specialPractice,rewardEligible:!specialPractice}:{}),calmMode:!!g.calmMode,...(g.archiveSolution?{archiveSolution:g.archiveSolution}:{})};
  rec.timingUnverified=!!g.timingUnverified;rec.mergedAttempts=!!g.mergedAttempts;renderTimingStatus(g);if(dailyGenerationUpgrade)rec.points=old.points??rec.points;if(!specialPractice&&(!old||dailyGenerationUpgrade))state.completed[key]=rec;if(state.inProgress?.[key])delete state.inProgress[key];if(specialPractice&&g.puzzle.meta.dailySpecialBinding.officialChallengeKey&&state.inProgress?.[g.puzzle.meta.dailySpecialBinding.officialChallengeKey])delete state.inProgress[g.puzzle.meta.dailySpecialBinding.officialChallengeKey];saveState(state);g.resultRecord=rec;if(!g.remoteCommitted)queueResult(rec);g.finishTelemetryPromise=g.remoteCommitted?Promise.resolve(null):finishAttemptTelemetry(rec);
  window.PropletFirstSteps?.recordCompleted(g);
- $('#winModal').classList.remove('starter-win');$('#starterHardActions')?.classList.add('hidden');$('#winPrimaryBtn').classList.remove('hidden');$('#winDetails')?.classList.remove('hidden');$('#winFeedback')?.classList.remove('hidden');winDailyGlobalData=null;const winBoard=$('#levelLeaderboardBox');if(winBoard){winBoard.classList.remove('daily-global-board','free-level-board');if(g.mode==='free'&&!g.postStarterWarmup){winBoard.classList.remove('hidden');winBoard.innerHTML='<div class="leaderboard-empty"><strong>Aktualizuji pořadí…</strong><small>Započítávám právě dohraný výsledek.</small></div>'}else if(g.postStarterWarmup){winBoard.classList.add('hidden')}else if(g.mode==='daily'||(g.mode==='daily_special'&&!specialPractice)){winBoard.classList.remove('hidden');winBoard.classList.add('daily-global-board');winBoard.innerHTML='<div class="leaderboard-empty"><strong>Hledám tvoje místo ve světě…</strong><small>Nejdřív bezpečně ukládám výsledek.</small></div>'}else winBoard.classList.add('hidden')}
+ $('#winModal').classList.remove('starter-win');$('#starterHardActions')?.classList.add('hidden');$('#winPrimaryBtn').classList.remove('hidden');$('#winDetails')?.classList.remove('hidden');$('#winFeedback')?.classList.remove('hidden');winDailyGlobalData=null;const winBoard=$('#levelLeaderboardBox');if(winBoard){winBoard.classList.remove('daily-global-board','free-level-board');if(g.mode==='free'&&!g.postStarterWarmup){winBoard.classList.remove('hidden');winBoard.innerHTML='<div class="leaderboard-empty"><strong>Aktualizuji pořadí…</strong><small>Započítávám právě dohraný výsledek.</small></div>'}else if(g.postStarterWarmup){winBoard.classList.add('hidden')}else if(g.mode==='daily'||(g.mode==='daily_special'&&!specialPractice)){winBoard.classList.remove('hidden');winBoard.classList.add('daily-global-board');winBoard.innerHTML='<div class="leaderboard-empty"><strong>Načítám pořadí…</strong><small>Nejdřív bezpečně ukládám výsledek.</small></div>'}else winBoard.classList.add('hidden')}
  const beforeLongest=calcLongest(Object.values(getState().completed).filter(r=>r.mode==='daily'&&r.challengeKey!==key).map(r=>r.dailyDate));const stats=effectiveStats(),newBadge=(!old&&g.mode==='daily')?BADGES.find(b=>b.days>beforeLongest&&b.days<=stats.longestStreak):null,newAchievements=completionAchievements(statsBefore,stats,g,getState().mozkokalypsaCelebrated);
  $('#winBadge').textContent=g.mode==='daily'?(newBadge?.icon||'☀️'):'✦';renderCompletionPraise(g.puzzle.difficulty,rec);if(g.postStarterWarmup){trackProductEvent('starter_easy_warmup_completed');$('#winTitle').textContent='Paráda. Teď už jsi rozehřátý.';}const levelSuffix=g.mode==='free'&&g.puzzle.meta?.level?` ${g.puzzle.meta.level}`:'';$('#winText').textContent=`${fmtTime(rec.elapsedMs)} · ${countCz(rec.moves,'tah','tahy','tahů')} · ${DIFF[g.puzzle.difficulty].label}${levelSuffix}`;
  g.winBaseXpAwarded=(dailyGenerationUpgrade||dailyReplay||specialPractice||specialReplay||(old&&g.mode==='free')||(g.mode==='free'&&rec.points===0))?0:Math.max(0,Number(rec.points)||0);g.winXpFallbackText=specialPractice?'Tréninkový pokus · bez dalších XP':specialReplay?'Tréninkový pokus · 200 XP už máš':dailyGenerationUpgrade?'✓ Nová Daily započítaná · 100 XP už máš':dailyReplay?'Tréninkový pokus · 100 XP už máš':old&&g.mode==='free'?'Tréninkový pokus · do pořadí platí první výsledek':g.mode==='free'&&rec.points===0?'Tréninkový pokus · XP už máš':`+${rec.points} XP`;renderRunWinXp(g);const wc=$('#winClean');wc.classList.remove('hidden','hinted');wc.textContent=rec.cleanSolve?'✨ Čistě · bez nápovědy':(g.helperHintUsed?`💛 S Pomocníkem · ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`:`💡 ${countCz(rec.hintsUsed,'nápověda','nápovědy','nápověd')}`);if(!rec.cleanSolve)wc.classList.add('hinted');$('#winWords').innerHTML=g.found.map(f=>`<span class="win-word" style="--word-color:${COLORS[f.colorIndex%COLORS.length]};background:color-mix(in srgb,${COLORS[f.colorIndex%COLORS.length]} 55%,white)">${f.word}</span>`).join('');
- const celebrations=[];if(!g.postStarterWarmup&&newBadge)celebrations.push(`<div class="unlock-row"><span class="emoji">${newBadge.icon}</span><div><strong>Nový odznak · ${newBadge.name}</strong><small>${countCz(newBadge.days,'den','dny','dní')} v řadě</small></div></div>`);if(!g.postStarterWarmup&&newAchievements.length){celebrations.push(`<div class="unlock-title">🏆 ${newAchievements.length===1?'Nový úspěch!':`Nové úspěchy · ${newAchievements.length}`}</div>`+newAchievements.map(a=>`<div class="unlock-row achievement-unlock" data-achievement-detail="${a.id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="${esc(a.name)} – zobrazit detail"><span class="emoji">${a.icon}</span><div><strong>${a.name}</strong><small>${a.desc}</small></div></div>`).join(''))}renderWinBadges(celebrations.join(''));
+ const celebrations=[];if(!g.postStarterWarmup&&newBadge)celebrations.push(`<div class="unlock-row" data-streak-detail="${esc(newBadge.name)}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="${esc(newBadge.name)} – zobrazit detail odznaku"><span class="emoji">${newBadge.icon}</span><div><strong>Nový odznak · ${newBadge.name}</strong><small>${countCz(newBadge.days,'den','dny','dní')} v řadě</small></div></div>`);if(!g.postStarterWarmup&&newAchievements.length){celebrations.push(`<div class="unlock-title">🏆 ${newAchievements.length===1?'Nový úspěch!':`Nové úspěchy · ${newAchievements.length}`}</div>`+newAchievements.map(a=>`<div class="unlock-row achievement-unlock" data-achievement-detail="${a.id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="${esc(a.name)} – zobrazit detail"><span class="emoji">${a.icon}</span><div><strong>${a.name}</strong><small>${a.desc}</small></div></div>`).join(''))}renderWinBadges(celebrations.join(''));
  const celebratedMk=newAchievements.filter(a=>a.group==='mozkokalypsa').map(a=>a.id);
- const badgeBox=$('#newBadgeBox'),badgeAnchor=celebratedMk.length?$('#winPrimaryBtn'):$('#starterHardActions');if(badgeBox&&badgeAnchor)badgeAnchor.before(badgeBox);
+ positionWinBadges();
  if(celebratedMk.length&&!g.postStarterWarmup){const latest=getState();latest.mozkokalypsaCelebrated=[...new Set([...(Array.isArray(latest.mozkokalypsaCelebrated)?latest.mozkokalypsaCelebrated:[]),...celebratedMk])];saveState(latest)}
  configureWinReplay(g.mode,g.dailyDate,rec);$('#winShareBtn').classList.toggle('hidden',!!g.postStarterWarmup);$('#winMenuBtn').classList.remove('hidden');$('#winMenuBtn').textContent=g.postStarterWarmup?'Zůstat ve Volné hře':(g.mode==='daily'||g.mode==='daily_special')?'← Dnes':'← Menu';$('#winPrimaryBtn').textContent=g.postStarterWarmup?'☀️ Jdu na dnešní výzvu':g.mode==='daily_special'?'Zpět na Dnes':g.mode==='daily'?'Vybrat další hru':g.mode==='free'&&g.contentBatchId?(latestContentUnplayed().length?'Hrát další nový':'Zpět k Volné hře'):'Hraj další úroveň';$('#winModal').classList.remove('hidden');updateWinAccountCta();renderWinFeedback();confetti();fx('win');renderDaily();renderFree();renderProfile();
  if(g.puzzle?.meta?.archiveExperience){
@@ -1625,14 +1722,14 @@ function analyticsHeaders(eventType,properties){
 function productAnalytics(){
  if(productAnalyticsController)return productAnalyticsController;
  const factory=window.PropletAnalytics;if(!factory?.create)return null;
- productAnalyticsController=factory.create({storage:localStorage,getScope:()=>getProfile()?.id?`p:${getProfile().id}`:`a:${getAnonymousId()}`,getProfile,getHeaders:analyticsHeaders,shouldSend:eventType=>!eventType.startsWith('marketing_')?true:window.PropletMarketing?window.PropletMarketing.consented():null,request:(path,opts)=>api(path,{...opts,headers:window.PropletAcquisition?.filterHeaders(opts.headers)||opts.headers}),isDisabled:()=>!!(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||window.PROPLET_RUNTIME_ENV==='preview')});
+ productAnalyticsController=factory.create({storage:localStorage,getScope:()=>getProfile()?.id?`p:${getProfile().id}`:`a:${getAnonymousId()}`,getProfile,getHeaders:analyticsHeaders,shouldSend:eventType=>!eventType.startsWith('marketing_')?true:window.PropletMarketing?window.PropletMarketing.consented():null,request:(path,opts)=>api(path,{...opts,headers:window.PropletAcquisition?.filterHeaders(opts.headers)||opts.headers}),isDisabled:()=>!!(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||(previewRuntime()&&!livePlayerPreview()))});
  return productAnalyticsController;
 }
 function trackProductEvent(eventType,properties){
  if(currentGame?.mode==='playtest'&&currentScreen==='game')return;
  const controller=productAnalytics();
  if(controller){controller.track(eventType,properties);return}
- if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW)return;
+ if(CONTENT_PREVIEW_DATE||GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||(previewRuntime()&&!livePlayerPreview()))return;
  api('/api/product-event',{method:'POST',body:JSON.stringify({event_type:eventType})}).catch(()=>{});
 }
 function trackInboundCampaign(){
@@ -1646,8 +1743,9 @@ function trackAppSession(){
 
 async function syncQueue({announce=false,waitForProfile=true}={}){
  if(navigator.onLine===false){renderOfflineStatus();return {ok:false,left:getQueue().length,offline:true,error:'Výsledky odešleme po připojení.'}}
+ if(previewRuntime())await loadRuntimeCapabilities();
+ if(GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||(previewRuntime()&&!livePlayerPreview()&&!window.PROPLET_ISOLATED_FAIR_PLAY_PREVIEW&&!window.PROPLET_ARCHIVE_PREVIEW)||new URLSearchParams(location.search).get('tutorial')==='1'){if(getProfile()?.token)await refreshRemoteProfile();syncState={status:'local',error:null,lastAt:null};renderDaily();renderProfile();return {ok:true,left:getQueue().length,preview:true}}
  if(await claimTelemetryAfterAuth()===false)return {ok:false,left:getQueue().length,error:"Převod postupu čeká na spojení se serverem."};
- if(GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW||(window.PROPLET_RUNTIME_ENV==='preview'&&!window.PROPLET_ISOLATED_FAIR_PLAY_PREVIEW&&!window.PROPLET_ARCHIVE_PREVIEW)||new URLSearchParams(location.search).get('tutorial')==='1'){if(getProfile()?.token)await refreshRemoteProfile();syncState={status:'local',error:null,lastAt:null};renderDaily();renderProfile();return {ok:true,left:0,preview:true}}
  const p=getProfile();if(!p?.token){syncState={status:'local',error:null,lastAt:null};if(announce)showToast('Nejdřív si ulož hráčský účet.');renderDaily();renderProfile();return {ok:false,left:getQueue().length,error:'Bez hráče'}}
  const scope=p.id,controller=resultQueue(p,scope);if(controller&&controller.getQueue().length){
   syncState={status:'syncing',error:null,lastAt:syncState.lastAt};renderProfile();renderDaily();
@@ -1674,13 +1772,14 @@ function mergeRemoteProgress(rows,scope=playerScope()){
  for(const r of rows||[]){
   if(!r?.challengeKey)continue;
   if(r.mode==='daily_special'&&(r.rewardEligible===false||r.official===false||r.challengeKey!==`daily-special:${r.dailyDate}:${r.difficulty}`))continue;
+  state.remoteConfirmedChallenges=state.remoteConfirmedChallenges||{};state.remoteConfirmedChallenges[r.challengeKey]=true;
   const old=state.completed[r.challengeKey];
   if(r.mode==='daily_special'&&old&&(old.mode!==r.mode||old.puzzleId!==r.puzzleId||(old.contentHash&&r.contentHash&&old.contentHash!==r.contentHash)))continue;
-  if(!old){state.completed[r.challengeKey]=r;if(state.inProgress?.[r.challengeKey])delete state.inProgress[r.challengeKey];continue}
+  if(!old){state.completed[r.challengeKey]={...r,serverConfirmed:true};if(state.inProgress?.[r.challengeKey])delete state.inProgress[r.challengeKey];continue}
   // Aktivní Daily nesmí přepsat opožděná synchronizace archivované desky.
-  if(r.mode==='daily'&&r.dailyDate){let activeId=datedDailyController?.cached(r.dailyDate)?.puzzleId;try{activeId=activeId||dailyPuzzleFor(r.dailyDate).id}catch{}if(activeId&&old.puzzleId===activeId&&r.puzzleId!==activeId)continue}
+  if(r.mode==='daily'&&r.dailyDate){let activeId=datedDailyController?.cached(r.dailyDate)?.puzzleId;try{activeId=activeId||dailyPuzzleFor(r.dailyDate).id}catch{}if(activeId&&old.puzzleId===activeId&&r.puzzleId!==activeId){old.points=r.points;old.serverConfirmed=true;continue}}
   // Server drží první oficiální dokončení pro Daily i volné úrovně.
-  state.completed[r.challengeKey]={...old,...r};
+  state.completed[r.challengeKey]={...old,...r,serverConfirmed:true};
   if(state.inProgress?.[r.challengeKey])delete state.inProgress[r.challengeKey];
  }
  saveState(state,scope);
@@ -1692,7 +1791,7 @@ async function refreshRemoteProfile({throwOnError=false}={}){
  async function loadSnapshot(){
   for(let attempt=0;attempt<2;attempt++){
    try{
-    const cachedAt=getState(p.id)?.remoteProgressLoadedAt,validCursor=typeof cachedAt==='string'&&Number.isFinite(Date.parse(cachedAt));
+    const cachedState=getState(p.id),cachedAt=cachedState?.remoteProgressLoadedAt,validCursor=cachedState.remoteXpCanonicalVersion===1&&typeof cachedAt==='string'&&Number.isFinite(Date.parse(cachedAt));
     const suffix=validCursor?`?since=${encodeURIComponent(cachedAt)}`:'';
     return await api('/api/account/snapshot'+suffix,{authProfile:p});
    }
@@ -1710,7 +1809,7 @@ async function refreshRemoteProfile({throwOnError=false}={}){
   if(!accountProfileMatches(p))return null;
   if(!Array.isArray(me.completed))throw new Error('Neúplná odpověď postupu');
   mergeRemoteProgress(me.completed||[],p.id);
-  const loadedState=getState(p.id),cursor=typeof me.cursor==='string'&&Number.isFinite(Date.parse(me.cursor))?me.cursor:new Date().toISOString();loadedState.remoteProgressLoadedAt=cursor;saveState(loadedState,p.id);
+  const loadedState=getState(p.id),cursor=typeof me.cursor==='string'&&Number.isFinite(Date.parse(me.cursor))?me.cursor:new Date().toISOString();loadedState.remoteProgressLoadedAt=cursor;loadedState.remoteXpCanonicalVersion=1;saveState(loadedState,p.id);
   accountProgressReady=p;accountProgressAuthRequired=false;
   const remoteMode=validSupportMode(me.supportMode)?me.supportMode:(validSupportMode(p.supportMode)?p.supportMode:'none');rememberSupportMode(remoteMode);
   const repairedBoardXp=Number(me.stats?.gen4RewardRepairXp||0)-Number(me.stats?.gen4ReturnBonusAwardedNow||0);if(repairedBoardXp>0){const state=getState();state.gen4XpRepairNotice=true;saveState(state);document.dispatchEvent(new CustomEvent('proplet:gen4-xp-repair'))}
@@ -2131,6 +2230,7 @@ async function probeCanonicalRelease(force=false){
  try{
   const local=await fetch(`/api/config?release_probe=${now}`,{cache:'no-store'}).then(r=>r.ok?r.json():null);
   if(!local)return;
+  acceptRuntimeCapabilities(local);
   const canonicalOrigin=window.PROPLET_RUNTIME_META?.canonicalOrigin||'https://hrajproplet.cz';
   window.PROPLET_RUNTIME_ENV=local.environment;
  if(local.environment==='preview'||location.origin===canonicalOrigin){
@@ -2259,7 +2359,8 @@ async function openPlayedLevels(diff){
  const pendingCount=levels.filter(r=>r.pendingSync).length;
  const actual=summary?.actual??levels.filter(r=>!r.transferred).length,transferred=summary?.transferred??levels.filter(r=>r.transferred).length,total=summary?.total??sortedFreeBank(diff).length;$('#playedLevelsMeta').textContent='';
  if(pendingCount)$('#playedLevelsMeta').textContent=`${actual} potvrzeno · ${pendingCount} čeká na synchronizaci`;
- const currentHtml=levels.length?levels.map(r=>`<button class="played-level-row ${r.transferred?'transferred':''}" data-level-puzzle="${esc(r.puzzleId)}" data-level-diff="${diff}"><span class="level-index">${r.transferred?'✦':`${r.level}.`}</span><span class="level-history-main">${r.transferred?`<strong>Nová deska · úroveň ${r.level}</strong><small>Dřívější verzi máš splněnou.</small>`:`<strong>${fmtTime(r.elapsedMs)}</strong><small>${r.pendingSync?'Čeká na synchronizaci · ':''}${r.cleanSolve?'Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}${r.attempts>1?` · hráno ${r.attempts}×`:''}</small>`}</span><span class="played-arrow">›</span></button>`).join(''):'<div class="empty-history">Tady zatím fouká vítr. 🌬️</div>';$('#playedLevelsList').innerHTML=currentHtml;
+ const currentHtml=levels.length?levels.map(r=>`<button class="played-level-row ${r.transferred?'transferred':''}" data-level-puzzle="${esc(r.puzzleId)}" data-level-diff="${diff}"><span class="level-index">${r.transferred?'✦':`${r.level}.`}</span><span class="level-history-main">${r.transferred?`<strong>Nová deska · úroveň ${r.level}</strong><small>Dřívější verzi máš splněnou.</small>`:`<strong>${fmtTime(r.elapsedMs)}</strong><small>${r.pendingSync?'Čeká na synchronizaci · ':''}${r.cleanSolve?'Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}${r.attempts>1?` · hráno ${r.attempts}×`:''}</small>`}</span><span class="played-arrow">›</span></button>`).join(''):`<div class="empty-history"><p>Tady se objeví tvoje dohrané úrovně.</p><button id="playedLevelsStartBtn" type="button" class="primary-btn">${freeProgress(diff).resume?'Pokračovat':'Začít hrát'}</button></div>`;$('#playedLevelsList').innerHTML=currentHtml;
+ const start=$('#playedLevelsStartBtn');if(start)start.onclick=()=>{modal.classList.add('hidden');startFree(diff)};
  $$('[data-level-puzzle]').forEach(b=>b.onclick=()=>openLevelDetail(b.dataset.levelDiff,b.dataset.levelPuzzle));
 }
 function localLevelResult(puzzleId){return getState().completed[`free:${puzzleId}`]||null}
@@ -2284,7 +2385,7 @@ function rankingExpandMarkup(data){
  return `<details class="ranking-expand"><summary>Zobrazit pořadí · ${countCz(total,'hráč','hráči','hráčů')}</summary><p class="ranking-expanded-position">${rank?`Tvoje pozice: ${rank}. z ${total}.`:'Celkové pořadí hráčů.'}</p><div class="ranking-expanded-rows"></div><button type="button" class="secondary-btn ranking-more">Načíst pořadí</button></details>`;
 }
 function rankingExpandedRows(rows){
- return rows.map(r=>`<div class="mini-leader-row result-player-row ${r.isMine?'me':''}" ${r.isMine?'aria-label="Tvůj výsledek"':''}><b class="result-player-rank">${rankBadge(r.rank)}</b><span class="result-player-avatar" data-player-avatar="${esc(r.avatar||'🎭')}">${esc(r.avatar||'🎭')}</span><span class="result-player-copy"><strong>${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'Čistě':`Nápověda ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em class="result-player-time">${fmtTime(r.elapsedMs)}</em></div>`).join('');
+ return rows.map(r=>`<div class="mini-leader-row result-player-row ${r.isMine?'me':''}" ${r.isMine?'aria-label="Tvůj výsledek"':''} data-result-elapsed="${esc(r.elapsedMs??'')}" data-result-moves="${esc(r.moves??'')}" data-result-hints="${esc(r.hintsUsed??'')}" data-result-clean="${typeof r.cleanSolve==='boolean'?String(r.cleanSolve):''}"><b class="result-player-rank">${rankBadge(r.rank)}</b><span class="result-player-avatar" data-player-avatar="${esc(r.avatar||'🎭')}">${esc(r.avatar||'🎭')}</span><span class="result-player-copy"><strong>${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'Čistě':`Nápověda ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em class="result-player-time">${fmtTime(r.elapsedMs)}</em></div>`).join('');
 }
 
 function bindRankingExpansion(container,data){
@@ -2315,14 +2416,14 @@ function bindRankingExpansion(container,data){
 }
 
 function renderFreeWorldBoard(data,error){
- if(error)return `<div class="leaderboard-empty"><strong>Světový radar teď mlčí.</strong><small>${esc(error)} Výsledek tím není ohrožený.</small></div>`;
+ if(error)return `<div class="leaderboard-empty"><strong>Pořadí se teď nepodařilo načíst.</strong><small>${esc(error)} Výsledek tím není ohrožený.</small></div>`;
  const total=Number(data?.total||0),rank=Number(data?.myRank||0),rows=data?.rows||[],minimum=Number(data?.percentileMinimum||10);
  if(!rank){return `<div class="daily-world-head"><strong>🌍 Globální pořadí</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${total?'Svět už tuhle úroveň proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${getProfile()?.token?'Tvůj první výsledek zatím není v globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.'}</small></div>${rows.length?`<div class="daily-world-neighbours">${rows.map(r=>`<div class="mini-leader-row"><b>${rankBadge(r.rank)}</b><span class="leader-name"><strong>${esc(r.avatar||'🎭')} ${esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'✨ Čistě':`💡 ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em>${fmtTime(r.elapsedMs)}</em></div>`).join('')}</div>`:''}${rankingExpandMarkup(data)}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`}
  const topLine=total===1?'První hráč téhle úrovně. Trůn je zatím celý tvůj.':total>=minimum?`Patříš mezi nejlepších ${data.topPercent} % hráčů této úrovně.`:`Jsi ${rank}. z ${total}. Procenta ukážeme od ${minimum} hráčů.`;
  return `<div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}</p></div><div class="daily-world-neighbours">${rankingExpandedRows(rows)}</div>${rankingExpandMarkup(data)}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku · počítá se první dokončený pokus.</small>`;
 }
 function renderFreeTeamBoard(data,error,myId){
- if(error)return `<div class="leaderboard-empty"><strong>Týmová tribuna se nenačetla.</strong><small>${esc(error)}</small></div>`;
+ if(error)return `<div class="leaderboard-empty"><strong>Týmové pořadí se teď nepodařilo načíst.</strong><small>${esc(error)}</small></div>`;
  if(data?.anonymous)return '<div class="leaderboard-empty"><strong>Ulož si postup a pak se můžeš přidat k týmu.</strong><small>Týmový žebříček srovnává přesně tuhle úroveň.</small></div>';
  const rows=(data?.rows||[]).map(r=>({...r,isMine:r.id===myId}));if(!rows.length)return '<div class="leaderboard-empty">Zatím jsi tady první.</div>';
  const mine=rows.findIndex(r=>r.isMine),start=mine<0?0:Math.max(0,Math.min(mine-1,rows.length-3));
@@ -2340,11 +2441,12 @@ function renderFreeLeaderboardPanel(container,data,myId,initialTab='world'){
 async function loadWinLevelLeaderboard(puzzle,rec){
  const box=$('#levelLeaderboardBox'),game=currentGame,profile=getProfile();
  if(!box||game?.mode!=='free'||isMozkomorQaDifficulty(puzzle?.difficulty)){box?.classList.add('hidden');return}
- const request={};box.postWinRequest=request;box.postWinData=null;
+ const request={};box.postWinRequest=request;box.postWinData=null;box.resultContext=null;
  const valid=()=>box.postWinRequest===request&&currentGame===game&&getProfile()?.id===profile?.id&&getProfile()?.token===profile?.token;
  renderFreeLeaderboardPanel(box,{worldPending:true,teamPending:true},profile?.id);
  await fetchFreeLevelLeaderboards(puzzle.id,(data,kind)=>{
   if(!valid())return;
+  box.resultContext=!data.worldPending&&!data.worldError&&data.world?{game,record:rec,profileId:profile?.id}:null;
   const tab=box.querySelector('[aria-selected="true"]')?.dataset.freeBoardTab||'world';
   if(tab===kind||!box.postWinData){renderFreeLeaderboardPanel(box,data,profile?.id,tab);box.postWinData=data}
   levelDetailContext={puzzleId:puzzle.id,difficulty:puzzle.difficulty,level:puzzle.meta?.level,globalRank:Number(data.world?.myRank)||null,teamRank:data.team?.rows?.find(r=>r.id===profile?.id)?.rank||null,result:rec};
@@ -2358,14 +2460,21 @@ function renderDailyGlobalLeaderboardBox(container,data){
  container.innerHTML=`<div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}</p></div><div class="daily-world-neighbours">${rankingExpandedRows(rows)}</div>${rankingExpandMarkup(data)}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`;
  bindRankingExpansion(container,data);
 }
-async function loadWinDailyGlobalLeaderboard(date,rec){const box=$('#levelLeaderboardBox');if(!box||currentGame?.mode!=='daily'){return}box.classList.remove('hidden');box.classList.add('daily-global-board');box.innerHTML='<div class="leaderboard-empty">Načítám globální pořadí…</div>';try{const data=transformRankingPayload(await api(`/api/daily-global-leaderboard?daily_date=${encodeURIComponent(date)}`));winDailyGlobalData=data;renderDailyGlobalLeaderboardBox(box,data)}catch(e){box.innerHTML=`<div class="leaderboard-empty"><strong>Světový radar teď mlčí.</strong><small>${esc(e.message)}. Výsledek tím není ohrožený.</small></div>`}}
+async function loadWinDailyGlobalLeaderboard(date,rec){
+ const box=$('#levelLeaderboardBox'),game=currentGame,profile=getProfile();if(!box||game?.mode!=='daily')return;
+ const request={};box.postWinRequest=request;box.resultContext=null;box.classList.remove('hidden');box.classList.add('daily-global-board');box.innerHTML='<div class="leaderboard-empty">Načítám globální pořadí…</div>';
+ const valid=()=>box.postWinRequest===request&&currentGame===game&&getProfile()?.id===profile?.id&&getProfile()?.token===profile?.token;
+ try{const data=transformRankingPayload(await api(`/api/daily-global-leaderboard?daily_date=${encodeURIComponent(date)}`));if(!valid())return;winDailyGlobalData=data;box.resultContext={game,record:rec,profileId:profile?.id};renderDailyGlobalLeaderboardBox(box,data)}
+ catch(e){if(valid()){box.resultContext=null;box.innerHTML=`<div class="leaderboard-empty"><strong>Pořadí se teď nepodařilo načíst.</strong><small>${esc(e.message)}. Výsledek tím není ohrožený.</small></div>`}}
+}
 async function loadWinSpecialLeaderboard(date,rec){
  const box=$('#levelLeaderboardBox'),game=currentGame,profile=getProfile(),key=rec?.challengeKey;
  if(!box||game?.mode!=='daily_special'||!/^daily-special:\d{4}-\d{2}-\d{2}:(hardcore|mozkomor|mozkokalypsa)$/.test(key||''))return;
+ box.resultContext=null;
  if(rec?.calmMode===true||game.calmMode===true){box.classList.add('hidden');return}
  const request={};box.postWinRequest=request;box.classList.remove('hidden','free-level-board');box.classList.add('daily-global-board');box.innerHTML='<div class="leaderboard-empty">Načítám pořadí speciálu…</div>';
  const current=()=>currentGame===game&&box.postWinRequest===request&&getProfile()?.id===profile?.id&&getProfile()?.token===profile?.token;
- try{const data={...transformRankingPayload(await api(`/api/rankings/daily-special?challenge_key=${encodeURIComponent(key)}`)),challengeKind:'special',challengeKey:key,date};if(!current())return;winDailyGlobalData=data;renderDailyGlobalLeaderboardBox(box,data)}
+ try{const data={...transformRankingPayload(await api(`/api/rankings/daily-special?challenge_key=${encodeURIComponent(key)}`)),challengeKind:'special',challengeKey:key,date};if(!current())return;winDailyGlobalData=data;box.resultContext={game,record:rec,profileId:profile?.id};renderDailyGlobalLeaderboardBox(box,data)}
  catch(error){if(current())box.innerHTML=`<div class="leaderboard-empty"><strong>Pořadí se teď nepodařilo načíst.</strong><small>${esc(error.message)} Výsledek tím není ohrožený.</small></div>`}
 }
 async function openLevelDetail(diff,puzzleId){
@@ -2564,7 +2673,7 @@ function bind(){
  const starterModalObserver=new MutationObserver(()=>{if(currentGame?.mode==='starter'&&currentGame.path?.length)gameInputController?.resetStarter()});
  $$('.modal').forEach(modal=>starterModalObserver.observe(modal,{attributes:true,attributeFilter:['class']}));
  $('#board').addEventListener('pointerdown',e=>{const g=currentGame;if(g?.mode==='starter'&&!g.finished&&g.pausedAt==null&&e.target.closest('.cell'))trackStarterPhase(g.starterTrace,'interaction')},{capture:true});
- $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.nav)));$('#playDailyBtn').onclick=startSelectedDaily;$('#shareDailyBtn').onclick=()=>{if(typeof isSpecialDailySelected==='function'&&isSpecialDailySelected()){shareSelectedDaily();return}const date=pragueDateISO(),daily=dailyResultState(date),rec=daily.active;if(!rec)return;currentGame=dailyResultSnapshot(daily.puzzle,date,rec);shareDaily()};
+ $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>b.dataset.nav==='leaderboard'?rankingsOrchestration().openLastView():nav(b.dataset.nav)));$('#playDailyBtn').onclick=startSelectedDaily;$('#shareDailyBtn').onclick=()=>{if(typeof isSpecialDailySelected==='function'&&isSpecialDailySelected()){shareSelectedDaily();return}const date=pragueDateISO(),daily=dailyResultState(date),rec=daily.active;if(!rec)return;currentGame=dailyResultSnapshot(daily.puzzle,date,rec);shareDaily()};
  $('#backFromGame').onclick=goBackFromGame;$('#hintBtn').onclick=openHintModal;$('#starterHintNudgeBtn').onclick=acceptStarterHintNudge;$('#starterHintNudgeDismiss').onclick=dismissStarterHintNudge;$('#winPrimaryBtn').onclick=closeWinAndContinue;$('#winExtraBtn').onclick=playExtraFromWin;$('#winAccountBtn').onclick=openAccountFromWin;$('#winReplayBtn').onclick=replayDailyFromWin;$('#winMenuBtn').onclick=closeWinToMenu;$('#winShareBtn').onclick=shareDaily;$('#starterWarmupBtn').onclick=()=>{trackProductEvent('starter_easy_warmup_selected');startStarterWarmup()};$('#starterHardDailyBtn').onclick=()=>{trackProductEvent('starter_hard_direct_selected');startDaily({starterHardDirect:true})};
  $('#closeProfileModal').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromWin)restoreWinAfterAccountModal();else if(profileModalFromNudge)resumeAfterAccountNudge() };$('#skipProfileBtn').onclick=()=>{ $('#profileModal').classList.add('hidden');if(profileModalFromWin)restoreWinAfterAccountModal();else if(profileModalFromNudge)resumeAfterAccountNudge() };$('#saveProfileBtn').onclick=saveNewProfile;$('#profileModeLogin').onclick=()=>setAccountMode('login');$('#profileModeCreate').onclick=()=>setAccountMode('create');$('#legacyTeamLoginToggle').onclick=toggleLegacyTeamLogin;$('#joinLeagueModeBtn').onclick=()=>setLeagueCreateMode('join');$('#newLeagueModeBtn').onclick=()=>setLeagueCreateMode('new');$('#leagueSelect').onchange=renderLeaguePinField;$('#profilePasswordToggle').onclick=()=>togglePassword('playerPasswordInput',$('#profilePasswordToggle'));
  $('#nudgeCreateBtn').onclick=()=>openAccountFromNudge('create');$('#nudgeBonusBtn').onclick=()=>openAccountFromNudge('create');$('#nudgeLoginBtn').onclick=()=>openAccountFromNudge('login');$('#nudgeSkipBtn').onclick=dismissAccountNudge;
@@ -2597,10 +2706,10 @@ const EXPECTED_PUZZLE_DB_VERSION=11;
 const COMPATIBLE_PUZZLE_DB_VERSIONS=new Set([9,10,EXPECTED_PUZZLE_DB_VERSION]);
 function compatiblePuzzleDatabase(data){const cutover=window.PROPLET_RUNTIME_META?.datedDailyCutover;return (!cutover||data?.datedDaily?.cutover===cutover)&&COMPATIBLE_PUZZLE_DB_VERSIONS.has(Number(data?.version||0))&&Number(data?.contentGeneration||0)===4&&Number(data?.dailyGeneration||0)===4}
 const requestedContentPreview=new URLSearchParams(location.search).get('content_preview')||'';
-const CONTENT_PREVIEW_DATE=location.hostname.endsWith('.vercel.app')&&/^\d{4}-\d{2}-\d{2}$/.test(requestedContentPreview)?requestedContentPreview:'';
+let CONTENT_PREVIEW_DATE=location.hostname.endsWith('.vercel.app')&&/^\d{4}-\d{2}-\d{2}$/.test(requestedContentPreview)?requestedContentPreview:'';
 const TAJENKA_PRODUCTION_HOSTS=new Set(['hrajproplet.cz','www.hrajproplet.cz','proplet-nine.vercel.app','proplet-pavel-prouzas-projects.vercel.app','proplet-git-main-pavel-prouzas-projects.vercel.app']);
 const TAJENKA_PREVIEW_ORIGIN=location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.hostname.endsWith('.vercel.app');
-const TAJENKA_PREVIEW=new URLSearchParams(location.search).get('tajenka')==='1'&&TAJENKA_PREVIEW_ORIGIN&&!TAJENKA_PRODUCTION_HOSTS.has(location.hostname);
+let TAJENKA_PREVIEW=new URLSearchParams(location.search).get('tajenka')==='1'&&TAJENKA_PREVIEW_ORIGIN&&!TAJENKA_PRODUCTION_HOSTS.has(location.hostname);
 const TAJENKA_RELEASE_ENABLED=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaReleaseEnabled===true;
 const requestedTajenkaWeek=Math.min(37,Math.max(1,Number.parseInt(new URLSearchParams(location.search).get('tajenka_week')||'1',10)||1));
 const TAJENKA_FIRST_SATURDAY=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaFirstSaturday||'2026-08-29';
@@ -2720,8 +2829,8 @@ function showPuzzleBootLoading(){
 async function loadPuzzleDatabase(){
  if(navigator.onLine===false){const cached=await window.PropletOffline?.getPuzzleDatabase?.();if(compatiblePuzzleDatabase(cached))return cached;}
  let url='/puzzles.json';
- GEN4_CANDIDATE_PREVIEW=window.PROPLET_RUNTIME_META?.gen4CandidatePreview===true;
- GEN5_CANDIDATE_PREVIEW=window.PROPLET_RUNTIME_META?.gen5CandidatePreview===true;
+ GEN4_CANDIDATE_PREVIEW=!livePlayerPreview()&&window.PROPLET_RUNTIME_META?.gen4CandidatePreview===true;
+ GEN5_CANDIDATE_PREVIEW=!livePlayerPreview()&&window.PROPLET_RUNTIME_META?.gen5CandidatePreview===true;
  if(GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW)url='/api/puzzle-database';
  if(GEN4_CANDIDATE_PREVIEW||GEN5_CANDIDATE_PREVIEW){
   const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('candidate-preview-db');const data=await r.json();if(!compatiblePuzzleDatabase(data)||Number(data?.contentGeneration)!==4)throw new Error('candidate-preview-db-version');if(GEN5_CANDIDATE_PREVIEW&&(data?.release?.seriesId!=='g5-r1'||Number(data?.release?.totalNewLevels)!==450))throw new Error('gen5-preview-content-missing');return data;
@@ -2748,8 +2857,8 @@ async function loadPuzzleDatabaseWithRecovery(){
  }
 }
 function showPuzzleBootError(){
- // Preserve the shell and consent DOM. Replacing body also removed its CSS.
- window.__PROPLET_REVEAL_CURRENT_UI?.();
+ // Fatal data errors must remain actionable even if home cannot be projected.
+ window.__PROPLET_REVEAL_CURRENT_UI?.(true);
  document.querySelectorAll('.app-shell,.bottom-nav').forEach(element=>{element.inert=true;element.setAttribute('aria-hidden','true')});
  const panel=document.createElement('main');panel.id='puzzleBootError';
  panel.style.cssText='position:fixed;inset:0;z-index:350;overflow:auto;background:var(--bg,#f7f2e8);color:var(--ink,#332d28);padding: max(48px,env(safe-area-inset-top)) 24px 200px;font:16px/1.5 system-ui;text-align:center';
@@ -2787,6 +2896,8 @@ async function refreshRollingContent(){
 async function boot(){
  // Install reporting before boot awaits; errors in startup must retain their producer.
  bindClientErrorReporting();
+ // Resolve the capability before content selection, auth-return sync or the first render.
+ if(previewRuntime())await loadRuntimeCapabilities();
  try{await ensureFirstStepsRuntime()}catch{reportClientError('first_steps_module_unavailable','first-steps-contract')}
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();globalThis.PropletArchiveExperience?.configure();
  if(freshStarterVisit()){starterBootTrace=createStarterTrace();trackStarterPhase(starterBootTrace,'requested')}
@@ -2794,7 +2905,7 @@ async function boot(){
  await Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]);
  await loadTajenkaFixture();
  await freeOrder().configure();freeOrderLastRefreshAt=Date.now();
- document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();await globalThis.PropletArchiveExperience?.install();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>{const installPreview=openInstallPreview();if(!installPreview&&!(window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&new URLSearchParams(location.search).get('releasePreview')==='1'))openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1');document.dispatchEvent(new CustomEvent('proplet:ready'));if(!installPreview)openSpecialInvitation().catch(()=>{})},80);
+ document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();await globalThis.PropletArchiveExperience?.install();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>{const installPreview=openInstallPreview();if(!installPreview&&!(!livePlayerPreview()&&window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&new URLSearchParams(location.search).get('releasePreview')==='1'))openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1');document.dispatchEvent(new CustomEvent('proplet:ready'));if(!installPreview)openSpecialInvitation().catch(()=>{})},80);
  const refreshDailyAfterResume=()=>Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]).then(()=>{if(currentScreen!=='game')renderDaily()}).catch(()=>{if(currentScreen==='daily')renderDaily()});
  window.addEventListener('online',refreshDailyAfterResume);window.addEventListener('focus',refreshDailyAfterResume);window.addEventListener('pageshow',refreshDailyAfterResume);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshDailyAfterResume()});

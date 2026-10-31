@@ -1,0 +1,58 @@
+name: Monthly competition integrity
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'backend/monthly_competition.py'
+      - 'backend/release_news.py'
+      - 'public/release-news*'
+      - 'backend/config.py'
+      - 'server.py'
+      - 'public/app/monthly/**'
+      - 'public/monthly-competition.css'
+      - 'public/rewards/monthly/**'
+      - 'public/app/rankings/rankings.js'
+      - 'public/ranking-navigation.css'
+      - 'vercel.json'
+      - 'supabase/migrations/*monthly*.sql'
+      - 'supabase/migrations/*release_news*.sql'
+      - 'supabase/tests/monthly*.sql'
+      - 'tools/test_monthly_competition_db.py'
+      - 'tools/check_release_news_db.py'
+      - 'tests/current/test_release_news*'
+      - 'tests/current/test_monthly_competition*'
+      - '.github/workflows/monthly-competition.yml'
+permissions:
+  contents: read
+jobs:
+  database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17.11
+        env:
+          POSTGRES_USER: proplet_test_admin
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: postgres
+        ports: ['55432:5432']
+        options: --health-cmd "pg_isready -U proplet_test_admin -d postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5'
+      - name: Complete current runtime gate
+        run: python tools/test_current.py
+      - name: Real atomic results and race-safe monthly closure
+        run: |
+          set -euo pipefail
+          python -c "from pathlib import Path; Path('/tmp/monthly-test-password').write_text('local-test-only')"
+          python tools/test_monthly_competition_db.py --password-file /tmp/monthly-test-password --output /tmp/monthly-database.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: monthly-competition-integrity
+          path: /tmp/monthly-database.json
+          retention-days: 7

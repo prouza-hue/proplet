@@ -11,7 +11,7 @@
   const identity=p=>p?.id&&p?.token?`${p.id}:${p.token}:${p.familyCode||''}`:'';
   const activeScreen=()=>$('.screen.active')?.id;
   const safeScreen=()=>['screen-daily','screen-free','screen-profile','screen-leaderboard'].includes(activeScreen());
-  const safePreview=()=>window.PROPLET_RUNTIME_ENV==='preview'||window.PROPLET_RUNTIME_META?.gen5CandidatePreview||new URLSearchParams(location.search).has('tutorial');
+  const safePreview=()=>new URLSearchParams(location.search).has('tutorial')||window.PROPLET_RUNTIME_META?.gen5CandidatePreview||((window.PROPLET_RUNTIME_ENV==='preview'||window.PROPLET_RUNTIME_META?.environment==='preview')&&!(typeof livePlayerPreview==='function'&&livePlayerPreview()===true));
   const number=n=>Math.max(0,Number(n)||0);
   const badge=id=>`${assets}${badges[id]||'proplet-legend'}.webp`;
   const roman=n=>{if(n>3999)return String(n);const values=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let out='';for(const [v,c] of values)while(n>=v){out+=c;n-=v;}return out;};

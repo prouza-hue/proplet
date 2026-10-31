@@ -52,6 +52,12 @@ function openModal(modal,{mode='default'}={}){
   modal.setAttribute('aria-labelledby','hintTitle');
   const title=modal.querySelector('#hintTitle');
   if(title)title.textContent=mode==='starter'?'Zkus malé postrčení':mode==='tajenka'?'Jak moc napovědět?':'Kolik pomoci chceš?';
+  const consequence=modal.querySelector('#hintConsequence');
+  if(consequence){
+    consequence.hidden=!['default','free','daily','daily_special'].includes(mode);
+    if(consequence.hidden)modal.removeAttribute('aria-describedby');
+    else modal.setAttribute('aria-describedby','hintConsequence');
+  }
   modal.classList.remove('hidden');
   modal.querySelector('#closeHintModal')?.focus({preventScroll:true});
 }

@@ -187,7 +187,46 @@ html[data-theme=dark] body :is(#referralHome,#referralInviteHome):not(.ref-incom
 
 /* Reward lifecycle and one-time discovery use the same native card anatomy. */
 html body #screen-profile.settings-open :is(#referralProfile,#referralProfileReward){display:none!important}
+/* A permanent profile entry; server-owned progress and reward receipts stay separate. */
+html.tiskarna-ui body #screen-profile #referralProfile{padding:20px!important;border-radius:16px!important}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-invite{display:grid;grid-template-columns:minmax(0,1fr) 174px;gap:12px 24px;align-items:center}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-copy{grid-column:1;grid-row:1;min-width:0}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-copy h2{font:700 24px/1.2 Outfit,sans-serif!important;margin:0 0 10px!important}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-benefit{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-benefit .xp-sticker{font:700 17px/1.25 Outfit,sans-serif!important;padding:5px 9px!important;margin:0!important;white-space:nowrap}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-benefit strong{font:600 15px/1.4 Outfit,sans-serif;color:var(--ref-ink)}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-pair{grid-column:2;grid-row:1;justify-self:center;display:flex;align-items:center;width:118px;height:76px}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-pair img{width:70px;height:76px;object-fit:contain}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-pair img+img{margin-left:-22px}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-condition{grid-column:1;grid-row:2;font:400 15px/1.45 Outfit,sans-serif!important;max-width:62ch;margin:0!important}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-invite>.primary-btn{grid-column:2;grid-row:2;width:100%;min-height:46px;font-size:15px!important;padding:11px 14px;white-space:normal}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-invite>.primary-btn:disabled{opacity:.65;cursor:default}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-status{grid-column:1/-1;font:400 14px/1.4 Outfit,sans-serif!important;margin:0!important}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-status[hidden]{display:none!important}
+html.tiskarna-ui body #screen-profile #referralProfile :is(.ref-rules,.ref-people-panel){margin:14px 0 0;font:400 14px/1.45 Outfit,sans-serif;color:var(--ref-muted)}
+html.tiskarna-ui body #screen-profile #referralProfile summary{cursor:pointer;min-height:40px;display:flex;align-items:center;text-decoration:underline;text-underline-offset:3px}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-rules p{font-size:14px!important;line-height:1.45!important}
+html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-progress{margin-top:14px;padding-top:18px;border-top:1px solid var(--ref-line)}
+@media(max-width:599px){
+ html.tiskarna-ui body #screen-profile #referralProfile{padding:18px!important}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-invite{grid-template-columns:minmax(0,1fr) 86px;gap:14px 10px}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-copy h2{font-size:22px!important}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-benefit{gap:7px}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-benefit strong{font-size:14px}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-pair{width:86px;height:62px}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-pair img{width:52px;height:62px}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-pair img+img{margin-left:-18px}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-condition{grid-column:1/-1;grid-row:2}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-invite>.primary-btn{grid-column:1/-1;grid-row:3}
+}
 html body :is(#referralProfileReward,#referralInviteHome)[hidden]{display:none!important}
+@media(max-width:359px){
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-invite{grid-template-columns:minmax(0,1fr) 64px;column-gap:8px}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-copy h2{font-size:20px!important}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-pair{width:64px;height:50px}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-pair img{width:40px;height:50px}
+ html.tiskarna-ui body #screen-profile #referralProfile .ref-profile-pair img+img{margin-left:-16px}
+}
 html body #referralDialog .ref-announcement{padding:26px!important}
 html body #referralDialog .ref-announcement .ref-story{grid-template-columns:minmax(0,1fr) 150px;gap:18px;margin:8px 0 24px}
 html body #referralDialog .ref-announcement h2{font-size:29px!important;text-align:left!important;margin-bottom:12px!important}

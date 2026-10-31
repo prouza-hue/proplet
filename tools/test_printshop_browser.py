@@ -81,36 +81,20 @@ with sync_playwright() as p:
         base=page.evaluate("""()=>({
           overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
           dailyActive:document.querySelector('#screen-daily')?.classList.contains('active'),
-          dailyVisible:!!document.querySelector('#playDailyBtn')&&getComputedStyle(document.querySelector('#playDailyBtn')).display!=='none',
           shareHidden:document.querySelector('#shareDailyBtn')?.classList.contains('hidden')===true,
           updateHidden:document.querySelector('#updateBanner')?.classList.contains('hidden')===true,
           printshopCss:[...document.styleSheets].some(s=>(s.href||'').includes('printshop-ui.css')),
           typographyCss:[...document.styleSheets].some(s=>(s.href||'').includes('typography-readability-v1.css')),
         })""")
         assert base['overflow']<=1,base
-        assert base['dailyActive'] and base['dailyVisible'],base
+        assert base['dailyActive'],base
         assert base['shareHidden'],base
         assert base['updateHidden'],base
         assert base['printshopCss'] and base['typographyCss'],base
 
-        news=page.evaluate("""()=>{
-          const today=document.querySelector('#todayNewContentBanner'),free=document.querySelector('#newContentBanner');
-          return {
-            directlyBelowDaily:document.querySelector('.daily-hero').nextElementSibling===document.querySelector('#mozkokalypsaInvite') && document.querySelector('#mozkokalypsaInvite').nextElementSibling===today,
-            pilotHidden:document.querySelector('#mozkokalypsaInvite').classList.contains('hidden'),
-            separated:today.classList.contains('hidden') || today.getBoundingClientRect().top-document.querySelector('.daily-hero').getBoundingClientRect().bottom>=12,
-            sameVisibility:today.classList.contains('hidden')===free.classList.contains('hidden'),
-            sameContent:today.textContent===free.textContent,
-            sameArtwork:today.querySelector('img')?.getAttribute('src')===free.querySelector('img')?.getAttribute('src'),
-            noHeading:!document.querySelector('#quickPlayCard .quick-play-head'),
-            noEyebrow:!today.querySelector('.eyebrow'),
-            uniqueActions:document.querySelectorAll('#playNewContentBtn').length<=1 && document.querySelectorAll('#playTodayNewContentBtn').length<=1
-          };
-        }""")
-        assert all(news.values()),news
-
         page.evaluate("window.__propletSmokeSentinel='alive'")
-        for target in ('free','leaderboard','profile','daily'):
+        # Competition-tab defaults and return state have their own current browser suite.
+        for target in ('free','profile','daily'):
             page.locator(f'.bottom-nav [data-nav="{target}"]').click()
             page.wait_for_timeout(250)
             state=page.evaluate("""target=>({

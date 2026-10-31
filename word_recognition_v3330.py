@@ -303,6 +303,7 @@ def install_word_recognition(
     daily_puzzle_matches_date=None,
     daily_special_discovery_identity=None,
     vercel_env: str = "",
+    live_player_preview: bool = False,
     **_kwargs,
 ):
     def require_discovery_dependencies() -> None:
@@ -409,7 +410,7 @@ def install_word_recognition(
         source = _recognize_source(normalized) if _acceptable(normalized) else None
         if source is None:
             raise HTTPException(400, "Slovo není v recognition lexikonu")
-        if payload.mode not in ("daily", "daily_special", "free"):
+        if payload.mode not in ("daily", "daily_special", "free", "tajenka"):
             raise HTTPException(400, "Odměna platí jen v běžné hře")
 
         if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
@@ -443,10 +444,9 @@ def install_word_recognition(
             }
 
         now = datetime.now(tz) if tz else datetime.now().astimezone()
-        # Preview deployments share the production database. QA may exercise the complete UX,
-        # but never writes reward rows. The dedicated Mozkomor calibration client disables XP
-        # altogether, so this simulation is only for normal preview regression testing.
-        if str(vercel_env or "").strip().lower() == "preview":
+        # Ordinary preview simulates XP. Explicit live-player preview reaches the same
+        # atomic RPC only after the auth, publication, date/binding and trace checks above.
+        if str(vercel_env or "").strip().lower() == "preview" and live_player_preview is not True:
             simulated_row = {
                 "reward_key": reward_key,
                 "points": WORD_DISCOVERY_XP,

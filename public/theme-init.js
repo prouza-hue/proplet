@@ -40,9 +40,21 @@
       document.body.prepend(screen);
     };
     mountBootScreen();
+    document.addEventListener('error',event=>{if(event.target?.matches?.('link[rel="stylesheet"]'))event.target.dataset.loadFailed='1';},true);
 
-    window.__PROPLET_REVEAL_CURRENT_UI=()=>{
+    let revealRetry=0,homeFallback=false;
+    window.__PROPLET_REVEAL_CURRENT_UI=(error=false)=>{
       if(revealed)return;
+      // Native home modules used to reveal the page before its final projection.
+      // Head styles settle before DOMContentLoaded; font loading must settle too.
+      const parsed=document.readyState!=='loading';
+      const styled=[...document.querySelectorAll('link[rel="stylesheet"]')].every(link=>link.sheet||link.dataset.loadFailed==='1');
+      const oneScreen=!document.body?.classList.contains('today-one-screen')||document.body.classList.contains('one-screen-ready');
+      const home=document.documentElement.dataset.archiveReady==='1'||homeFallback;
+      if(!error&&(!parsed||!styled||!oneScreen||!home||document.fonts?.status==='loading')){
+        if(!revealRetry)revealRetry=setTimeout(()=>{revealRetry=0;window.__PROPLET_REVEAL_CURRENT_UI();},50);
+        return;
+      }
       revealed=true;
       const loader=document.getElementById('propletBootScreen');
       root.classList.add('proplet-current-ui-ready');
@@ -72,7 +84,7 @@
       if(++readyChecks<180)setTimeout(revealWhenCanonicalHomeReady,50);
     };
     setTimeout(revealWhenCanonicalHomeReady,25);
-    setTimeout(()=>window.__PROPLET_REVEAL_CURRENT_UI?.(),6500);
+    setTimeout(()=>{homeFallback=true;window.__PROPLET_REVEAL_CURRENT_UI?.();},6500);
   }
 
   try{
@@ -166,21 +178,21 @@
   }
 
   const styles=[
-    ['/app-play.css?v=40140-s13b','propletAppPlayCss'],
+    ['/app-play.css?v=ui-refinement2','propletAppPlayCss'],
     ['/ranking-polish.css?v=5','propletRankingPolishCss'],
     ['/app-onboarding.css?v=40140-s13b','propletAppOnboardingCss'],
     ['/difficulty-nudge.css?v=2','propletDifficultyNudgeCss'],
     ['/gesture-guard-v3325.css?v=1','propletGestureGuardCss'],
-    ['/copy-density-v3327.css?v=play-polish1','propletCopyDensityCss'],
+    ['/copy-density-v3327.css?v=ui-refinement1','propletCopyDensityCss'],
     ['/push-retention-v3329.css?v=1','propletPushRetentionCss'],
     ['/desktop-layout-v3330.css?v=3','propletDesktopLayoutCss'],
     ['/game.css?v=control-side2','propletGameCss'],
     ['/results.css?v=weekly3','propletResultsCss'],
     ['/competitive-sharing-v3331.css?v=1','propletCompetitiveSharingCss'],
-    ['/challenge-cta-v3333.css?v=5','propletChallengeCtaV3333Css'],
-    ['/account-conversion-v3331.css?v=1','propletAccountConversionV3331Css'],
+    ['/challenge-cta-v3333.css?v=ui-refinement1','propletChallengeCtaV3333Css'],
+    ['/account-conversion-v3331.css?v=ui-refinement1','propletAccountConversionV3331Css'],
     ['/onboarding-return-v3332.css?v=1','propletOnboardingReturnV3332Css'],
-    ['/app-profile-settings.css?v=privacyflow1','propletAppProfileSettingsCss'],
+    ['/app-profile-settings.css?v=ui-refinement1','propletAppProfileSettingsCss'],
     ['/typography-readability-v1.css?v=uipolish1','propletTypographyReadabilityV1Css'],
     ['/brand-wordmark-fraunces.css?v=offline1','propletBrandWordmarkFrauncesCss'],
     ['/tajenka-release-fix.css?v=uipolish1','propletTajenkaReleaseFixCss'],
@@ -196,7 +208,7 @@
     css.rel='stylesheet';css.href=href;css.dataset[key]='1';
     let retries=0;
     css.addEventListener('error',()=>{
-      if(retries>=2)return;
+      if(retries>=2){css.dataset.loadFailed='1';return;}
       const attempt=++retries;
       setTimeout(()=>{
         const retryUrl=new URL(href,location.href);
@@ -228,29 +240,29 @@
   };
 
   const loadExtras=async()=>{
-    await loadScript('/runtime-meta.js?v=40915','propletRuntimeMeta',{wait:true});
+    loadScript('/challenge-cta-v3333.js?v=result-sticker1','propletChallengeCtaV3333');
+    await loadScript('/runtime-meta.js?v=41000','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
-    loadScript('/home-layout.js?v=resume-contract1','propletHomeLayout');
+    loadScript('/home-layout.js?v=studio-recovery1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
-    await loadScript('/account-auth.js?v=oauth1','propletAccountAuth',{wait:true});
+    await loadScript('/account-auth.js?v=ui-refinement1','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
-    loadScript('/game-layout-v3330.js?v=control-side2','propletGameLayout');
+    loadScript('/game-layout-v3330.js?v=control-side3','propletGameLayout');
     await loadScript('/app/client-diagnostics.js?v=actor-context1','propletClientDiagnostics',{wait:true});
     loadScript('/gesture-guard-v3325.js?v=clienterrors2','propletGestureGuard');
     await loadScript('/recognition/lexicon.js?v=bonuscs1','propletBonusLexicon',{wait:true});
-    loadScript('/valid-word-feedback-v3330.js?v=extra-xp1','propletValidWordFeedback');
+    loadScript('/valid-word-feedback-v3330.js?v=tajenka-xp1','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=analytics2','propletCompetitiveSharing');
-    loadScript('/challenge-cta-v3333.js?v=extra-entry1','propletChallengeCtaV3333');
     loadScript('/footer-hotfix-v40120.js?v=mk100','propletFooterHotfixV40120');
-    await loadScript('/account-bonus-v3331.js?v=sessionrecovery1','propletAccountBonusV3331',{wait:true});
-    await loadScript('/account-conversion-v3331.js?v=firststeps1-inappauth1','propletAccountConversionV3331',{wait:true});
-    loadScript('/settings-ia-v40122.js?v=privacyflow1','propletSettingsIaV40122');
-    loadScript('/settings-polish-v40122.js?v=offline1','propletSettingsPolishV40122');
-    await loadScript('/printshop-release-polish.js?v=archive-release1','propletPrintshopReleasePolish',{wait:true});
-    await loadScript('/tajenka-release-fix.js?v=archive-layout2','propletTajenkaReleaseFix',{wait:true});
+    await loadScript('/account-bonus-v3331.js?v=monthly-releaseprep6','propletAccountBonusV3331',{wait:true});
+    await loadScript('/account-conversion-v3331.js?v=ui-refinement1','propletAccountConversionV3331',{wait:true});
+    loadScript('/settings-ia-v40122.js?v=monthly-releaseprep6','propletSettingsIaV40122');
+    loadScript('/settings-polish-v40122.js?v=ui-refinement1','propletSettingsPolishV40122');
+    await loadScript('/printshop-release-polish.js?v=ui-refinement1','propletPrintshopReleasePolish',{wait:true});
+    await loadScript('/tajenka-release-fix.js?v=ui-refinement5','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
     loadScript('/tajenka-card-polish.js?v=result-heading2','propletTajenkaCardPolish');
     loadScript('/tajenka-runtime-polish.js?v=idleoffline1','propletTajenkaRuntimePolish');

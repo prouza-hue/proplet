@@ -8,7 +8,7 @@
   const DISCOVERY_REWARD_PREFIX='word_discovery_v1:';
   const TRIGGER_STREAK=3;
   const RECOGNITION_VERSION=7;
-  const DISCOVERY_CLAIM_VERSION=2;
+  const DISCOVERY_CLAIM_VERSION=3;
   const BLOCKED_DISCOVERY_WORDS=new Set(['NEGR']);
   let localWords=null;
   let localWordsPromise=null;
@@ -89,6 +89,13 @@
     style.id='wordDiscoveryXpStyle';
     style.textContent=`
       .word-discovery-xp-pop{position:fixed;left:50%;top:50%;z-index:1600;pointer-events:none;font-weight:900;font-size:19px;line-height:1;padding:9px 12px;border-radius:999px;background:rgba(75,181,113,.98);color:#fff;box-shadow:0 8px 24px rgba(20,80,45,.24);transform:translate(-50%,-50%) scale(.94);opacity:0;animation:wordDiscoveryXpPop 1s cubic-bezier(.2,.8,.2,1) forwards}
+      .word-discovery-help{display:block;margin:4px 0 0;padding:4px 0;min-height:36px;font:500 13px/1.4 Outfit,sans-serif;color:var(--td-blue,#315da8);text-align:left;text-decoration:underline;text-underline-offset:3px;background:none;border:0}
+      html.tiskarna-ui #validWordFailsafeModal .bonus-words-card{position:relative;width:min(420px,calc(100vw - 28px));padding:24px;box-sizing:border-box;text-align:left;background:var(--td-paper,#fffcf5);color:var(--td-ink,#293747);border:1px solid var(--td-line,#d9d5c7);border-radius:20px;max-height:calc(100dvh - 28px);overflow:auto}
+      #validWordFailsafeModal .bonus-words-card>img{display:block;object-fit:contain;margin:0 auto 12px}
+      html.tiskarna-ui #validWordFailsafeModal h2{font:700 27px/1.15 Fraunces,Georgia,serif!important;margin:0 20px 14px 0;text-wrap:balance}
+      #validWordFailsafeModal .bonus-words-card p{font:400 15px/1.55 Outfit,sans-serif!important;margin:16px 0;color:inherit}
+      #validWordFailsafeModal .bonus-words-close{position:absolute;right:12px;top:12px;width:40px;height:40px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:28px}
+      #validWordFailsafeModal .bonus-words-back{width:100%;margin-top:6px;min-height:48px}
       @keyframes wordDiscoveryXpPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.92)}14%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}78%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-54%) scale(.98)}}
       @media (prefers-reduced-motion:reduce){.word-discovery-xp-pop{animation:wordDiscoveryXpFade 1s linear forwards}@keyframes wordDiscoveryXpFade{0%,100%{opacity:0}12%,82%{opacity:1}}}
     `;
@@ -245,11 +252,11 @@
       const store=readDiscoveryStore(id);
       let changed=false;
       for(const [key,row] of Object.entries(store.entries||{})){
-        // Earlier clients kept these valid traces after the API rejected the longer
-        // daily_special mode. Re-submit their original proof once under this contract.
-        const legacySpecial=row?.mode==='daily_special'&&row.status==='rejected'
+        // Earlier APIs rejected Extra/Tajenka modes. Re-submit only stored original
+        // proofs of those specific failures; the server revalidates every path.
+        const legacySpecial=['daily_special','tajenka'].includes(row?.mode)&&row.status==='rejected'
           &&Number(row.claimVersion||0)<DISCOVERY_CLAIM_VERSION
-          &&(Number(row.rejectedStatus)===422||(Number(row.rejectedStatus)===400
+          &&((row.mode==='daily_special'&&Number(row.rejectedStatus)===422)||(Number(row.rejectedStatus)===400
             &&row.rejectedReason==='Odměna platí jen v běžné hře'));
         if(row?.status!=='pending'&&!legacySpecial)continue;
         if(discoveryKnownKeys.has(key)){
@@ -372,24 +379,38 @@
   const ensureModal=()=>{
     let modal=document.querySelector('#validWordFailsafeModal');
     if(modal)return modal;
+    ensureXpStyle();
     modal=document.createElement('div');
-    modal.id='validWordFailsafeModal';
-    modal.className='modal hidden';
-    modal.setAttribute('role','dialog');
-    modal.setAttribute('aria-modal','true');
-    modal.innerHTML=`<div class="modal-card helper-offer-card valid-word-failsafe-card"><div class="helper-big-icon">🧩</div><span class="eyebrow">JEN PŘIPOMENUTÍ</span><h2>Jo — jsou to skutečná slova.</h2><p class="muted">Proplet ale nehledá všechna česká slova, která na desce objevíš.</p><strong class="valid-word-rule">Každá deska má předem danou sadu slov. Když je najdeš, přesně vyplní celou plochu.</strong><button type="button" class="primary-btn big">Rozumím, hledám řešení</button></div>`;
-    const close=()=>modal.classList.add('hidden');
-    modal.querySelector('button').onclick=close;
+    modal.id='validWordFailsafeModal';modal.className='modal hidden';
+    modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');
+    modal.setAttribute('aria-labelledby','bonusWordsTitle');
+    modal.innerHTML=`<div class="modal-card bonus-words-card"><button type="button" class="bonus-words-close" aria-label="Zavřít">×</button><img src="/assets/hints/printshop/bonus-words-v1.webp" width="96" height="96" alt=""><h2 id="bonusWordsTitle">Slova navíc, XP navíc</h2><span class="xp-sticker">+1 XP</span><p>Za každé nové platné slovo alespoň ze čtyř písmen mimo řešení získáš na této desce <strong>1 XP</strong>. Za stejné slovo se bonus připíše jen jednou.</p><p>K dokončení desky hledej připravenou sadu slov, která společně zaplní všechna políčka. Slova navíc ti přidají XP, políčka ale nezaplní.</p><button type="button" class="primary-btn bonus-words-back">Zpátky ke hře</button></div>`;
+    let opener=null;
+    const close=()=>{modal.classList.add('hidden');if(opener?.isConnected)opener.focus({preventScroll:true});};
+    modal.querySelector('.bonus-words-close').onclick=close;
+    modal.querySelector('.bonus-words-back').onclick=close;
     modal.onclick=e=>{if(e.target===modal)close()};
-    document.body.appendChild(modal);
-    return modal;
+    modal.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}
+      if(e.key==='Tab'){
+        const first=modal.querySelector('.bonus-words-close'),last=modal.querySelector('.bonus-words-back');
+        if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+        else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+      }
+    });
+    modal.openBonusWords=button=>{opener=button;modal.classList.remove('hidden');modal.querySelector('.bonus-words-back').focus();};
+    document.body.appendChild(modal);return modal;
   };
 
   const showFailsafe=()=>{
     if(failsafeShown())return;
-    markFailsafeShown();
-    track('valid_nonsolution_failsafe_shown');
-    ensureModal().classList.remove('hidden');
+    const anchor=document.querySelector('#gameMessage');if(!anchor)return;
+    ensureXpStyle();
+    const button=document.createElement('button');button.type='button';
+    button.className='text-btn word-discovery-help';button.textContent='Jak fungují slova navíc?';
+    button.onclick=()=>ensureModal().openBonusWords(button);
+    anchor.after(button);
+    markFailsafeShown();track('valid_nonsolution_failsafe_shown');
   };
 
   const install=()=>{
@@ -456,7 +477,7 @@
             :awardState==='rejected'?' · Bonus XP se tentokrát nepřipsal.'
             :'';
           message(`„${candidate.word}“ je platné, mimo řešení${suffix}`);
-          if(validNonSolutionStreak>=TRIGGER_STREAK&&!failsafeShown())showFailsafe();
+          if(awardState!=='disabled'&&validNonSolutionStreak>=TRIGGER_STREAK&&!failsafeShown())showFailsafe();
         }).catch(()=>{});
       }
       return result;

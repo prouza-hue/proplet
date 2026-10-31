@@ -51,11 +51,9 @@ require(AUTH, r"new_session", "recovery no longer issues a fresh session")
 # Team leave keeps historical scoring attribution while ending current membership.
 require(SERVER, r"left_at", "team leave membership history missing")
 require(SERVER, r"team_joined_at", "team join/leave attribution timestamp missing")
-require(
-    SERVER,
-    r'db_update\("team_memberships".*?\{"left_at": now\}\).*?'
-    r'db_update\("players".*?\{"family_code": new_solo, "team_joined_at": None\}',
-    "team leave no longer closes membership before moving the player to solo scope",
-)
+LEAVE = (ROOT / "supabase/migrations/20261030230000_team_leave_atomic.sql").read_text(encoding="utf-8")
+require(SERVER, r'db_rpc\("proplet_team_leave_v1"', "team leave must use the atomic SQL boundary")
+require(LEAVE, r'update public.team_memberships set left_at=v_now.*?update public.players set family_code=p_new_solo,team_joined_at=null',
+        "team leave must retain historical attribution while moving the player to solo atomically")
 
 print("PASS: Sprint 12A account/session/team backend surface characterized")

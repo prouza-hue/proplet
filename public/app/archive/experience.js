@@ -10,7 +10,7 @@ const glyph={arrow:'M5 12h14m-5-5 5 5-5 5',back:'M19 12H5m5-5-5 5 5 5',check:'m5
 const ico=n=>'<svg class="ax-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="'+glyph[n]+'"/></svg>';
 function archiveArt(){return '<img class="archive-art" src="/assets/archive/archive-letterpress-v2.webp" width="512" height="512" alt="" decoding="async">';}
 
-let configuration=null,installed=false,bank=null,loading=null,archiveState={diff:'easy',filter:'all',query:'',page:0},modalFocus=null;
+let configuration=null,installed=false,appReady=false,recovery=null,bank=null,loading=null,archiveState={diff:'easy',filter:'all',query:'',page:0},modalFocus=null;
 const STORE='proplet:archive-progress:v2',entries=new Map();
 let claimsState={identity:'',status:'unknown',claims:{},completed:new Set()},claimsFlight=null;
 const identity=()=>{const p=getProfile();return p?.id&&p?.token?p.id+':'+p.token:'guest';};
@@ -99,7 +99,8 @@ function renderResult(g){
  return true;
 }
 function configure(){
- return configuration||(configuration=(async()=>{
+ if(configuration)return configuration;
+ const request=(async()=>{
   if(window.navigator?.onLine!==false){
    try{const config=await api('/api/config',{timeoutMs:2000});if(typeof config?.archiveEnabled==='boolean')return config;}catch{}
   }
@@ -107,7 +108,13 @@ function configure(){
   // Cached content alone does not grant a release gate, and claims stay private.
   const config=await offlineRead('getPublicConfig');
   return typeof config?.archiveEnabled==='boolean'?config:null;
- })());
+ })();
+ configuration=request;
+ // An unavailable response is not a release decision. Keep explicit true/false,
+ // but let a later boot/connection attempt retry a transient or malformed read.
+ const clearUnknown=()=>{if(configuration===request)configuration=null;};
+ request.then(value=>{if(value===null)clearUnknown();},clearUnknown);
+ return request;
 }
 
 function resultConfirmed(rec,receipt,owner){
@@ -133,26 +140,18 @@ function archiveEntry(){return destination({kind:'archive',title:'Archiv Proplet
 function home(){
  if(!installed)return;
  const root=q('#screen-daily');if(!root)return;
- let games=q('#axHomeGames');if(!games){games=document.createElement('div');games.id='axHomeGames';games.innerHTML='<div id="axHomeArchive">'+archiveEntry()+'</div>';root.append(games);}
- if(!q('#axHomeFree')){root.insertAdjacentHTML('beforeend',destination({id:'axHomeFree',kind:'free',title:'Volná hra',description:'Všechny obtížnosti a úrovně',art:'<div class="ax-free-art">'+Object.keys(DIFF).map(diff=>'<button type="button" class="ax-free-start" data-home-free="'+diff+'" aria-label="Hrát '+esc(DIFF[diff].label)+'" title="'+esc(DIFF[diff].label)+'">'+difficultyIconMarkup(diff,'ax-free-difficulty')+'</button>').join('')+'</div>',action:'free',label:'Vybrat hru',interactiveArt:true}));}
- let competition=q('#axHomeCompetitions');if(!competition){competition=document.createElement('section');competition.id='axHomeCompetitions';competition.className='ax-competitions';competition.setAttribute('aria-label','Soutěže');competition.innerHTML='<div class="ax-competition-grid">'+destination({kind:'team',title:'Týdenní soutěž',description:'Hraj s týmem o zlatou trofej',art:'<img src="/rewards/team-victories/first-imprint.webp" alt="">',action:'team',label:'Otevřít soutěž'})+'</div>';root.append(competition);}
+  // The catalogue stays on Play. A contextual desktop shortcut uses the same action.
+  q('#axHomeGames')?.remove();
+  if(!q('#studioArchiveShortcut')){const shortcut=document.createElement('div');shortcut.id='studioArchiveShortcut';shortcut.innerHTML=archiveEntry();root.append(shortcut);}
+  if(!q('#axHomeFree')){root.insertAdjacentHTML('beforeend',destination({id:'axHomeFree',kind:'free',title:'Volná hra',description:'Obtížnosti, nové desky i Archiv',art:difficultyIconMarkup('easy','ax-free-difficulty'),action:'free',label:'Vybrat hru'}));}
+ let competition=q('#axHomeCompetitions');if(!competition){competition=document.createElement('section');competition.id='axHomeCompetitions';competition.className='ax-competitions';competition.setAttribute('aria-label','Soutěže');competition.innerHTML='<div class="ax-competition-grid">'+destination({kind:'team',title:'Týdenní soutěž',description:'Hraj s týmem o zlatou trofej',art:'<img src="/assets/navigation/competitions-v1.webp" alt="">',action:'team',label:'Otevřít soutěž'})+'</div>';root.append(competition);}
  const latest=Object.values(getState().inProgress||{}).filter(r=>r.mode==='free').sort((a,b)=>(b.savedAt||0)-(a.savedAt||0))[0];
  const archiveResume=latest&&read().progress[latest.puzzleId];let resume=q('#axArchiveResume');
  if(archiveResume){if(!resume){resume=document.createElement('button');resume.id='axArchiveResume';resume.className='home-resume-card';root.prepend(resume);}
- const level=Number(latest.puzzleId.split('-').pop());resume.dataset.archiveStart=latest.puzzleId;const copy='<span class="home-resume-icon">'+difficultyIconMarkup(latest.difficulty,'home-resume-difficulty-icon')+'</span><span class="home-resume-copy"><span>Archiv · rozehráno</span><strong>'+labels[latest.difficulty]+' · deska '+level+'</strong></span><b>Pokračovat <i>→</i></b>';if(resume.innerHTML!==copy)resume.innerHTML=copy;q('#homeResumeCard')?.classList.add('hidden');
+  const level=Number(latest.puzzleId.split('-').pop());resume.dataset.archiveStart=latest.puzzleId;const copy='<span class="home-resume-icon">'+difficultyIconMarkup(latest.difficulty,'home-resume-difficulty-icon')+'</span><span class="home-resume-copy"><strong>Rozehráno v Archivu: '+labels[latest.difficulty]+' · deska '+level+'</strong></span><b>Pokračovat <i>→</i></b>';if(resume.innerHTML!==copy)resume.innerHTML=copy;q('#homeResumeCard')?.classList.add('hidden');
  }else{resume?.remove();q('#homeResumeCard')?.classList.remove('hidden');}
- // Keep canonical Daily / Tajenka / release state and handlers. Only reorder stable nodes.
- const referral=q('#referralHome');
- const tajenka=q('#tajenkaPreviewCard'),tajenkaSolved=tajenka?.classList.contains('completed');
- const progress=q('#homeCompetitionCard');
- const ordered=[q('#axArchiveResume'),q('#homeResumeCard'),root.querySelector('.daily-hero'),q('#visualPlaytestInvite'),referral,q('#referralInviteHome'),q('#rescueCard'),q('#todayNewContentBanner'),tajenkaSolved?null:tajenka,q('#axHomeFree'),competition,games,q('#levelCard')].filter(Boolean);
- let prev=null;for(const el of ordered){if(prev){if(prev.nextElementSibling!==el)prev.after(el);}else if(root.firstElementChild!==el)root.prepend(el);prev=el;}
- // Tail nodes have one owner and are never also moved within the ordered prefix.
- if(progress&&root.lastElementChild!==progress)root.append(progress);
- if(tajenkaSolved){
-  if(progress){if(tajenka.nextElementSibling!==progress)progress.before(tajenka);}
-  else if(root.lastElementChild!==tajenka)root.append(tajenka);
- }
+  // Stable nodes retain their real handlers; the Today owner applies one direct-child order.
+  window.PropletHomeLayout?.orderDailyNodes?.();
 }
 function placePlayExtra(card){
  const archive=q('#axPlayArchive');if(!archive)return false;
@@ -164,7 +163,7 @@ function free(){
  const root=q('#screen-free');if(!root)return;
  // Order is intentional: fresh content, current difficulties, Tajenka, Archive.
  if(!q('#axPlayArchive')){const el=document.createElement('div');el.id='axPlayArchive';el.innerHTML=archiveEntry();root.append(el);}
- all('#difficultyCards .cp-action-row').forEach(row=>{const play=row.querySelector('.cp-play');if(play)row.replaceWith(play);});
+ // The native play card keeps its next/resume level beside the action.
 }
 function seed(){
  if(!window.PROPLET_ARCHIVE_PREVIEW)return;
@@ -182,8 +181,10 @@ async function install(){
  if(installed)return true;
  const config=await configure();
  if(config?.archiveEnabled!==true)return false;
- installed=true;ROUTE_SCREENS.add('archive');document.documentElement.dataset.archiveEnabled='1';for(const key of Object.keys(labels))labels[key]=DIFF[key].label;document.body.classList.add('archive-experience');
+ if(installed)return true;
+ if(appReady&&typeof currentScreen!=='undefined'&&currentScreen==='game')return false;
  if(!q('#screen-free'))throw Error('Archive mount: canonical free screen missing');
+ installed=true;ROUTE_SCREENS.add('archive');document.documentElement.dataset.archiveEnabled='1';for(const key of Object.keys(labels))labels[key]=DIFF[key].label;document.body.classList.add('archive-experience');
  for(const id of ['archive']){const section=document.createElement('section');section.id='screen-'+id;section.className='screen ax-screen';q('#screen-free').after(section);}
  const modal=document.createElement('div');modal.id='archiveExperienceModal';modal.className='modal hidden';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-labelledby','axModalTitle');document.body.append(modal);
  seed();home();free();
@@ -218,9 +219,24 @@ async function install(){
  refreshClaims();
  document.addEventListener('input',e=>{if(e.target.id==='axSearch'){archiveState.query=e.target.value.replace(/[^0-9]/g,'');archiveState.page=0;renderGrid();}});
  document.addEventListener('keydown',e=>{if(q('#archiveExperienceModal').classList.contains('hidden'))return;if(e.key==='Escape'){e.stopImmediatePropagation();closeModal();}if(e.key==='Tab'){const nodes=all('#archiveExperienceModal button,#archiveExperienceModal select,#archiveExperienceModal input');const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}},true);
- document.addEventListener('proplet:ready',()=>{home();free();window.__PROPLET_REVEAL_CURRENT_UI?.();document.documentElement.dataset.archiveReady='1';const open=new URLSearchParams(location.search).get('review');if(['archive','free','daily'].includes(open))nav(open);else if(open==='announcement')announcement();},{once:true});
+ if(appReady)revealReadyArchive();
  return true;
 }
+function revealReadyArchive(){
+ home();free();window.__PROPLET_REVEAL_CURRENT_UI?.();document.documentElement.dataset.archiveReady='1';
+ const open=new URLSearchParams(location.search).get('review');if(['archive','free','daily'].includes(open))nav(open);else if(open==='announcement')announcement();
+}
+function recoverInstall(){
+ if(installed||!appReady||(typeof currentScreen!=='undefined'&&currentScreen==='game'))return Promise.resolve(installed);
+ if(recovery)return recovery;
+ const request=install().catch(()=>false);recovery=request;
+ request.finally(()=>{if(recovery===request)recovery=null;});
+ return request;
+}
+// These listeners must exist even when the first configuration read failed.
+document.addEventListener?.('proplet:ready',()=>{appReady=true;if(installed)revealReadyArchive();else return recoverInstall();},{once:true});
+document.addEventListener?.('proplet:screen-changed',recoverInstall);
+window.addEventListener?.('online',recoverInstall);
 function screen(name,previous){if(installed&&name==='archive'){if(previous!=='archive')refreshClaims({force:true});renderArchive();}}
 async function renderArchive(){
  const root=q('#screen-archive');
@@ -238,7 +254,7 @@ function renderGrid(){
  const list=bank.boards.filter(r=>r.difficulty===diff&&(!query||String(r.level).includes(query))).filter(r=>filter==='unplayed'?!completion(r,localState,claims):filter==='reward'?paid(r)===false:true);
  const pages=Math.max(1,Math.ceil(list.length/40));archiveState.page=Math.min(archiveState.page,pages-1);const offset=archiveState.page*40;
  const notice=claims.status==='ready'?'':claims.status==='guest'?'Hraj i bez účtu. XP ověříme po přihlášení.':claims.status==='loading'?'Ověřuji historické odměny…':'Odměny teď nelze ověřit. Hrát můžeš dál; XP potvrdí server po připojení.';
- q('#axBoardResults').innerHTML=(notice?'<p class="ax-legend" role="status">'+notice+'</p>':'')+'<div class="ax-board-grid">'+list.slice(offset,offset+40).map(r=>{const done=!!completion(r,localState,claims),claimed=paid(r),progress=localState.inProgress['free:'+r.puzzleId],xp=claimed===true?'Získáno':claimed===false?'+'+r.rewardXp+' XP':claims.status==='guest'?'Hrát':'XP neověřeny';return '<button class="ax-board '+(claimed===true?'ax-paid':'')+'" data-archive-board="'+r.puzzleId+'" aria-label="'+labels[diff]+' deska '+r.level+', '+(done?'odehráno':progress?'rozehráno':'nehráno')+', '+xp+'">'+(done?'<i>'+ico('check')+'</i>':progress?'<i class="ax-progress-dot"></i>':'')+'<strong>'+r.level+'</strong><span>'+(progress?'Rozehráno':xp)+'</span></button>';}).join('')+(list.length?'':'<p class="ax-empty">'+(filter==='reward'&&claims.status!=='ready'?'Odměny nejdřív potřebujeme ověřit. Vyber zatím filtr Všechny.':'Zkus jiné číslo nebo filtr.')+'</p>')+'</div><div class="ax-grid-foot"><span>'+(list.length?(offset+1)+'–'+Math.min(offset+40,list.length)+' z '+list.length:'Žádné desky')+'</span><div><button data-archive-page="-1" aria-label="Předchozí desky" '+(archiveState.page===0?'disabled':'')+'>'+ico('back')+'</button><span>'+(archiveState.page+1)+' / '+pages+'</span><button data-archive-page="1" aria-label="Další desky" '+(archiveState.page===pages-1?'disabled':'')+'>'+ico('arrow')+'</button></div></div>';
+ q('#axBoardResults').innerHTML=(notice?'<p class="ax-legend" role="status">'+notice+'</p>':'')+'<div class="ax-board-grid">'+list.slice(offset,offset+40).map(r=>{const done=!!completion(r,localState,claims),claimed=paid(r),progress=localState.inProgress['free:'+r.puzzleId],xp=claimed===true?'XP získáno':claimed===false?'+'+r.rewardXp+' XP':claims.status==='guest'?'Hrát':'XP neověřeny';return '<button class="ax-board '+(claimed===true?'ax-paid':'')+'" data-archive-board="'+r.puzzleId+'" aria-label="'+labels[diff]+' deska '+r.level+', '+(done?'odehráno':progress?'rozehráno':'nehráno')+', '+xp+'">'+(done?'<i>'+ico('check')+'</i>':progress?'<i class="ax-progress-dot"></i>':'')+'<strong>'+r.level+'</strong><span>'+(progress?'Rozehráno':xp)+'</span></button>';}).join('')+(list.length?'':'<p class="ax-empty">'+(filter==='reward'&&claims.status!=='ready'?'Odměny nejdřív potřebujeme ověřit. Vyber zatím filtr Všechny.':'Zkus jiné číslo nebo filtr.')+'</p>')+'</div><div class="ax-grid-foot"><span>'+(list.length?(offset+1)+'–'+Math.min(offset+40,list.length)+' z '+list.length:'Žádné desky')+'</span><div><button data-archive-page="-1" aria-label="Předchozí desky" '+(archiveState.page===0?'disabled':'')+'>'+ico('back')+'</button><span>'+(archiveState.page+1)+' / '+pages+'</span><button data-archive-page="1" aria-label="Další desky" '+(archiveState.page===pages-1?'disabled':'')+'>'+ico('arrow')+'</button></div></div>';
 }
 function modal(html,kind=''){
  const m=q('#archiveExperienceModal');if(m.classList.contains('hidden')){modalFocus=document.activeElement;document.body.dataset.axOldOverflow=document.body.style.overflow;document.body.style.overflow='hidden';}
@@ -249,7 +265,7 @@ function closeModal(){const active=q('#archiveExperienceModal');if(!active||acti
 function detail(id){
  const r=row(id);if(!r)return;const done=completion(r),progress=getState().inProgress['free:'+id],earned=paid(r),guest=!getProfile()?.token;
  const heading=earned===true?'Odměna už je tvoje':earned===false?'Čeká na tebe '+r.rewardXp+' XP':guest?'Zahraj si i bez účtu':'Odměna zatím není ověřená';
- const copy=earned===true?'Historickou odměnu za tuto úroveň už máš získanou. Desku si přesto můžeš zahrát kdykoli.':earned===false?'Tohle je dosud nezískaná historická odměna. Dokončené novější desky ji neblokují.':guest?'Výsledek uložíme v tomto zařízení. Dostupnost historické odměny ověříme po přihlášení.':'Přehled odměn se nepodařilo načíst. Hrát můžeš; XP potvrdí server po připojení.';
+ const copy=earned===true?'Historickou odměnu za tuto úroveň už máš získanou. Desku si přesto můžeš zahrát kdykoli.':earned===false?'Tuhle odměnu ještě nemáš. Novější desky se počítají zvlášť.':guest?'Výsledek uložíme v tomto zařízení. Dostupnost historické odměny ověříme po přihlášení.':'Přehled odměn se nepodařilo načíst. Hrát můžeš; XP potvrdí server po připojení.';
  modal('<div class="ax-detail-heading">'+difficultyIconMarkup(r.difficulty,'ax-detail-art')+'<div><h2 id="axModalTitle">Deska '+r.level+'</h2><p>'+labels[r.difficulty]+' · Archiv</p></div></div><div class="ax-detail-reward"><strong>'+heading+'</strong><p>'+copy+'</p></div><p class="ax-detail-state">'+(progress?'Rozehráno · '+progress.found.length+' slov nalezeno':done?'Tuto desku už máš odehranou.':'Tuto desku jsi ještě nehrál.')+'</p><button class="primary-btn big" data-archive-start="'+id+'">'+(progress?'Pokračovat':done?'Zahrát znovu':'Hrát desku '+r.level)+' →</button>','ax-detail');
 }
 function snapshot(g){const r=row(g.puzzle);return {solutionPolicyRevision:r.solutions.solutionPolicyRevision,found:g.found.map(f=>({word:f.word,path:[...f.path]})),revealed:g.archiveHints||[]};}
@@ -296,7 +312,7 @@ async function onClick(e){
  if(action==='demo-clear-resume'){const state=getState();state.inProgress={};saveState(state);closeModal();renderDaily();renderFree();return}
  closeModal();
  if(action==='open'||action==='enter'||action==='retry'){nav('archive');return}
- if(action==='extra'){nav('daily');const ui=dailySpecialUI();ui?.select('special');if(ui?.getState().selected==='special'){q('#dailyChallengeSwitch')?.scrollIntoView({block:'center',behavior:'smooth'});q('#dailyChallengeSwitch [data-daily-kind="special"]')?.focus({preventScroll:true});}else ui?.openWeek(q('#dailyHeroTitle [data-daily-kind="base"]'));return}
+ if(action==='extra'){nav('daily');const ui=dailySpecialUI();ui?.select('special');const target=q('#playDailyBtn');if(ui?.getState().selected==='special'){target?.scrollIntoView({block:'center',behavior:'smooth'});target?.focus({preventScroll:true});}else ui?.openWeek(target);return}
  if(action==='free'){nav('free');return}if(action==='daily'){nav('daily');return}
  if(action==='rankings'){nav('leaderboard');return}
  if(action==='team'){if(window.PropletWeeklyCompetition){window.PropletWeeklyCompetition.open();return;}nav('leaderboard');await rankingsOrchestration().openWeeklyTeams();q('#xpRankingTitle')?.scrollIntoView({block:'start',behavior:'smooth'});}

@@ -7,17 +7,6 @@
     const text=new Intl.DateTimeFormat('cs-CZ',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Prague'}).format(new Date(Date.UTC(y,m-1,d,12)));
     return text.charAt(0).toUpperCase()+text.slice(1);
   };
-  let rankingCache=null;
-  let rankingCacheAt=0;
-  let rankingCacheScope=null;
-  let rankingLoading=null;
-  let rankingLoadingScope=null;
-
-  function rankingSessionScope(){
-    const p=typeof getProfile==='function'?getProfile():null;
-    return p?.id&&p?.token?`player:${p.id}:${p.token}`:'anonymous';
-  }
-
   function tuneNoviceIcon(){
     try{if(typeof LEVELS!=='undefined'&&LEVELS[0]?.name==='Nováček')LEVELS[0].icon='🔰'}catch{}
   }
@@ -36,7 +25,7 @@
   function compactDailyHero(){
     const hero=document.querySelector('#screen-daily .daily-hero'),main=hero?.querySelector('.hero-main>div'),date=document.querySelector('#dailyDate'),meta=document.querySelector('#dailyMeta');
     if(!hero||!main||!date||!meta)return;
-    const title=main.querySelector('h1');
+    const title=main.querySelector('#dailyHeroTitle');
     const titleRow=title?.closest('.daily-title-choice-row')||title;
     if(title&&!title.dataset.dailySpecialTitle)title.textContent='Denní výzva';
     let line=main.querySelector('.daily-title-meta');
@@ -59,8 +48,10 @@
   }
 
   function tuneDailyState(){
+    const date=pragueDateISO(),studioDate=document.querySelector('#studioTodayDate');
+    if(studioDate){studioDate.textContent=shortHomeDate(date);studioDate.setAttribute('datetime',date)}
     try{
-      const date=pragueDateISO(),daily=dailyResultState(date),button=document.querySelector('#playDailyBtn'),sync=document.querySelector('#dailySyncStatus'),dateEl=document.querySelector('#dailyDate'),meta=document.querySelector('#dailyMeta');
+      const daily=dailyResultState(date),button=document.querySelector('#playDailyBtn'),sync=document.querySelector('#dailySyncStatus'),dateEl=document.querySelector('#dailyDate'),meta=document.querySelector('#dailyMeta');
       if(dateEl)dateEl.textContent=shortHomeDate(date);
       if(meta)meta.textContent=DIFF[daily.puzzle.difficulty]?.label||'';
       if(button){
@@ -130,73 +121,46 @@
         card.className='home-resume-card';
       }
       card.dataset.diff=difficulty;
-      card.innerHTML=`<span class="home-resume-icon">${difficultyIconMarkup(difficulty,'home-resume-difficulty-icon')}</span><span class="home-resume-copy"><span>ROZEHRANÁ HRA</span><strong>${htmlEsc(d.label)} · úroveň ${level}</strong></span><b>Pokračovat <i>→</i></b>`;
+      card.innerHTML=`<span class="home-resume-icon">${difficultyIconMarkup(difficulty,'home-resume-difficulty-icon')}</span><span class="home-resume-copy"><strong>Rozehráno: ${htmlEsc(d.label)} · úroveň ${level}</strong></span><b>Pokračovat <i>→</i></b>`;
       card.onclick=()=>startFree(difficulty);
-      if(anchor.previousElementSibling!==card)screen.insertBefore(card,anchor);
+      if(screenId==='screen-daily'){if(card.parentElement!==screen)screen.append(card)}
+      else if(anchor.previousElementSibling!==card)screen.insertBefore(card,anchor);
     }
   }
 
   function ensureCompetitionCard(){
-    const screen=document.querySelector('#screen-daily'),quick=screen?.querySelector('#quickPlayCard');
-    if(!screen||!quick)return null;
+    const screen=document.querySelector('#screen-daily');if(!screen)return null;
     let card=screen.querySelector('#homeCompetitionCard');
     if(!card){
-      card=document.createElement('section');
-      card.id='homeCompetitionCard';
-      card.className='card home-competition-card';
-      card.innerHTML=`<div class="home-competition-head"><h2>Tvůj postup</h2><button type="button" id="homeLeaderboardBtn">Celkové pořadí <b>→</b></button></div><div id="homeCompetitionSelf" class="home-competition-self"></div><div id="homeCompetitionRows" class="home-competition-rows"><div class="home-ranking-loading">Načítám pořadí…</div></div>`;
-      card.querySelector('#homeLeaderboardBtn').onclick=()=>nav('leaderboard');
+      card=document.createElement('section');card.id='homeCompetitionCard';card.className='studio-progress-strip';
+      card.innerHTML='<div id="homeCompetitionSelf"></div><button type="button" class="text-btn" id="homeProgressBtn">Můj postup →</button>';
+      card.querySelector('#homeProgressBtn').onclick=()=>nav('profile');screen.append(card);
     }
-    if(window.PropletArchiveExperience?.isEnabled?.()){
-      if(card.parentElement!==screen)screen.append(card);
-    }else if(quick.nextElementSibling!==card)quick.insertAdjacentElement('afterend',card);
     return card;
   }
 
-  function renderCompetitionSelf(selfRow=null){
-    const root=document.querySelector('#homeCompetitionSelf');if(!root)return;
-    const stats=effectiveStats(),points=stats.points||0,streak=stats.currentStreak||0,l=levelFor(points),p=getProfile?.();
-    const place=selfRow?.rank?`${selfRow.rank}. místo`:'—',days=streak===1?'den':streak>=2&&streak<=4?'dny':'dní';
+  function renderCompetitionSelf(){
+    ensureCompetitionCard();const root=document.querySelector('#homeCompetitionSelf');if(!root)return;
+    const stats=effectiveStats(),points=stats.points||0,streak=stats.currentStreak||0,l=levelFor(points);
+    const days=streak===1?'den':streak>=2&&streak<=4?'dny':'dní';
     const remaining=l.next?Math.max(0,l.next.xp-points):0;
-    const art=window.PropletRibbonArt?.art(l.current.name,{category:'rank',size:160});
-    const next=l.next?`<div class="rank-track" role="progressbar" aria-label="Postup k hodnosti ${htmlEsc(l.next.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(l.pct)}" aria-valuetext="Do další hodnosti zbývá ${remaining} XP"><span style="width:${l.pct}%"></span></div><p class="rank-next"><strong>${remaining.toLocaleString('cs-CZ')} XP <span aria-hidden="true">→</span></strong><span>${htmlEsc(l.next.name)}</span></p>`:'<p class="rank-next">Nejvyšší hodnost. Klobouk dolů!</p>';
-    root.innerHTML=`<div class="rank-hero" role="button" tabindex="0" data-rank-detail="${l.index-1}" aria-haspopup="dialog" aria-label="Detail hodnosti ${htmlEsc(l.current.name)}"><div class="rank-art" aria-hidden="true">${art?.outerHTML||l.current.icon}</div><div class="rank-copy"><h3>${htmlEsc(l.current.name)}</h3>${next}</div></div><dl class="rank-metrics"><div><dt>Celkem XP</dt><dd>${points.toLocaleString('cs-CZ')}</dd></div><div><dt>V pořadí</dt><dd>${place}</dd>${!selfRow?.rank&&!p?.token?'<small>po přihlášení</small>':''}</div><div><dt>Denní série</dt><dd><img src="/rewards/printshop/symbol-streak.svg" alt="" width="28" height="32">${streak} <span>${days}</span></dd></div></dl>`;
+    const next=l.next?`<span class="studio-progress-next">Do hodnosti ${htmlEsc(l.next.name)} zbývá ${remaining.toLocaleString('cs-CZ')} XP</span>`:'';
+    root.innerHTML=`<img src="/rewards/printshop/symbol-streak.svg" alt="" width="38" height="42"><div><strong>${streak} ${days} v řadě</strong><span>${htmlEsc(l.current.name)} · ${points.toLocaleString('cs-CZ')} XP</span>${next}</div>`;
   }
 
-  function renderCompetitionRows(data){
-    const root=document.querySelector('#homeCompetitionRows');if(!root)return;
-    const players=Array.isArray(data?.players)?data.players:[],top=players.slice(0,3),self=players.find(r=>r.isMine)||null;
-    renderCompetitionSelf(self);
-    if(!top.length){root.innerHTML='<div class="home-ranking-subhead"><h3>Špička žebříčku</h3></div><div class="home-ranking-empty"><strong>Pořadí se právě rozjíždí.</strong><span>Nasbírej XP a zabydli se nahoře.</span></div>';return}
-    const medals=['🥇','🥈','🥉'];
-    root.innerHTML=`<div class="home-ranking-subhead"><h3>Špička žebříčku</h3></div><div class="home-ranking-list">${top.map((r,i)=>`<div class="home-ranking-row ${r.isMine?'mine':''}"><span class="home-ranking-medal">${medals[i]}</span><span class="home-ranking-avatar">${htmlEsc(r.avatar||'🙂')}</span><strong>${htmlEsc(r.name||'Hráč')}${r.isMine?' <span class="home-ranking-you">TY</span>':''}</strong><b>${Number(r.xp||0).toLocaleString('cs-CZ')} XP</b></div>`).join('')}</div>`+(!getProfile?.()?.token?'<button type="button" class="home-ranking-login" data-home-profile>Přihlas se a ukaž svoje místo v pořadí →</button>':'');
-    root.querySelector('[data-home-profile]')?.addEventListener('click',()=>nav('profile'));
-  }
-
-  async function loadCompetition(){
-    const card=ensureCompetitionCard();if(!card)return;
-    renderCompetitionSelf();
-    const scope=rankingSessionScope(),fresh=rankingCache&&rankingCacheScope===scope&&Date.now()-rankingCacheAt<60000;
-    if(fresh){renderCompetitionRows(rankingCache);return}
-    if(rankingLoading&&rankingLoadingScope===scope){await rankingLoading;return}
-    const request=(async()=>{
-      try{
-        const data=typeof api==='function'?await api('/api/rankings/xp?period=all'):await fetch('/api/rankings/xp?period=all',{cache:'no-store'}).then(r=>r.json());
-        if(rankingSessionScope()!==scope)return;
-        rankingCache=data;rankingCacheAt=Date.now();rankingCacheScope=scope;renderCompetitionRows(data);
-      }catch{if(rankingSessionScope()===scope){const root=document.querySelector('#homeCompetitionRows');if(root)root.innerHTML='<div class="home-ranking-empty"><strong>Pořadí teď nedoběhlo.</strong><span>Zkus ho otevřít za chvíli.</span></div>'}}
-    })();
-    rankingLoading=request;rankingLoadingScope=scope;
-    try{await request}finally{if(rankingLoading===request){rankingLoading=null;rankingLoadingScope=null}}
-    if(rankingSessionScope()!==scope)await loadCompetition();
-  }
-
-  function placeMetaProgress(){
-    const screen=document.querySelector('#screen-daily'),level=document.querySelector('#levelCard'),competition=ensureCompetitionCard();
-    if(!screen||!level||!competition)return;
+  function orderDailyNodes(){
+    const screen=document.querySelector('#screen-daily');if(!screen)return;
     screen.classList.add('home-layout-active');
-    level.classList.add('home-status-strip');
-    if(competition.nextElementSibling!==level)competition.insertAdjacentElement('afterend',level);
+    const complete=screen.querySelector('.daily-hero')?.dataset.studioState==='complete';
+    const destinations=complete?['#axHomeFree','#axHomeCompetitions','#studioExtraCard','#tajenkaPreviewCard']:['#studioExtraCard','#tajenkaPreviewCard','#axHomeFree','#axHomeCompetitions'];
+    const nodes=['#studioTodayHeading','#studioDailyResult','.daily-hero','#axArchiveResume','#homeResumeCard','#referralHome','#rescueCard','#mozkokalypsaInvite',...destinations,'#studioArchiveShortcut','#homeCompetitionCard','#levelCard']
+      .map(selector=>screen.querySelector(':scope > '+selector)).filter(Boolean);
+    let previous=null;
+    for(const node of nodes){
+      if(previous){if(previous.nextElementSibling!==node)previous.after(node)}
+      else if(screen.firstElementChild!==node)screen.prepend(node);
+      previous=node;
+    }
   }
 
   function applyLayout(){
@@ -205,12 +169,10 @@
     tuneDailyState();
     renderResumeCard();
     ensureCompetitionCard();
-    placeMetaProgress();
-    const tajenka=document.querySelector('#tajenkaPreviewCard');
-    if(tajenka)document.querySelector('#screen-daily')?.appendChild(tajenka);
-    loadCompetition();
+    renderCompetitionSelf();
     if(window.PropletArchiveExperience?.isEnabled?.())window.PropletArchiveExperience.home();
     if(typeof renderDailySpecialUI==='function')renderDailySpecialUI();
+    orderDailyNodes();
   }
 
   function install(){
@@ -224,7 +186,7 @@
     return true;
   }
 
-  window.PropletHomeLayout={applyDailyLayout:applyLayout,renderResumeCard,install};
+  window.PropletHomeLayout={applyDailyLayout:applyLayout,renderResumeCard,orderDailyNodes,install};
 
   let tries=0;
   const boot=()=>{

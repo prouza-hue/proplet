@@ -41,8 +41,11 @@ async function ready(page){
   document.querySelectorAll('.modal').forEach(el=>el.classList.add('hidden'));
   document.querySelector('.release-notes-v3331-backdrop')?.remove();
  });
+ await page.locator('#propletBootScreen').waitFor({state:'detached'});
  await page.locator('[data-nav="leaderboard"]').click();
- await page.waitForSelector('#dailyLeaderboardList .ranking-row');await page.waitForSelector('#xpLeaderboardList .ranking-row');await settle(page);
+ // The competition hub now defaults to Monthly; Daily remains an explicit tab.
+ await page.locator('.screen.active [data-ranking-view="daily"]').click();
+ await page.waitForSelector('#dailyLeaderboardList .ranking-row');await settle(page);
 }
 async function run(viewport){
  const ctx=await browser.newContext({viewport,screen:viewport,hasTouch:true,serviceWorkers:'block',reducedMotion:'reduce'});
@@ -56,7 +59,16 @@ async function run(viewport){
  const page=await ctx.newPage();page.setDefaultTimeout(15000);page.on('pageerror',error=>errors.push(error.message));
  page.on('response',response=>{if(response.status()===404)missingAssets.add(new URL(response.url()).pathname)});
  const calls=[],pending=[],waiters=[];let hold=false;
- const next=(kind,period)=>new Promise(resolve=>{const found=pending.find(row=>!row.claimed&&row.kind===kind&&row.period===period);if(found){found.claimed=true;resolve(found)}else waiters.push({kind,period,resolve})});
+ const next=(kind,period)=>new Promise((resolve,reject)=>{
+  const found=pending.find(row=>!row.claimed&&row.kind===kind&&row.period===period);
+  if(found){found.claimed=true;resolve(found);return}
+  const waiter={kind,period,used:false,resolve:row=>{clearTimeout(timer);resolve(row)}};
+  const timer=setTimeout(()=>{
+   waiter.used=true;
+   reject(Error(`Missing ranking request ${kind}/${period} after 15s; observed=${JSON.stringify(calls)}; pending=${JSON.stringify(pending.map(({kind,period,claimed})=>({kind,period,claimed})))}`));
+  },15000);
+  waiters.push(waiter);
+ });
  await page.route('**/*',async route=>{
   const req=route.request(),url=new URL(req.url());
   if(url.origin!==new URL(base).origin)return route.abort();
@@ -73,118 +85,35 @@ async function run(viewport){
   return route.fulfill({status:answer.status||200,contentType:'application/json',body:JSON.stringify(answer.body)});
  });
  await page.goto(base,{waitUntil:'domcontentloaded'});await ready(page);
- await page.evaluate(()=>{
-  window.__rankingViewportTrace=[];
-  window.__recordRankingViewport=(phase,target)=>{
-   const group=document.querySelector('.ranking-control-row');
-   window.__rankingViewportTrace.push({phase,scrollY,groupTop:group?.getBoundingClientRect().top,targetTop:target?.getBoundingClientRect?.().top,target:target?.className,state:rankingsOrchestration().getState()});
-   if(window.__rankingViewportTrace.length>24)window.__rankingViewportTrace.shift();
-  };
-  for(const type of ['pointerdown','click'])for(const capture of [true,false])document.addEventListener(type,event=>{
-   if(event.target.closest?.('.ranking-scope-tab,.ranking-period-tab,.ranking-retry'))window.__recordRankingViewport(type+(capture?':capture':':bubble'),event.target);
-  },capture);
- });
- assert.equal(await page.locator('#dailyLeaderboardList .ranking-row').count(),6,'Daily preview shows 5 leaders plus distant own rank');
- assert.equal(await page.locator('#xpLeaderboardList .ranking-row').count(),6,'XP preview shows 5 leaders plus distant own rank');
- assert(await page.locator('#dailyLeaderboardList .ranking-row.me').count()===1,'own Daily place visible');
- assert(await page.locator('#xpLeaderboardList .ranking-row.me').count()===1,'own XP place visible');
- const dailySection=page.locator(section('daily')),xpSection=page.locator(section('xp'));
- const dailyCollapse=dailySection.locator('.ranking-collapse-toggle'),dailyMore=dailySection.locator('.ranking-expand-list');
- await dailyCollapse.focus();const countBeforeCollapse=calls.length;await page.keyboard.press('Enter');
- assert.equal(await dailyCollapse.getAttribute('aria-expanded'),'false');assert.equal(await page.locator('#dailyLeaderboardList').isVisible(),false);
- assert(await dailyCollapse.evaluate(el=>document.activeElement===el),'collapse keeps keyboard focus');
- await settle(page);
- const collapsedTitle=await page.locator('#dailyRankingTitle').boundingBox(),collapsedInfo=await page.locator('#dailyRankingInfoBtn').boundingBox(),collapsedSummary=await dailySection.locator('.ranking-section-summary').boundingBox();
- assert(Math.abs(collapsedTitle.y+collapsedTitle.height/2-collapsedInfo.y-collapsedInfo.height/2)<=3,'collapsed title and information stay on the same row');
- assert(collapsedSummary.y>=Math.max(collapsedTitle.y+collapsedTitle.height,collapsedInfo.y+collapsedInfo.height)-1,'collapsed player count stays below the heading');
- await page.screenshot({path:path.join(artifacts,`${viewport.width}x${viewport.height}-collapsed.png`),fullPage:true});
- await page.keyboard.press('Space');assert.equal(await dailyCollapse.getAttribute('aria-expanded'),'true');
- assert.equal(calls.length,countBeforeCollapse,'collapse/expand never refetches data');
- const initialDaily=await page.locator('#dailyLeaderboardList').innerHTML();
- let top=await placeControls(page,'xp');await page.locator('[data-ranking-xp-scope="teams"]').click();await settle(page);
- await stableControls(page,'xp',top,'96 player to 3 team rows');
- assert.equal(await page.locator('#xpLeaderboardList .ranking-row').count(),3);
- assert(await page.locator('[data-ranking-xp-scope="teams"]').evaluate(el=>document.activeElement===el),'scope switch keeps focus');
- assert.equal(await page.locator('#dailyLeaderboardList').innerHTML(),initialDaily,'XP scope does not replace Daily DOM');
- const beforeScope=calls.length;await page.locator('[data-ranking-xp-scope="players"]').click();await stableControls(page,'xp',top,'cached players switch');
- assert.equal(calls.length,beforeScope,'player/team data shares the same response cache');
- // On phones, the first control row may be above the viewport while the
- // period row is still visible. The clicked button remains a valid anchor.
- if(viewport.width<=520)top=await placeControls(page,'xp',-42);
- // Deliberately resolve all-time before the previous weekly read.
- hold=true;await page.locator('[data-ranking-period="week"]').click();const week=await next('xp','week');
- await page.locator('[data-ranking-period="all"]').click();const all=await next('xp','all');
+ const views=page.locator('#screen-leaderboard .ranking-view-tabs');
+ assert.equal(await page.locator('#dailyLeaderboardList').isVisible(),true);assert.equal(await page.locator('#xpLeaderboardList').isVisible(),false);
+ assert.equal(await page.locator('#dailyLeaderboardList .ranking-row').count(),6);assert.equal(await page.locator('#dailyLeaderboardList .ranking-row.me').count(),1);
+ await views.locator('[data-ranking-view="xp"]').click();await page.waitForSelector('#xpLeaderboardList .ranking-row');await settle(page);
+ assert.equal(await page.locator('#dailyLeaderboardList').isVisible(),false);assert.equal(await page.locator('#xpLeaderboardList .ranking-row').count(),6);
+ let top=await placeControls(page,'xp'),count=calls.length;
+ await page.locator('[data-ranking-xp-scope="teams"]').click();await stableControls(page,'xp',top,'cached team scope');assert.equal(calls.length,count);assert.equal(await page.locator('#xpLeaderboardList .ranking-row').count(),3);
+ await page.locator('[data-ranking-xp-scope="players"]').click();await stableControls(page,'xp',top,'cached player scope');assert.equal(calls.length,count);
+ hold=true;await page.locator('[data-ranking-period="week"]').click();const week=await next('xp','week');await page.locator('[data-ranking-period="all"]').click();const all=await next('xp','all');
  all.release({body:data('Celkové pořadí',2,2)});await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList').textContent.includes('Celkové pořadí'));
- week.release({body:data('Zastaralý týden',25,7)});await settle(page);
- assert(!(await page.locator('#xpLeaderboardList').textContent()).includes('Zastaralý'),'late weekly response cannot overwrite selected all-time view');
- await stableControls(page,'xp',top,'out-of-order periods');
- assert(await page.locator('[data-ranking-period="all"]').evaluate(el=>document.activeElement===el),'period switch keeps focus');
- // A refresh may change the section ABOVE the clicked controls. Exercise both
- // the error path below the controls and an asynchronous Daily height decrease.
- top=await placeControls(page,'xp');await page.evaluate(()=>{void renderLeaderboard()});
- const failed=await next('xp','all'),shortDaily=await next('daily','daily');
- failed.release({status:503,body:{detail:'syntetická síťová chyba'}});await page.waitForSelector('#xpLeaderboardList .ranking-retry');
- await stableControls(page,'xp',top,'network error');
- shortDaily.release({body:data('Krátká výzva',2,2)});await page.waitForFunction(()=>document.querySelector('#dailyLeaderboardList').textContent.includes('Krátká výzva'));
- await stableControls(page,'xp',top,'height change above active XP controls');
- await page.locator('#xpLeaderboardList .ranking-retry').click();const retried=await next('xp','all');
- retried.release({body:data('Obnovené XP',24,4)});await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList').textContent.includes('Obnovené XP'));
- await stableControls(page,'xp',top,'retry');assert(await page.locator('[data-ranking-period="all"]').evaluate(el=>document.activeElement===el),'retry gives focus to selected period control');
- // A new cached control click renews the global viewport context for a
- // Daily request that was already pending before that click.
- await page.evaluate(()=>{window.__recordRankingViewport('before-renewed-refresh');void renderLeaderboard();window.__recordRankingViewport('after-renewed-refresh-call')});const supersededXp=await next('xp','all'),renewedDaily=await next('daily','daily');
- await page.evaluate(()=>window.__recordRankingViewport('before-renewed-click'));
- await page.locator('[data-ranking-xp-scope="teams"]').click();
- await page.evaluate(()=>window.__recordRankingViewport('after-renewed-click'));
- supersededXp.release({body:data('Překonaná obnova XP',24,4)});renewedDaily.release({body:data('Obnovená dlouhá výzva',120,9)});
- await page.waitForFunction(()=>document.querySelector('#dailyLeaderboardList').textContent.includes('Obnovená dlouhá výzva'));await stableControls(page,'xp',top,'pending Daily follows a renewed XP control anchor');
- assert(!(await page.locator('#xpLeaderboardList').textContent()).includes('Překonaná obnova XP'),'superseded XP refresh does not overwrite a newer cached scope switch');
- // Focus/viewport adjustment can occur after pointerdown and before click.
- // Dispatch those phases explicitly so the race does not depend on Chromium's
- // focus-scroll timing or whether the checkout's native art is already cached.
- await page.evaluate(()=>{
-  const button=document.querySelector('[data-ranking-xp-scope="players"]');
-  button.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));
-  window.scrollBy({top:-120,behavior:'instant'});
-  button.click();
- });
- await stableControls(page,'xp',top,'pointerdown position survives focus scroll before click');
- // Native art decoration can settle later than the response's first animation
- // frames. Exercise a genuinely later row-height change above the active
- // controls, independently of machine speed or missing local image assets.
- assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).overflowAnchor),'none','the actual document scroller delegates ranking anchoring to the controller');
- const heightBeforeLateLayout=await dailySection.evaluate(el=>el.getBoundingClientRect().height);
- await page.evaluate(async()=>{
-  await new Promise(resolve=>setTimeout(resolve,100));
-  document.querySelectorAll('#dailyLeaderboardList .ranking-row').forEach(row=>row.style.minHeight='180px');
- });
- assert((await dailySection.evaluate(el=>el.getBoundingClientRect().height))-heightBeforeLateLayout>200,'late-layout fixture must actually increase the section height');
- await stableControls(page,'xp',top,'late row layout after response animation frames');
- await page.evaluate(()=>document.dispatchEvent(new CustomEvent('proplet:account-changed')));
- assert.equal(await page.evaluate(()=>rankingsOrchestration().getState().viewportAnchor),null,'account changes discard the previous viewport anchor');
- const accountChangeY=await page.evaluate(()=>scrollY);
- await page.evaluate(()=>document.querySelectorAll('#dailyLeaderboardList .ranking-row').forEach(row=>row.style.minHeight='220px'));
- await settle(page);assert(Math.abs((await page.evaluate(()=>scrollY))-accountChangeY)<=3,'account changes disconnect layout restoration');
- // Pending reads must not undo a deliberate subsequent user scroll.
- await page.evaluate(()=>{void renderLeaderboard()});const laterXp=await next('xp','all'),laterDaily=await next('daily','daily');
- await page.mouse.wheel(0,-10000);await page.waitForTimeout(80);const userY=await page.evaluate(()=>scrollY);
- laterXp.release({body:data('Aktuální XP',24,4)});laterDaily.release({body:data('Dlouhá výzva znovu',120,9)});
- await page.waitForFunction(()=>document.querySelector('#dailyLeaderboardList').textContent.includes('Dlouhá výzva znovu'));await settle(page);
- assert(Math.abs((await page.evaluate(()=>scrollY))-userY)<=3,'late response must not return the viewport to an abandoned anchor');
- // Full ranking remains available, with a keyboard-friendly return path.
- await dailyMore.scrollIntoViewIfNeeded();await dailyMore.click();await settle(page);
- assert.equal(await page.locator('#dailyLeaderboardList .ranking-row').count(),120,'full Daily view includes every result');
- const back=dailySection.locator('.ranking-back-summary');await back.click();await settle(page);
- assert.equal(await page.locator('#dailyLeaderboardList .ranking-row').count(),6,'return restores preview and distant own position');
- assert(await dailyMore.evaluate(el=>document.activeElement===el),'return restores focus to stable expand control');
- assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'no horizontal overflow');
- const collapseBox=await dailyCollapse.boundingBox();assert(collapseBox.width>=42&&collapseBox.height>=42,'collapse touch target');
- await page.screenshot({path:path.join(artifacts,`${viewport.width}x${viewport.height}.png`),fullPage:true});
- checks.push(`${viewport.width}x${viewport.height}: compact/self, collapse keyboard, cached scope, racing periods, async height and late layout, error/retry, user-scroll cancellation, full list return`);
- await page.locator('.bottom-nav [data-nav="daily"]').click();
- assert.equal(await page.evaluate(()=>rankingsOrchestration().getState().viewportAnchor),null,'leaving rankings discards the viewport anchor');
- assert.equal(await page.evaluate(()=>document.querySelector('.ranking-viewport-tail').style.height),'0px','leaving rankings clears reserved scroll space');
- assert.notEqual(await page.evaluate(()=>getComputedStyle(document.documentElement).overflowAnchor),'none','other pages retain native document anchoring');
+ week.release({body:data('Zastaralý týden',20,8)});await settle(page);assert(!(await page.locator('#xpLeaderboardList').textContent()).includes('Zastaralý'));
+ await stableControls(page,'xp',top,'out-of-order periods');assert(await page.locator('[data-ranking-period="all"]').evaluate(el=>document.activeElement===el));
+ await page.evaluate(()=>{void renderLeaderboard()});const failed=await next('xp','all');failed.release({status:503,body:{detail:'syntetická síťová chyba'}});
+ await page.waitForSelector('#xpLeaderboardList .ranking-retry');await stableControls(page,'xp',top,'active view error');
+ await page.locator('#xpLeaderboardList .ranking-retry').click();const retry=await next('xp','all');retry.release({body:data('Obnovené XP',24,4)});
+ await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList').textContent.includes('Obnovené XP'));await stableControls(page,'xp',top,'retry');assert(await page.locator('[data-ranking-period="all"]').evaluate(el=>document.activeElement===el));
+ await page.evaluate(()=>{void renderLeaderboard()});const later=await next('xp','all');await page.mouse.wheel(0,-10000);await page.waitForTimeout(80);const userY=await page.evaluate(()=>scrollY);
+ later.release({body:data('Aktuální XP',24,4)});await page.waitForFunction(()=>document.querySelector('#xpLeaderboardList').textContent.includes('Aktuální XP'));await settle(page);assert(Math.abs((await page.evaluate(()=>scrollY))-userY)<=3,'response cannot undo deliberate user scroll');
+ hold=false;await page.locator('[data-ranking-period="week"]').click();await page.locator('[data-ranking-xp-scope="teams"]').click();await page.waitForFunction(()=>currentScreen==='weekly');await settle(page);
+ assert.equal(await page.locator('#screen-weekly .ranking-view-tabs [data-ranking-view="weekly"]').getAttribute('aria-current'),'page');assert(await page.locator('.bottom-nav [data-nav="leaderboard"]').evaluate(el=>el.classList.contains('active')));assert.equal(await page.locator('#screen-leaderboard').isVisible(),false);
+ await page.locator('#screen-weekly [data-ranking-view="xp"]').click();await page.waitForFunction(()=>currentScreen==='leaderboard');await settle(page);
+ await page.locator('[data-ranking-period="today"]').click();await page.locator('[data-ranking-xp-scope="teams"]').click();await settle(page);assert.equal(await page.evaluate(()=>currentScreen),'leaderboard');
+ await page.locator('[data-ranking-period="all"]').click();await settle(page);assert.equal(await page.evaluate(()=>currentScreen),'leaderboard');
+ await views.locator('[data-ranking-view="daily"]').click();await settle(page);const dailySection=page.locator(section('daily')),more=dailySection.locator('.ranking-expand-list');await more.click();await settle(page);assert.equal(await page.locator('#dailyLeaderboardList .ranking-row').count(),120);
+ await dailySection.locator('.ranking-back-summary').click();await settle(page);assert.equal(await page.locator('#dailyLeaderboardList .ranking-row').count(),6);assert(await more.evaluate(el=>document.activeElement===el));
+ assert.equal(await page.locator('#xpLeaderboardList').isVisible(),false);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+ for(const button of await views.locator('button').all()){const box=await button.boundingBox();assert(box.width>=42&&box.height>=44);}
+ await page.screenshot({path:path.join(artifacts,viewport.width+'x'+viewport.height+'.png'),fullPage:true});checks.push(viewport.width+'x'+viewport.height+': active view, own row, cache/races, error/retry focus, scroll, shared weekly, team today/all, full list return');
+ await page.locator('.bottom-nav [data-nav="daily"]').click();assert.equal(await page.evaluate(()=>rankingsOrchestration().getState().viewportAnchor),null);assert.equal(await page.evaluate(()=>document.querySelector('.ranking-viewport-tail').style.height),'0px');
  await ctx.close();
 }
 (async()=>{

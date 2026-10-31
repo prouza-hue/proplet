@@ -23,7 +23,7 @@ const tick=()=>new Promise(resolve=>setImmediate(resolve));
  assert(!context.accountProgressAvailable(),'new account cannot assume empty history');
  states.a={completed:{},remoteProgressLoadedAt:'invalid'};
  assert(!context.accountProgressAvailable(),'invalid cache is not accepted');
- states.a={completed:{saved:{challengeKey:'saved'}},remoteProgressLoadedAt:'2026-09-14T12:00:00Z'};
+ states.a={completed:{saved:{challengeKey:'saved'}},remoteProgressLoadedAt:'2026-09-14T12:00:00Z',remoteXpCanonicalVersion:1};
  assert(context.accountProgressAvailable(),'verified history displays immediately online');
  context.renderAccountProgressStatus();
  assert(!context.document.body.classList.contains('account-progress-pending'));

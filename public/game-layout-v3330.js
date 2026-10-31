@@ -16,8 +16,19 @@
   let gameInfoNext=null;
   let raf=0;
 
+  const hasSideRail=()=>{
+    if(!document.body.classList.contains(TABLET_CLASS)&&!document.body.classList.contains(DESKTOP_CLASS))return false;
+    // Training may keep the device class while its CSS stacks the real controls
+    // below the board. display:contents also makes the column wrappers boxless.
+    const board=document.querySelector('.game-board-column>.board-stage')?.getBoundingClientRect();
+    const controls=document.querySelector('.game-control-column>.game-actions')?.getBoundingClientRect();
+    return !!board&&!!controls&&board.width>0&&board.height>0&&controls.width>0&&controls.height>0
+      &&(board.right<=controls.left+1||controls.right<=board.left+1)
+      &&Math.min(board.bottom,controls.bottom)>Math.max(board.top,controls.top);
+  };
+
   const syncControlSide=()=>{
-    const sideRail=document.body.classList.contains(TABLET_CLASS)||document.body.classList.contains(DESKTOP_CLASS);
+    const sideRail=hasSideRail();
     document.querySelector('.game-main')?.classList.toggle('game-controls-left',sideRail&&controlSide==='left');
     const button=document.querySelector('#gameSideToggle');
     if(button){
@@ -38,6 +49,7 @@
     button.hidden=true;
     button.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16m-4-4 4 4-4 4M20 16H4m4-4-4 4 4 4"/></svg><span>Prohodit strany</span>';
     button.addEventListener('click',()=>{
+      if(!hasSideRail())return;
       // A second finger must not move the board underneath an active word gesture.
       try{if(typeof currentGame!=='undefined'&&currentGame?.dragging)return}catch{}
       controlSide=controlSide==='left'?'right':'left';
@@ -175,6 +187,7 @@
   };
 
   const refit=()=>requestAnimationFrame(()=>{
+    syncControlSide();
     try{if(typeof fitGameBoard==='function')fitGameBoard()}catch{}
     try{centerDesktopMask()}catch{}
     try{if(typeof drawPaths==='function')drawPaths()}catch{}

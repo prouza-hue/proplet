@@ -1,0 +1,140 @@
+{
+  "date": "2026-10-28",
+  "projectRef": "eanzztstmwlamwfdskbf",
+  "productionTouched": false,
+  "preservedLegacySyntheticState": {
+    "players": 12,
+    "results": 7,
+    "resultXP": 530,
+    "playerDigestBeforeAndAfter": "7eb6a24f903dbfabae96206f0e86c1fe",
+    "resultDigestBeforeAndAfter": "9607dcb596d0f0414beedada657ef985",
+    "oldFreeClaims": 0,
+    "historicalFreeClaims": 0
+  },
+  "appliedInOrder": [
+    {
+      "version": "20261028085447",
+      "name": "monthly_preview_historical_reward_parity",
+      "source": "supabase/prepared/historical_free_rewards.sql",
+      "canonicalSourceSHA256": "59c8d4fddb4466181463e32fce585b405d289cd146704719bbd1332c5bee3295"
+    },
+    {
+      "version": "20261028085448",
+      "name": "monthly_preview_offline_result_timing_parity",
+      "source": "supabase/migrations/20261015070626_offline_result_timing.sql",
+      "canonicalSourceSHA256": "df23d5bcab7b04ebb1d67b47cf615a89b5ff7150ab182e69c4d9c8a6318035c9"
+    },
+    {
+      "version": "20261028090336",
+      "name": "monthly_isolated_moving_preview_clock",
+      "source": "supabase/migrations/20261028085718_monthly_isolated_preview_clock.sql",
+      "canonicalSourceSHA256": "348e5b268a6889ae902e3efc0d9e016934e567b6a783d037baed964b78976a2b"
+    },
+    {
+      "version": "20261028095014",
+      "name": "monthly_preview_special_clock_policy",
+      "source": "supabase/migrations/20261028094820_monthly_preview_special_clock_policy.sql",
+      "canonicalSourceSHA256": "c046fd151fc2ad4b879c7e25627fa0fc61bd49ae8cbb8c4934b972cfb1ed2164"
+    },
+    {
+      "version": "20261028095122",
+      "name": "monthly_preview_difficulty_parity",
+      "source": "supabase/migrations/20261028095102_monthly_preview_difficulty_parity.sql",
+      "canonicalSourceSHA256": "1754779fe383695ad870bf5155e35ae1f65ecf4d83816a0a5882d4889c4900aa"
+    },
+    {
+      "version": "20261028095330",
+      "name": "monthly_preview_extra_xp_parity",
+      "source": "supabase/migrations/20261028095256_monthly_preview_extra_xp_parity.sql",
+      "canonicalSourceSHA256": "d8522d8049d033d20fe35fad604619b9637b4edafeb020613413ddfb5e6acd8e"
+    },
+    {
+      "version": "20261028100020",
+      "name": "monthly_preview_referral_parity",
+      "source": "supabase/prepared/referral_v1.sql",
+      "canonicalSourceSHA256": "ea4bdb63b3ad0f1e42c1500c8d5a4c7c2e5f5fc51945f24ed4299bd81b33d3c8"
+    },
+    {
+      "version": "20261028101732",
+      "name": "monthly_preview_special_bindings",
+      "source": "supabase/migrations/20261028101522_monthly_preview_special_bindings.sql",
+      "canonicalSourceSHA256": "27a3e487a0146d55ace3ce9a71b38d2a45fec220730220d8229bddf329655d9b"
+    },
+    {
+      "version": "20261028103935",
+      "name": "monthly_preview_empty_claim_probe",
+      "source": "supabase/migrations/20261028103442_monthly_preview_empty_claim_probe.sql",
+      "canonicalSourceSHA256": "82ed82cd44eab407bc954bd73c1172d593d8c51d96f77bfc6ecdd8b4c8f38ca0"
+    }
+  ],
+  "remoteRollbackAcceptance": {
+    "source": "supabase/tests/monthly_preview_clock.sql",
+    "passed": [
+      "Only isolated database plus trusted server request marker permits QA clock controls",
+      "Anonymous and authenticated database roles cannot execute QA control RPC",
+      "Moving QA clock advances with real elapsed time and preserves session duration",
+      "Online official completion uses server QA time",
+      "Offline completion retains original publication day while receipt uses QA receive time",
+      "Receipt arriving during the 48-hour review is included; after cutoff is excluded",
+      "Real finalizer creates actual monthly badges",
+      "Unmarked legacy isolated-branch requests retain ordinary wall clock",
+      "January 4 is accepted and January 5 is outside the control range",
+      "All acceptance fixtures rolled back; existing synthetic players and results unchanged"
+    ]
+  },
+  "afterRollback": {
+    "enabled": false,
+    "rulesApproved": true,
+    "lateSyncPolicy": "review-close",
+    "isolated": true,
+    "previewNow": null,
+    "previewAnchorAt": null
+  },
+  "scope": "Core account/auth/play-session/online and offline Daily/monthly lifecycle dependencies. This file records SQL readiness and rollback acceptance, not the later public browser E2E result.",
+  "remoteExtraRollbackAcceptance": {
+    "source": "supabase/tests/monthly_preview_extra.sql",
+    "passed": true,
+    "scope": "Actual official November Extra result and session; no monthly points; legacy October policy unchanged",
+    "awardedXP": 200
+  },
+  "legacySpecialCatalogPreserved": {
+    "count": 36,
+    "digestBeforeAndAfter": "5212836dd12c26ce9439a92d361d41ad",
+    "trustedCurrentNovember1": "g6-ds-mozkokalypsa-w03",
+    "unmarkedLegacyNovember1": "g6-ds-mozkokalypsa-w02",
+    "previewCatalogCount": 36,
+    "approvedSource": "data/daily_specials_private.json",
+    "approvedSourceSHA256": "88c130b44fb5288a3e2439df68ff81deedf9e51cd3b8cfc3631000455720a84d"
+  },
+  "referralParity": {
+    "statusRpcVerified": true,
+    "initialClaims": 0,
+    "initialBoards": 0,
+    "initialRewards": 0,
+    "notifications": false,
+    "note": "Required by actual new-account UI; exact existing application migration, no invitation sending."
+  },
+  "legacyStateAfterLiveRegistrationAndCatalogFix": {
+    "originalPlayers": 12,
+    "originalResults": 7,
+    "originalResultXP": 530,
+    "originalPlayerDigest": "7eb6a24f903dbfabae96206f0e86c1fe",
+    "originalResultDigest": "9607dcb596d0f0414beedada657ef985",
+    "scope": "Exclude actual browser-created MQA-* cohort; original synthetic fixtures remain byte-for-byte intact."
+  },
+  "emptyClaimProof": {
+    "scope": "Dedicated monthly QA only; authenticated HTTP path plus trusted database marker/isolated guard",
+    "readOnly": true,
+    "localDatabaseAcceptance": "15 groups passed; eight source categories each deny the empty shortcut, original transfer counter untouched",
+    "remoteProbe": {
+      "empty": true,
+      "anonExecute": false,
+      "authenticatedExecute": false,
+      "existingAnonymousClaimHitsBefore": 23,
+      "existingAnonymousClaimHitsAfter": 23,
+      "novemberPointsBefore": 120,
+      "novemberPointsAfter": 120
+    },
+    "quotas": "No reset or widening; actual nonempty transfers retain original12/hour guard. Root adds independent cheap120/hour QA probe guard."
+  }
+}

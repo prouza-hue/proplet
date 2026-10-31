@@ -24,6 +24,36 @@ def _env(name: str, default: str = "") -> str:
     return os.environ.get(name, default).strip()
 
 
+def live_player_preview_enabled() -> bool:
+    """Only explicitly approved preview branches may serve players against the live DB."""
+    return (
+        _env("PROPLET_LIVE_PLAYER_PREVIEW_ENABLED").lower() in {"1", "true", "yes"}
+        and _env("VERCEL_ENV").lower() == "preview"
+        and _env("VERCEL_GIT_COMMIT_REF") in {"codex/studio-edition", "codex/today-one-screen"}
+        and _env("SUPABASE_URL").rstrip("/") == "https://iopyhluayfszskyqqpuc.supabase.co"
+    )
+
+
+def monthly_preview_qa_enabled(supabase_url: str | None = None) -> bool:
+    """The QA clock is confined to one branch and its disposable database."""
+    return (
+        _env("VERCEL_ENV") == "preview"
+        and _env("VERCEL_GIT_COMMIT_REF") == "codex/monthly-competition-202611"
+        and (supabase_url if supabase_url is not None else _env("SUPABASE_URL")).rstrip("/") == "https://eanzztstmwlamwfdskbf.supabase.co"
+        and _env("PROPLET_MONTHLY_QA_ENABLED").lower() == "true"
+        and len(_env("PROPLET_MONTHLY_QA_SECRET")) >= 32
+    )
+
+
+def release_news_enabled() -> bool:
+    """Explicit opt-in; preview can only access the already isolated monthly QA DB."""
+    if _env("PROPLET_RELEASE_NEWS_ENABLED").lower() != "true":
+        return False
+    if _env("VERCEL_ENV").lower() == "production":
+        return _env("SUPABASE_URL").rstrip("/") == "https://iopyhluayfszskyqqpuc.supabase.co"
+    return monthly_preview_qa_enabled()
+
+
 ADMIN_PREVIEW_BRANCH = "codex/admin-modernization"
 ADMIN_PREVIEW_DATABASE = "https://eanzztstmwlamwfdskbf.supabase.co"
 ADMIN_PREVIEW_ORIGIN = "https://proplet-git-codex-admin-modernization-pavel-prouzas-projects.vercel.app"
@@ -63,6 +93,7 @@ class Settings:
     cron_secret: str
     vercel_env: str
     vercel_git_commit_ref: str
+    live_player_preview: bool
     gen4_preview_branch: str
     gen4_candidate_preview: bool
     gen5_candidate_preview: bool
@@ -80,6 +111,13 @@ def load_settings() -> Settings:
     root = Path(__file__).resolve().parents[1]
     vercel_env = _env("VERCEL_ENV").lower()
     vercel_git_commit_ref = _env("VERCEL_GIT_COMMIT_REF")
+    live_player_preview = live_player_preview_enabled()
+    monthly_preview = vercel_env == "preview" and vercel_git_commit_ref == "codex/monthly-competition-202611"
+    if monthly_preview and _env("SUPABASE_URL").rstrip("/") not in {"", "https://eanzztstmwlamwfdskbf.supabase.co"}:
+        raise RuntimeError("Monthly competition preview requires the isolated test database")
+    if _env("PROPLET_MONTHLY_QA_SECRET") or _env("PROPLET_MONTHLY_QA_ENABLED"):
+        if not monthly_preview_qa_enabled():
+            raise RuntimeError("Monthly QA requires its exact preview branch, isolated database and dedicated secret")
     admin_preview = admin_preview_enabled()
     if vercel_git_commit_ref == ADMIN_PREVIEW_BRANCH or _env("PROPLET_ADMIN_PREVIEW_ENABLED"):
         if (not admin_preview
@@ -108,10 +146,10 @@ def load_settings() -> Settings:
         # Preserve the historical parsing exactly: URL only lost trailing
         # slashes and the secret was not whitespace-normalized.
         supabase_url="" if playtest_preview else os.environ.get("SUPABASE_URL", "").rstrip("/"),
-        # Reuse the existing isolated-test credential available to previews.
+        # Reuse isolated-test credentials for both approved isolated previews.
         # The generic SUPABASE_SECRET_KEY may point at production and is never
         # selected for this branch, even when it is inherited by Vercel.
-        supabase_secret_key=(os.environ.get("PROPLET_MONTHLY_TEST_KEY", "") if admin_preview else
+        supabase_secret_key=(os.environ.get("PROPLET_MONTHLY_TEST_KEY", "") if monthly_preview or admin_preview else
                              "" if playtest_preview else os.environ.get("SUPABASE_SECRET_KEY", "")),
         vapid_public_key="" if playtest_preview or admin_preview else _env("VAPID_PUBLIC_KEY"),
         vapid_private_key="" if playtest_preview or admin_preview else _env("VAPID_PRIVATE_KEY"),
@@ -119,6 +157,7 @@ def load_settings() -> Settings:
         cron_secret="" if playtest_preview or admin_preview else _env("CRON_SECRET"),
         vercel_env=vercel_env,
         vercel_git_commit_ref=vercel_git_commit_ref,
+        live_player_preview=live_player_preview,
         gen4_preview_branch=gen4_preview_branch,
         gen4_candidate_preview=gen4_candidate_preview,
         gen5_candidate_preview=gen5_candidate_preview,
@@ -129,7 +168,7 @@ def load_settings() -> Settings:
         content_catalog_path=data_root / "content_catalog_v334.json",
         tajenka_bank_path=data_root / "tajenka_weekend_v2.json",
         tajenka_release_enabled=(
-            vercel_env == "production"
+            (vercel_env == "production" or live_player_preview or monthly_preview_qa_enabled())
             and _env("PROPLET_TAJENKA_RELEASE_ENABLED", "true").lower() in {"1", "true", "yes"}
         ),
         atomic_result_v1_enabled=(
@@ -159,6 +198,7 @@ VAPID_SUBJECT = settings.vapid_subject
 CRON_SECRET = settings.cron_secret
 VERCEL_ENV = settings.vercel_env
 VERCEL_GIT_COMMIT_REF = settings.vercel_git_commit_ref
+LIVE_PLAYER_PREVIEW = settings.live_player_preview
 GEN4_PREVIEW_BRANCH = settings.gen4_preview_branch
 GEN4_CANDIDATE_PREVIEW = settings.gen4_candidate_preview
 GEN5_CANDIDATE_PREVIEW = settings.gen5_candidate_preview

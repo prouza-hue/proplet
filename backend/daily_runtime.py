@@ -124,5 +124,6 @@ def install(namespace: dict) -> None:
             raise HTTPException(400, "Neplatné datum") from exc
         except DailyUnavailable as exc:
             raise HTTPException(404, "Tato Denní výzva není dostupná") from exc
+        payload.update(namespace.get("monthly_preview_capabilities", lambda: {})())
         return JSONResponse(payload, headers={"Cache-Control": "private, no-store",
                             "Vercel-CDN-Cache-Control": "no-store", "CDN-Cache-Control": "no-store"})

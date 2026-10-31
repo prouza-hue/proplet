@@ -105,7 +105,7 @@ const server=http.createServer(async(req,res)=>{
   if(['/puzzles.json','/puzzles-bootstrap.json'].includes(p)&&(controls.failDatabase||controls.failDatabaseRequests>0)){if(controls.failDatabaseRequests>0)controls.failDatabaseRequests--;return json(res,503,{detail:'synthetic database asset outage'})}
   const name=p==='/'?'index.html':decodeURIComponent(p).slice(1);
   if(name.split('/').includes('..'))return json(res,400,{detail:'invalid path'});
-  let bytes=asset(name);if(name==='runtime-meta.js'&&bytes)bytes=Buffer.concat([Buffer.from('window.PROPLET_FIRST_STEPS_ENABLED='+JSON.stringify(controls.firstSteps)+';\n'),bytes]);if(!bytes)return json(res,404,{detail:'not found'});
+  let bytes=asset(name);if(name==='runtime-meta.js'&&bytes)bytes=Buffer.concat([Buffer.from('window.PROPLET_FIRST_STEPS_ENABLED='+JSON.stringify(controls.firstSteps)+';\n'),bytes,Buffer.from('\n// Loopback fixture: exercise production event gates; all APIs remain in-memory.\nwindow.PROPLET_RUNTIME_META=Object.freeze({...window.PROPLET_RUNTIME_META,environment:"production"});\n')]);if(!bytes)return json(res,404,{detail:'not found'});
   res.writeHead(200,{'content-type':types[path.extname(name)]||'application/octet-stream','cache-control':'no-store','service-worker-allowed':'/'});res.end(req.method==='HEAD'?undefined:bytes);
  }catch(error){if(!res.headersSent)json(res,400,{detail:error.message});else res.end()}
 });

@@ -1,6 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const app=fs.readFileSync('public/app.js','utf8');
+const capabilities=app.slice(app.indexOf('let livePlayerPreviewEnabled='),app.indexOf('window.PropletClientDiagnostics?.claimErrorListeners'));
 const source=app.slice(app.indexOf('function canAutomaticallyUpdate('),app.indexOf('function ensureAudio('));
 function harness({store=new Map(),release='old',now=100000}={}){
  const timers=new Map(),events={};let id=0,reloads=0,deletes=0,banners=0,modal=null,editing=false;
@@ -15,7 +16,7 @@ function harness({store=new Map(),release='old',now=100000}={}){
   fetch:async()=>({ok:true,text:async()=>"const SHELL_CACHE='new';",json:async()=>({environment:'production'})})};
  const reg={update:async()=>{},addEventListener:()=>{}};
  ctx.navigator.serviceWorker={controller:{},register:async()=>reg,getRegistration:async()=>reg,addEventListener:(n,f)=>events[n]=f};
- vm.createContext(ctx);vm.runInContext(source,ctx);
+ vm.createContext(ctx);vm.runInContext(capabilities+'\n'+source,ctx);
  return {ctx,reg,events,store,timers,get now(){return now},get reloads(){return reloads},get deletes(){return deletes},get banners(){return banners},set modal(v){modal=v},set editing(v){editing=v},async tick(){const [key,timer]=timers.entries().next().value;timers.delete(key);now+=timer.delay;await timer.fn();for(let i=0;i<20;i++)await Promise.resolve()}};
 }
 (async()=>{

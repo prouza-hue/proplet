@@ -3,7 +3,7 @@
   if(window.__PROPLET_ACCOUNT_CONVERSION_V3331__)return;
   window.__PROPLET_ACCOUNT_CONVERSION_V3331__=true;
 
-  let patched=false;
+  let patched=false,authWasOpen=false,authReturnFocus=null;
   const $=s=>document.querySelector(s);
 
   function isCreateMode(){return !!$('#profileModeCreate')?.classList.contains('active')}
@@ -18,7 +18,7 @@
       block=document.createElement('section');
       block.id='googlePrimaryBlock';
       block.className='google-primary-auth';
-      block.innerHTML='<div class="google-primary-head"><span>NEJRYCHLEJŠÍ ZPŮSOB</span><small>pár vteřin</small></div><div class="google-primary-slot"></div><small class="google-primary-note">Bez vytváření nového hesla.</small>';
+      block.innerHTML='<div class="google-primary-slot"></div>';
     }
     const slot=block.querySelector('.google-primary-slot');
     if(slot&&button.parentElement!==slot)slot.appendChild(button);
@@ -30,7 +30,7 @@
       divider=document.createElement('div');
       divider.id='googleManualDivider';
       divider.className='account-auth-divider google-manual-divider';
-      divider.innerHTML='<span>nebo jménem a heslem</span>';
+      divider.innerHTML='<span>nebo</span>';
     }
     if(block.nextElementSibling!==divider)block.insertAdjacentElement('afterend',divider);
 
@@ -43,30 +43,23 @@
     if(!positionGoogleFirst())return;
     const create=isCreateMode();
     const title=$('#profileModalTitle'),desc=$('#profileModalDesc'),save=$('#saveProfileBtn');
-    const divider=$('#googleManualDivider span'),head=$('#googlePrimaryBlock .google-primary-head span'),note=$('#googlePrimaryBlock .google-primary-note');
-    const inApp=!!window.PropletInAppBrowserHelp?.context();
-    const speed=$('#googlePrimaryBlock .google-primary-head small');
-    if(speed)speed.hidden=inApp;
-
-    if(create&&$('#profileModal')?.classList.contains('first-steps-auth')){
-      setText(title,'Ulož si postup');
-      setText(desc,'Zvol si přezdívku a heslo. E-mail pro obnovu účtu můžeš přidat níže.');
-      setText(save,'Vytvořit účet');return;
-    }
-    if(create){
-      setText(title,'Nepřijď o své výsledky');
-      setText(desc,'Založ si účet, trvá to pár vteřin. Uložíme XP, výsledky i sérii — a přidáme ti +500 XP.');
-      setText(save,'Založit jménem a heslem · +500 XP');
-      setText(divider,'nebo přezdívkou a heslem');
-      setText(head,inApp?'PŘIHLÁŠENÍ PŘES GOOGLE':'NEJRYCHLEJŠÍ ZPŮSOB');
-      setText(note,'Bez vytváření nového hesla · +500 XP po založení.');
-    }else{
-      setText(title,'Přihlásit se');
-      setText(desc,inApp?'Přihlas se přes Google. Nebo použij herní jméno či ověřený e-mail a heslo.':'Nejrychleji přes Google. Nebo použij herní jméno či ověřený e-mail a heslo.');
-      setText(save,'Přihlásit se');
-      setText(divider,'nebo jménem a heslem');
-      setText(head,inApp?'PŘIHLÁŠENÍ PŘES GOOGLE':'NEJRYCHLEJŠÍ PŘIHLÁŠENÍ');
-      setText(note,inApp?'Použij svůj Google účet.':'Bez vyplňování jména a hesla.');
+    const modal=$('#profileModal'),login=$('#profileModeLogin'),signup=$('#profileModeCreate'),tabs=login?.parentElement;
+    setText(title,create?'Uložit postup':'Přihlásit se');
+    setText(desc,create?'Uchovej své výsledky, XP i sérii. Za nový účet získáš +500 XP.':'');
+    if(desc&&desc.hidden===create)desc.hidden=!create;
+    setText(save,create?'Vytvořit účet':'Přihlásit se');
+    setText(login,'Přihlásit se');setText(signup,'Vytvořit účet');
+    if(modal&&modal.getAttribute('aria-labelledby')!=='profileModalTitle')modal.setAttribute('aria-labelledby','profileModalTitle');
+    if(title&&title.getAttribute('tabindex')!=='-1')title.setAttribute('tabindex','-1');
+    if(tabs){
+      let prompt=tabs.querySelector('.auth-mode-prompt');
+      if(!prompt){prompt=document.createElement('span');prompt.className='auth-mode-prompt';tabs.prepend(prompt);}
+      setText(prompt,create?'Už máš účet?':'Nemáš ještě účet?');
+      const anchor=$('#authLegacyOptions')||save;
+      if(anchor&&anchor.nextElementSibling!==tabs)anchor.after(tabs);
+      // The clicked mode link becomes the hidden active mode. Move focus to the
+      // single heading, without clearing fields or overriding password managers.
+      if(document.activeElement===login||document.activeElement===signup)title?.focus({preventScroll:true});
     }
   }
 
@@ -96,6 +89,21 @@
   function boot(){
     patchFunctions();
     polishAuthModal();
+    syncAuthFocus();
+  }
+
+  function syncAuthFocus(){
+    const modal=$('#profileModal'),shown=!!modal&&!modal.classList.contains('hidden');
+    if(shown&&!authWasOpen){
+      authReturnFocus=document.activeElement;
+      // Heading focus works with keyboards and screen readers without opening
+      // the mobile keyboard or skipping the Google alternative.
+      if(!modal.contains(document.activeElement))$('#profileModalTitle')?.focus({preventScroll:true});
+    }else if(!shown&&authWasOpen&&!document.querySelector('.modal:not(.hidden),dialog[open]')){
+      const target=authReturnFocus?.isConnected?authReturnFocus:$('#profileChip');
+      target?.focus({preventScroll:true});authReturnFocus=null;
+    }
+    authWasOpen=shown;
   }
 
   let bootScheduled=false;
@@ -107,7 +115,16 @@
   function start(){
     boot();
     const modal=$('#profileModal');
-    if(modal)new MutationObserver(scheduleBoot).observe(modal,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+    if(modal){
+      new MutationObserver(scheduleBoot).observe(modal,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+      modal.addEventListener('keydown',event=>{
+        if(event.key!=='Tab'||modal.classList.contains('hidden'))return;
+        const controls=[...modal.querySelectorAll('button,input,select,summary,a[href],[tabindex="0"]')].filter(el=>!el.disabled&&!el.closest('[inert]')&&el.getClientRects().length);
+        const first=controls[0],last=controls.at(-1);if(!first)return;
+        if(event.shiftKey&&(document.activeElement===first||document.activeElement===$('#profileModalTitle'))){event.preventDefault();last.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+      });
+    }
   }
   if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',start,{once:true});
   else start();

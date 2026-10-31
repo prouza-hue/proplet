@@ -34,6 +34,7 @@ def install_account_bonus(
     telemetry_actor=None,
     app_version: str = "",
     vercel_env: str = "",
+    live_player_preview: bool = False,
     **_kwargs,
 ):
     """Install the v3.33.1 account-creation reward.
@@ -62,9 +63,9 @@ def install_account_bonus(
         if summary["accountCreationBonusGranted"]:
             return summary, False
 
-        # Preview shares the production database. Do not create reward rows for preview-only
-        # test accounts; simulate the grant so the UI can still be physically QA'd end-to-end.
-        if str(vercel_env or "").strip().lower() == "preview":
+        # Ordinary preview simulates rewards. An explicitly enabled live-player preview
+        # uses the same authenticated, unique-key grant and canonical reread as production.
+        if str(vercel_env or "").strip().lower() == "preview" and live_player_preview is not True:
             return {
                 **summary,
                 "accountCreationBonusGranted": True,
@@ -121,7 +122,7 @@ def install_account_bonus(
         enforce_rate_limit(request, "account_bonus_event", limit=240, window_seconds=3600)
         if payload.event_type not in ALLOWED_ACCOUNT_BONUS_EVENTS:
             raise HTTPException(400, "Neplatný account bonus event")
-        if str(vercel_env or "").strip().lower() == "preview":
+        if str(vercel_env or "").strip().lower() == "preview" and live_player_preview is not True:
             return {"ok": True, "ignored": True, "preview": True}
         if not callable(telemetry_actor):
             raise HTTPException(503, "Account bonus analytika není připravená")

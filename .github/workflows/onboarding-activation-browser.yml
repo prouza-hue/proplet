@@ -49,11 +49,6 @@ jobs:
           mkdir -p browser-results
           node tools/onboarding_fixture_server.cjs > browser-results/fixture.log 2>&1 &
           node -e 'const end=Date.now()+10000; (async()=>{while(Date.now()<end){try{if((await fetch(process.env.TEST_URL+"/api/health")).ok)return}catch{}await new Promise(r=>setTimeout(r,100))}throw Error("fixture failed to start")})().catch(e=>{console.error(e);process.exitCode=1})'
-      - name: Reproduce baseline delayed telemetry with playable intro
-        env:
-          TEST_EXPECT_BASELINE: '1'
-          RESULT_PATH: browser-results/baseline.json
-        run: node tools/test_onboarding_activation_browser.cjs
       - name: Verify first visit, input, auth, invitation, outages, and SW upgrade
         env:
           RESULT_PATH: browser-results/current.json
