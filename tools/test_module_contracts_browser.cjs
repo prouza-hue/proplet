@@ -79,7 +79,9 @@ async function hintClose(page){await page.evaluate(()=>{document.querySelector('
   assert.equal(rows.filter(r=>r.body.code==='team_victories_contract').length,1,'re-renders do not spam telemetry');
   // Producer identifies app.js; reporter identifies the independently cached
   // diagnostic transport. They need not have the same release suffix.
-  for(const row of rows){assert.equal(row.body.client_release,row.headers['x-proplet-client-release']);assert.equal(row.body.client_release,await page.evaluate(()=>APP_PREVIEW_RELEASE));assert.equal(row.body.reporter_release,reporterRelease);assert.equal(row.body.source_availability,'available');assert.equal(row.body.is_test,true)}
+  // Browser transport marks this isolated run; production-like page JavaScript
+  // cannot read extraHTTPHeaders and correctly reports its own non-preview state.
+  for(const row of rows){assert.equal(row.body.client_release,row.headers['x-proplet-client-release']);assert.equal(row.body.client_release,await page.evaluate(()=>APP_PREVIEW_RELEASE));assert.equal(row.body.reporter_release,reporterRelease);assert.equal(row.body.source_availability,'available');assert.equal(row.headers['x-proplet-test'],'1');assert.equal(row.body.is_test,false)}
   // User-triggered repair uses the existing safe update path, not cache/storage deletion.
   await profilePage(page);stale=false;
   await Promise.all([page.waitForEvent('load'),page.locator('#profileTeamContractStatus button').click()]);
