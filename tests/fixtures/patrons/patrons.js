@@ -3,13 +3,32 @@
  'use strict';if(!window.PROPLET_STUDIO_PREVIEW)throw Error('Patron fixtures require isolation');
  window.PROPLET_PATRON_PREVIEW=true;
  const KEY='patron-server-fixture-v1',ACCOUNT='5531840001/5500';
- const fresh=()=>({intents:[],receipts:[],preferences:{},bankTransactions:{},scenario:'eligible',offset:0});
+ const fresh=()=>({intents:[],receipts:[],preferences:{},bankTransactions:{},firstSeen:{},newsReceipts:{},completedBoards:{},thanksClaimed:{},scenario:'eligible',offset:0});
  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY))||fresh()}catch{return fresh()}};
  const write=s=>localStorage.setItem(KEY,JSON.stringify(s));
  const now=s=>Date.now()+(s.offset||0),who=()=>typeof getProfile==='function'?getProfile():JSON.parse(localStorage.getItem('proplet-v2-profile')||'null');
  const error=(status,message)=>{const e=new Error(message);e.status=status;throw e};
  const prefs=(s,id)=>s.preferences[id]||{publicBadge:false,offersDisabled:false};
- function state(s){const p=who(),id=p?.id,pr=prefs(s,id);const patron=s.intents.some(i=>i.playerId===id&&i.status==='confirmed');const recent=s.receipts.filter(r=>r.playerId===id&&r.at>now(s)-90*86400000);const cool=recent.some(r=>r.at>now(s)-30*86400000);return {enabled:true,authenticated:!!p?.token,patron,publicBadge:patron&&pr.publicBadge,offersDisabled:pr.offersDisabled,canOffer:!!p?.token&&!patron&&!pr.offersDisabled&&!cool&&recent.length<2&&s.scenario==='eligible'&&p.supportMode!=='younger',offerCount90d:recent.length};}
+ const HOUR=3600000,DAY=24*HOUR,ordinary=new Set(['daily','daily_special','free','tajenka']);
+ const historicalBoards=s=>[7,6,5,4,3].map((days,index)=>({mode:'free',key:'historic-'+index,at:now(s)-days*DAY}));
+ function state(s){
+  const p=who(),id=p?.id,pr=prefs(s,id),authenticated=!!p?.token;
+  const patron=s.intents.some(i=>i.playerId===id&&i.status==='confirmed');
+  const recent=s.receipts.filter(r=>r.playerId===id&&r.at>now(s)-90*DAY),cool=recent.some(r=>r.at>now(s)-30*DAY);
+  s.firstSeen=s.firstSeen||{};s.newsReceipts=s.newsReceipts||{};s.completedBoards=s.completedBoards||{};s.thanksClaimed=s.thanksClaimed||{};
+  if(authenticated&&s.firstSeen[id]===undefined){s.firstSeen[id]=now(s)-(s.scenario==='first_visit'?0:49*HOUR);write(s);}
+  if(authenticated&&!s.completedBoards[id]){s.completedBoards[id]=historicalBoards(s);write(s);}
+  const newsAt=s.newsReceipts[id],anchor=newsAt??s.firstSeen[id]??now(s),played=(s.completedBoards[id]||[]).filter(b=>ordinary.has(b.mode));
+  const distinct=rows=>new Set(rows.map(b=>b.mode+':'+b.key)).size;
+  const boards=distinct(played),days=new Set(played.map(b=>new Date(b.at).toLocaleDateString('en-CA',{timeZone:'Europe/Prague'}))).size;
+  const postAnchorBoards=distinct(played.filter(b=>b.at>anchor));
+  const offerWaitReason=!authenticated?'authentication':patron?'patron':pr.offersDisabled?'disabled':now(s)<anchor+48*HOUR?'release_wait':newsAt!==undefined&&postAnchorBoards<2?'post_news_boards':boards<5||days<3?'playing_history':recent.length>=2?'offer_limit':cool?'cooldown':null;
+  const contributions=s.intents.filter(i=>i.playerId===id&&i.status==='confirmed').flatMap(i=>(i.payments||[]).map(r=>({id:r.id,amountCzk:r.amountCzk,frequency:i.frequency||'once',confirmedAt:r.confirmedAt}))).sort((a,b)=>Date.parse(b.confirmedAt)-Date.parse(a.confirmedAt)).slice(0,50);
+  return {ok:true,enabled:true,authenticated,patron,publicBadge:patron&&pr.publicBadge,offersDisabled:pr.offersDisabled,
+   canOffer:offerWaitReason===null,offerCount90d:recent.length,displayGranted:false,receiptId:null,
+   offerWaitReason,offerAnchorSource:newsAt===undefined?'first_seen':'release_news',offerAvailableAt:new Date(anchor+48*HOUR).toISOString(),postAnchorBoards,
+   thanksPending:patron&&!s.thanksClaimed[id],contributions};
+ }
  // Same BBAN and SPAYD escaping as backend/patrons.py; input is the persisted model intent.
  const bban='5500'+'000000'+'5531840001',IBAN='CZ'+String(98-Number(BigInt(bban+'123500')%97n)).padStart(2,'0')+bban;
  const spaydQuote=value=>encodeURIComponent(value).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase()).replace(/%20/g,' ');
@@ -27,6 +46,7 @@
   if(u.pathname==='/api/patrons'&&method==='GET')return state(s);
   if(u.pathname.startsWith('/api/admin/patrons'))return admin(u.pathname,{...options,body,reference:u.searchParams.get('reference')});
   if(!p?.token)error(401,'Nejdřív se přihlas ke svému účtu.');
+  if(u.pathname==='/api/patrons/thanks/claim'&&method==='POST'){const status=state(s);if(!status.thanksPending)return {ok:true,displayGranted:false,patron:status.patron};s.thanksClaimed[p.id]=new Date(now(s)).toISOString();write(s);return {ok:true,displayGranted:true,patron:true};}
   if(u.pathname==='/api/patrons/intents'&&method==='POST'){
    if(!Number.isInteger(body.amountCzk)||body.amountCzk<1||body.amountCzk>100000||typeof body.requestId!=='string')error(400,'Neplatná částka nebo požadavek.');
    const frequency=body.frequency||'once',firstPaymentDate=body.firstPaymentDate||null;if(!['once','monthly'].includes(frequency)||(frequency==='monthly'&&!/^\d{4}-\d{2}-\d{2}$/.test(firstPaymentDate||''))||(frequency==='once'&&firstPaymentDate))error(400,'Neplatná četnost nebo datum.');let i=s.intents.find(i=>i.playerId===p.id&&i.requestId===body.requestId);if(i&&(i.amountCzk!==body.amountCzk||(i.frequency||'once')!==frequency||(i.firstPaymentDate||null)!==firstPaymentDate))error(409,'Požadavek už patří jiné částce.');
@@ -51,5 +71,11 @@
   }error(404,'Neznámá adminová operace.');
  }
  const nativeFetch=window.fetch.bind(window);window.fetch=async(input,init)=>{const url=new URL(typeof input==='string'?input:input.url,location.href);const response=await nativeFetch(input,init);if(!/rankings|leaderboard/.test(url.pathname)||!response.ok)return response;try{const value=await response.clone().json(),s=read(),status=state(s);const decorate=rows=>rows?.map(r=>({...r,patron:r.isMine===true?status.publicBadge:['review-klara','review-matej','review-2'].includes(r.id)}));if(Array.isArray(value.players))value.players=decorate(value.players);if(Array.isArray(value.rows))value.rows=decorate(value.rows);return new Response(JSON.stringify(value),{status:response.status,headers:{'content-type':'application/json'}});}catch{return response}};
- window.PropletPatronApi={request,admin,read,reset(){write(fresh());document.dispatchEvent(new Event('proplet:patron-updated'));},scenario(value){const s=read();s.scenario=value;write(s);document.dispatchEvent(new Event('proplet:patron-updated'));},advance(days){const s=read();s.offset+=days*86400000;write(s);document.dispatchEvent(new Event('proplet:patron-updated'));}};
+ window.PropletPatronApi={request,admin,read,reset(){write(fresh());document.dispatchEvent(new Event('proplet:patron-updated'));},scenario(value){const s=read(),id=who()?.id;state(s);s.scenario=value;
+   s.firstSeen[id]=now(s)-(value==='first_visit'?0:49*HOUR);delete s.newsReceipts[id];s.completedBoards[id]=historicalBoards(s);
+   if(value==='news_wait')s.newsReceipts[id]=now(s);
+   if(value==='post_news_boards')s.newsReceipts[id]=now(s)-49*HOUR;
+   write(s);document.dispatchEvent(new Event('proplet:patron-updated'));},
+  newsReceipt(){const s=read(),id=who()?.id;state(s);if(s.newsReceipts[id]===undefined)s.newsReceipts[id]=now(s);write(s);document.dispatchEvent(new Event('proplet:patron-updated'));},
+  completeBoard(mode='free'){const s=read(),id=who()?.id;state(s);s.completedBoards[id].push({mode,key:crypto.randomUUID(),at:now(s)+1});write(s);document.dispatchEvent(new Event('proplet:patron-updated'));},advance(days){const s=read();s.offset+=days*86400000;write(s);document.dispatchEvent(new Event('proplet:patron-updated'));}};
 })();
