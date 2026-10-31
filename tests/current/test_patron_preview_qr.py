@@ -1,4 +1,4 @@
-"""Decode actual client SVGs after independent PNG rendering, against server payment_data."""
+"""Independently decode the production server QR and its non-deployed model fixture."""
 import io
 import json
 from pathlib import Path
@@ -27,6 +27,14 @@ class PreviewQr(unittest.TestCase):
                 expected = payment_data(case['intent'])
                 self.assertEqual(payment['iban'], expected['iban'])
                 self.assertEqual(payment['spd'], expected['spd'])
+                # Production QR comes from qrcode's server encoder, not the model's vendor.
+                # Its physical millimetre size needs an explicit DPI in independent resvg.
+                for width in (256, 512):
+                    png = resvg_py.svg_to_bytes(svg_string=expected['qrSvg'], width=width, height=width,
+                                               dpi=96.0, background='#ffffff')
+                    decoded = zxingcpp.read_barcode(Image.open(io.BytesIO(png)).convert('RGB'))
+                    self.assertIsNotNone(decoded, 'production server SVG must independently decode')
+                    self.assertEqual(decoded.text, expected['spd'])
                 root = ElementTree.fromstring(payment['qrSvg'])
                 viewbox = list(map(int, root.attrib['viewBox'].split()))
                 self.assertEqual(viewbox[2], viewbox[3])
@@ -41,7 +49,7 @@ class PreviewQr(unittest.TestCase):
                     quiet = max(1, int(32 * width / viewbox[2]))
                     for bounds in [(0,0,width,quiet),(0,0,quiet,width),(0,width-quiet,width,width),(width-quiet,0,width,width)]:
                         self.assertEqual(image.crop(bounds).getextrema(), ((255,255),)*3)
-        print('PASS: four persisted TEST intents, backend-exact SPAYD, 8 independently decoded PNGs; no client grants')
+        print('PASS: four persisted TEST intents, backend-exact SPAYD, 16 independently decoded production/model PNGs; no client grants')
 
 
 if __name__ == '__main__':

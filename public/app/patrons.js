@@ -33,7 +33,7 @@
 
  }
  function close(){clearQrDownload();if(model.receiptId){void request('/api/patrons/offers/dismiss',{method:'POST',body:JSON.stringify({receiptId:model.receiptId,action:'ignored'})}).catch(()=>{});model.receiptId=null;}const el=$('#patronDialog');if(el?.open)el.close();model.returnFocus?.isConnected&&model.returnFocus.focus({preventScroll:true});}
- function open(step='offer',from=document.activeElement){if(!model.enabled)return;ensure();model.error='';model.returnFocus=from;model.step=step;render();if(!$('#patronDialog').open)$('#patronDialog').showModal();$('#patronTitle')?.focus({preventScroll:true});}
+ function open(step='offer',from=document.activeElement){if(!model.enabled)return;if(step==='offer'&&model.paid){model.requestId=null;model.requestAmount=null;model.intent=null;model.payment=null;}ensure();model.error='';model.returnFocus=from;model.step=step;render();if(!$('#patronDialog').open)$('#patronDialog').showModal();$('#patronTitle')?.focus({preventScroll:true});}
  const recurringWarning=()=>'<aside class="patron-recurring-warning" role="note"><strong>Zkontroluj měsíční opakování</strong><p>Některé banky načtou QR jen jako jednorázovou platbu. Pokud se opakování nenastaví, založ ve své bance trvalý příkaz <b>každý měsíc</b>. Zachovej stejný účet, částku a variabilní symbol.</p></aside>';
  function heading(title,copy){return `<header class="patron-intro">${art}<div><h2 id="patronTitle" tabindex="-1">${title}</h2>${copy?`<p>${copy}</p>`:''}</div></header>`;}
  function render(){

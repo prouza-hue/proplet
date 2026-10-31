@@ -22,6 +22,7 @@ vm.runInNewContext(fs.readFileSync('public/app/patrons.js','utf8'),context);
  assert.equal(nodes.get('#patronDialog').open,true);assert.equal(thanks.eligible(),false);
  assert.match(nodes.get('#patronDialog').innerHTML,/Tvoje potvrzené příspěvky/);assert.match(nodes.get('#patronDialog').innerHTML,/Přispět znovu/);
  assert.equal(calls.filter(p=>p==='/api/patrons/thanks/claim').length,1);
+ window.PropletPatrons.model.requestId='prior-confirmed-intent';window.PropletPatrons.open('offer');assert.equal(window.PropletPatrons.model.requestId,null,'manual support from an existing patron starts a new contribution');
  // Live disable must remove previously rendered support and bank details with no write.
  for(const id of ['patronProfileEntry','patronTodayLink','patronOfferPreference']){const node=element();node.id=id;nodes.set('#'+id,node);}
  window.PropletPatrons.model.intent={id:'bound'};window.PropletPatrons.model.payment={spd:'bound'};
