@@ -103,7 +103,7 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
     def status(request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
         headers(response)
         if not enabled():return {'enabled':False}
-        if not authorization:return {'enabled':True,'authenticated':False,'patron':False,'publicBadge':False,'offersDisabled':True,'canOffer':False}
+        if not authorization:return {'enabled':True,'authenticated':False,'patron':False,'publicBadge':False,'offersDisabled':True,'canOffer':False,'thanksPending':False,'contributions':[]}
         p=auth_player(authorization);enforce_rate_limit(request,'patron_status',limit=120,window_seconds=3600)
         return {'enabled':True,'authenticated':True,'nickname':p.get('name') or 'Hráč',**state(p['id'])}
 
@@ -123,6 +123,11 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
     def preferences(body:PreferenceBody,response:Response,authorization:Optional[str]=Header(default=None)):
         headers(response);p=account(authorization)
         return run('proplet_patron_preferences_v1',{'p_player':p['id'],'p_public':body.publicBadge,'p_disabled':body.offersDisabled})
+
+    @app.post('/api/patrons/thanks/claim')
+    def claim_thanks(response:Response,authorization:Optional[str]=Header(default=None)):
+        headers(response);p=account(authorization)
+        return run('proplet_patron_thanks_claim_v1',{'p_player':p['id']})
 
     @app.post('/api/patrons/offers/claim')
     def claim(request:Request,response:Response,authorization:Optional[str]=Header(default=None)):

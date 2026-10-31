@@ -36,12 +36,19 @@ create table proplet_private.patron_payments(
 create table proplet_private.patron_entitlements(
  player_id uuid primary key references public.players(id),
  first_payment_id uuid not null references proplet_private.patron_payments(id),
- granted_at timestamptz not null default now()
+ granted_at timestamptz not null default now(),
+ thanks_claimed_at timestamptz
 );
 create table proplet_private.patron_preferences(
  player_id uuid primary key references public.players(id),
  public_badge boolean not null default false,
  offers_disabled boolean not null default false
+);
+-- First authenticated visit to the enabled UI, never a shared deployment date.
+-- Immutable per account so reinstalling or switching devices cannot reset it.
+create table proplet_private.patron_first_seen(
+ player_id uuid primary key references public.players(id),
+ first_seen_at timestamptz not null default statement_timestamp()
 );
 create table proplet_private.patron_offer_receipts(
  id uuid primary key default gen_random_uuid(),
@@ -65,13 +72,14 @@ create table proplet_private.patron_audit(
 -- No direct client access. Intents, receipts and audit cannot be updated/deleted
 -- by the application role; corrections require a separately reviewed operation.
 do $$declare t text;begin
- foreach t in array array['patron_intents','patron_payments','patron_entitlements','patron_preferences','patron_offer_receipts','patron_audit'] loop
+ foreach t in array array['patron_intents','patron_payments','patron_entitlements','patron_preferences','patron_offer_receipts','patron_audit','patron_first_seen'] loop
   execute format('alter table proplet_private.%I enable row level security',t);
   execute format('revoke all on proplet_private.%I from public,anon,authenticated,service_role',t);
   execute format('grant select,insert on proplet_private.%I to service_role',t);
  end loop;
 end$$;
 grant update on proplet_private.patron_preferences,proplet_private.patron_offer_receipts to service_role;
+grant update(thanks_claimed_at) on proplet_private.patron_entitlements to service_role;
 grant usage,select on sequence proplet_private.patron_reference_seq,proplet_private.patron_audit_id_seq to service_role;
 
 create function public.proplet_patron_intent_json_v1(p_intent uuid) returns jsonb
@@ -116,33 +124,89 @@ language sql stable security invoker set search_path='' as $$
  else jsonb_build_object('ok',false,'code','not_found') end;
 $$;
 
+-- News and patron claims share the account lock across devices. A newly claimed
+-- news receipt supersedes the fallback clock and resets the two-board gate.
+create function proplet_private.patron_lock_news_receipt_v1() returns trigger
+language plpgsql security invoker set search_path='' as $$
+begin
+ perform 1 from public.players where id=new.player_id for update;
+ return new;
+end;$$;
+revoke all on function proplet_private.patron_lock_news_receipt_v1() from public,anon,authenticated;
+grant execute on function proplet_private.patron_lock_news_receipt_v1() to service_role;
+create trigger patron_serialize_news_receipt before insert on public.release_news_receipts
+ for each row execute function proplet_private.patron_lock_news_receipt_v1();
+
 create function public.proplet_patron_state_v1(p_player uuid,p_claim boolean default false) returns jsonb
 language plpgsql security invoker set search_path='' as $$
 declare p public.players%rowtype;pr proplet_private.patron_preferences%rowtype;
  t timestamptz:=statement_timestamp();is_patron boolean;n integer;last_shown timestamptz;
- boards integer;days integer;eligible boolean;granted boolean:=false;receipt uuid;
+ boards integer;days integer;post_boards integer;eligible boolean;granted boolean:=false;receipt uuid;
+ first_seen timestamptz;news_at timestamptz;anchor_at timestamptz;anchor_source text;wait_reason text;thanks_pending boolean;contributions jsonb;
 begin
  if p_claim is null then raise exception 'invalid claim' using errcode='22023';end if;
  select * into p from public.players where id=p_player for update;
  if not found then return jsonb_build_object('ok',false,'code','not_found');end if;
+ insert into proplet_private.patron_first_seen(player_id,first_seen_at) values(p_player,t)
+  on conflict(player_id) do nothing;
+ select first_seen_at into first_seen from proplet_private.patron_first_seen where player_id=p_player;
+ select claimed_at into news_at from public.release_news_receipts
+  where campaign_id='november-2026-release-v1' and player_id=p_player;
+ anchor_at:=coalesce(news_at,first_seen);
+ anchor_source:=case when news_at is null then 'first_seen' else 'release_news' end;
  select * into pr from proplet_private.patron_preferences where player_id=p_player;
  select exists(select 1 from proplet_private.patron_entitlements where player_id=p_player) into is_patron;
+ select exists(select 1 from proplet_private.patron_entitlements where player_id=p_player and thanks_claimed_at is null) into thanks_pending;
+ select coalesce(jsonb_agg(item order by confirmed_at desc,id desc),'[]'::jsonb) into contributions from (
+  select r.confirmed_at,r.id,jsonb_build_object('id',r.id,'amountCzk',r.amount_czk,'frequency',i.frequency,'confirmedAt',r.confirmed_at) item
+  from proplet_private.patron_payments r join proplet_private.patron_intents i on i.id=r.intent_id
+  where i.player_id=p_player order by r.confirmed_at desc,r.id desc limit 50
+ ) own_payments;
+
  select count(*),max(shown_at) into n,last_shown from proplet_private.patron_offer_receipts where player_id=p_player and shown_at>t-interval '90 days';
  -- Completed boards define active playing days, not passive page opens.
  select count(distinct (mode,challenge_key)),count(distinct active_day) into boards,days from (
   select distinct mode,challenge_key,(completed_at at time zone 'Europe/Prague')::date active_day
   from public.results where player_id=p_player and mode in('daily','daily_special','free','tajenka')
  ) played;
- eligible:=not is_patron and coalesce(p.support_mode,'none')<>'younger' and not coalesce(pr.offers_disabled,false)
-  and boards>=5 and days>=3 and n<2 and (last_shown is null or last_shown<=t-interval '30 days');
+ select count(distinct (mode,challenge_key)) into post_boards from public.results
+  where player_id=p_player and mode in('daily','daily_special','free','tajenka') and completed_at>anchor_at;
+ -- support_mode='younger' is the balanced help preset, not an age signal.
+ wait_reason:=case
+  when is_patron then 'patron'
+  when coalesce(pr.offers_disabled,false) then 'disabled'
+  when t<anchor_at+interval '48 hours' then 'release_wait'
+  when news_at is not null and post_boards<2 then 'post_news_boards'
+  when boards<5 or days<3 then 'playing_history'
+  when n>=2 then 'offer_limit'
+  when last_shown>t-interval '30 days' then 'cooldown'
+  else null end;
+ eligible:=wait_reason is null;
  if p_claim and eligible then
   insert into proplet_private.patron_offer_receipts(player_id,shown_at) values(p_player,t) returning id into receipt;
-  granted:=true;n:=n+1;eligible:=false;
+  granted:=true;n:=n+1;eligible:=false;wait_reason:='cooldown';
  end if;
  return jsonb_build_object('ok',true,'enabled',true,'authenticated',true,'patron',is_patron,
  'publicBadge',is_patron and coalesce(pr.public_badge,false),'offersDisabled',coalesce(pr.offers_disabled,false),
- 'canOffer',eligible,'offerCount90d',n,'displayGranted',granted,'receiptId',receipt);
+ 'canOffer',eligible,'offerCount90d',n,'displayGranted',granted,'receiptId',receipt,
+ 'offerWaitReason',wait_reason,'offerAnchorSource',anchor_source,
+ 'offerAvailableAt',anchor_at+interval '48 hours','postAnchorBoards',post_boards,
+ 'thanksPending',thanks_pending,'contributions',contributions);
 end;$$;
+-- Acknowledgement is account-wide and at most once, independent of public badge.
+create function public.proplet_patron_thanks_claim_v1(p_player uuid) returns jsonb
+language plpgsql security invoker set search_path='' as $$
+declare granted boolean;is_patron boolean;
+begin
+ perform 1 from public.players where id=p_player for update;
+ if not found then return jsonb_build_object('ok',false,'code','not_found');end if;
+ update proplet_private.patron_entitlements set thanks_claimed_at=statement_timestamp()
+  where player_id=p_player and thanks_claimed_at is null;
+ granted:=found;
+ select exists(select 1 from proplet_private.patron_entitlements where player_id=p_player) into is_patron;
+ return jsonb_build_object('ok',true,'displayGranted',granted,'patron',is_patron);
+end;$$;
+
 create function public.proplet_patron_preferences_v1(p_player uuid,p_public boolean,p_disabled boolean) returns jsonb
 language plpgsql security invoker set search_path='' as $$
 begin
