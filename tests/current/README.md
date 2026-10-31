@@ -78,3 +78,11 @@ Retired scenarios (2026-10-31):
   collection disclosures first; the removed Today rank hero is no longer a target.
   Referral reward dismissal/eligibility is tested in Profile and invitation signup
   through the visible Today notice, preserving the actual API and invite-code checks.
+
+- Historical signature-error replays and an injected obsolete HomeLayout were retired
+  from the module browser suite. Current HomeLayout resume and all four input
+  outcomes remain; module recovery uses the current module with a single malformed
+  export. The real 4.09.9 service-worker upgrade still checks exact account,
+  completed-result and in-progress preservation on desktop, mobile and Fold.
+  Focused `test_module_contracts.cjs`, `test_first_input_diagnostics.cjs` and
+  `test_automatic_updates.js` retain contract/recovery/error handling coverage.
