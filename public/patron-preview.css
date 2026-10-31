@@ -135,3 +135,7 @@ html.tiskarna-ui body #patronProfileEntry{display:flex;align-items:center;gap:16
 #patronDialog .patron-perk p{font-size:13px;margin-top:4px}
 #patronDialog .patron-perk strong{font-size:19px}
 #patronDialog .patron-mini-person{gap:6px}
+
+#patronDialog .patron-recurring-warning{margin:16px 0 20px;padding:14px 16px;border-left:4px solid #b47829;border-radius:0 10px 10px 0;background:color-mix(in srgb,#d69a32 13%,var(--td-paper));color:var(--td-ink)}
+#patronDialog .patron-recurring-warning strong{display:block;font:650 16px/1.35 Outfit,sans-serif;color:inherit}
+#patronDialog .patron-recurring-warning p{margin:6px 0 0;font:400 14px/1.5 Outfit,sans-serif;color:inherit}
