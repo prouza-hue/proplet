@@ -37,6 +37,7 @@ def rpc(name, body):
 with patch.object(server, "enforce_rate_limit"), \
      patch.object(server, "auth_player", return_value=player), \
      patch.object(server, "db_rpc", side_effect=rpc), \
+     patch.object(server, "db_select", return_value=[]), \
      patch.object(server, "load_puzzles", return_value={
          "freeGeneration": 4,
          "release": {"baselineLevelCounts": {"easy": 200, "hardcore": 200}},
@@ -48,7 +49,7 @@ with patch.object(server, "enforce_rate_limit"), \
 
 assert response.status_code == 200, response.text
 payload = response.json()
-assert payload["completed"] == snapshot["completed"]
+assert payload["completed"] == [{**row, "wordDiscoveryXpAwarded": 0} for row in snapshot["completed"]]
 assert payload["cursor"] == snapshot["cursor"]
 assert payload["stats"]["earnedBadges"][-1]["days"] == 3
 assert payload["stats"]["nextBadge"]["days"] == 3
