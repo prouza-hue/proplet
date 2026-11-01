@@ -63,13 +63,15 @@
     (model.contributions.length?'<details class="patron-history"><summary>Tvoje potvrzené příspěvky</summary><ul>'+model.contributions.map(p=>'<li><span>'+esc(paidDate(p.confirmedAt))+' · '+(p.frequency==='monthly'?'Měsíční převod':'Jednorázově')+'</span><strong>'+esc(money(p.amountCzk))+'</strong></li>').join('')+'</ul><p>Posledních nejvýše 50 ověřených převodů. Platby čekající na ověření tu ještě nejsou.</p></details>':'')+
     '<p class="patron-qr-hint">Případný trvalý příkaz můžeš změnit nebo zastavit ve své bance. Značka ti zůstává jako poděkování.</p><button class="secondary-btn patron-primary" data-contribute-again>Přispět znovu</button><button class="primary-btn patron-primary" data-close>Zpátky do hry</button>';
   }else{
-   content=heading(esc(model.personName||'Tenhle hráč')+' podporuje Proplet.','Příspěvek pomáhá s provozem a další péčí o hru. Tohle je naše poděkování.')+
-    '<div class="patron-own-badge"><span class="patron-avatar-demo"><img src="'+esc(model.personArt||'/assets/avatars/v3/05-jelen.svg')+'" width="56" height="56" alt=""><i>'+heart+'</i></span><div><strong>'+esc(model.personName||'Podporovatel')+'</strong><span class="patron-label-static">'+heart+' Podporovatel</span></div></div><p class="patron-fair">Stejná značka pro každou částku. Herní výhody si za ni nekoupíš.</p>'+
-    '<button class="primary-btn patron-primary" data-support>Chci také podpořit Proplet <span aria-hidden="true">→</span></button><button class="text-btn patron-dismiss" data-close>Zpátky do hry</button>';
+   const avatar=model.personAvatarNodes?.length?'<span class="patron-person-avatar"></span>':model.personAvatar?'<span class="patron-avatar-native" data-player-avatar="'+esc(model.personAvatar)+'">'+esc(model.personAvatar)+'</span>':model.personArt?'<img src="'+esc(model.personArt)+'" width="56" height="56" alt="">':'<span class="patron-avatar-native" data-player-avatar="🙂">🙂</span>';
+   content='<header class="patron-person-intro"><span class="patron-avatar-demo">'+avatar+'<i>'+heart+'</i></span><div><h2 id="patronTitle" tabindex="-1">'+esc(model.personName||'Podporovatel')+'</h2><span class="patron-label-static">'+heart+' Podporovatel</span></div></header><p class="patron-person-copy">Podporuje provoz a další rozvoj Propletu. Podpoř Proplet a získej vlastní značku podporovatele.</p>'+
+    '<button class="primary-btn patron-primary" data-support>Podpořit Proplet <span aria-hidden="true">→</span></button><button class="text-btn patron-dismiss" data-close>Zpátky do hry</button>';
   }
+  dialog.setAttribute('data-patron-step',model.step);
   dialog.innerHTML='<button class="patron-close" aria-label="Zavřít podporu">×</button>'+content+(model.error?'<p class="patron-error" role="alert">'+esc(model.error)+'</p>':'');
+  const personAvatar=dialog.querySelector('.patron-person-avatar');if(model.step==='other'&&personAvatar&&model.personAvatarNodes?.length)personAvatar.append(...model.personAvatarNodes.map(node=>node.cloneNode(true)));
   dialog.querySelector('.patron-close').onclick=close;dialog.querySelectorAll('[data-close]').forEach(b=>b.onclick=close);
-  dialog.querySelector('[data-back]')?.addEventListener('click',()=>{model.step='offer';render();$('#patronTitle')?.focus({preventScroll:true})});dialog.querySelector('[data-support]')?.addEventListener('click',()=>{model.step='offer';render();$('#patronTitle')?.focus({preventScroll:true})});
+  dialog.querySelector('[data-back]')?.addEventListener('click',()=>{model.step='offer';render();$('#patronTitle')?.focus({preventScroll:true})});dialog.querySelector('[data-support]')?.addEventListener('click',()=>open('offer',model.returnFocus));
   const form=$('#patronForm');if(form){
    form.addEventListener('change',e=>{if(e.target.name==='frequency'){model.frequency=e.target.value;render();document.querySelector('#patronForm input[name=frequency]:checked')?.focus();return;}if(e.target.name==='firstPaymentDate'){model.firstPaymentDate=e.target.value;return;}if(e.target.name==='amount'){model.selected=e.target.value;if(model.selected!=='custom')model.amount=Number(model.selected);render();if(model.selected==='custom')$('#patronCustom').focus();else document.querySelector('#patronForm input:checked')?.focus()}});
    $('#patronCustom').addEventListener('input',e=>{const n=Number(e.target.value);model.amount=n;form.querySelector('button[type=submit]').textContent=Number.isInteger(n)&&n>0?(model.frequency==='monthly'?'Měsíčně ':'Jednorázově ')+money(n)+' · QR →':'Zadej částku';});
@@ -81,11 +83,22 @@
   dialog.querySelector('[data-copy]')?.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(model.payment.spd);$('#patronCopyStatus').textContent='Zkopírovány přesné platební údaje z QR (SPAYD).';}catch{$('#patronCopyStatus').textContent='Kopírování není dostupné. Údaje jsou uvedené nad QR.';}});
 
  }
+ function personName(row,name){return row.classList.contains('me')?profile()?.name||'Podporovatel':name.textContent.replace(/\s*Ty\s*$/,'').trim()||'Podporovatel';}
+ function showPerson(row,name,from){if(!model.enabled||!row.classList.contains('patron-supported'))return;model.personName=personName(row,name);model.personAvatarNodes=Array.from(row.querySelector('.result-player-avatar')?.childNodes||[],node=>node.cloneNode(true));model.personAvatar=row.querySelector('.result-player-avatar')?.dataset.playerAvatar||null;model.personArt=row.querySelector('.result-player-avatar img,.leader-name img')?.getAttribute('src');open('other',from);}
+ function resultAvatarControl(avatar,supported){
+  if(!avatar)return null;const wasButton=avatar.tagName==='BUTTON';if(wasButton===supported)return avatar;
+  const next=document.createElement(supported?'button':'span');next.className=avatar.className.replace(/\s*patron-avatar-info/g,'');next.dataset.playerAvatar=avatar.dataset.playerAvatar||'';
+  if(avatar.dataset.organicAvatarKey)next.dataset.organicAvatarKey=avatar.dataset.organicAvatarKey;
+  next.append(...avatar.childNodes);avatar.replaceWith(next);
+  if(supported){next.type='button';next.classList.add('patron-avatar-info');}
+  return next;
+ }
  function decorate(){
   if(!model.enabled){
    model.receiptId=null;close();model.thanksPending=false;model.contributions=[];model.intent=null;model.payment=null;model.pending=false;model.requestId=null;model.requestAmount=null;
    for(const node of document.querySelectorAll('#patronProfileEntry,#patronTodayLink,#patronOfferPreference,#patronOffer,.patron-label'))node.remove();
    for(const row of document.querySelectorAll('.patron-supported'))row.classList.remove('patron-supported');
+   for(const avatar of document.querySelectorAll('.result-player-avatar.patron-avatar-info'))resultAvatarControl(avatar,false);
    return;
   }
   const card=$('#profileCard');if(card&&!$('#patronProfileEntry')){const entry=document.createElement('button');entry.type='button';entry.id='patronProfileEntry';entry.className='patron-profile-entry';card.after(entry);}
@@ -99,8 +112,9 @@
    const name=row.querySelector('.leader-name strong,.result-player-copy strong,.leader-name');if(!name)continue;
    const mine=row.classList.contains('me'),supported=mine?model.paid&&model.public:row.dataset.patron==='true';
    const copy=row.querySelector('.result-player-copy,.leader-name')||name.parentElement;
-   const badge=row.querySelector('.patron-label');if(supported&&!badge){const holder=document.createElement('span');holder.innerHTML=seal();const button=holder.firstElementChild;button.onclick=e=>{e.stopPropagation();model.personName=name.textContent.replace(/\s*Ty\s*$/,'').trim();model.personArt=row.querySelector('.result-player-avatar img,.leader-name img')?.getAttribute('src');open(mine?'thanks':'other',button)};copy.append(button);}else if(!supported&&badge)badge.remove();
+   const badge=row.querySelector('.patron-label');if(supported&&!badge){const holder=document.createElement('span');holder.innerHTML=seal();const button=holder.firstElementChild;button.onclick=e=>{e.stopPropagation();if(mine)open('thanks',button);else showPerson(row,name,button)};copy.append(button);}else if(!supported&&badge)badge.remove();
    row.classList.toggle('patron-supported',supported);
+   if(row.classList.contains('result-player-row')){const avatar=resultAvatarControl(row.querySelector('.result-player-avatar'),supported);if(supported&&avatar){avatar.setAttribute('aria-label','Podporovatel '+personName(row,name)+' — o podpoře Propletu');avatar.setAttribute('aria-haspopup','dialog');avatar.onclick=e=>{e.stopPropagation();showPerson(row,name,avatar)};}}
   }
  }
  let raf=0;const schedule=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;decorate()})};

@@ -705,6 +705,22 @@
       ]
     },
     {
+      "id": "20261101-patron-manual-badge",
+      "order": 620,
+      "version": "2026.11.01",
+      "path": "supabase/migrations/20261101022415_patron_manual_badge.sql",
+      "type": "migration",
+      "status": "prepared-no-grant-seeded",
+      "sha256": "d7d0f2926cd3a7f04821ed85303881f13abf7c29eb58ea81fc3b3fa558a40861",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_patron_state_v1",
+        "public.proplet_patron_thanks_claim_v1",
+        "public.proplet_patron_preferences_v1",
+        "public.proplet_patron_public_ids_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

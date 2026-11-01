@@ -138,3 +138,10 @@ html.tiskarna-ui body #patronProfileEntry{display:flex;align-items:center;gap:16
 .patron-history ul{list-style:none;margin:12px 0;padding:0}
 .patron-history li{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:8px 0;font-size:14px}
 #patronDialog .patron-history p{font-size:12px}
+
+/* A public support signature opens the same native dialog from result avatars. */
+.result-player-avatar.patron-avatar-info{padding:0!important;min-height:0!important;border:0!important;background:transparent!important;border-radius:50%;font:inherit;cursor:pointer;box-shadow:none!important}.result-player-avatar.patron-avatar-info:focus-visible{outline:3px solid var(--td-blue,#315da8)!important;outline-offset:4px!important}
+#patronDialog[data-patron-step=other]{width:min(430px,calc(100% - 24px));padding:28px 26px 22px}#patronDialog .patron-person-intro{display:grid;grid-template-columns:64px minmax(0,1fr);gap:18px;align-items:center;margin:14px 0 24px}#patronDialog .patron-person-intro h2{font-size:29px;margin:0 0 7px;overflow-wrap:anywhere;text-wrap:pretty}#patronDialog .patron-person-copy{font-size:16px;margin-bottom:24px}
+@media(max-width:359px){#patronDialog[data-patron-step=other]{padding:25px 20px 18px}#patronDialog .patron-person-intro{gap:12px}#patronDialog .patron-person-intro h2{font-size:25px}#patronDialog .patron-person-copy{font-size:15px}}
+
+.patron-person-avatar,.patron-person-avatar .organic-avatar{display:block!important;width:56px!important;height:56px!important}.patron-person-avatar>img{display:block;width:56px;height:56px;border-radius:50%}

@@ -1,5 +1,6 @@
 """Release deployment cannot accidentally publish the isolated payment demo."""
 import json
+import re
 from pathlib import Path
 from tools.release_contract import assert_release_contract
 
@@ -18,8 +19,9 @@ assert_release_contract(ROOT)
 index = (ROOT / 'public/index.html').read_text()
 shell = (ROOT / 'public/sw.js').read_text()
 offline = json.loads((ROOT / 'public/offline-assets.json').read_text())['assets']
-for path in ('/app/patrons.js?v=patron-release1', '/patrons.css?v=patron-release1'):
-    assert path in index and path in shell and path in offline
+for asset in ('/app/patrons.js', '/patrons.css'):
+    path = re.search(re.escape(asset) + r"\?v=[^\s\"'<>]+", index).group(0)
+    assert path in shell and path in offline, f'Patron asset cache mismatch: {path}'
 client = (ROOT / 'public/app/patrons.js').read_text()
 assert 'PROPLET_PATRON_PREVIEW' not in client and 'PropletPatronApi' not in client
 assert 'TEST-NEODESILAT' not in client

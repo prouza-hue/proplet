@@ -1,0 +1,13 @@
+# Non-monetary owner supporter badge — 2026-11-01
+
+Prepared from production main f7f10bb / 4.10.3. The user explicitly requested a visible supporter badge on their own Pavel account. Read-only production verification matched the UUID already bound by owner authentication, active owner admin grant and public rankings. There was no supporter entitlement or public badge. Confirmed bank payments, CZK totals and financial audit rows were all zero.
+
+Existing patron status required patron_entitlements.first_payment_id, a non-null bank-payment foreign key. Existing audit accepted only bank_payment_confirmed. There was no legitimate manual-grant path. No payment confirmation, bank transaction, intent or financial entitlement was fabricated.
+
+The forward migration adds one private append-only patron_manual_badge_events table. Service-role callers may read its audit, but cannot insert, update or delete it. The service-only proplet_patron_owner_badge_v1 RPC requires the existing exact owner UUID, an active owner admin role, self-targeting, a mandatory reason and an idempotency UUID. It supports grant/revoke, defaults private and requires explicit public opt-in. The immutable receipt labels source owner_promotional_badge and paymentCreated=false. Replaying an old grant after a later revoke returns its original receipt without reactivating it. The migration itself grants no account badge.
+
+Effective supporter status is a real bank entitlement OR the latest manual grant event. Status, preferences, thanks status and bounded public ranking decoration use that effective status. Financial contribution history remains unchanged; a manual badge produces no contribution record or bank thanks claim. Revoking the manual source never removes a real bank entitlement. Existing ranking privacy still suppresses a public decoration for nonpublic accounts.
+
+The isolated native patron suite runs unchanged bank/QR/HTTP behavior plus manual grant/default privacy/explicit opt-in/UUID authority/inactive owner/revoke/idempotency/six concurrent retries/immutable ACL and injected audit-failure rollback. It asserts financial counts and totals and gameplay XP remain unchanged. Run tools/test_patrons_db.py --minimal --password-file <loopback-password-file>. The existing full SQL CI also calls this test through its canonical fresh database.
+
+Any production application and owner activation are separate from this preparation. Use one service-only RPC with a durable request UUID, exact owner identity, a transparent non-monetary promotional reason and p_public=true. Record financial counts before/after and audit receipt. No bank action is authorized or implied by this path.
