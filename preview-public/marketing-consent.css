@@ -1,0 +1,12 @@
+.marketing-consent{position:fixed;z-index:400;bottom:max(12px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);box-sizing:border-box;width:max-content;max-width:calc(100% - 24px);display:flex;align-items:center;gap:18px;border:1px solid #c8c4bc;border-radius:14px;padding:12px 16px;background:#fdfbf7;color:#26372f;font:15px/1.4 system-ui,sans-serif;box-shadow:0 3px 18px #0002}
+.marketing-consent[hidden]{display:none}
+.marketing-consent p{font:inherit;margin:0;max-width:420px}
+.marketing-consent a{color:inherit;text-decoration:underline;white-space:nowrap}
+.marketing-consent-actions{display:flex;gap:8px;flex-shrink:0}
+.marketing-consent-actions button{min-height:44px;padding:8px 14px;border:1px solid #738475;border-radius:9px;background:transparent;color:inherit;font:600 15px/1.4 system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+.marketing-consent-actions button:hover{background:#e6ede5}
+.marketing-consent :focus-visible{outline:3px solid #365baf;outline-offset:3px}
+.legal-card [data-marketing-settings]{font:600 16px/1.5 system-ui,sans-serif;min-height:48px;padding:10px 16px;cursor:pointer}
+@media(max-width:600px){.marketing-consent{width:calc(100% - 24px);flex-wrap:wrap;gap:8px;padding:12px}.marketing-consent-actions{margin-left:auto}.marketing-consent-actions button{min-width:90px}}
+html[data-theme="dark"] .marketing-consent{background:#203029;color:#f2f4ed;border-color:#718679}
+html[data-theme="dark"] .marketing-consent-actions button:hover{background:#344c3d}

@@ -1,0 +1,44 @@
+/* The optional challenge shares the existing Daily heading, metadata and CTA.
+   Its controls add no row, card, vertical padding or height to the hero. */
+.daily-title-choice-row{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-width:0}
+.daily-title-choice-row>h1{min-width:0;white-space:nowrap}
+.daily-base-title{display:block;border:0;padding:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:left;cursor:pointer;border-radius:4px}
+html.tiskarna-ui body #screen-daily .daily-hero .daily-title-choice-row .daily-base-title{font:inherit!important;line-height:inherit!important;letter-spacing:inherit!important}
+.daily-base-title:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+.daily-challenge-switch{flex:none;position:relative;align-self:center;margin:0}
+.daily-challenge-switch button{display:inline-flex;align-items:center;gap:5px;height:30px;min-height:0;padding:0 8px;border:1px solid #FFF8E9;border-radius:999px;background:#FFF8E9;color:#214FAE;font-family:inherit;font-size:15px;line-height:1;font-weight:650;position:relative;cursor:pointer;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.daily-challenge-switch button:before{content:"";position:absolute;inset:-7px -2px;border-radius:inherit}
+.daily-challenge-switch button:hover{background:#fff;border-color:#fff}
+.daily-challenge-switch button:focus-visible{outline:2px solid #FFF8E9;outline-offset:3px}
+.daily-challenge-switch button[aria-pressed="true"]{background:#FFF8E9;color:#214FAE;border-color:#FFF8E9;box-shadow:inset 0 0 0 2px #214FAE,0 2px 0 rgba(0,0,0,.12)}
+.daily-challenge-switch img{display:block;width:24px;height:24px;object-fit:contain;pointer-events:none}
+#dailySpecialTabStatus:empty{display:none}
+#dailySpecialTabStatus{font-size:14px;line-height:1;font-weight:700}
+.daily-special-selected .daily-base-title{opacity:.78}
+#screen-daily .daily-hero #playDailyBtn.daily-special-action{display:flex;flex-direction:column;justify-content:center;gap:0;padding-top:3px!important;padding-bottom:3px!important}
+#playDailyBtn.daily-special-action>span{font-size:inherit;line-height:1.25}
+#playDailyBtn.daily-special-action>small{font-family:inherit;font-size:15px;line-height:1.25;font-weight:400;opacity:.83}
+.daily-week-day.has-daily-special{position:relative;cursor:pointer}
+.daily-week-special-mark{display:block;position:absolute;right:2px;bottom:2px;width:14px;height:14px;object-fit:contain;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2));pointer-events:none}
+.daily-week-day.has-daily-special:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.daily-week-dialog-list{display:grid;gap:6px;margin:18px 0}
+.daily-week-dialog-day{display:grid;grid-template-columns:40px minmax(0,.9fr) minmax(0,1.1fr);align-items:center;gap:8px;padding:9px 10px;border-radius:8px;border:1px solid var(--line);font-size:15px;line-height:1.35}
+.daily-week-dialog-day.today{background:color-mix(in srgb,#214FAE 8%,var(--paper));border-color:color-mix(in srgb,#214FAE 35%,var(--line))}
+.daily-week-dialog-day>span{display:flex;align-items:center;gap:5px;min-width:0}
+.daily-week-dialog-day img{width:24px;height:24px;object-fit:contain;flex:none}
+.daily-week-dialog-day .daily-week-none{color:var(--muted)}
+.daily-week-dialog-copy{font-size:15px;line-height:1.4;margin:12px 0}
+.daily-week-dialog .modal-card>h2{margin:0;font-size:27px}
+.daily-week-dialog .modal-card>.primary-btn{width:100%;margin-top:10px}
+.daily-extra-intro .modal-card{position:relative;width:min(420px,calc(100vw - 32px));padding:28px 24px 20px;text-align:center}
+.daily-extra-intro-art{display:flex;align-items:center;justify-content:center;gap:15px;margin:0 0 16px}
+.daily-extra-intro-art img{display:block;width:52px;height:52px;object-fit:contain}
+.daily-extra-intro .modal-card>h2{margin:0 0 12px;font-size:29px;line-height:1.15}
+.daily-extra-intro .modal-card>p{margin:0 0 12px;font-size:16px;line-height:1.45}
+.daily-extra-intro .modal-card>.primary-btn{width:100%;margin-top:6px}
+.daily-extra-intro .modal-card>.text-btn{margin:8px 0 0;min-height:38px;font-size:15px;line-height:1.4}
+.daily-extra-intro .modal-close{position:absolute;top:9px;right:9px;width:34px;height:34px;min-height:0;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);cursor:pointer;font-size:26px;line-height:1}
+.daily-extra-intro .modal-close:hover{background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.daily-extra-intro button:focus-visible{outline:2px solid #214FAE;outline-offset:3px}
+@media(max-width:350px){.daily-challenge-switch button{padding:0 6px;gap:3px}.daily-challenge-switch img{width:21px;height:21px}.daily-title-choice-row{gap:5px}html.tiskarna-ui body #screen-daily.home-layout-active .daily-hero .hero-main .daily-title-choice-row>h1:first-child{font-size:26px!important}.daily-week-dialog-day{grid-template-columns:28px minmax(0,.9fr) minmax(0,1.1fr);gap:4px;padding:8px 6px}}
+@media(max-width:384px){.daily-week-dialog-day>span:last-child img{display:none}}

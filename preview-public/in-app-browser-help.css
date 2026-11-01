@@ -1,0 +1,11 @@
+/* Optional instructions belong to the Google action, never the first screen. */
+.in-app-browser-help{margin:6px 0 0;text-align:left;color:var(--ink);font-size:13px;line-height:1.45}
+.in-app-browser-help>summary{min-height:44px;display:list-item;box-sizing:border-box;padding:12px 4px;cursor:pointer;font-weight:650;color:var(--purple)}
+.in-app-browser-help>summary:focus-visible{outline:3px solid var(--purple);outline-offset:2px;border-radius:4px}
+.in-app-browser-help-body{padding:0 10px 10px;border-bottom:1px solid var(--line)}
+.in-app-browser-help-body p{margin:0 0 10px;font-size:13px;line-height:1.45}
+.in-app-browser-help-body ol{margin:0 0 12px;padding-left:21px}
+.in-app-browser-help-body li+li{margin-top:6px}
+.in-app-browser-help-body .in-app-browser-progress-note{margin:0;color:var(--muted)}
+.account-hub-row>.in-app-browser-help{grid-column:1/-1;min-width:0}
+html[data-theme="dark"] .in-app-browser-help>summary{color:#c7bfff}

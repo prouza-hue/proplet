@@ -1,0 +1,17 @@
+{
+  "version": "bonus-cs-v1",
+  "format": "PRLX0001",
+  "license": "GPL-2.0",
+  "sourceCommit": "b3a1c0be50d1ad0b404070124463fb4af90bbe39",
+  "minimumLength": 4,
+  "maximumLength": 24,
+  "alphabet": "aábcčdďeéěfghiíjklmnňoópqrřsštťuúůvwxyýzž",
+  "sourceEntries": 261167,
+  "includedLowercaseRoots": 155186,
+  "forbiddenForms": 9,
+  "nodes": 102665,
+  "edges": 303769,
+  "words": 3264888,
+  "bytes": 1625850,
+  "sha256": "e324313ffa462b10f19e77757bf5e5517bba5d9a888ec71fb8929c00055af5f1"
+}

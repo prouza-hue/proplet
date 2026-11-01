@@ -1,0 +1,58 @@
+/* Same paper, ink, soft light and tactile button as the Refresh 300 invitation. */
+[data-achievement-detail]{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+[data-achievement-detail]:focus-visible{outline:3px solid #246b54!important;outline-offset:3px}
+#screen-profile .achievement-peek[data-achievement-detail]{min-width:44px;min-height:44px;display:inline-grid;place-items:center}
+#achievementDetail{box-sizing:border-box;width:min(460px,calc(100% - 32px));max-width:460px;max-height:calc(100dvh - 32px);margin:auto;padding:0;border:1px solid #a5b5a0;border-radius:24px;background:radial-gradient(ellipse at 15% 0%,#dcecd0 0,transparent 58%),radial-gradient(ellipse at 100% 5%,#f7e8bb 0,transparent 55%),#fff9ee;color:#243b31;box-shadow:0 6px 0 #69816a,0 26px 65px #071d304a;overflow-y:auto;overscroll-behavior:contain;text-align:center}
+#achievementDetail:not([open]){display:none}
+#achievementDetail::backdrop{background:rgba(15,31,29,.6);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+#achievementDetail .achievement-detail-card{position:relative;padding:38px 28px 24px}
+#achievementDetail .achievement-detail-x{position:absolute;right:10px;top:10px;width:44px;height:44px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:#fffaf17d;color:#42624f;cursor:pointer}
+#achievementDetail .achievement-detail-x svg{width:20px;height:20px}
+#achievementDetailArt{display:grid;place-items:center;min-height:176px;margin:0 auto 10px;font-size:100px}
+html #achievementDetail #achievementDetailArt .ribbon-art{width:176px;height:176px;filter:none;opacity:1}
+#achievementDetail h2{font-family:Fraunces,Georgia,serif!important;font-size:clamp(27px,5.6vw,36px)!important;font-weight:750!important;line-height:1.1!important;letter-spacing:-.8px!important;margin:0 0 14px!important;color:#254535!important;text-wrap:balance}
+#achievementDetailStory{font:400 17px/1.5 Outfit,system-ui,sans-serif;margin:0 auto 22px;color:#4c6256;max-width:32ch;text-wrap:pretty}
+#achievementDetail .achievement-detail-progress{padding:14px 16px;margin-bottom:20px;border:1px solid #c6d3bf;border-radius:13px;background:#ffffff70}
+#achievementDetailCondition{font:500 14px/1.4 Outfit,system-ui,sans-serif;margin:0 0 9px;color:#4c6256}
+#achievementDetail progress{display:block;width:100%;height:6px;border:0;border-radius:8px;overflow:hidden;appearance:none;background:#dce5d6}
+#achievementDetail progress[hidden]{display:none}
+#achievementDetail progress::-webkit-progress-bar{background:#dce5d6;border-radius:8px}
+#achievementDetail progress::-webkit-progress-value{background:#568267;border-radius:8px}
+#achievementDetail progress::-moz-progress-bar{background:#568267;border-radius:8px}
+#achievementDetailStatus{font:600 13px/1.4 Outfit,system-ui,sans-serif;margin:8px 0 0;color:#466553}
+#achievementDetail .achievement-detail-done{display:block;width:100%;min-height:52px;padding:12px 16px;border:1px solid #154d40;border-radius:12px;background:#246b54;color:#fffaf0;box-shadow:0 4px 0 #154d40;font:650 17px/1.3 Outfit,system-ui,sans-serif;cursor:pointer}
+#achievementDetail .achievement-detail-done:hover{background:#1d604a}
+#achievementDetail button:focus-visible{outline:3px solid #3b7055;outline-offset:4px}
+html[data-theme=dark] #achievementDetail{background:radial-gradient(ellipse at 20% 0%,#375947,transparent 60%),#23362e;border-color:#75866b;box-shadow:0 6px 0 #14281f,0 26px 65px #0008}
+html[data-theme=dark] #achievementDetail h2{color:#f9f1d6!important}
+html[data-theme=dark] #achievementDetail :is(#achievementDetailStory,#achievementDetailCondition,#achievementDetailStatus){color:#d0dbc8}
+html[data-theme=dark] #achievementDetail .achievement-detail-progress{background:#ffffff08;border-color:#637763}
+html[data-theme=dark] #achievementDetail .achievement-detail-x{background:#ffffff12;color:#e3ead5}
+html[data-theme=dark] #achievementDetail button:focus-visible,html[data-theme=dark] [data-achievement-detail]:focus-visible{outline-color:#b5d5ac!important}
+@media(max-width:380px),(max-height:700px){
+ #achievementDetail .achievement-detail-card{padding:34px 20px 18px}
+ #achievementDetailArt{min-height:130px;margin-bottom:6px}
+ html #achievementDetail #achievementDetailArt .ribbon-art{width:130px;height:130px}
+ #achievementDetail h2{font-size:28px!important;margin-bottom:10px!important}
+ #achievementDetailStory{font-size:15px;margin-bottom:16px}
+ #achievementDetail .achievement-detail-progress{padding:10px 12px;margin-bottom:14px}
+}
+
+/* Loyalty shares the achievement title and story typography. */
+[data-streak-detail]{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+[data-streak-detail]:focus-visible{outline:3px solid #246b54!important;outline-offset:3px}
+#achievementDetail[data-loyalty="true"] .achievement-detail-progress{display:none}
+#achievementDetail[data-loyalty="true"] #achievementDetailArt{margin:8px auto 10px;min-height:0}
+html #achievementDetail[data-loyalty="true"] #achievementDetailArt .ribbon-art{width:min(240px,60vw);height:min(240px,60vw)}
+html[data-theme=dark] [data-streak-detail]:focus-visible{outline-color:#b5d5ac!important}
+
+
+/* Rank entry points retain their existing layout and share the reward dialog. */
+[data-rank-detail]{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+[data-rank-detail]:focus-visible{outline:3px solid #246b54!important;outline-offset:3px}
+html[data-theme=dark] [data-rank-detail]:focus-visible{outline-color:#b5d5ac!important}
+#achievementDetail .rank-detail-navigation{display:flex;align-items:center;justify-content:space-between;gap:5px;margin:16px -8px -6px;font:400 12px/1.4 Outfit,system-ui,sans-serif;color:#4c6256}
+#achievementDetail .rank-detail-navigation[hidden]{display:none}
+#achievementDetail .rank-detail-navigation button{min-height:44px;padding:8px;background:transparent;border:0;border-radius:8px;color:#365b46;font:500 13px/1.4 Outfit,system-ui,sans-serif;cursor:pointer}
+#achievementDetail .rank-detail-navigation button:disabled{opacity:.35;cursor:default}
+html[data-theme=dark] #achievementDetail .rank-detail-navigation,html[data-theme=dark] #achievementDetail .rank-detail-navigation button{color:#d0dbc8}

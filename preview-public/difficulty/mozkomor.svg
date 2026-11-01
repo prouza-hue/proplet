@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Mozkomor</title>
+  <defs>
+    <radialGradient id="void" cx="50%" cy="46%" r="58%">
+      <stop offset="0" stop-color="#7d6fe7"/>
+      <stop offset=".55" stop-color="#5143a8"/>
+      <stop offset="1" stop-color="#282342"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="12" y1="52" x2="51" y2="11" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6456c8"/>
+      <stop offset="1" stop-color="#b28cff"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 5.8c14.7 0 25.7 10.9 25.7 25.5 0 15.5-10.9 27-25.7 27S6.3 46.8 6.3 31.3C6.3 16.7 17.3 5.8 32 5.8Z" fill="url(#void)" stroke="#29284a" stroke-width="4"/>
+  <path d="M18 19.2c5.2-5.2 13.6-7 20.4-4.1 7.3 3.1 11.7 10.2 10.6 17.4-1.2 8.2-8.4 13.9-16.3 13-6.8-.8-11.9-6.4-11.5-12.7.3-5.3 4.8-9.5 9.9-9.5 4.4 0 7.9 3.5 7.9 7.7 0 3.5-2.8 6.4-6.2 6.4-2.7 0-4.9-2.1-4.9-4.7 0-1.9 1.5-3.5 3.4-3.5" fill="none" stroke="url(#rim)" stroke-width="4.2" stroke-linecap="round"/>
+  <circle cx="31.5" cy="32.3" r="3.3" fill="#fffefd"/>
+  <path d="M16.2 47.5c5 4.5 10.2 6.4 15.8 6.4 6 0 11.2-2 15.7-6.1" fill="none" stroke="#b9a8ff" stroke-width="2.6" stroke-linecap="round" opacity=".8"/>
+  <path d="M15.7 13.7 20 18m28.3-4.3L44 18" stroke="#29284a" stroke-width="3" stroke-linecap="round"/>
+</svg>

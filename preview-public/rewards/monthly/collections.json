@@ -1,0 +1,71 @@
+{
+  "revision": "monthly-quotes-approved-20261029",
+  "source": {
+    "commit": "edca88a6a201890d31c779f0be824288809fc3aa",
+    "branch": "preview/monthly-competition-20261014",
+    "deployment": "dpl_8Cyyh1FVERiL2qPxBZinhJtsQFEW",
+    "chatId": "6ace7db0-b2c8-83ed-bd7f-4a4f19714eb9"
+  },
+  "collections": {
+    "2026-11": {
+      "label": "Listopad 2026",
+      "edition": "XI · 2026",
+      "awards": [
+        {
+          "rank": 1,
+          "role": "king",
+          "title": "Král listopadu",
+          "quote": "K čemu že máte ty špejle? Postavičky jdete dělat? Krále nechte na pokoji!",
+          "asset": "/rewards/monthly/2026-11/king-v1.webp",
+          "character": "Kaštanový král se zlatou korunou"
+        },
+        {
+          "rank": 2,
+          "role": "knight",
+          "title": "Rytíř listopadu",
+          "quote": "To brnění je moc pěkné, ale mohlo být nepromokavé.",
+          "asset": "/rewards/monthly/2026-11/knight-v1.webp",
+          "character": "Stříbrný rytíř s chocholem z dubového listí"
+        },
+        {
+          "rank": 3,
+          "role": "prince",
+          "title": "Kníže listopadu",
+          "quote": "Veverka že mě sháněla? Řekněte jí, že jsem na dovolené.",
+          "asset": "/rewards/monthly/2026-11/prince-v1.webp",
+          "character": "Žaludový kníže s bronzovou korunkou"
+        }
+      ]
+    },
+    "2026-12": {
+      "label": "Prosinec 2026",
+      "edition": "XII · 2026",
+      "awards": [
+        {
+          "rank": 1,
+          "role": "king",
+          "title": "Král prosince",
+          "quote": "Prosím vystavit. Neochutnávat.",
+          "asset": "/rewards/monthly/2026-12/king-v1.webp",
+          "character": "Perníkový král se zlatou korunou"
+        },
+        {
+          "rank": 2,
+          "role": "knight",
+          "title": "Rytíř prosince",
+          "quote": "Letos hlídám cukroví. Zatím chybí šest kousků.",
+          "asset": "/rewards/monthly/2026-12/knight-v1.webp",
+          "character": "Rytíř z vykrajovátka se skořicovým mečem"
+        },
+        {
+          "rank": 3,
+          "role": "prince",
+          "title": "Kníže prosince",
+          "quote": "Cinknu jen jednou. Doma už všichni spí.",
+          "asset": "/rewards/monthly/2026-12/prince-v1.webp",
+          "character": "Bronzový kníže zvoneček"
+        }
+      ]
+    }
+  }
+}

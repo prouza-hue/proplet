@@ -1,0 +1,71 @@
+/* A compact overview with explicit expansion; list changes keep controls stable. */
+.ranking-view-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 22px;align-items:stretch}
+.ranking-view-tabs button{min-width:0;min-height:52px;padding:11px 10px;border:1px solid var(--td-line,var(--line));border-radius:11px;background:var(--td-paper,var(--paper));box-shadow:0 2px 0 color-mix(in srgb,var(--td-ink,var(--ink)) 12%,transparent);color:var(--td-ink,var(--ink));font:600 16px/1.25 Outfit,system-ui,sans-serif;cursor:pointer;touch-action:manipulation}
+.ranking-view-tabs button.active{background:var(--td-blue,var(--blue));border-color:var(--td-blue,var(--blue));color:var(--td-paper,var(--paper));box-shadow:inset 0 -2px 0 #0002;font-weight:700}
+.ranking-view-tabs button:not(.active):hover{border-color:var(--td-blue,var(--blue));background:color-mix(in srgb,var(--td-blue,var(--blue)) 8%,var(--td-paper,var(--paper)))}
+.ranking-view-tabs button:active{box-shadow:none}
+.ranking-view-tabs button:focus-visible{outline:3px solid var(--td-blue,var(--blue));outline-offset:3px}
+@media(max-width:540px){.ranking-view-tabs{gap:6px}.ranking-view-tabs button{font-size:14px;padding:8px 4px;min-height:52px}}
+@media(max-width:360px){.ranking-view-tabs{gap:5px}.ranking-view-tabs button{font-size:13px;padding-inline:3px}}
+html.tiskarna-ui body #screen-leaderboard.ranking-single-view{max-width:760px!important;width:100%;margin-inline:auto!important}
+#screen-leaderboard.ranking-single-view>.screen-title>p{display:none}
+#screen-leaderboard.ranking-single-view .ranking-section[hidden],#screen-leaderboard #rankingTeamCard[hidden]{display:none!important}
+html.tiskarna-ui #screen-leaderboard.ranking-single-view .ranking-section{border:0!important;box-shadow:none!important;background:transparent!important;padding:0!important;margin:0 0 20px!important}
+html.tiskarna-ui #screen-leaderboard.ranking-single-view .ranking-row{border-radius:0!important;background:transparent!important;border:0!important;border-bottom:1px solid var(--td-line)!important;padding:12px 8px!important;min-width:0;gap:10px}
+html.tiskarna-ui #screen-leaderboard.ranking-single-view .ranking-row.me{background:var(--td-mint)!important;border-left:3px solid var(--td-blue)!important}
+#screen-leaderboard.ranking-single-view .leader-name{min-width:0}
+#screen-leaderboard.ranking-single-view .leader-name strong{overflow-wrap:anywhere}
+#screen-leaderboard.ranking-single-view .leader-score{white-space:nowrap}
+#screen-leaderboard.ranking-single-view #rankingPrivacyNote{border:0!important;background:transparent!important;box-shadow:none!important;padding:0 0 14px!important;margin:0!important;font-size:14px}
+#screen-leaderboard.ranking-single-view #rankingPrivacyNote .ranking-privacy-icon{display:none}
+#screen-leaderboard.ranking-single-view #rankingPrivacyNote small{font-size:13px;line-height:1.4}
+#screen-leaderboard.ranking-single-view #rankingTeamCard{border:0!important;border-top:1px solid var(--td-line)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:18px 0!important}
+:root:has(#screen-leaderboard.active){overflow-anchor:none}
+#screen-leaderboard{overflow-anchor:none}
+#screen-leaderboard .ranking-navigation-section>.ranking-section-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  scroll-margin-top:18px;
+}
+#screen-leaderboard .ranking-navigation-section>.ranking-section-head>div{min-width:0}
+#screen-leaderboard .ranking-section-head>.quality-ranking-head{display:grid;grid-template-columns:minmax(0,1fr) auto}
+#screen-leaderboard .quality-ranking-head h2{min-width:0;grid-column:1;grid-row:1}
+#screen-leaderboard .quality-ranking-head>.quality-info-button{grid-column:2;grid-row:1}
+#screen-leaderboard .quality-ranking-head .ranking-section-summary{grid-column:1/-1;grid-row:2}
+#screen-leaderboard .ranking-collapse-toggle{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-width:98px;min-height:44px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:999px;background:var(--r-accent-soft);color:var(--r-accent);
+  cursor:pointer;font:inherit;font-size:15px;font-weight:600;line-height:1.35;
+}
+#screen-leaderboard .ranking-collapse-toggle>.ranking-collapse-label{margin:0;font-size:inherit;line-height:inherit}
+#screen-leaderboard .ranking-collapse-toggle>svg{width:16px;height:16px;flex:0 0 16px;transition:transform .16s ease}
+#screen-leaderboard .ranking-collapse-toggle[aria-expanded="false"]>svg{transform:rotate(180deg)}
+@media(prefers-reduced-motion:reduce){#screen-leaderboard .ranking-collapse-toggle>svg{transition:none}}
+#screen-leaderboard .ranking-collapse-toggle:focus-visible,
+#screen-leaderboard .ranking-expand-list:focus-visible,
+#screen-leaderboard .ranking-back-summary:focus-visible,
+#screen-leaderboard .ranking-retry:focus-visible,
+#screen-leaderboard .ranking-segment>button:focus-visible{
+  outline:3px solid var(--ink);outline-offset:3px;
+}
+#screen-leaderboard .ranking-navigation-collapsed>:not(.ranking-section-head){display:none!important}
+#screen-leaderboard .ranking-navigation-collapsed>.ranking-section-head{margin-bottom:0}
+#screen-leaderboard .ranking-section-summary{display:block;color:var(--muted);font-size:12px;margin-top:3px;flex-basis:100%}
+#screen-leaderboard .ranking-expand-list,
+#screen-leaderboard .ranking-back-summary{
+  display:block;min-height:44px;max-width:100%;padding:9px 0;margin:0 0 8px;
+  color:var(--ink);font-size:13px;line-height:1.35;text-align:left;white-space:normal;
+  text-decoration:underline;text-underline-offset:3px;
+}
+#screen-leaderboard .ranking-back-summary{margin:10px 0 0}
+#screen-leaderboard .ranking-section-summary[hidden],
+#screen-leaderboard .ranking-expand-list[hidden],
+#screen-leaderboard .ranking-back-summary[hidden]{display:none!important}
+#screen-leaderboard .ranking-navigation-section .leaderboard-list[aria-busy="true"]{opacity:.65}
+#screen-leaderboard .ranking-viewport-tail{height:0;pointer-events:none}
+@media(max-width:360px){
+  #screen-leaderboard .ranking-navigation-section>.ranking-section-head{gap:5px}
+  #screen-leaderboard .ranking-navigation-section .quality-ranking-head{gap:5px}
+  #screen-leaderboard .ranking-navigation-section .ranking-section-head h2{font-size:19px}
+  #screen-leaderboard .ranking-collapse-toggle{min-width:88px;padding-inline:7px;gap:4px}
+}

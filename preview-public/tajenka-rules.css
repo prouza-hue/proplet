@@ -1,0 +1,21 @@
+#tajenkaRulesModal .tajenka-rules-card{width:min(100%,460px);padding:28px;text-align:center;border-radius:24px}
+#tajenkaRulesTitle{font-size:30px;line-height:1.15;margin:0 0 22px}
+.tajenka-rule{padding:16px 0;border-top:1px solid var(--td-line,#d8d2c7)}
+.tajenka-rule p{font-size:15px;line-height:1.45;margin:12px auto 0;max-width:320px}
+.rule-tiles,.rule-phrase{display:flex;justify-content:center;gap:5px}
+.rule-tiles span{display:grid;place-items:center;width:40px;height:40px;border-radius:9px;background:#255f51;color:#fff8e9;border:2px solid #71b69d;font-size:22px;font-weight:800;position:relative}
+.rule-tiles span+span:before{content:"";position:absolute;right:100%;width:9px;height:4px;background:#71b69d}
+.rule-phrase span{padding:8px 10px;background:var(--td-tint,#e8eef8);border-radius:8px;font-size:16px;font-weight:700;color:var(--td-ink,#202b39)}
+.rule-phrase .rule-auto{background:#e7dcfa;color:#573885;border:1px dashed #9168c3}
+#tajenkaRulesDone{width:100%;min-height:48px;margin-top:16px;font-size:17px!important}
+#screen-game.tajenka-mode #tajenkaRulesBtn{display:flex!important;align-items:center;justify-content:center;min-width:48px!important;min-height:48px;font-size:26px!important;color:var(--td-ink)!important}
+#screen-game.tajenka-mode .game-actions{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 52px!important}
+@media(max-width:480px){#tajenkaRulesModal{padding:12px}#tajenkaRulesModal .tajenka-rules-card{padding:22px 18px}#tajenkaRulesTitle{font-size:27px;margin-bottom:16px}.tajenka-rule{padding:13px 0}}
+
+
+#screen-game.tajenka-mode #tajenkaRulesBtn{order:3}
+body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game.tajenka-mode .game-actions{grid-template-columns:minmax(0,1fr)!important}
+
+#tajenkaRulesModal .rule-example-board{--cell-size:40px;--word-color:#7A3B32;display:grid;grid-template-columns:repeat(3,40px);grid-template-rows:repeat(3,40px);gap:4px;width:128px;height:128px;margin:0 auto;position:relative;padding:0;background:none;border:0;box-shadow:none;pointer-events:none}
+#tajenkaRulesModal .rule-example-board .cell{width:40px;height:40px;min-width:0;min-height:0;padding:0;z-index:1}
+.rule-example-path{position:absolute;inset:0;width:128px;height:128px;z-index:0;overflow:visible}
