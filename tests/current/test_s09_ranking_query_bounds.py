@@ -181,6 +181,23 @@ assert public_identity == {"name": "Veřejný", "avatar": "🐸", "anonymous": F
 assert private_identity["anonymous"] is True
 assert private_identity["name"] != "Tajné jméno" and private_identity["avatar"] != "😎"
 
+# Regular presentation follows the same public boolean/privacy boundary as the
+# permanent badge; knowing a private type alone cannot disclose support.
+assert server._ranking_display_identity(
+    {"id":"regular","name":"Veřejný","public_rankings":True,"_patron_public":True,"_patron_badge":"recurring"},
+    None,"day:2026-08-31",
+)["patronBadge"] == "recurring"
+hidden_support = server._ranking_display_identity(
+    {"id":"private","name":"Tajný","public_rankings":False,"_patron_public":True,"_patron_badge":"recurring"},
+    None,"day:2026-08-31",
+)
+assert "patron" not in hidden_support and "patronBadge" not in hidden_support
+private_owner = server._ranking_display_identity(
+    {"id":"private","name":"Tajný","public_rankings":False,"_patron_public":False,"_patron_badge":"recurring"},
+    "private","day:2026-08-31",
+)
+assert private_owner["patron"] is False and "patronBadge" not in private_owner
+
 
 # Admin routes are one RPC each; filtering and pagination happen in Postgres.
 admin_row = {

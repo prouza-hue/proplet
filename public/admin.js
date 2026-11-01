@@ -1,4 +1,4 @@
-import {patronsView} from './admin/patrons.js?v=patron-release1';
+import {patronsView} from './admin/patrons.js?v=recurring-patron1';
 import {api,profile,onDenied,cancelAll,createRequestScope} from './admin/api.js';
 import {esc,errorHTML,dismissConfirmation} from './admin/ui.js';
 import {route,navigate,installRouter} from './admin/router.js?v=patron-release1';

@@ -33,7 +33,8 @@ def run_manual_badge_acceptance(opts):
  private_key=str(uuid4());first=call(request=private_key)
  assert first['patron'] and not first['publicBadge'] and not first['paymentCreated'] and first['source']=='owner_promotional_badge'
  assert call(request=private_key)==first
- s=state();assert s['patron'] and not s['publicBadge'] and not s['thanksPending'] and not s['canOffer'] and s['contributions']==[]
+ s=state();assert s['badgeType']=='supporter' and s['recurringStatus']['state']=='none'
+ assert s['patron'] and not s['publicBadge'] and not s['thanksPending'] and not s['canOffer'] and s['contributions']==[]
  other=str(uuid4())
  for changes in ({'actor':other},{'target':other},{'reason':'tiny'}):
   try:call(**changes);raise AssertionError('invalid or unauthorized grant accepted')

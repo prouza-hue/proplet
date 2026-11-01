@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.9-reward-egress1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.10-reward-egress1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -2397,7 +2397,7 @@ function rankingExpandMarkup(data){
  return `<details class="ranking-expand"><summary>Zobrazit pořadí · ${countCz(total,'hráč','hráči','hráčů')}</summary><p class="ranking-expanded-position">${rank?`Tvoje pozice: ${rank}. z ${total}.`:'Celkové pořadí hráčů.'}</p><div class="ranking-expanded-rows"></div><button type="button" class="secondary-btn ranking-more">Načíst pořadí</button></details>`;
 }
 function rankingExpandedRows(rows){
- return rows.map(r=>`<div class="mini-leader-row result-player-row ${r.isMine?'me':''}" data-patron="${r.patron===true}" ${r.isMine?'aria-label="Tvůj výsledek"':''} data-result-elapsed="${esc(r.elapsedMs??'')}" data-result-moves="${esc(r.moves??'')}" data-result-hints="${esc(r.hintsUsed??'')}" data-result-clean="${typeof r.cleanSolve==='boolean'?String(r.cleanSolve):''}"><b class="result-player-rank">${rankBadge(r.rank)}</b><span class="result-player-avatar" data-player-avatar="${esc(r.avatar||'🎭')}">${esc(r.avatar||'🎭')}</span><span class="result-player-copy"><strong>${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'Čistě':`Nápověda ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em class="result-player-time">${fmtTime(r.elapsedMs)}</em></div>`).join('');
+ return rows.map(r=>`<div class="mini-leader-row result-player-row ${r.isMine?'me':''}" data-patron="${r.patron===true}" data-patron-badge="${r.patron===true?(r.patronBadge==='recurring'?'recurring':'supporter'):''}" ${r.isMine?'aria-label="Tvůj výsledek"':''} data-result-elapsed="${esc(r.elapsedMs??'')}" data-result-moves="${esc(r.moves??'')}" data-result-hints="${esc(r.hintsUsed??'')}" data-result-clean="${typeof r.cleanSolve==='boolean'?String(r.cleanSolve):''}"><b class="result-player-rank">${rankBadge(r.rank)}</b><span class="result-player-avatar" data-player-avatar="${esc(r.avatar||'🎭')}">${esc(r.avatar||'🎭')}</span><span class="result-player-copy"><strong>${r.isMine?'Ty':esc(r.name||'Anonymní propletač')}</strong><small>${r.cleanSolve?'Čistě':`Nápověda ${r.hintsUsed||0}×`} · ${countCz(r.moves,'tah','tahy','tahů')}</small></span><em class="result-player-time">${fmtTime(r.elapsedMs)}</em></div>`).join('');
 }
 
 function bindRankingExpansion(container,data){

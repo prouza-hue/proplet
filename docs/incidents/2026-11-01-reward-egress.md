@@ -53,5 +53,7 @@
 
 - Pavel approved production deployment and ChatGPT sign-in in the continuing conversation.
 - Rebased release contents on current production/main `15976ef` (v4.10.8), preserving supporter-ranking identity changes.
-- Release v4.10.9 coordinates canonical/runtime version, service-worker cache and entry script URLs.
+- Release v4.10.10 coordinates canonical/runtime version, service-worker cache and entry script URLs.
 - Production deployment and billed savings must be verified after the release gates pass.
+
+- Concurrent main advanced to `9569de9` (v4.10.9); preserved its recurring patron/API forwarding and Daily special fixes. Final release number: v4.10.10.

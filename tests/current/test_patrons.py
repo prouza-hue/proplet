@@ -62,14 +62,17 @@ class PatronHttpTests(unittest.TestCase):
   self.assertEqual(self.client.post('/api/patrons/intents',json={**body,'amountCzk':199},headers=headers).status_code,409)
   self.assertEqual(self.client.get('/api/patrons/intents/'+first['intent']['id'],headers={'Authorization':'Bearer player-b'}).status_code,404)
  def test_admin_authorization_and_receipt_fields(self):
-  body={'intentId':str(uuid4()),'reference':'1000000001','amountCzk':99,'currency':'CZK','recipientAccount':patrons.ACCOUNT,'bankTransactionId':'bank-1'}
+  body={'intentId':str(uuid4()),'reference':'1000000001','amountCzk':99,'currency':'CZK','recipientAccount':patrons.ACCOUNT,'bankTransactionId':'bank-1','paidOn':'2026-01-31'}
   self.assertEqual(self.client.get('/api/admin/patrons',headers={'Authorization':'Bearer player-a'}).status_code,403)
   self.assertEqual(self.client.post('/api/admin/patrons/confirm',json=body,headers={'Authorization':'Bearer player-a'}).status_code,403)
   h={'Authorization':'Bearer admin'}
-  for patcher in ({'currency':'EUR'},{'recipientAccount':'1/0100'},{'reference':'0001'},{'bankTransactionId':'bad id'}):
+  for patcher in ({'currency':'EUR'},{'recipientAccount':'1/0100'},{'reference':'0001'},{'bankTransactionId':'bad id'},{'paidOn':'2026-02-30'},{'paidOn':None}):
    self.assertEqual(self.client.post('/api/admin/patrons/confirm',json={**body,**patcher},headers=h).status_code,422)
   self.assertEqual(self.client.post('/api/admin/patrons/confirm',json=body,headers=h).status_code,200)
   self.assertEqual(self.calls[-1][1]['p_actor'],'admin')
+  self.assertEqual(self.calls[-1][0],'proplet_patron_confirm_v2')
+  self.assertEqual(self.calls[-1][1]['p_paid_on'],'2026-01-31')
+  self.assertEqual(self.client.post('/api/admin/patrons/confirm',json={k:v for k,v in body.items() if k!='paidOn'},headers=h).status_code,422)
   self.client.get('/api/admin/patrons?reference=1000000001',headers=h)
   self.assertEqual(self.calls[-1][1]['p_reference'],'1000000001')
  def test_monthly_schedule_validation_and_immutable_qr(self):
@@ -97,5 +100,52 @@ class PatronHttpTests(unittest.TestCase):
  def test_spayd_cannot_inject_another_field(self):
   result=patrons.payment_data({'account':patrons.ACCOUNT,'currency':'CZK','reference':'1000000001','amountCzk':1,'message':'A*AM:999 podporuje Proplet'})
   self.assertEqual(result['spd'].count('*AM:'),1);self.assertIn('%2AAM%3A999',result['spd'])
+ def test_public_badge_type_requires_the_same_public_id_gate(self):
+  rows=[{'id':'public','public_rankings':True},{'id':'private','public_rankings':False},{'id':'off','public_rankings':True}]
+  lookup=Mock(return_value={'players':['public'],'badges':{'public':'recurring','private':'recurring','off':'recurring'}})
+  with patch.object(patrons,'feature_enabled',return_value=True):
+   actual=patrons.annotate_players(rows,lookup)
+  self.assertEqual(lookup.call_count,1)
+  self.assertEqual(lookup.call_args.args[1],{'p_players':['public','off']})
+  self.assertEqual([(p['_patron_public'],p['_patron_badge']) for p in actual],[(True,'recurring'),(False,None),(False,None)])
+  # During a rolling schema update the old public boolean remains blue.
+  lookup.return_value={'players':['public']}
+  with patch.object(patrons,'feature_enabled',return_value=True):
+   self.assertEqual(patrons.annotate_players(rows,lookup)[0]['_patron_badge'],'supporter')
+ def test_actual_ranking_endpoints_forward_public_type_without_private_status(self):
+  from contextlib import ExitStack
+  import server
+  people=[{'id':pid,'name':name,'avatar':'A','public_rankings':visible}
+          for pid,name,visible in [('red','Public regular',True),('blue','Public supporter',True),
+                                   ('private','Private badge',True),('hidden','Hidden real name',False)]]
+  rows=[{'player_id':p['id'],'puzzle_id':'patron-api-puzzle','challenge_key':'daily:2026-11-01',
+         'daily_date':'2026-11-01','mode':'daily','elapsed_ms':10000+i*1000,'moves':8,
+         'hints_used':0,'clean_solve':True,'completed_at':'2026-11-01T10:00:00Z'} for i,p in enumerate(people)]
+  score={p['id']:100-i for i,p in enumerate(people)}
+  public={'players':['red','blue'],'badges':{'red':'recurring','blue':'supporter'}}
+  with ExitStack() as stack:
+   for name,value in {'enforce_rate_limit':lambda *a,**k:None,'free_puzzle_info':lambda *a:{'difficulty':'easy','level':1},
+                      'competitive_row':lambda row:True,'daily_leaderboard_puzzle_id':lambda *a:'patron-api-puzzle',
+                      'expected_daily_puzzle_id':lambda *a:'patron-api-puzzle','db_select_bounded':lambda *a,**k:[],
+                      'db_rpc':lambda *a,**k:public,'_ranking_xp_aggregates':lambda *a:(score,score,{},{}),
+                      '_ranking_viewer':lambda *a:None}.items():stack.enter_context(patch.object(server,name,value))
+   stack.enter_context(patch.object(server.ranking_queries,'ranking_runs',return_value=(rows,'test')))
+   stack.enter_context(patch.object(server.ranking_queries,'entity_context',return_value=(people,[])))
+   stack.enter_context(patch.object(patrons,'feature_enabled',return_value=True))
+   client=TestClient(server.app)
+   for url,key in [('/api/free-global-leaderboard?puzzle_id=patron-api-puzzle&offset=0','rows'),
+                   ('/api/daily-global-leaderboard?daily_date=2026-11-01&offset=0','rows'),
+                   ('/api/rankings/xp?period=all','players'),('/api/rankings/daily?daily_date=2026-11-01','players')]:
+    with self.subTest(endpoint=url):
+     response=client.get(url);self.assertEqual(response.status_code,200,response.text)
+     actual=response.json()[key];by_name={p['name']:p for p in actual}
+     self.assertEqual(by_name['Public regular']['patronBadge'],'recurring')
+     self.assertEqual(by_name['Public supporter']['patronBadge'],'supporter')
+     self.assertTrue(by_name['Public regular']['patron'])
+     self.assertFalse(by_name['Private badge']['patron']);self.assertNotIn('patronBadge',by_name['Private badge'])
+     self.assertNotIn('Hidden real name',by_name)
+     for row in actual:
+      self.assertFalse({'recurringStatus','paidOn','paidThrough','nextDue','graceUntil','contributions','amountCzk'}&set(row))
+      if row['anonymous']:self.assertNotIn('patronBadge',row);self.assertNotIn('patron',row)
 
 if __name__=='__main__':unittest.main()

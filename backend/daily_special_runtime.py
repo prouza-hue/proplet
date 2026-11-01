@@ -187,6 +187,7 @@ def install(namespace):
                 continue
             team = namespace["public_family_code"](player.get("family_code"), player.get("team_joined_at"))
             output.append({"name": display["name"], "avatar": display["avatar"], "anonymous": display["anonymous"],
+                           **({key: display[key] for key in ("patron", "patronBadge") if key in display}),
                            "teamName": team_names.get(team or "") if not display["anonymous"] else None,
                            "elapsedMs": row["best_elapsed_ms"], "moves": row["best_moves"],
                            "hintsUsed": row.get("hints_used") or 0, "cleanSolve": row.get("clean_solve") is True,

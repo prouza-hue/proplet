@@ -4364,7 +4364,7 @@ def free_global_leaderboard(
             "name": identity["name"],
             "avatar": identity["avatar"],
             "anonymous": identity["anonymous"],
-            **({"patron": identity["patron"]} if "patron" in identity else {}),
+            **({key: identity[key] for key in ("patron", "patronBadge") if key in identity}),
             "elapsedMs": int(row.get("elapsed_ms") or 0),
             "moves": int(row.get("moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0),
@@ -4474,7 +4474,7 @@ def daily_global_leaderboard(
             "name": identity["name"],
             "avatar": identity["avatar"],
             "anonymous": identity["anonymous"],
-            **({"patron": identity["patron"]} if "patron" in identity else {}),
+            **({key: identity[key] for key in ("patron", "patronBadge") if key in identity}),
             "elapsedMs": int(row.get("elapsed_ms") or row.get("best_elapsed_ms") or 0),
             "moves": int(row.get("moves") or row.get("best_moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0),
@@ -4579,6 +4579,7 @@ def _ranking_display_identity(player: dict | None, viewer_id: str | None, scope:
             "avatar": player.get("avatar") or "🙂",
             "anonymous": False,
             **({"patron": bool(player.get("_patron_public"))} if "_patron_public" in player else {}),
+            **({"patronBadge": player["_patron_badge"]} if player.get("_patron_public") and player.get("_patron_badge") in ("supporter", "recurring") else {}),
         }
     return _ranking_anonymous_identity(str(player.get("id") or "unknown"), scope, used_names)
 
@@ -4878,7 +4879,7 @@ def rankings_xp(
             team_name = (league or {}).get("name") or family
         player_rows.append({
             "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"],
-            **({"patron": identity["patron"]} if "patron" in identity else {}),
+            **({key: identity[key] for key in ("patron", "patronBadge") if key in identity}),
             "xp": score, "lifetimePoints": int(lifetime_points.get(pid, 0)),
             "teamName": team_name, "badgeCount": int(badge_counts.get(pid, 0)),
             "isMine": pid == viewer_id, "isPrivate": player.get("public_rankings") is False,
@@ -4989,7 +4990,7 @@ def rankings_daily(
             team_name = league.get("name") or family
         player_rows.append({
             "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"],
-            **({"patron": identity["patron"]} if "patron" in identity else {}), "teamName": team_name,
+            **({key: identity[key] for key in ("patron", "patronBadge") if key in identity}), "teamName": team_name,
             "elapsedMs": int(row.get("elapsed_ms") or row.get("best_elapsed_ms") or 0), "moves": int(row.get("moves") or row.get("best_moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0), "cleanSolve": row.get("clean_solve") is True,
             "isMine": pid == viewer_id, "rank": ranks[row_index],
