@@ -1,5 +1,5 @@
 /* Patron support uses the current printshop surfaces and type scale. */
-:root{--patron-blue:#315d91;--patron-tint:#e7edf4}
+:root{--patron-blue:#315d91;--patron-tint:#e7edf4;--patron-stamp:#bd4435;--patron-cream:#fff0cd;--patron-cream-edge:#c9ad7e}
 html[data-theme=dark]{--patron-blue:#adcaff;--patron-tint:#364657}
 #patronDialog{box-sizing:border-box;width:min(610px,calc(100% - 24px));max-height:calc(100dvh - 32px);overflow:auto;margin:auto;border:1px solid var(--td-line,#d8d0c3);border-radius:24px;padding:32px;background:var(--td-paper,#fffcf5);color:var(--td-ink,#253142);box-shadow:0 22px 85px #0005;font:400 16px/1.5 Outfit,sans-serif;scrollbar-width:thin}
 #patronDialog::backdrop{background:#15202b99;backdrop-filter:blur(5px)}
@@ -172,3 +172,28 @@ html.tiskarna-ui body #screen-leaderboard :is(.ranking-rank-chip,.ranking-player
  html.tiskarna-ui body :is(#winModal,#levelDetailModal) .patron-supported .result-player-copy>.patron-label{font-size:10px!important}
  html.tiskarna-ui body :is(#winModal,#levelDetailModal) .result-player-row .result-player-time{font-size:13px!important;text-align:right}
 }
+
+/* Monthly thanks use a paper keepsake with the same avatar allocation. */
+html.tiskarna-ui .patron-avatar-marked.patron-recurring>.patron-avatar-card,.patron-avatar-demo.patron-recurring>i,.patron-settings-preview.patron-recurring>i{background:var(--patron-cream);color:var(--patron-stamp);border-color:var(--patron-cream-edge);box-shadow:inset 0 0 0 1px #fff8}
+html.tiskarna-ui .patron-avatar-marked.patron-recurring>.patron-avatar-card svg,.patron-avatar-demo.patron-recurring>i svg,.patron-settings-preview.patron-recurring>i svg{transform:rotate(6deg);stroke:currentColor;stroke-width:.5;stroke-linejoin:round}
+.patron-label.patron-recurring,.patron-label-static.patron-recurring{color:var(--patron-stamp)!important}
+html[data-theme=dark] .patron-label.patron-recurring,html[data-theme=dark] .patron-label-static.patron-recurring{color:#ffb0a0!important}
+.patron-own-badge.patron-recurring{background:color-mix(in srgb,var(--patron-cream) 18%,var(--td-paper))}
+.patron-label-compact{display:none}
+#patronDialog .patron-status{font-size:14px;margin:0 0 18px}
+.patron-mini-person .patron-label-static{text-align:center;justify-content:center;line-height:1.25}
+.patron-own-badge>div{min-width:0;overflow-wrap:anywhere}
+.patron-settings-preview{display:flex!important;align-items:center;gap:7px;color:var(--patron-blue)!important}
+.patron-settings-preview>i{display:grid;place-items:center;width:20px;height:20px;flex:none;border:1px solid var(--patron-tint);border-radius:4px;transform:rotate(-8deg);background:var(--patron-blue);color:var(--td-paper)}
+.patron-settings-preview>i svg{width:63%;height:63%}
+html[data-theme=dark] .patron-settings-preview.patron-recurring{color:#ffb0a0!important}
+.patron-settings-preview.patron-recurring{color:var(--patron-stamp)!important}
+@media(max-width:540px){
+ html.tiskarna-ui body .result-player-copy>.patron-label.patron-recurring .patron-label-full{display:none}
+ html.tiskarna-ui body .result-player-copy>.patron-label.patron-recurring .patron-label-compact{display:inline}
+}
+
+#patronDialog .patron-bank-help{margin-top:10px;font:400 14px/1.5 Outfit,sans-serif}
+#patronDialog .patron-bank-help summary{cursor:pointer;min-height:32px;font-weight:600;color:var(--td-ink)}
+#patronDialog .patron-bank-help p{margin:10px 0 0}
+#patronDialog .patron-bank-help a{color:var(--patron-blue);text-decoration:underline;text-underline-offset:2px}

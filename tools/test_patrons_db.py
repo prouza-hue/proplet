@@ -29,6 +29,7 @@ def main():
    c.execute((ROOT/'supabase/migrations/20261029120000_release_news_receipts.sql').read_text())
    c.execute((ROOT/'supabase/migrations/20261031134258_patron_support.sql').read_text())
    c.execute((ROOT/'supabase/migrations/20261101022415_patron_manual_badge.sql').read_text(encoding='utf8'))
+   c.execute((ROOT/'supabase/migrations/20261101103408_patron_recurring_badge.sql').read_text(encoding='utf8'))
   ids=[str(uuid4()) for _ in range(4)];player,other,balanced,admin=ids
   for index,pid in enumerate(ids):c.execute('insert into public.players(id,name,family_code,token_hash,support_mode,public_rankings) values(%s,%s,%s,%s,%s,true)',(pid,'Patron SQL '+str(index),'patron-test',secrets.token_hex(32),'younger' if pid==balanced else 'none'))
   # Use the existing schema's required admin columns, if present.
@@ -248,6 +249,8 @@ def main():
   http_acceptance(opts,new_player(),new_player(),admin)
   from tools.test_patron_manual_badge_db import run_manual_badge_acceptance
   run_manual_badge_acceptance(opts)
+  from tools.test_patron_recurring_db import run_recurring_acceptance
+  run_recurring_acceptance(opts)
  print('PASS patron SQL: migration, ownership, immutable once/monthly/date, Prague calendar, repeated monthly receipts, concurrent receipt retry, permanent entitlement, account-wide exactly-once thanks claim, private bounded personal payment history, monthly audit/ledger, rename, atomic claims/news receipt race, balanced preset eligibility, durable first-visit 48h fallback, news priority + 48h + two distinct ordinary boards, late receipt reset, 3-day/5-board eligibility, 30/90-day limits, opt-out, exact receipt, duplicate bank transaction, private default and ACL; database='+name)
 
 def http_acceptance(opts,owner,other,admin):
@@ -297,7 +300,7 @@ def http_acceptance(opts,owner,other,admin):
  assert client.get(path,headers=h).json()==created
  assert not client.get('/api/patrons',headers=h).json()['patron']
  assert client.get('/api/admin/patrons',headers=h).status_code==403
- receipt={'intentId':intent['id'],'reference':intent['reference'],'bankTransactionId':'http-synthetic-'+str(uuid4()),'amountCzk':99,'currency':'CZK','recipientAccount':'5531840001/5500'}
+ receipt={'intentId':intent['id'],'reference':intent['reference'],'bankTransactionId':'http-synthetic-'+str(uuid4()),'paidOn':'2026-01-31','amountCzk':99,'currency':'CZK','recipientAccount':'5531840001/5500'}
  assert client.post('/api/admin/patrons/confirm',json=receipt,headers=h).status_code==403
  for changes in ({'amountCzk':100},{'reference':'9999999999'}):
   assert client.post('/api/admin/patrons/confirm',json={**receipt,**changes},headers=ah).status_code==409

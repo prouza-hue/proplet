@@ -20,9 +20,31 @@ const scenario = {
  referral: reviewParams.get('account')==='guest'?'guest':reviewParams.get('account')==='incoming'?'incoming':'member',
  announcement:'none'
 };
+const patronPeriods=new Set(['first','current','grace','expired','reinstated','oneoff','private']);
+const patronPeriod=patronPeriods.has(reviewParams.get('patronPeriod'))?reviewParams.get('patronPeriod'):null;
 const patronInfoPreview=reviewParams.get('patronInfo')==='1',patronRankingsPreview=reviewParams.get('patronRankings')==='1';
-const fixtureState=['ready','done','complete'].includes(reviewParams.get('state'))?reviewParams.get('state'):patronInfoPreview?'done':'ready';
-const prefix = 'proplet:studio-review:20261021:v2:' + scenario.extra + ':' + scenario.referral + ':' + fixtureState + (patronRankingsPreview?':patron-rankings:':':');
+// This explicit opt-in is available only in the guarded generated preview.
+const patronPeriodPreview=!!patronPeriod;
+const patronPreviewEnabled=patronInfoPreview||patronRankingsPreview||patronPeriodPreview;
+let patronPreviewPublic=patronPeriod!=='private'&&(reviewParams.get('patronOwn')==='public'||patronRankingsPreview&&reviewParams.get('patronOwn')!=='private');
+function patronFixtureStatus(){
+ const paid=patronPreviewEnabled&&reviewParams.get('patronOwn')!=='none';
+ const recurring=patronPeriodPreview&&patronPeriod!=='oneoff'&&patronPeriod!=='expired';
+ const restored=patronPeriod==='reinstated',once=patronPeriod==='oneoff';
+ const status=patronPeriod==='grace'?'grace':patronPeriod==='expired'?'expired':recurring?'current':'none';
+ const nextDue=patronPeriodPreview&&!once?(restored?'2027-01-10':'2026-12-01'):null;
+ const contributions=paid&&patronPeriodPreview?[{id:'synthetic-patron-transfer-1',amountCzk:99,frequency:once?'once':'monthly',confirmedAt:restored?'2026-12-10T12:00:00Z':'2026-11-01T12:00:00Z'}]:[];
+ if(paid&&patronPeriodPreview&&!['first','oneoff'].includes(patronPeriod))contributions.push({id:'synthetic-patron-transfer-previous',amountCzk:99,frequency:'monthly',confirmedAt:'2026-10-01T12:00:00Z'});
+ return {enabled:patronPreviewEnabled,authenticated:!!profile()?.token,patron:paid,publicBadge:paid&&patronPreviewPublic,
+  badgeType:paid?(recurring?'recurring':'supporter'):null,
+  recurringStatus:{state:paid?status:'none',paidThrough:paid&&nextDue?(restored?'2027-01-09':'2026-11-30'):null,nextDue:paid?nextDue:null,graceUntil:paid&&nextDue?(restored?'2027-01-17':'2026-12-08'):null,graceDays:7},
+  offersDisabled:true,canOffer:false,thanksPending:false,
+  contributions,
+  reviewOnly:true};
+}
+const patronPublicFields=(type,visible=true)=>visible?{patron:true,patronBadge:type}:{patron:false};
+const fixtureState=['ready','done','complete'].includes(reviewParams.get('state'))?reviewParams.get('state'):patronInfoPreview||patronPeriodPreview?'done':'ready';
+const prefix = 'proplet:studio-review:20261021:v2:' + scenario.extra + ':' + scenario.referral + ':' + fixtureState + (patronRankingsPreview?':patron-rankings:':':')+(patronPeriodPreview?'patron-period:'+patronPeriod+':'+(reviewParams.get('patronOwn')||'private')+':':'');
 // Keep native Storage identity. WindowProxy property replacement is not reliable
 // across all embedded-browser realms; app controllers must see these same methods.
 const storagePrototype=Storage.prototype;
@@ -242,7 +264,13 @@ function boardRanking(url){
  const rows=[{id:'review-klara',name:patronInfoPreview?'Ukázkový Pavel':'Klára',avatar:patronInfoPreview?'🦊':'🌺',patron:patronInfoPreview,rank:1,elapsedMs:Math.max(1000,elapsed-20000),moves:8,hintsUsed:0,cleanSolve:true},
   {id:mine,isMine:!!profile()?.id,name:profile()?.name||'Alex',avatar:profile()?.avatar||'🦊',rank:2,elapsedMs:elapsed,moves:record?.moves??9,hintsUsed:record?.hintsUsed??0,cleanSolve:record?.cleanSolve??true,attemptId:record?.attemptId},
   {id:'review-matej',name:'Matěj',avatar:'🐉',rank:3,elapsedMs:elapsed+30000,moves:10,hintsUsed:0,cleanSolve:true}];
- return {rows,total:3,myRank:2,position:2,players:rows,nextOffset:null,reviewOnly:true,
+ if(patronPeriodPreview){
+  Object.assign(rows[0],{name:'Ukázková Klára'},patronPublicFields('recurring'));
+  const own=patronFixtureStatus();Object.assign(rows[1],patronPublicFields(own.badgeType,own.patron&&own.publicBadge));
+  Object.assign(rows[2],{name:'Ukázkový Matěj'},patronPublicFields('supporter'));
+  rows.push({id:'review-private',name:'Ukázkový Robin',avatar:'🦉',rank:4,elapsedMs:elapsed+45000,moves:12,hintsUsed:0,cleanSolve:true,patron:false});
+ }
+ return {rows,total:rows.length,myRank:2,position:2,players:rows,nextOffset:null,reviewOnly:true,
   puzzleId:url.searchParams.get('puzzle_id'),date:url.searchParams.get('daily_date')||today(),
   challengeKey:url.searchParams.get('challenge_key'),challengeKind:url.pathname.includes('daily-special')?'special':undefined};
 }
@@ -258,7 +286,11 @@ window.fetch=async(input,init={})=>{
  requests.push({path:url.pathname,method,reviewOnly:true});
  let body={};try{body=JSON.parse(init.body||'{}');}catch{}
  const path=url.pathname;
- if(path==='/api/patrons'&&method==='GET')return json({enabled:patronInfoPreview||patronRankingsPreview,authenticated:!!profile()?.token,patron:(patronInfoPreview||patronRankingsPreview)&&reviewParams.get('patronOwn')!=='none',publicBadge:reviewParams.get('patronOwn')==='public'||patronRankingsPreview&&reviewParams.get('patronOwn')!=='private',offersDisabled:true,canOffer:false,thanksPending:false,contributions:[],reviewOnly:true});
+ if(path==='/api/patrons'&&method==='GET')return json(patronFixtureStatus());
+ if(patronPeriodPreview&&path==='/api/patrons/preferences'&&method==='POST'){
+  if(typeof body.publicBadge==='boolean')patronPreviewPublic=body.publicBadge;
+  return json({publicBadge:patronFixtureStatus().publicBadge,reviewOnly:true});
+ }
  if(path.startsWith('/api/patrons/'))return json({detail:'Náhled podpory neprovádí platby ani zápisy.',reviewOnly:true},409);
  if(method==='GET'&&path==='/api/competition/monthly')return json(window.PropletMonthlyV2Fixture.response(reviewParams.get('monthlyCase')));
  if(method==='GET'&&path==='/api/config'){
@@ -308,8 +340,14 @@ window.fetch=async(input,init={})=>{
  if(path==='/api/play-session'&&method==='POST')return sessionCommand(body);
  if(path==='/api/rescue/status'||path==='/api/rescue-status')return json({state:'unavailable',reviewOnly:true});
  if(method==='GET'&&(path.includes('global-leaderboard')||path==='/api/rankings/daily-special'))return json(boardRanking(url));
- if(patronRankingsPreview&&method==='GET'&&['/api/rankings/xp','/api/rankings/daily'].includes(path)){
+ if((patronRankingsPreview||patronPeriodPreview)&&method==='GET'&&['/api/rankings/xp','/api/rankings/daily'].includes(path)){
   const players=Array.from({length:24},(_,i)=>({id:i===20?profileId:'patron-ranking-'+i,name:i===20?'Pavel':i===0?'Ukázková podporovatelka':'Ukázkový hráč '+(i+1),avatar:i===20?'🦌':'🦊',patron:i===0||i===20,isMine:i===20,rank:i+1,xp:100000-i*2200,lifetimePoints:80000,teamName:'Propletové – Řeporyje',moves:11,hintsUsed:0,cleanSolve:true,elapsedMs:65000+i*1500}));
+  if(patronPeriodPreview)for(const [index,row] of players.entries()){
+   if(index===0)Object.assign(row,patronPublicFields('recurring'));
+   else if(index===1)Object.assign(row,patronPublicFields('supporter'));
+   else if(row.isMine){const own=patronFixtureStatus();Object.assign(row,patronPublicFields(own.badgeType,own.patron&&own.publicBadge));}
+   else Object.assign(row,{patron:false});
+  }
   return json({players,teams:[],visibilityReady:true,period:url.searchParams.get('period')||'week',reviewOnly:true});
  }
  if(method==='GET'&&(path.includes('rankings')||path.includes('leaderboard')))return json({
@@ -369,11 +407,49 @@ function diagnostics(){
  try{actualTheme=document.documentElement.dataset?.theme||null;completed=Object.keys(state().completed||{}).length}catch{}
  return {scope:prefix,storageMode:'native-prototype-v2',requestedTheme:new URLSearchParams(location.search).get('theme')||'light',storedTheme:read('proplet-v3-settings',{}).theme||null,actualTheme,expectedAccount:scenario.referral==='guest'?'guest':profileId,actualAccount:actualProfile,completed,storageBinding:localStorage===nativeStorage,archiveSeedBlocked:localStorage.getItem('ax-seeded')==='1'};
 }
-window.PropletStudioFixture={...api,fixtureState,day:today,seedState,diagnostics};
+window.PropletStudioFixture={...api,fixtureState,day:today,seedState,diagnostics,patronPeriod,patronStatus:patronFixtureStatus};
+
+// Native patrons may finish their first asynchronous refresh after the app's ready
+// event. Explicit fixture links wait for actual controls, then use their handlers.
+function waitForPatronView(predicate,label){
+ return new Promise((resolve,reject)=>{
+  let frame=0,finished=false;
+  const timeout=setTimeout(()=>{finished=true;cancelAnimationFrame(frame);reject(Error('patron-preview-timeout:'+label));},5000);
+  const check=()=>{if(finished)return;const value=predicate();if(value){finished=true;clearTimeout(timeout);resolve(value);}else frame=requestAnimationFrame(check);};
+  check();
+ });
+}
+async function openPatronFixtureView(view){
+ await waitForPatronView(()=>window.PropletPatrons?.model.enabled&&document.querySelector('#patronTodayLink'),'native-entry');
+ // Let the initial navigation/announcement turn finish before opening a dialog.
+ await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+ if(view==='offer'||view==='thanks'){
+  window.PropletPatrons.open(view);
+  await waitForPatronView(()=>document.querySelector('#patronDialog[open][data-patron-step="'+view+'"]'),'dialog-'+view);
+  if(view==='offer'&&reviewParams.get('patronFrequency')==='monthly'){
+   const monthly=await waitForPatronView(()=>document.querySelector('#patronForm input[name="frequency"][value="monthly"]'),'monthly-radio');
+   if(!monthly.checked)monthly.click();
+   await waitForPatronView(()=>document.querySelector('#patronForm input[name="frequency"][value="monthly"]:checked')&&document.querySelector('#patronDialog .patron-avatar-demo.patron-recurring'),'monthly-selected');
+  }
+ }else if(view==='settings'){
+  const settings=await waitForPatronView(()=>document.querySelector('#settingsHeaderBtn'),'settings-entry');settings.click();
+  await waitForPatronView(()=>document.querySelector('#screen-profile.settings-open')&&(!window.PropletPatrons.model.paid||document.querySelector('#patronBadgePreference')),'settings-open');
+ }
+ window.PROPLET_STUDIO_PATRON_VIEW={view,ready:true,frequency:window.PropletPatrons.model.frequency};
+}
 
 document.addEventListener('proplet:ready',()=>{
  ready=true;
- seedState().then(async()=>{if(patronRankingsPreview){await rankingsOrchestration().openView(reviewParams.get('rankingView')==='daily'?'daily':'xp');if(reviewParams.get('rankingView')!=='daily')document.querySelector('[data-ranking-period=week]')?.click();return;}if(patronInfoPreview)return showDailyResult(today(),getState().completed['daily:'+today()]);}).catch(error=>{console.error('Studio state seed failed',error);window.PROPLET_STUDIO_SEED_ERROR=error.message});
+ seedState().then(async()=>{
+  if(patronPeriodPreview){
+   await waitForPatronView(()=>typeof window.PropletPatrons?.refresh==='function'&&typeof window.PropletPatrons?.open==='function','native-api');
+   await window.PropletPatrons.refresh();
+   const view=reviewParams.get('patronView')||'result';
+   if(['offer','thanks','settings'].includes(view)){await openPatronFixtureView(view);return;}
+  }
+  if(patronRankingsPreview){await rankingsOrchestration().openView(reviewParams.get('rankingView')==='daily'?'daily':'xp');if(reviewParams.get('rankingView')!=='daily')document.querySelector('[data-ranking-period=week]')?.click();return;}
+  if(patronInfoPreview||patronPeriodPreview)return showDailyResult(today(),getState().completed['daily:'+today()]);
+ }).catch(error=>{console.error('Studio state seed failed',error);window.PROPLET_STUDIO_SEED_ERROR=error.message});
  if(!local.getItem('referralBaseline'))save('referralBaseline',completionIds());
  // Defaults are returning-player fixtures. Explicit announcement scenarios still
  // use the native eligibility/gating code; we never force-open a launch modal.

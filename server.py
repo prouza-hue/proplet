@@ -4579,6 +4579,7 @@ def _ranking_display_identity(player: dict | None, viewer_id: str | None, scope:
             "avatar": player.get("avatar") or "🙂",
             "anonymous": False,
             **({"patron": bool(player.get("_patron_public"))} if "_patron_public" in player else {}),
+            **({"patronBadge": player["_patron_badge"]} if player.get("_patron_public") and player.get("_patron_badge") in ("supporter", "recurring") else {}),
         }
     return _ranking_anonymous_identity(str(player.get("id") or "unknown"), scope, used_names)
 

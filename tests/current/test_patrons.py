@@ -62,14 +62,17 @@ class PatronHttpTests(unittest.TestCase):
   self.assertEqual(self.client.post('/api/patrons/intents',json={**body,'amountCzk':199},headers=headers).status_code,409)
   self.assertEqual(self.client.get('/api/patrons/intents/'+first['intent']['id'],headers={'Authorization':'Bearer player-b'}).status_code,404)
  def test_admin_authorization_and_receipt_fields(self):
-  body={'intentId':str(uuid4()),'reference':'1000000001','amountCzk':99,'currency':'CZK','recipientAccount':patrons.ACCOUNT,'bankTransactionId':'bank-1'}
+  body={'intentId':str(uuid4()),'reference':'1000000001','amountCzk':99,'currency':'CZK','recipientAccount':patrons.ACCOUNT,'bankTransactionId':'bank-1','paidOn':'2026-01-31'}
   self.assertEqual(self.client.get('/api/admin/patrons',headers={'Authorization':'Bearer player-a'}).status_code,403)
   self.assertEqual(self.client.post('/api/admin/patrons/confirm',json=body,headers={'Authorization':'Bearer player-a'}).status_code,403)
   h={'Authorization':'Bearer admin'}
-  for patcher in ({'currency':'EUR'},{'recipientAccount':'1/0100'},{'reference':'0001'},{'bankTransactionId':'bad id'}):
+  for patcher in ({'currency':'EUR'},{'recipientAccount':'1/0100'},{'reference':'0001'},{'bankTransactionId':'bad id'},{'paidOn':'2026-02-30'},{'paidOn':None}):
    self.assertEqual(self.client.post('/api/admin/patrons/confirm',json={**body,**patcher},headers=h).status_code,422)
   self.assertEqual(self.client.post('/api/admin/patrons/confirm',json=body,headers=h).status_code,200)
   self.assertEqual(self.calls[-1][1]['p_actor'],'admin')
+  self.assertEqual(self.calls[-1][0],'proplet_patron_confirm_v2')
+  self.assertEqual(self.calls[-1][1]['p_paid_on'],'2026-01-31')
+  self.assertEqual(self.client.post('/api/admin/patrons/confirm',json={k:v for k,v in body.items() if k!='paidOn'},headers=h).status_code,422)
   self.client.get('/api/admin/patrons?reference=1000000001',headers=h)
   self.assertEqual(self.calls[-1][1]['p_reference'],'1000000001')
  def test_monthly_schedule_validation_and_immutable_qr(self):
@@ -97,5 +100,17 @@ class PatronHttpTests(unittest.TestCase):
  def test_spayd_cannot_inject_another_field(self):
   result=patrons.payment_data({'account':patrons.ACCOUNT,'currency':'CZK','reference':'1000000001','amountCzk':1,'message':'A*AM:999 podporuje Proplet'})
   self.assertEqual(result['spd'].count('*AM:'),1);self.assertIn('%2AAM%3A999',result['spd'])
+ def test_public_badge_type_requires_the_same_public_id_gate(self):
+  rows=[{'id':'public','public_rankings':True},{'id':'private','public_rankings':False},{'id':'off','public_rankings':True}]
+  lookup=Mock(return_value={'players':['public'],'badges':{'public':'recurring','private':'recurring','off':'recurring'}})
+  with patch.object(patrons,'feature_enabled',return_value=True):
+   actual=patrons.annotate_players(rows,lookup)
+  self.assertEqual(lookup.call_count,1)
+  self.assertEqual(lookup.call_args.args[1],{'p_players':['public','off']})
+  self.assertEqual([(p['_patron_public'],p['_patron_badge']) for p in actual],[(True,'recurring'),(False,None),(False,None)])
+  # During a rolling schema update the old public boolean remains blue.
+  lookup.return_value={'players':['public']}
+  with patch.object(patrons,'feature_enabled',return_value=True):
+   self.assertEqual(patrons.annotate_players(rows,lookup)[0]['_patron_badge'],'supporter')
 
 if __name__=='__main__':unittest.main()

@@ -72,3 +72,21 @@ The supporter-avatar consistency preview also accepts `patronOwn=public`, `priva
 
 
 `/?patronRankings=1` opens the native XP weekly player ranking with an explicitly public synthetic supporter at rank 21, outside the first-five summary. The sample has a long rank title and team “Propletové – Řeporyje”. Add `&rankingView=daily` for Daily, or `&patronOwn=private` to verify the own public mark disappears while the personal header remains marked. This fixture uses no real player data or backend writes.
+
+
+## Recurring supporter preview (2026-11-01)
+
+An explicit `patronPeriod=first|current|grace|expired|reinstated|oneoff|private` enables the guarded in-memory supporter fixtures. `first` models one genuinely confirmed payment as sample data; subsequent examples model renewal, a seven-day grace period, permanent blue thanks after expiry, reinstatement and private visibility. They do not confirm any real bank payment or prove SQL behavior. Sample `nextDue=2026-12-01`, `paidThrough=2026-11-30`, `graceUntil=2026-12-08`: red through the end of 8 December, blue from 9 December in Prague.
+
+Build/serve separately from other review outputs:
+
+```powershell
+node tools/studio-preview/build.cjs ../recurring-patron-preview-public
+node tools/studio-preview/verify.cjs ../recurring-patron-preview-public
+$env:PORT='8898'
+node tools/studio-preview/serve.cjs ../recurring-patron-preview-public
+```
+
+The native result comparison is `/?patronInfo=1&patronOwn=public&patronPeriod=current`. It contains a public recurring mark, a blue one-off mark, the synthetic viewer, and an unmarked private sample player. Add `patronView=thanks`, `offer`, or `settings`; `patronFrequency=monthly` preselects the native monthly offer. `patronOwn=none&patronView=offer` previews the unentitled offer. `/?patronRankings=1&patronOwn=public&patronPeriod=current` opens XP; append `rankingView=daily` for Daily rankings. The top two entries compare recurring and blue support, and the own row remains outside the first five.
+
+Only synthetic privacy preferences change in memory. Patron intents, payments and claim endpoints remain blocked with 409; no QR or bank transfer is created. Production imports none of these fixtures. Controls and notice remain outside the app shell. The preview verification covers every explicit state, public row redaction, unknown-state rejection, blocked payment creation, memory-only preferences and existing network/service-worker isolation. Browser layout and backend PostgreSQL acceptance are separate checks.
