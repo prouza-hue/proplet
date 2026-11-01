@@ -65,7 +65,7 @@ def run_recurring_acceptance(opts):
   assert confirm(old,'legacy-date',today)['ok']
   assert state(legacy)['badgeType']=='recurring'
   # Bank date, rather than today's operator timestamp, controls late confirmation.
-  delayed=player('Delayed bank confirmation');d=intent(delayed)
+  delayed=player('Delayed bank date');d=intent(delayed)
   assert confirm(d,'delayed-monthly','2024-01-31')['ok']
   assert at(delayed,'2024-01-31')['nextDue']=='2024-02-29' # Leap year.
   assert state(delayed)['badgeType']=='supporter'
