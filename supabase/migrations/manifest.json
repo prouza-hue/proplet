@@ -721,6 +721,21 @@
       ]
     },
     {
+      "id": "20261101-fair-play-disconnect-wall-clock",
+      "order": 630,
+      "version": "2026.11.01",
+      "path": "supabase/migrations/20261101040000_fair_play_disconnect_wall_clock.sql",
+      "type": "migration",
+      "status": "prepared-preserves-historical-results",
+      "sha256": "2c8952bdb0e54d66e14c4a27711a20a323d545e777120ae324d9143984df687d",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_play_session_v1",
+        "public.proplet_submit_result_v1",
+        "public.proplet_submit_daily_special_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

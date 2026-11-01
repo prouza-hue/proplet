@@ -22,6 +22,8 @@
     }
     merged.moves = Math.max(merged.moves, found.length + merged.wrongAttempts);
     merged.calmMode = !!(current.calmMode || incoming.calmMode);
+    merged.disconnected = !!(current.disconnected || incoming.disconnected);
+    merged.serverTimingAnchored = !!(current.serverTimingAnchored || incoming.serverTimingAnchored);
     merged.timingUnverified = !!(current.timingUnverified || incoming.timingUnverified);
     merged.cleanSolve = merged.hints === 0 && merged.maxHintLevel === 0;
     // Distinct attempts cannot be proven to represent one uninterrupted run.

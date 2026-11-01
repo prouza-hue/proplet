@@ -32,7 +32,7 @@ console.log('PASS guest merge, monotonic clock, retry and quota retention, inten
  await controller.pause(g);assert.equal(timers,0);
  await controller.resume(g);assert.equal(claimed,1);assert.equal(g.baseElapsedMs,20000);assert.equal(g.found.length,1);
  fail=true;await controller.send(g,'pulse');assert.equal(!!g.timingUnverified,false);
- await controller.finish(g);assert.equal(g.timingUnverified,true);
+ await controller.finish(g);assert.equal(!!g.timingUnverified,false);assert.equal(g.disconnected,true,'failed finish retains server anchor and charges the gap on retry');
  fail=false;finished=true;
  assert.equal((await controller.prepare({id:'p'},'daily',null,null)).restored.found.length,1);
  completed=true;assert.equal((await controller.prepare({id:'p'},'daily',null,null)).replay,true);

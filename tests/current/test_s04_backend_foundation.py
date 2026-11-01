@@ -65,6 +65,8 @@ assert openapi_contract["info"]["version"] == f"{server.APP_VERSION}-cloud"
 # every path, method, component and field remains covered. Tajenka v2
 # intentionally extends the schema while preserving the route inventory.
 openapi_contract = json.loads(json.dumps(openapi_contract))
+from duration_contract import normalize_disconnect_durations
+normalize_disconnect_durations(openapi_contract)
 # Dedicated isolated QA control is additive, authenticated and not part of the historical public API.
 qa_operation = openapi_contract["paths"].pop("/api/qa/monthly-control")
 assert set(qa_operation) == {"post"}
