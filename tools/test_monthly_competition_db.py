@@ -334,6 +334,22 @@ def main():
     report['checks'].append('closed correction atomically downgrades/removes/regrants badges and rank ties; immutable audit/revision; XP unchanged; aftercutoff offline retains eligible original')
     from tools.check_release_news_db import check_release_news
     report['checks'].append(check_release_news(options))
+    # The forward v2 migration installs dormant (scoring_version=1), so every
+    # historical v1 integrity scenario above still runs against the full schema.
+    # Activate only here, then exercise v2 and verify frozen v1 snapshots survive.
+    with connect() as c:
+        legacy_rounds=c.execute('select month,standings,revision from monthly_competition_rounds order by month').fetchall()
+        assert c.execute('select scoring_version from monthly_competition_settings').fetchone()[0]==1
+    from tools.test_monthly_quality_db import run_quality_acceptance
+    report['qualityV2']=run_quality_acceptance(connect,report)
+    with connect() as c:
+        for legacy_month,legacy_standings,legacy_revision in legacy_rounds:
+            assert c.execute('select standings,revision,scoring_version from monthly_competition_rounds where month=%s',(legacy_month,)).fetchone()==(legacy_standings,legacy_revision,1)
+            assert c.execute('select proplet_monthly_state_v1(null,%s)',(legacy_month,)).fetchone()[0]['scoringVersion']==1
+    with connect() as c:
+        c.execute((ROOT/'supabase/tests/monthly_quality_rank_explanations.sql').read_text(encoding='utf8'))
+    report['checks'].append('v2 rank reason compares adjacent equal-total contender across 100/90/90 groups')
+    report['checks'].append('forward migration dormant through complete v1 suite; explicit v2 activation; legacy closed standings/revisions/rules remain unchanged')
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report,indent=2),encoding='utf8')
     (ROOT/'data/monthly-preview-scenarios.json').write_text(json.dumps({

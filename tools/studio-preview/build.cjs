@@ -16,7 +16,7 @@ function copy(dir,prefix=''){
 copy(source);
 const csp="default-src 'self'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; object-src 'none'; frame-src 'none'; worker-src 'none'; form-action 'none'; base-uri 'none'";
 let html=fs.readFileSync(path.join(source,'index.html'),'utf8');
-html=html.replace('<head>','<head>\n<meta http-equiv="Content-Security-Policy" content="'+csp+'">\n<script src="/studio-fixtures/guard.js"></script>\n<script src="/studio-fixtures/adapter.js"></script>\n<link rel="stylesheet" href="/studio-fixtures/controls.css">\n<script defer src="/studio-fixtures/controls.js"></script>');
+html=html.replace('<head>','<head>\n<meta http-equiv="Content-Security-Policy" content="'+csp+'">\n<script src="/studio-fixtures/guard.js"></script>\n<script src="/studio-fixtures/monthly-v2-fixture.js"></script>\n<script src="/studio-fixtures/adapter.js"></script>\n<link rel="stylesheet" href="/studio-fixtures/controls.css">\n<script defer src="/studio-fixtures/controls.js"></script>');
 // Metadata links describe production in the real app, but this is an isolated copy.
 html=html.replace(/<meta[^>]+(?:og:url|og:image|twitter:image)[^>]+>/g,'').replace(/<link rel="canonical"[^>]+>/g,'');
 html=html.replace(/<title>[^<]+<\/title>/,'<title>Proplet — Studio Edition, izolovaný náhled</title>');
@@ -25,7 +25,7 @@ let runtime=fs.readFileSync(path.join(source,'runtime-meta.js'),'utf8');
 runtime=runtime.replace("const canonicalOrigin='https://hrajproplet.cz';","const canonicalOrigin=location.origin;").replace(/const previewHost=[^;]+;/,'const previewHost=true;');
 fs.writeFileSync(path.join(out,'runtime-meta.js'),runtime);
 fs.mkdirSync(path.join(out,'studio-fixtures'),{recursive:true});
-for(const file of ['guard.js','adapter.js','controls.js','controls.css'])fs.copyFileSync(path.join(__dirname,file),path.join(out,'studio-fixtures',file));
+for(const file of ['guard.js','monthly-v2-fixture.js','adapter.js','controls.js','controls.css'])fs.copyFileSync(path.join(__dirname,file),path.join(out,'studio-fixtures',file));
 fs.copyFileSync(path.join(repo,'tests/fixtures/browser/tajenka.json'),path.join(out,'studio-fixtures/tajenka.json'));
 fs.writeFileSync(path.join(out,'robots.txt'),'User-agent: *\nDisallow: /\n');
 // Original gameplay bytes must remain exact, including any future source additions.

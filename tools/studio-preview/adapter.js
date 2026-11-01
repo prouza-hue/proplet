@@ -257,6 +257,7 @@ window.fetch=async(input,init={})=>{
  requests.push({path:url.pathname,method,reviewOnly:true});
  let body={};try{body=JSON.parse(init.body||'{}');}catch{}
  const path=url.pathname;
+ if(method==='GET'&&path==='/api/competition/monthly')return json(window.PropletMonthlyV2Fixture.response(reviewParams.get('monthlyCase')));
  if(method==='GET'&&path==='/api/config'){
   let config={"badges":[{"days":1,"icon":"🥉","name":"První zářez"},{"days":3,"icon":"❤️","name":"Srdcař"},{"days":5,"icon":"⭐","name":"Pětka"},{"days":7,"icon":"🔥","name":"Týden v plamenech"},{"days":10,"icon":"🏆","name":"Desítka"},{"days":14,"icon":"⚡","name":"Blesk"},{"days":21,"icon":"🦉","name":"Mistr slov"},{"days":30,"icon":"👑","name":"Koruna"},{"days":50,"icon":"💎","name":"Diamant"},{"days":100,"icon":"🚀","name":"Legenda"}],"points":{"daily":100,"easy":15,"medium":25,"hard":50,"hardcore":100,"mozkomor":150,"starter":10,"mozkokalypsa":200},"dictionarySize":13939,"dailyRotationSize":365,"dailyGeneration":4,"dailyGeneration3From":"2026-08-17","dailyCadence":{"weekdays":["easy","easy","medium","medium","medium","hard","hard"],"counts":{"easy":105,"medium":156,"hard":104}},"rescueBankSize":30,"pushAvailable":false,"environment":"preview","version":"4.09.12","historicalFreeWriteEnabled":false,"referralsEnabled":true,"dailySpecialsEnabled":true};
 

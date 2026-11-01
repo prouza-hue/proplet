@@ -1,6 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const source=fs.readFileSync('public/app/monthly/competition.js','utf8');
+const monthlyV2=require('../../tools/studio-preview/monthly-v2-fixture.js');
 const approvedCatalog=JSON.parse(fs.readFileSync('public/rewards/monthly/collections.json','utf8'));
 const tick=()=>new Promise(setImmediate);
 // The trusted isolated clock changes completion timestamps, never Date/performance
@@ -78,7 +79,7 @@ function fixture(search='',catalogAvailable=true){
   f.context.navigator.onLine=true;f.click('data-retry');f.pending.at(-1).resolve({enabled:false,reason:'non-production'});await tick();assert(f.content().includes('Pořadí nyní není dostupné'));assert(!f.content().includes('personal-score'));
   const isolated=fixture('?monthlyScenario=ties');isolated.open();assert(isolated.calls[0].url.endsWith('&scenario=ties'));
   isolated.pending[0].resolve({...state,month:'2026-10',scenarioViewer:true,isolatedScenario:'ties',truncated:true,limit:100,me:{...state.me,sharedRank:true}});await tick();
-  assert(isolated.content().includes('personal-score'),'server-approved isolated viewer can inspect own card without saving a fake account');assert(isolated.content().includes('společné umístění'),'authoritative shared rank survives bounded standings');
+  assert(isolated.content().includes('personal-score'),'server-approved isolated viewer can inspect own card without saving a fake account');assert(!isolated.content().includes('společné umístění'),'legacy shared rank is not presented as a final v2 tie outcome');
   assert.equal(isolated.nodes.get('#scenarioNotice').hidden,false);assert(isolated.nodes.get('#scenarioNotice').textContent.includes('ukázkoví hráči'));assert(isolated.content().includes('prvních 100 míst a tvoje'));
   assert.equal(isolated.nodes.get('#previousMonth').disabled,true);assert.equal(isolated.nodes.get('#nextMonth').disabled,true);
   const unapproved=fixture('?monthlyScenario=ties');unapproved.open();unapproved.pending[0].resolve(state);await tick();assert(unapproved.content().includes('data-account'),'URL alone does not enable own synthetic identity');assert.equal(unapproved.nodes.get('#scenarioNotice').hidden,true);
@@ -99,6 +100,21 @@ function fixture(search='',catalogAvailable=true){
   ownership.click('data-retry');ownership.pending.at(-1).resolve({enabled:true,status:'closed',standings:[],badges:[{month:'2026-11',rank:1}]});await tick();
   ownership.click('data-retry');ownership.pending.at(-1).reject(new Error('offline'));await tick();assert.equal(ownership.nodes.get('#awardDetailOwnership').textContent,'Náhled odznaku','unverified ownership is cleared on fetch failure');assert.equal(ownership.detailWrites(),1);
   ownership.setProfile({id:'other',token:'other-token'});assert.equal(ownership.nodes.get('#awardDetail').open,false,'account change still closes private ownership detail');
+  for(const kind of ['ready','provisional','ties','closed']){
+    const preview=fixture();preview.setProfile({id:'studio-review',token:'fixture-only'});preview.open();preview.pending[0].resolve(monthlyV2.response(kind));await tick();
+    const html=preview.content();assert(html.includes('/ 2 500 bodů'));assert(html.includes('Denní výzvy <small>80 % maxima'));assert(html.includes('Další hraní <small>20 % maxima'));assert(html.includes(kind==='ties'?'55 + 25 + 20':'55 + 25 + 10'));assert(html.includes('6 000 XP'));assert(!html.includes('2 400'));assert(!html.includes('1–1–3'));assert(!html.includes('Rychlost ani XP nerozhodují'));
+    if(kind==='ready'){assert(html.includes('Rozhodl počet čistých řešení'));assert.match(html,/day-components">55 \+ 7 \+ 20<\/small><\/span><b>82 bodů/);assert.match(html,/day-components">55 \+ 25 \+ 10<\/small><\/span><b>90 bodů/);assert(html.includes('Každý den: dokončení + samostatnost + ověřená rychlost.'));assert(html.includes('25 bodů bez nápovědy, 7 s jednou, 4 se dvěma, 1 se třemi a 0 se čtyřmi či více nápovědami.'));assert(!html.includes('čisté řešení + nápovědy'));}
+    if(kind==='provisional'){assert(html.includes('3. 12.'));assert(html.includes('platná offline dokončení'));}
+    if(kind==='ties'){assert(html.includes('čeká na závěrečný los'));assert(html.includes('místo předběžné'));assert(!html.includes('rank-number" aria-label="1. místo'));assert(!html.includes('award-rank="1"'),'unresolved podium does not promise an award');}
+    if(kind==='closed'){assert(html.includes('Rozhodl závěrečný los'));assert(!html.includes('místo předběžné'));}
+  }
+  for(const version of [{scoringVersion:1},{rulesVersion:'monthly-basic-v1'}]){
+    const history=fixture();history.setProfile({id:'historic-player',token:'fixture-only'});history.open();history.pending[0].resolve({...state,...version,status:'closed',month:'2026-11',me:{points:2400,dailyPoints:2400,otherPoints:0,otherEarnedXp:99999,rank:1,sharedRank:true,countedDays:20,validDays:20,days:[{date:'2026-11-01',points:120,counted:true},{date:'2026-11-02',points:100,counted:true}]}});await tick();
+    const html=history.content();assert(html.includes('/ 2 400 bodů'));assert(html.includes('společné umístění'));assert(html.includes('100 soutěžních bodů a dalších 20 bez nápovědy'));assert(html.includes('Rychlost ani XP nerozhodují'));assert(html.includes('1–1–3'));assert(html.includes('Bez nápovědy'));assert(!html.includes('80 % maxima'));assert(!html.includes('ověřená rychlost'));
+    history.clickData({monthlyPanel:'awards'});await tick();assert(history.content().includes('Při shodě získá stejný odznak každý'));assert(!history.content().includes('tři různí hráči'));
+    history.clickData({monthlyPanel:'standings'});history.click('data-retry');history.pending.at(-1).resolve(monthlyV2.response());await tick();assert(history.content().includes('/ 2 500 bodů'));assert(!history.content().includes('Rychlost ani XP nerozhodují'),'a subsequent v2 response clears the legacy policy');
+  }
+  const unknownTime=fixture();unknownTime.setProfile({id:'studio-review',token:'fixture-only'});unknownTime.open();const unknown=monthlyV2.response();unknown.me.days[0].verifiedTimeMs=null;unknown.me.days[0].speedPoints=0;unknownTime.pending[0].resolve(unknown);await tick();assert(unknownTime.content().includes('čas neověřen'),'missing verified timing is explicitly visible');
   const unavailable=fixture('',false);unavailable.setProfile({id:'mine',token:'session'});unavailable.open();unavailable.pending[0].resolve(state);await tick();assert(unavailable.content().includes('personal-score'),'catalog failure leaves scores functional');unavailable.clickData({monthlyPanel:'awards'});assert(unavailable.content().includes('Odznaky se nepodařilo načíst'));
   console.log('PASS monthly UI: server-only data, first season, own distant rank, best20 details, escaping, account races, offline and disabled backend');
 })().catch(error=>{console.error(error);process.exitCode=1;});
