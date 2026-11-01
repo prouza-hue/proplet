@@ -44,8 +44,8 @@ html[data-theme=dark]{--patron-blue:#adcaff;--patron-tint:#364657}
 .patron-own-badge strong{display:block;font-size:18px;margin-bottom:5px}
 .patron-avatar-demo{position:relative;width:56px;height:56px;outline:1px solid var(--patron-blue);outline-offset:4px;border-radius:50%}
 .patron-avatar-demo>img{border-radius:50%;display:block}
-.patron-avatar-demo i{position:absolute;right:-8px;bottom:-5px;width:23px;height:23px;display:grid;place-items:center;background:var(--patron-blue);color:var(--td-paper);border:2px solid var(--patron-tint);border-radius:7px;transform:rotate(-8deg)}
-.patron-avatar-demo i svg{width:13px;height:13px}
+.patron-avatar-demo i,.patron-avatar-card{position:absolute;right:-8px;bottom:-5px;width:23px;height:23px;display:grid;place-items:center;background:var(--patron-blue);color:var(--td-paper);border:2px solid var(--patron-tint);border-radius:7px;transform:rotate(-8deg)}
+.patron-avatar-demo i svg,.patron-avatar-card svg{width:13px;height:13px}
 .patron-label-static{display:flex;align-items:center;gap:5px;color:var(--patron-blue);font-size:13px}
 .patron-label-static svg{width:13px;height:13px}
 .patron-visibility{display:flex;gap:12px;align-items:flex-start;font-size:15px;margin:20px 0 28px;cursor:pointer}
@@ -57,9 +57,13 @@ html.tiskarna-ui body #patronProfileEntry{display:flex;align-items:center;gap:16
 #patronProfileEntry strong{font:650 23px/1.2 Fraunces,serif;display:block}
 #patronProfileEntry small{font:400 15px/1.4 Outfit,sans-serif;display:block;color:var(--td-muted);margin-top:4px}
 #patronProfileEntry>b{color:var(--patron-blue);font-size:23px}
-.patron-label{display:flex!important;align-items:center;gap:5px!important;min-height:28px!important;width:max-content;max-width:100%;padding:3px 0!important;border:0!important;background:none!important;color:var(--patron-blue)!important;font:500 12px/1.25 Outfit,sans-serif!important;cursor:pointer;text-align:left;text-decoration:none;box-shadow:none!important}
+.patron-label{display:flex!important;align-items:center;gap:5px!important;min-height:0!important;width:max-content;max-width:100%;padding:0!important;border:0!important;background:none!important;color:var(--patron-blue)!important;font:500 12px/1.25 Outfit,sans-serif!important;cursor:pointer;text-align:left;text-decoration:none;box-shadow:none!important}
 .patron-label svg{width:13px;height:13px;flex:none}
-.patron-supported .avatar-dot,.patron-supported .result-player-avatar{outline:1px solid var(--patron-blue);outline-offset:3px}
+/* The rotated keepsake stays inside the existing avatar box. */
+html.tiskarna-ui .patron-avatar-marked{position:relative!important;overflow:visible!important}
+html.tiskarna-ui .patron-avatar-marked>.patron-avatar-card{box-sizing:border-box;right:2px;bottom:2px;width:43%;height:43%;max-width:27px;max-height:27px;min-width:14px;min-height:14px;border-width:1.5px;border-radius:5px;pointer-events:none;z-index:2}
+html.tiskarna-ui .patron-avatar-card svg{width:63%;height:63%}
+.patron-avatar-marked>img.google-profile-avatar{border-radius:50%}
 #patronDialog :is(button,a,input):focus-visible{outline:3px solid var(--td-blue,#315da8);outline-offset:3px}
 @media(max-width:540px){
  #patronDialog{padding:24px 20px;border-radius:20px}
@@ -89,13 +93,12 @@ html.tiskarna-ui body #patronProfileEntry{display:flex;align-items:center;gap:16
 .patron-perk{grid-template-columns:92px minmax(0,1fr);gap:18px}
 .patron-mini-person{display:flex;flex-direction:column;align-items:center;gap:12px}
 .patron-mini-person .patron-label-static{font-size:11px;font-weight:500}
-/* Wider rankings can carry the quiet signature beside the name. */
-@media(min-width:600px){
- html.tiskarna-ui .patron-supported :is(.leader-name,.result-player-copy){display:grid!important;grid-template-columns:minmax(0,max-content) max-content;justify-content:start;align-items:center;column-gap:9px;row-gap:2px}
- .patron-supported :is(.leader-name,.result-player-copy)>strong{grid-column:1;grid-row:1;min-width:0}
- .patron-supported :is(.leader-name,.result-player-copy)>.patron-label{grid-column:2;grid-row:1}
- .patron-supported :is(.leader-name,.result-player-copy)>small{grid-column:1/-1;grid-row:2}
-}
+/* A signature shares the name line; result metrics keep their existing line. */
+html.tiskarna-ui body .patron-supported :is(.leader-name,.result-player-copy){display:grid!important;grid-template-columns:minmax(0,max-content) max-content;justify-content:start;align-items:center;column-gap:6px;row-gap:4px;min-width:0;text-align:left!important}
+html.tiskarna-ui body :is(#winModal,#levelDetailModal) .patron-supported .result-player-copy{display:grid!important}
+html.tiskarna-ui body .patron-supported .leader-name>strong,html.tiskarna-ui body :is(#winModal,#levelDetailModal) .patron-supported .result-player-copy>strong{grid-column:1;grid-row:1;min-width:0;max-width:100%;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
+html.tiskarna-ui body .patron-supported :is(.leader-name,.result-player-copy)>.patron-label{grid-column:2;grid-row:1;white-space:nowrap;font-size:11px!important;line-height:1.25!important}
+html.tiskarna-ui body .patron-supported :is(.leader-name,.result-player-copy)>small{grid-column:1/-1;grid-row:2}
 
 .patron-bank-details{font-size:13px;margin:0;overflow-wrap:anywhere}.patron-bank-details dt{color:var(--td-muted);font-size:12px}.patron-bank-details dd{margin:0 0 5px}.patron-avatar-native{display:grid;place-items:center;width:56px;height:56px;font-size:36px}.patron-error{color:#a33131!important;padding-top:12px}.patron-today-link{display:block;margin:12px auto;font-size:13px!important;min-height:36px}.patron-offer{display:flex;align-items:center;gap:14px;padding:16px;margin:16px 0;border:1px solid var(--td-line);border-radius:14px;background:var(--td-paper)}.patron-offer>div{flex:1}.patron-offer p{font-size:13px;margin:3px 0 0}.patron-offer button{font-size:13px;min-height:40px}.patron-offer .patron-entry-seal{flex:none}@media(max-width:540px){.patron-offer{flex-wrap:wrap}.patron-offer>div{flex-basis:60%}}
 
