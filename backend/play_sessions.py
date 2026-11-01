@@ -12,7 +12,7 @@ class FoundWord(BaseModel):
 
 class Progress(BaseModel):
     found: list[FoundWord] = Field(default_factory=list, max_length=99)
-    elapsedMs: int = Field(default=0, ge=0, le=86_400_000)
+    elapsedMs: int = Field(default=0, ge=0, le=2_147_483_647)
     moves: int = Field(default=0, ge=0, le=10000)
     hints: int = Field(default=0, ge=0, le=99)
     wrongAttempts: int = Field(default=0, ge=0, le=999)
@@ -20,6 +20,7 @@ class Progress(BaseModel):
     calmMode: bool = False
     unverified: bool = False
     mergedAttempts: bool = False
+    disconnected: bool = False
 
 
 class SessionCommand(BaseModel):
@@ -68,6 +69,8 @@ def execute(command, actor, puzzle, rpc):
         value = value[0] if value else {}
     if not isinstance(value, dict):
         raise HTTPException(503, 'Pokračování hry se nepodařilo načíst')
+    if value.get('error') == 'duration_limit':
+        raise HTTPException(422, 'Tento pokus přesáhl nejdelší podporovanou dobu měření (24 dní). Čas nelze zkrátit pro zařazení do pořadí.')
     if value.get('error') in ('busy', 'ownership'):
         raise HTTPException(409, 'Tahle hra je otevřená na jiném zařízení. Nejprve ji tam pozastav.')
     if value.get('error'):

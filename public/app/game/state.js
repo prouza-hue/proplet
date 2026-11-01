@@ -116,6 +116,8 @@ function create(deps={}){
       elapsedMs:Math.round(elapsed(game)),
       attemptId:game.attemptId||null,
       timingUnverified:!!game.timingUnverified,
+      serverTimingAnchored:!!game.serverTimingAnchored,
+      disconnected:!!game.disconnected,
       mergedAttempts:!!game.mergedAttempts,
       calmMode:!!game.calmMode,
       wordDiscoveryXpAwarded:Math.max(0,Number(game.wordDiscoveryXpAwarded)||0),

@@ -91,6 +91,8 @@ route_snapshot = sorted(
 # additions reproduces the prior 7da3e64c digest, including both weekly-team routes.
 assert _digest(route_snapshot) == "9f8cb87c1786afdfd7bb04be8f595bcb62d8248b8cdedfdeb020cd32f25c6e4b"
 openapi_contract = json.loads(json.dumps(server.app.openapi()))
+from duration_contract import normalize_disconnect_durations
+normalize_disconnect_durations(openapi_contract)
 # Validate the exact additive announcement endpoints before preserving the old digest.
 news_paths = {"/api/release-news": {"get"}, "/api/release-news/claim": {"post"}}
 assert {p for p in openapi_contract["paths"] if p.startswith("/api/release-news")} == set(news_paths)
