@@ -154,6 +154,7 @@ function home(){
   window.PropletHomeLayout?.orderDailyNodes?.();
 }
 function placePlayExtra(card){
+ if(q('#screen-free')?.classList.contains('play-compact')){card?.remove();return true;}
  const archive=q('#axPlayArchive');if(!archive)return false;
  if(card.nextElementSibling!==archive)archive.before(card);
  return true;
@@ -162,7 +163,7 @@ function free(){
  if(!installed)return;
  const root=q('#screen-free');if(!root)return;
  // Order is intentional: fresh content, current difficulties, Tajenka, Archive.
- if(!q('#axPlayArchive')){const el=document.createElement('div');el.id='axPlayArchive';el.innerHTML=archiveEntry();root.append(el);}
+ if(!q('#axPlayArchive')){const el=document.createElement('div');el.id='axPlayArchive';el.innerHTML=root.classList.contains('play-compact')?'<button type="button" class="play-browse-link play-archive-link" data-archive-action="open"><span>Archiv</span><small>800 desek</small><span aria-hidden="true">→</span></button>':archiveEntry();(q('#playBrowseLinks')||root).append(el);}
  // The native play card keeps its next/resume level beside the action.
 }
 function seed(){

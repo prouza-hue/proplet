@@ -22,7 +22,7 @@ LIVE = {
     "VERCEL_GIT_COMMIT_REF": "codex/studio-edition",
     "SUPABASE_URL": "https://iopyhluayfszskyqqpuc.supabase.co",
 }
-LIVE_BRANCHES = ("codex/studio-edition", "codex/today-one-screen")
+LIVE_BRANCHES = ("codex/studio-edition", "codex/today-one-screen", "codex/play-one-screen")
 
 
 class LivePreview(unittest.TestCase):
@@ -45,7 +45,9 @@ class LivePreview(unittest.TestCase):
                     "VERCEL_ENV": ("production", "development", ""),
                     "VERCEL_GIT_COMMIT_REF": ("main", "preview/studio-edition", "codex/studio-edition-other",
                                                "preview/today-one-screen", "codex/today-one-screen-other",
-                                               "codex/today-one-screen/child", "codex/Today-one-screen"),
+                                               "codex/today-one-screen/child", "codex/Today-one-screen",
+                                               "preview/play-one-screen", "codex/play-one-screen-other",
+                                               "codex/play-one-screen/child", "codex/Play-one-screen"),
                     "SUPABASE_URL": ("", "https://eanzztstmwlamwfdskbf.supabase.co", LIVE["SUPABASE_URL"] + ".invalid"),
                 }.items():
                     for value in values:
@@ -53,6 +55,33 @@ class LivePreview(unittest.TestCase):
                             self.assertFalse(config.live_player_preview_enabled())
                 with patch.dict(os.environ, {"PROPLET_TAJENKA_RELEASE_ENABLED": "false"}):
                     self.assertFalse(config.load_settings().tajenka_release_enabled)
+
+    def test_play_preview_google_start_keeps_same_origin_without_persistence(self):
+        from datetime import timezone
+        from urllib.parse import parse_qs, urlparse
+        from account_auth_core import install_account_auth
+        origin = "https://proplet-git-codex-play-one-screen-pavel-prouzas-projects.vercel.app"
+        app = FastAPI()
+        persistence = Mock(side_effect=AssertionError("OAuth start must not write player/session data"))
+        install_account_auth(app, supabase_url=LIVE["SUPABASE_URL"], supabase_key="synthetic-preview-key",
+            tz=timezone.utc, db_select=persistence, db_insert=persistence, db_update=persistence,
+            db_delete=persistence, auth_player=persistence, new_session=persistence,
+            hash_password=lambda p:p, verify_password=lambda *a:False,
+            enforce_rate_limit=lambda *a,**k:None, player_stats=persistence,
+            public_family_code=lambda *a:None, league_name_for=lambda *a:None,
+            canonical_origin="https://hrajproplet.cz", vercel_env="preview")
+        with patch.dict(os.environ,{**LIVE,"VERCEL_GIT_COMMIT_REF":"codex/play-one-screen"},clear=True):
+            client = TestClient(app,base_url=origin,headers={"Origin":origin})
+            response = client.get("/api/auth/google/start",follow_redirects=False)
+        self.assertEqual(response.status_code,302)
+        target = parse_qs(urlparse(response.headers["location"]).query)
+        self.assertEqual(urlparse(target["redirect_to"][0]).netloc,urlparse(origin).netloc)
+        self.assertEqual(parse_qs(urlparse(target["redirect_to"][0]).query)["auth"],["google"])
+        self.assertEqual(target["code_challenge_method"],["s256"])
+        self.assertIn("HttpOnly",response.headers["set-cookie"])
+        self.assertIn("Secure",response.headers["set-cookie"])
+        self.assertNotIn("Domain=",response.headers["set-cookie"])
+        persistence.assert_not_called()
 
     def test_real_paths_pass_guard_but_test_results_do_not(self):
         async def exercise(live, path, test=False):

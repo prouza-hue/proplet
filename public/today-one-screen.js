@@ -48,7 +48,7 @@
   }
   const archiveResume=q('#axArchiveResume'),freeResume=q('#homeResumeCard');
   const resume=visible(archiveResume)?archiveResume:visible(freeResume)?freeResume:null;
-  const difficultyCount=document.querySelectorAll('#difficultyCards .cp-card').length;
+  const difficultyCount=document.querySelectorAll('#difficultyCards [data-play-free]').length;
   const free={key:'free',title:resume?'Rozehráno':'Volná hra',detail:resume?text(resume.querySelector('strong')).replace(/^Rozehráno:\s*/,'').replace(/^Rozehráno v Archivu\s*·?\s*/,'Archiv · '):difficultyCount?difficultyCount+' obtížností':'',art:resume?icon(resume):'/difficulty/printshop/easy.webp',target:resume?'#'+resume.id:q('#axHomeFree .ax-card-action')?'#axHomeFree .ax-card-action':'.bottom-nav [data-nav="free"]',label:resume?text(resume):'Volná hra. Vybrat obtížnost.',kind:complete?'free next':'free'};
   complete?tiles.unshift(free):tiles.push(free);
   tiles.push({key:'team',title:'Soutěže',detail:'Týdenní · měsíční',art:'/assets/navigation/competitions-v1.webp',target:'.bottom-nav [data-nav="leaderboard"]',label:'Otevřít soutěže. Týdenní a měsíční soutěž.',kind:'team'});

@@ -103,3 +103,9 @@ for(const teamMember of [false,true]){
 }
 assert.equal(competitionEntries,2);assert.equal(weeklyEntries,0);
 console.log('PASS one-screen readiness: guarded native actions, separate accessible result metrics, and completed Extra label');
+
+// Tajenka remains available on Today when Play no longer duplicates its card.
+const tajenka=new Element(),tajenkaPlay=new Element('button'),tajenkaRecap=new Element('button'),resumeCard=new Element('button');tajenka.id='tajenkaPreviewCard';tajenkaPlay.textContent='Pokračovat';tajenkaRecap.textContent='Zobrazit výsledek';resumeCard.id='homeResumeCard';resumeCard.textContent='Pokračovat ve Volné hře';selectors.set('#tajenkaPreviewCard',tajenka);selectors.set('#tajenkaPreviewBtn',tajenkaPlay);selectors.set('#tajenkaPreviewCard [data-tajenka-recap]',tajenkaRecap);selectors.set('#homeResumeCard',resumeCard);let tajenkaActions=0;tajenkaPlay.onclick=()=>tajenkaActions++;tajenkaRecap.onclick=()=>tajenkaActions++;
+for(const state of [{daily:'before',special:false,done:false},{daily:'before',special:true,done:false},{daily:'complete',special:true,done:true},{daily:'complete',special:false,done:true}]){hero.dataset.studioState=state.daily;hero.classList.toggle('daily-special-selected',state.special);tajenka.classList.toggle('completed',state.done);extra.hidden=false;repaint();assert(rendered('tajenka'),'Today retains Tajenka with Extra, free resume and completed variants');rendered('tajenka').click();}
+assert.equal(tajenkaActions,4,'all variants keep their native start/resume/result target');
+console.log('PASS Today Tajenka remains reachable with Extra, resume and all-complete layouts');

@@ -172,6 +172,7 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
     const source=q('#tajenkaPreviewCard'),screen=q('#screen-free');
     if(!screen)return;
     let card=q('#tajenkaPlayCard');
+    if(screen.classList.contains('play-compact')){card?.remove();return;}
     if(!source||source.classList.contains('hidden')){card?.classList.add('hidden');return}
     if(!card){
       card=document.createElement('div');

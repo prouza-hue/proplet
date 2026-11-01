@@ -41,9 +41,10 @@
     const original=global.openPlayedLevels;
     global.openPlayedLevels=async function(diff){
       document.getElementById('historyNumericCatalogue')?.remove();
-      await original(diff);
+      const opened=await original(diff);if(opened===false)return false;
       const list=document.getElementById('playedLevelsList');
-      if(!list||document.getElementById('playedLevelsModal').classList.contains('hidden'))return;
+      const modal=document.getElementById('playedLevelsModal');
+      if(!list||modal.classList.contains('hidden')||modal.__playedLevelsDifficulty&&modal.__playedLevelsDifficulty!==diff)return;
       const details=document.createElement('details');details.id='historyNumericCatalogue';details.className='history-numeric-catalogue';details.dataset.sharedCatalogue=diff;
       const summary=document.createElement('summary');summary.textContent='Všechny úrovně podle čísel';details.append(summary);
       details.addEventListener('toggle',()=>{if(details.open)populateNumericCatalogue(details,diff)});

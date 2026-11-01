@@ -9,10 +9,10 @@
   <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
   <script src="/referral-transport.js?v=profile-entry1"></script>
-<script src="/runtime-meta.js?v=41009" data-proplet-runtime-meta="1" data-loaded="1"></script>
+<script src="/runtime-meta.js?v=41009play-one-screen1" data-proplet-runtime-meta="1" data-loaded="1"></script>
   <script src="/app/client-diagnostics.js?v=actor-context1" id="propletClientDiagnostics"></script>
   <script src="/analytics-init.js?v=telemetry1"></script>
-  <script src="/theme-init.js?v=41009recurring-patron1"></script>
+  <script src="/theme-init.js?v=41009play-one-screen1"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
@@ -76,7 +76,7 @@
 <link rel="stylesheet" href="/free-order.css?v=shared3">
 <link rel="stylesheet" href="/first-steps.css?v=2">
 <link rel="stylesheet" href="/mozkokalypsa.css?v=mk3release1">
-<link rel="stylesheet" href="/studio-edition.css?v=heading1">
+<link rel="stylesheet" href="/studio-edition.css?v=play-one-screen1">
 <link rel="stylesheet" href="/today-one-screen.css?v=heading1">
 <link rel="stylesheet" href="/ui-playtest-preview.css?v=1">
 <link rel="stylesheet" href="/patrons.css?v=recurring-patron1">
@@ -161,10 +161,11 @@
 
     </section>
 
-    <section id="screen-free" class="screen">
+    <section id="screen-free" class="screen play-compact">
       <div class="screen-title"><span class="eyebrow">VOLNÁ HRA</span><h1>Hrát</h1><p class="muted">Každá nová úroveň přidá XP. Série roste jen Denní výzvou.</p></div>
       <div id="newContentBanner" class="new-content-banner hidden"></div>
       <div id="difficultyCards" class="difficulty-grid"></div>
+      <div id="playBrowseLinks" class="play-browse-links"><button type="button" id="playHistoryEntry" class="play-browse-link"><span>Přehled úrovní</span><svg class="play-browse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg></button></div>
     </section>
 
     <section id="screen-leaderboard" class="screen">
@@ -646,6 +647,7 @@
       <button id="closePlayedLevelsModal" class="modal-close" aria-label="Zavřít">×</button>
       <span class="eyebrow">ODEHRANÉ ÚROVNĚ</span>
       <h2 id="playedLevelsTitle">Tvoje kola</h2>
+      <label class="play-history-filter" for="playedLevelsDifficulty">Obtížnost<select id="playedLevelsDifficulty"><option value="easy">Snadná</option><option value="medium">Střední</option><option value="hard">Těžká</option><option value="hardcore">Mozkožrout</option><option value="mozkomor">Mozkomor</option><option value="mozkokalypsa">Mozkokalypsa</option></select></label>
       <p id="playedLevelsMeta" class="muted"></p>
       <div id="playedLevelsList" class="played-levels-list"></div>
     </div>
@@ -793,25 +795,25 @@
   <script src="/app/engagement/first-steps.js?v=firstgame-recovery2"></script>
   <script src="/app/acquisition.js?v=1"></script>
   <script src="/team-victories.js?v=studio-live1"></script>
-  <script src="/app/content/refresh-ui.js?v=archive-release1"></script>
+  <script src="/app/content/refresh-ui.js?v=play-one-screen1"></script>
   <script src="/app/content/refresh-release.js?v=archive-release1"></script>
   <script src="/app/archive/solution-contract.js"></script>
-  <script src="/app/archive/experience.js?v=monthly-releaseprep6"></script>
+  <script src="/app/archive/experience.js?v=play-one-screen1"></script>
   <script src="/release-news.js?v=monthly-quality2"></script>
-  <script src="/app.js?v=41009recurring-patron1"></script>
+  <script src="/app.js?v=41009play-one-screen1"></script>
   <script src="/app/weekly/competition.js?v=monthly-releaseprep6"></script>
   <script src="/app/monthly/competition.js?v=monthly-clarity1"></script>
 
   <script src="/app/mozkokalypsa.js?v=mk3release1"></script>
   <script src="/app/marketing.js?v=5"></script>
-  <script src="/quality-v334.js?v=play-polish1"></script>
+  <script src="/quality-v334.js?v=play-one-screen1"></script>
   <script src="/achievement-stories.js?v=1"></script>
   <script src="/achievement-details.js?v=rank-details1"></script>
   <script src="/organic-ui-v4023.js?v=artcutout3"></script>
   <script src="/app/mozkokalypsa-launch.js?v=archive-release1"></script>
 <script src="/referrals.js?v=ui-refinement2"></script>
   <script src="/studio-shell.js?v=1"></script>
-  <script src="/today-one-screen.js?v=monthly-releaseprep6"></script>
+  <script src="/today-one-screen.js?v=play-one-screen1"></script>
 
   <script src="/ui-playtest-preview.js?v=1"></script>
 <script src="/visual-playtest.js?v=1"></script>

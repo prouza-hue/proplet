@@ -12,6 +12,7 @@ const referralAliases = {invite:'member',progress:'incoming',earned:'paid'};
 let stored = {};
 try { stored = JSON.parse(nativeStorage.getItem(settingsKey) || '{}'); } catch {}
 const reviewParams = new URLSearchParams(location.search);
+const playCase=['resume','complete','fresh'].includes(reviewParams.get('playCase'))?reviewParams.get('playCase'):null;
 const linkedExtra=reviewParams.get('reviewExtra'),linkedReferral=reviewParams.get('reviewReferral');
 if(['live',...Object.keys(extras)].includes(linkedExtra))stored.extra=linkedExtra;
 if(referralStates.has(linkedReferral))stored.referral=linkedReferral;
@@ -44,7 +45,7 @@ function patronFixtureStatus(){
 }
 const patronPublicFields=(type,visible=true)=>visible?{patron:true,patronBadge:type}:{patron:false};
 const fixtureState=['ready','done','complete'].includes(reviewParams.get('state'))?reviewParams.get('state'):patronInfoPreview||patronPeriodPreview?'done':'ready';
-const prefix = 'proplet:studio-review:20261021:v2:' + scenario.extra + ':' + scenario.referral + ':' + fixtureState + (patronRankingsPreview?':patron-rankings:':':')+(patronPeriodPreview?'patron-period:'+patronPeriod+':'+(reviewParams.get('patronOwn')||'private')+':':'');
+const prefix = 'proplet:studio-review:20261021:v2:' + scenario.extra + ':' + scenario.referral + ':' + fixtureState + (patronRankingsPreview?':patron-rankings:':':')+(patronPeriodPreview?'patron-period:'+patronPeriod+':'+(reviewParams.get('patronOwn')||'private')+':':'')+'play:'+(playCase||'default')+':';
 // Keep native Storage identity. WindowProxy property replacement is not reliable
 // across all embedded-browser realms; app controllers must see these same methods.
 const storagePrototype=Storage.prototype;
@@ -197,6 +198,15 @@ function sessionCommand(body){
  }
  sessions[id]=saved;save(key,sessions);return json({...saved,verified:false,reviewOnly:true});
 }
+async function seedPlayState(){
+ if(!playCase||playCase!=='fresh'&&local.getItem('studio-play-seeded'))return;
+ await window.__PROPLET_ENSURE_FULL_PUZZLE_DB?.();
+ const value=getState();value.completed||={};value.inProgress||={};
+ if(playCase==='resume'){const puzzle=puzzleDB.free.medium.find(p=>p.answers?.length),answer=puzzle.answers[0];value.inProgress['free:'+puzzle.id]={puzzleId:puzzle.id,mode:'free',difficulty:'medium',found:[{answerIndex:0,word:answer.word,colorIndex:0,path:[...answer.path]}],moves:1,hints:0,elapsedMs:12000,attemptId:'studio-play-resume',timingUnverified:true,savedAt:Date.now()};}
+ if(playCase==='complete')for(const [diff,bank]of Object.entries(puzzleDB.free))for(const puzzle of bank)value.completed['free:'+puzzle.id]={puzzleId:puzzle.id,mode:'free',difficulty:diff,level:puzzle.meta?.level,contentGeneration:puzzle.meta?.contentGeneration,elapsedMs:65000,moves:puzzle.answers?.length||8,hintsUsed:0,cleanSolve:true,points:0,completedAt:today()+'T10:00:00Z'};
+ if(playCase==='fresh'){const puzzle=puzzleDB.free.hard.find(p=>p.answers?.length);puzzleDB.contentStatus={...puzzleDB.contentStatus,latestBatch:{id:'studio-play-new',availableFrom:pragueDateISO(),levels:[{id:puzzle.id,difficulty:'hard'}]}};}
+ saveState(value);local.setItem('studio-play-seeded','1');renderFree();renderDaily();
+}
 async function seedState(){
  if(fixtureState==='ready'||local.getItem('studio-state-seeded'))return;
  const descriptors=[await modelDaily()];if(fixtureState==='complete'&&scenario.extra!=='live')descriptors.push((await specialResponse()).special);
@@ -286,6 +296,7 @@ window.fetch=async(input,init={})=>{
  requests.push({path:url.pathname,method,reviewOnly:true});
  let body={};try{body=JSON.parse(init.body||'{}');}catch{}
  const path=url.pathname;
+ if(method==='GET'&&path==='/api/played-levels'){const difficulty=url.searchParams.get('difficulty'),bank=(await publicBank()).free?.[difficulty]||[],records=state().completed||{};const levels=bank.flatMap(p=>{const r=records['free:'+p.id];return r?[{...r,level:p.meta?.level,puzzleId:p.id,attempts:1,transferred:false}]:[]});return json({levels,legacyLevels:[],actual:levels.length,transferred:0,total:bank.length,reviewOnly:true});}
  if(path==='/api/patrons'&&method==='GET')return json(patronFixtureStatus());
  if(patronPeriodPreview&&path==='/api/patrons/preferences'&&method==='POST'){
   if(typeof body.publicBadge==='boolean')patronPreviewPublic=body.publicBadge;
@@ -318,7 +329,7 @@ window.fetch=async(input,init={})=>{
   const week=typeof activeTajenkaWeek==='number'?activeTajenkaWeek:14;
   return json({...puzzle,week,id:'tajenka-v2-week-'+String(week).padStart(2,'0')});
  }
- if(method==='GET'&&path==='/api/rolling-content')return json({version:2,asOf:today(),puzzles:{},latestBatch:null,nextRelease:null,availableFreeCounts:{},reviewOnly:true});
+ if(method==='GET'&&path==='/api/rolling-content'){const puzzle=playCase==='fresh'?(await publicBank()).free.hard.find(p=>p.answers?.length):null;let date=today();try{date=pragueDateISO()}catch{}return json({version:2,asOf:date,puzzles:{},latestBatch:puzzle?{id:'studio-play-new',availableFrom:date,levels:[{id:puzzle.id,difficulty:'hard'}]}:null,nextRelease:null,availableFreeCounts:{},reviewOnly:true});}
  if(path==='/api/referrals'&&method==='GET')return json(referralStatus());
  if(path==='/api/referrals/invite'&&method==='POST')return json({...ownInvite(),rewardXp:1000,requiredBoards:5,reviewOnly:true});
  if(path.startsWith('/api/referrals/invite/')&&method==='GET')return json({enabled:true,inviter:{name:'Katka',avatar:'🦊'},reviewOnly:true});
@@ -441,6 +452,7 @@ async function openPatronFixtureView(view){
 document.addEventListener('proplet:ready',()=>{
  ready=true;
  seedState().then(async()=>{
+  await seedPlayState();
   if(patronPeriodPreview){
    await waitForPatronView(()=>typeof window.PropletPatrons?.refresh==='function'&&typeof window.PropletPatrons?.open==='function','native-api');
    await window.PropletPatrons.refresh();

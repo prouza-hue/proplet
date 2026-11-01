@@ -75,7 +75,7 @@ function calmControlMarkup(id){
 }
 function bindCalmSwitch(root){const b=root?.querySelector('.calm-quick-toggle');if(!b||b.dataset.bound==='1')return;b.dataset.bound='1';b.onclick=toggleCalmPreference}
 function ensureQuickCalmControls(){
-  const grid=q('#difficultyCards');if(grid&&!q('#freeCalmQuick')){grid.insertAdjacentHTML('beforebegin',calmControlMarkup('freeCalmQuick'));bindCalmSwitch(q('#freeCalmQuick'))}
+  const grid=q('#difficultyCards'),compact=q('#screen-free')?.classList.contains('play-compact');if(compact)q('#freeCalmQuick')?.remove();if(grid&&!compact&&!q('#freeCalmQuick')){grid.insertAdjacentHTML('beforebegin',calmControlMarkup('freeCalmQuick'));bindCalmSwitch(q('#freeCalmQuick'))}
   q('#dailyCalmQuick')?.remove();
 }
 function ensureCalmRunButton(){
@@ -164,13 +164,14 @@ function installGameWrappers(){
 async function enrichPlayedLevels(diff){
   const list=q('#playedLevelsList'),meta=q('#playedLevelsMeta');if(!list)return;
   let data=null;try{const p=safeProfile();if(p?.token&&typeof api==='function')data=await api(`/api/played-levels?difficulty=${encodeURIComponent(diff)}`)}catch{}
+  const modal=q('#playedLevelsModal');if(modal?.__playedLevelsDifficulty&&modal.__playedLevelsDifficulty!==diff)return;
   const legacy=data?.legacyLevels||[],transferred=Number(data?.transferred||0);
   q('.legacy-history-v334',list)?.remove();if(!legacy.length)return;
   const section=document.createElement('section');section.className='legacy-history-v334';
   section.innerHTML=`<h3>Dříve odehrané</h3><p>Tvoje starší výsledky zůstávají v historii. Původní desky už nemusí být znovu hratelné.</p>${legacy.slice().sort((a,b)=>(a.level||0)-(b.level||0)).map(r=>`<div class="legacy-history-row"><span class="level-index">${Number(r.level)||'–'}.</span><span><strong>${r.elapsedMs&&typeof fmtTime==='function'?fmtTime(r.elapsedMs):'Dokončeno'}</strong><small>${r.cleanSolve?'Čistě':r.hintsUsed?`💡 ${r.hintsUsed}×`:'Dokončeno'} · ${Number(r.moves||0)} tahů${r.calmMode?' · 🫧 Klid':''}</small></span><em>archiv</em></div>`).join('')}`;
   list.appendChild(section);
 }
-function installHistoryWrapper(){if(typeof openPlayedLevels==='function'&&!openPlayedLevels.__qualityWrapped){const base=openPlayedLevels,wrapped=async function(diff){const out=await base(diff);await enrichPlayedLevels(diff);return out};wrapped.__qualityWrapped=true;openPlayedLevels=wrapped}}
+function installHistoryWrapper(){if(typeof openPlayedLevels==='function'&&!openPlayedLevels.__qualityWrapped){const base=openPlayedLevels,wrapped=async function(diff){const out=await base(diff);if(out!==false)await enrichPlayedLevels(diff);return out};wrapped.__qualityWrapped=true;openPlayedLevels=wrapped}}
 
 function transferredCount(){try{return Object.keys(DIFF).reduce((sum,d)=>sum+localFreeSlotState(d).transferred.size,0)}catch{return 0}}
 function releaseModalStorage(){return window.PROPLET_RUNTIME_META?.gen4CandidatePreview?sessionStorage:localStorage}
