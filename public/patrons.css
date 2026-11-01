@@ -192,3 +192,8 @@ html[data-theme=dark] .patron-settings-preview.patron-recurring{color:#ffb0a0!im
  html.tiskarna-ui body .result-player-copy>.patron-label.patron-recurring .patron-label-full{display:none}
  html.tiskarna-ui body .result-player-copy>.patron-label.patron-recurring .patron-label-compact{display:inline}
 }
+
+#patronDialog .patron-bank-help{margin-top:10px;font:400 14px/1.5 Outfit,sans-serif}
+#patronDialog .patron-bank-help summary{cursor:pointer;min-height:32px;font-weight:600;color:var(--td-ink)}
+#patronDialog .patron-bank-help p{margin:10px 0 0}
+#patronDialog .patron-bank-help a{color:var(--patron-blue);text-decoration:underline;text-underline-offset:2px}

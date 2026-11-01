@@ -36,6 +36,7 @@ async function avatarInfoLifecycle(){
  win.PropletPatrons.model.frequency='monthly';win.PropletPatrons.open('offer');
  assert(dialog.innerHTML.includes('Červené srdíčko získáš po první potvrzené měsíční platbě.'));
  assert(dialog.innerHTML.includes('Některé banky načtou QR jen jako jednorázovou platbu'));
+ assert(dialog.innerHTML.includes('Jak je to u mé banky?'));assert(dialog.innerHTML.includes('https://www.kb.cz/cs/o-bance/spokojenost-klientu'));assert(dialog.innerHTML.includes('https://www.rb.cz/osobni/ucty/sluzby-k-uctum/mobilni-bankovnictvi'));assert(dialog.innerHTML.includes('target="_blank" rel="noopener noreferrer"'));assert(dialog.innerHTML.includes('při našem vyzkoušení na Androidu se ale opakování nepředvyplnilo'));assert(dialog.innerHTML.includes('Pokud už první platba odešla, nastav trvalý příkaz až od dalšího měsíce'));
  assert.equal(win.PropletPatrons.model.badgeType,'supporter');assert(!header.classList.contains('patron-recurring'),'QR selection does not activate regular badge');
  Object.assign(server,{contributions:[{frequency:'monthly',amountCzk:99,confirmedAt:'2026-11-01'}]});await win.PropletPatrons.refresh();
  assert(!header.classList.contains('patron-recurring'),'client never derives regular status from payment history or a selected frequency');
