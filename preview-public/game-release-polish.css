@@ -1,0 +1,205 @@
+/* Final game-screen polish before Printshop release.
+   Scope: HUD fit, current-word density, side-rail action alignment, Tajenka hierarchy. */
+
+/* The remaining-length strip and the found-count own separate grid columns.
+   This prevents the pills from ever sliding underneath 0/N on phones. */
+html.tiskarna-ui #screen-game .game-info{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:start!important;
+  column-gap:8px!important;
+}
+html.tiskarna-ui #screen-game .word-status-wrap{
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+}
+html.tiskarna-ui #screen-game .word-status-row{
+  min-width:0!important;
+  max-width:100%!important;
+}
+html.tiskarna-ui #screen-game .word-status-row .lengths{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  gap:4px!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  touch-action:pan-y!important;
+}
+html.tiskarna-ui #screen-game .word-status-row .lengths .length-pill{
+  flex:1 1 0!important;
+  min-width:0!important;
+  max-width:30px!important;
+}
+html.tiskarna-ui #screen-game .word-status-row .found-words{
+  min-width:0!important;
+  max-width:100%!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  overscroll-behavior-x:contain;
+  scrollbar-width:none;
+}
+html.tiskarna-ui #screen-game .game-progress{
+  min-width:42px!important;
+  justify-self:end!important;
+  align-self:start!important;
+  padding-top:2px!important;
+  text-align:right!important;
+  line-height:1.05!important;
+  position:relative;
+  z-index:2;
+}
+
+/* Tajenka game header: one clear label, using the same dedicated icon as Dnes / Hrát. */
+html.tiskarna-ui #screen-game.tajenka-mode #gameModeLabel{
+  display:none!important;
+}
+html.tiskarna-ui #screen-game.tajenka-mode #gameDifficulty .tajenka-game-label{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  font-size:0!important;
+  line-height:1!important;
+}
+html.tiskarna-ui #screen-game.tajenka-mode #gameDifficulty .tajenka-game-label::before{
+  content:"";
+  width:30px;
+  height:30px;
+  flex:0 0 30px;
+  background:url('/tajenka.svg') center/contain no-repeat;
+}
+html.tiskarna-ui #screen-game.tajenka-mode #gameDifficulty .tajenka-game-label::after{
+  content:"Tajenka";
+  font-size:18px;
+  line-height:1.1;
+  font-weight:800;
+  color:var(--r-ink);
+}
+
+/* Fold / tablet / desktop side rail: every action reads as a centered control. */
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game #calmRunBtn{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+html.tiskarna-ui body:is(.game-tablet-landscape,.game-desktop-wide) #screen-game #calmRunBtn.painted-action-control{
+  justify-content:center!important;
+}
+
+/* Tajenka should stay board-first. The phrase is useful state, not a second hero card. */
+html.tiskarna-ui #screen-game.tajenka-mode .tajenka-phrase{
+  background:color-mix(in srgb,var(--r-board-mat) 72%,var(--r-paper))!important;
+  background-image:none!important;
+  border-color:color-mix(in srgb,var(--r-edge) 72%,transparent)!important;
+  box-shadow:none!important;
+  padding:5px 8px!important;
+}
+html.tiskarna-ui #screen-game.tajenka-mode .tajenka-phrase-head{
+  color:var(--r-muted)!important;
+}
+html.tiskarna-ui #screen-game.tajenka-mode .tajenka-rule-inline{
+  margin-top:1px!important;
+  color:var(--r-muted)!important;
+  font-size:8.5px!important;
+  line-height:1.2!important;
+}
+
+@media(max-width:600px){
+  /* Give the pills a little more horizontal budget on phones. */
+  html.tiskarna-ui #screen-game .game-info{
+    padding:4px 7px!important;
+    column-gap:6px!important;
+  }
+  html.tiskarna-ui #screen-game .word-status-row{
+    grid-template-columns:64px minmax(0,1fr)!important;
+    gap:4px!important;
+  }
+  html.tiskarna-ui #screen-game .word-status-row .stat-label{
+    font-size:8.5px!important;
+  }
+  html.tiskarna-ui #screen-game .word-status-row .lengths{
+    gap:3px!important;
+  }
+  html.tiskarna-ui #screen-game .word-status-row .length-pill{
+    min-width:0!important;
+    height:21px!important;
+    padding-inline:2px!important;
+    font-size:9px!important;
+  }
+  html.tiskarna-ui #screen-game .game-progress{
+    min-width:38px!important;
+    font-size:15px!important;
+  }
+  html.tiskarna-ui #screen-game.tajenka-mode #gameDifficulty .tajenka-game-label::before{
+    width:26px;
+    height:26px;
+    flex-basis:26px;
+  }
+  html.tiskarna-ui #screen-game.tajenka-mode #gameDifficulty .tajenka-game-label::after{
+    font-size:17px;
+  }
+
+  /* The phone current-word panel was reserving more vertical room than the magnifier needs. */
+  html.tiskarna-ui #screen-game:not(.tajenka-mode) .current-word{
+    padding:5px 9px!important;
+    gap:1px 7px!important;
+  }
+  html.tiskarna-ui #screen-game:not(.tajenka-mode) .current-word #gameMessage{
+    min-height:30px!important;
+    font-size:14px!important;
+    line-height:1.3!important;
+  }
+  html.tiskarna-ui body:has(#magnifierQuickBtn:not(.hidden)) #magnifierDock{
+    height:72px!important;
+  }
+  html.tiskarna-ui #magnifierDock>.touch-magnifier{
+    width:72px!important;
+    height:72px!important;
+  }
+
+  /* Tajenka has no magnifier. Collapse the unused vertical reserve and hand it to the board. */
+  html.tiskarna-ui #screen-game.tajenka-mode .current-word{
+    min-height:0!important;
+    padding:5px 8px!important;
+    gap:1px 7px!important;
+  }
+  html.tiskarna-ui body:not(.game-tablet-landscape):not(.game-desktop-wide) #screen-game.tajenka-mode .current-word>div:first-child{
+    grid-template-rows:auto auto!important;
+    min-height:0!important;
+  }
+  html.tiskarna-ui #screen-game.tajenka-mode .current-word #gameMessage{
+    min-height:20px!important;
+    font-size:12.5px!important;
+    line-height:1.2!important;
+  }
+  html.tiskarna-ui #screen-game.tajenka-mode .tajenka-phrase{
+    padding:4px 7px!important;
+    gap:2px!important;
+  }
+}
+
+@media(max-width:420px){
+  html.tiskarna-ui #screen-game .word-status-row{
+    grid-template-columns:58px minmax(0,1fr)!important;
+  }
+  html.tiskarna-ui #screen-game .word-status-row .lengths{
+    gap:2px!important;
+  }
+  html.tiskarna-ui #screen-game .word-status-row .length-pill{
+    min-width:0!important;
+    padding-inline:1px!important;
+  }
+  html.tiskarna-ui #screen-game .game-progress{
+    min-width:36px!important;
+  }
+}
+
+/* Dark mode keeps the Tajenka phrase quiet and integrated with the game mat. */
+html.tiskarna-ui[data-theme=dark] #screen-game.tajenka-mode .tajenka-phrase{
+  background:color-mix(in srgb,var(--r-board-mat) 82%,var(--r-paper))!important;
+  border-color:var(--r-edge)!important;
+}

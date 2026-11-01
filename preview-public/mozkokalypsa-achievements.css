@@ -1,0 +1,13 @@
+/* Seven static emblems; scoped to the new series, no observers or motion. */
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"] .ribbon-art{width:58px;height:58px}
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"]{border-color:color-mix(in srgb,#bf7050 35%,var(--r-edge));background:var(--r-paper)}
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"].earned{background:color-mix(in srgb,#e3b85e 9%,var(--r-paper))}
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"] .achievement-progress>span{background:#ad6a35!important}
+html.ribbon-ui #screen-profile .achievement[data-achievement="mozkokalypsa-100"].earned{border-color:#b48336;box-shadow:inset 0 0 0 1px #e3b85e55}
+
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"]>.emoji.bespoke-ready{width:58px;height:58px;margin-bottom:6px}
+html.ribbon-ui #screen-profile .achievement[data-achievement^="mozkokalypsa-"]{grid-template-columns:58px minmax(0,1fr) auto}
+
+/* Reviewed silhouettes: keep source artwork, exclude the baked pale floor. */
+img[src*="/achievement-mozkokalypsa-1.webp"]{clip-path:polygon(0.0000% 0.0000%,100.0000% 0.0000%,100.0000% 81.4286%,89.0476% 81.4286%,88.8095% 82.6190%,85.9524% 83.8095%,82.3810% 83.8095%,83.0952% 84.7619%,83.8095% 85.4762%,80.9524% 86.1905%,77.6190% 85.4762%,78.5714% 84.5238%,77.3810% 84.0476%,76.1905% 85.9524%,72.3810% 86.9048%,63.3333% 86.6667%,58.8095% 85.4762%,56.6667% 86.1905%,51.4286% 86.4286%,46.4286% 86.4286%,40.7143% 85.9524%,40.4762% 87.3810%,36.9048% 87.8571%,30.4762% 87.3810%,29.7619% 85.4762%,27.1429% 85.9524%,15.4762% 85.0000%,11.9048% 82.3810%,0.0000% 82.3810%)}
+img[src*="/achievement-mozkokalypsa-5.webp"]{clip-path:polygon(0.0000% 0.0000%,100.0000% 0.0000%,100.0000% 81.6667%,92.8571% 81.6667%,93.0952% 85.0000%,86.6667% 85.7143%,72.3810% 87.6190%,60.0000% 88.8095%,49.2857% 89.5238%,38.5714% 90.2381%,28.8095% 90.4762%,18.8095% 89.7619%,11.1905% 86.1905%,9.7619% 83.0952%,0.0000% 83.0952%)}

@@ -1,0 +1,9 @@
+/* Production P0 fixes carried into the v3.34 preview. */
+
+/* Keep board cells rounded-square at every fitted cell size. */
+body.playing .board .cell{border-radius:24%}
+body.playing .board.dense-board .cell{border-radius:22%}
+body.playing .board.ultra-board .cell{border-radius:20%}
+
+/* Rail composition intentionally remains owned by game-layout-v3330.js and its existing
+   portrait / Fold-landscape / desktop contracts. Do not force a side rail from width alone. */
