@@ -42,7 +42,7 @@ html[data-theme=dark]{--patron-blue:#adcaff;--patron-tint:#364657}
 .patron-pending-dot{width:8px;height:8px;border-radius:50%;background:#bb8d46;margin-top:6px;flex:none}
 .patron-own-badge{display:flex;gap:20px;align-items:center;padding:20px 24px;background:var(--patron-tint);border-radius:14px;margin:20px 0}
 .patron-own-badge strong{display:block;font-size:18px;margin-bottom:5px}
-.patron-avatar-demo{position:relative;width:56px;height:56px;outline:1px solid var(--patron-blue);outline-offset:4px;border-radius:50%}
+.patron-avatar-demo{position:relative;display:block;width:56px;height:56px;flex:none;border-radius:50%}
 .patron-avatar-demo>img{border-radius:50%;display:block}
 .patron-avatar-demo i,.patron-avatar-card{position:absolute;right:-8px;bottom:-5px;width:23px;height:23px;display:grid;place-items:center;background:var(--patron-blue);color:var(--td-paper);border:2px solid var(--patron-tint);border-radius:7px;transform:rotate(-8deg)}
 .patron-avatar-demo i svg,.patron-avatar-card svg{width:13px;height:13px}
@@ -60,9 +60,11 @@ html.tiskarna-ui body #patronProfileEntry{display:flex;align-items:center;gap:16
 .patron-label{display:flex!important;align-items:center;gap:5px!important;min-height:0!important;width:max-content;max-width:100%;padding:0!important;border:0!important;background:none!important;color:var(--patron-blue)!important;font:500 12px/1.25 Outfit,sans-serif!important;cursor:pointer;text-align:left;text-decoration:none;box-shadow:none!important}
 .patron-label svg{width:13px;height:13px;flex:none}
 /* The rotated keepsake stays inside the existing avatar box. */
-html.tiskarna-ui .patron-avatar-marked{position:relative!important;overflow:visible!important}
-html.tiskarna-ui .patron-avatar-marked>.patron-avatar-card{box-sizing:border-box;right:2px;bottom:2px;width:43%;height:43%;max-width:27px;max-height:27px;min-width:14px;min-height:14px;border-width:1.5px;border-radius:5px;pointer-events:none;z-index:2}
-html.tiskarna-ui .patron-avatar-card svg{width:63%;height:63%}
+html.tiskarna-ui .patron-avatar-marked{position:relative!important;overflow:visible!important;background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+html.tiskarna-ui #profileChipAvatar.patron-avatar-marked,html.tiskarna-ui .profile-avatar-big.patron-avatar-marked{background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+html.tiskarna-ui .patron-avatar-marked>.organic-avatar,html.tiskarna-ui .patron-avatar-marked>img.google-profile-avatar,.patron-avatar-demo>:is(.patron-avatar-native,.patron-person-avatar,img){transform:translate(1%,1%) scale(.88);transform-origin:top left}
+html.tiskarna-ui .patron-avatar-marked>.patron-avatar-card,.patron-avatar-demo>i{box-sizing:border-box;right:2px;bottom:2px;width:32%;height:32%;max-width:27px;max-height:27px;min-width:12px;min-height:12px;border-width:1.25px;border-radius:4px;pointer-events:none;z-index:2}
+html.tiskarna-ui .patron-avatar-card svg,.patron-avatar-demo>i svg{width:63%;height:63%}
 .patron-avatar-marked>img.google-profile-avatar{border-radius:50%}
 #patronDialog :is(button,a,input):focus-visible{outline:3px solid var(--td-blue,#315da8);outline-offset:3px}
 @media(max-width:540px){
