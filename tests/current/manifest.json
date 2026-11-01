@@ -896,6 +896,14 @@
       {
         "path": "tests/current/test_patron_release_package.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_result_xp_clarity.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_completion_discovery_rewards.py",
+        "runner": "python"
       }
     ]
   },

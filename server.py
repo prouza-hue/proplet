@@ -2440,13 +2440,39 @@ def result_completion_payload(r: dict) -> dict:
     }
 
 
+def completion_discovery_rewards(player_id: str, completed: list[dict]) -> list[dict]:
+    """Decorate result history with earned discovery XP, without changing its ledger."""
+    if not completed:
+        return completed
+    rewards = db_select("account_rewards", columns="id,puzzle_id,reward_key,points,granted_at", player_id=player_id)
+    by_puzzle = {}
+    for reward in rewards:
+        if str(reward.get("reward_key") or "").startswith("word_discovery_v1:"):
+            by_puzzle.setdefault(reward.get("puzzle_id"), []).append(reward)
+    enriched = []
+    for record in completed:
+        end = parse_timestamp(record.get("completedAt"))
+        day = str(record.get("dailyDate") or "")[:10]
+        bonus = 0
+        for reward in by_puzzle.get(record.get("puzzleId"), []):
+            granted = parse_timestamp(reward.get("granted_at"))
+            if not granted or not end or granted > end:
+                continue
+            # Dated boards can reuse a puzzle; do not attach another day's words.
+            if day and granted.astimezone(TZ).date().isoformat() != day:
+                continue
+            bonus += max(0, int(reward.get("points") or 0))
+        enriched.append({**record, "wordDiscoveryXpAwarded": bonus})
+    return enriched
+
+
 @app.get("/api/progress")
 def progress(request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "progress_read", limit=240, window_seconds=3600)
     player = auth_player(authorization)
     rows = db_select("results", columns=RESULT_PROGRESS_COLUMNS, player_id=player["id"])
     return {
-        "completed": [result_completion_payload(r) for r in rows]
+        "completed": completion_discovery_rewards(player["id"], [result_completion_payload(r) for r in rows])
     }
 
 
@@ -2494,7 +2520,7 @@ def account_snapshot(
         "googleLinked": bool(player.get("auth_user_id")), "googleAvatarUrl": player.get("google_avatar_url"),
         "useGoogleAvatar": bool(player.get("use_google_avatar")),
         "supportMode": player.get("support_mode") or "none", "publicRankings": player.get("public_rankings"),
-        "stats": stats, "completed": snapshot["completed"], "cursor": snapshot.get("cursor"),
+        "stats": stats, "completed": completion_discovery_rewards(player["id"], snapshot["completed"]), "cursor": snapshot.get("cursor"),
     }
 
 
