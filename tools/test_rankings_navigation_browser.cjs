@@ -58,7 +58,7 @@ async function run(viewport){
  });
  const page=await ctx.newPage();page.setDefaultTimeout(15000);page.on('pageerror',error=>errors.push(error.message));
  page.on('response',response=>{if(response.status()===404)missingAssets.add(new URL(response.url()).pathname)});
- const calls=[],pending=[],waiters=[];let hold=false;
+ const calls=[],pending=[],waiters=[];let hold=false,patronCase=false,patronPublic=true;
  const next=(kind,period)=>new Promise((resolve,reject)=>{
   const found=pending.find(row=>!row.claimed&&row.kind===kind&&row.period===period);
   if(found){found.claimed=true;resolve(found);return}
@@ -73,10 +73,12 @@ async function run(viewport){
   const req=route.request(),url=new URL(req.url());
   if(url.origin!==new URL(base).origin)return route.abort();
   if(!['GET','HEAD'].includes(req.method()))return route.fulfill({status:503,contentType:'application/json',body:'{"detail":"isolated fixture: writes disabled"}'});
+  if(url.pathname==='/api/patrons')return route.fulfill({contentType:'application/json',body:JSON.stringify({enabled:patronCase,authenticated:true,patron:patronCase,publicBadge:patronPublic,offersDisabled:true,canOffer:false,thanksPending:false,contributions:[]})});
   const kind=url.pathname==='/api/rankings/xp'?'xp':url.pathname==='/api/rankings/daily'?'daily':null;
   if(!kind)return route.continue();
   const period=kind==='xp'?url.searchParams.get('period'):'daily';calls.push({kind,period});
   let answer={status:200,body:kind==='daily'?data('Denní hráč',120,9):data('Dnešní XP hráč',96,3)};
+  if(patronCase)answer.body={players:rows('Ukázkový hráč',24,20).map((r,i)=>({...r,name:i===20?'Pavel':r.name,patron:i===0,teamName:'Propletové – Řeporyje',lifetimePoints:80000,xp:15720-i})),teams:[],visibilityReady:true};
   if(hold)answer=await new Promise(release=>{
    const row={kind,period,release,claimed:false};pending.push(row);
    const waiter=waiters.find(item=>item.kind===kind&&item.period===period&&!item.used);
@@ -112,6 +114,21 @@ async function run(viewport){
  await dailySection.locator('.ranking-back-summary').click();await settle(page);assert.equal(await page.locator('#dailyLeaderboardList .ranking-row').count(),6);assert(await more.evaluate(el=>document.activeElement===el));
  assert.equal(await page.locator('#xpLeaderboardList').isVisible(),false);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
  for(const button of await views.locator('button').all()){const box=await button.boundingBox();assert(box.width>=42&&box.height>=44);}
+ // Real supporter identity and long metadata must survive narrow ranking columns.
+ patronCase=true;await page.evaluate(()=>window.PropletPatrons.refresh());
+ for(const view of ['xp','daily']){
+  await page.evaluate(view=>{rankingsOrchestration().openView(view);if(view==='xp')document.querySelector('[data-ranking-period="week"]').click()},view);
+  const own=page.locator(list(view)+' .ranking-row.me');await own.locator('.ranking-player-name').filter({hasText:'Pavel'}).waitFor();await own.locator('.patron-avatar-card').waitFor();await settle(page);
+  const geometry=await own.evaluate(row=>{
+   const identity=row.querySelector('.ranking-player-name'),avatar=row.querySelector('.ranking-avatar'),copy=row.querySelector('.leader-name'),meta=copy.querySelector('small'),score=row.querySelector('.leader-score');
+   const box=e=>{const r=e.getBoundingClientRect();return {width:r.width,left:r.left,right:r.right}};
+   return {name:box(identity),avatar:box(avatar),copy:box(copy),meta:box(meta),score:box(score),text:identity.textContent,metaFits:meta.scrollWidth<=meta.clientWidth+1,labelCount:row.querySelectorAll('.ranking-player-identity>.patron-label').length,cards:row.querySelectorAll('.patron-avatar-card').length,overflow:document.documentElement.scrollWidth>innerWidth+1};
+  });
+  assert(geometry.text.includes('Pavel')&&geometry.name.width>=24,'supporter name remains visible');assert(geometry.avatar.width>=30,'supporter avatar retains its allocated size');assert(geometry.copy.right<=geometry.score.left+1,'identity and metadata never overlap the score');assert(geometry.metaFits&&!geometry.overflow,'long rank/team metadata wraps inside the row');assert.equal(geometry.labelCount,1);assert.equal(geometry.cards,1);
+ }
+ patronPublic=false;await page.evaluate(()=>window.PropletPatrons.refresh());assert.equal(await page.locator('#dailyLeaderboardList .ranking-row.me .patron-label').count(),0,'private own supporter is not publicly labelled');assert.equal(await page.locator('#dailyLeaderboardList .ranking-row.me .patron-avatar-card').count(),0,'private own supporter has no public avatar mark');
+ patronPublic=true;await page.evaluate(()=>window.PropletPatrons.refresh());
+ checks.push(viewport.width+'px: XP week/Daily supporter name/avatar, distant own rank, long rank/team wrap, score separation and public-badge privacy');
  await page.screenshot({path:path.join(artifacts,viewport.width+'x'+viewport.height+'.png'),fullPage:true});checks.push(viewport.width+'x'+viewport.height+': active view, own row, cache/races, error/retry focus, scroll, shared weekly, team today/all, full list return');
  await page.locator('.bottom-nav [data-nav="daily"]').click();assert.equal(await page.evaluate(()=>rankingsOrchestration().getState().viewportAnchor),null);assert.equal(await page.evaluate(()=>document.querySelector('.ranking-viewport-tail').style.height),'0px');
  await ctx.close();
