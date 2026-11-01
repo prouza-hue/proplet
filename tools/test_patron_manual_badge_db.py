@@ -19,7 +19,7 @@ def run_manual_badge_acceptance(opts):
  def finance(c):
   return c.execute('select (select count(*) from proplet_private.patron_intents),(select count(*) from proplet_private.patron_payments),(select coalesce(sum(amount_czk),0) from proplet_private.patron_payments),(select count(*) from proplet_private.patron_entitlements),(select count(*) from proplet_private.patron_audit),(select count(*) from public.results),(select coalesce(sum(points),0) from public.results)').fetchone()
  with connect() as c:
-  c.execute("insert into public.players(id,name,family_code,token_hash) values(%s,'Owner badge QA','SOLO_MANUAL_QA',%s) on conflict(id) do nothing",(OWNER,'owner-badge-'+str(uuid4())))
+  c.execute("insert into public.players(id,name,family_code,token_hash,public_rankings) values(%s,'Owner badge QA','SOLO_MANUAL_QA',%s,true) on conflict(id) do update set public_rankings=true",(OWNER,'owner-badge-'+str(uuid4())))
   cols={x[0] for x in c.execute("select column_name from information_schema.columns where table_schema='public' and table_name='admin_accounts'")}
   if 'id' in cols:c.execute("insert into public.admin_accounts(id,player_id,role,active) values(%s,%s,'owner',true) on conflict(player_id) do update set role='owner',active=true",(str(uuid4()),OWNER))
   else:c.execute("insert into public.admin_accounts(player_id,role,active) values(%s,'owner',true) on conflict(player_id) do update set role='owner',active=true",(OWNER,))
