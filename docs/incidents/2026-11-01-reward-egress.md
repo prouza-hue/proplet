@@ -48,3 +48,10 @@
   dependencies; absence of API requests over one day does not prove redundancy.
 - Prepared in a PR; not deployed. Before release, recheck main, coordinate the
   next version/cache markers and verify preview, CI and production health.
+
+## Approved release preparation — 2026-11-01
+
+- Pavel approved production deployment and ChatGPT sign-in in the continuing conversation.
+- Rebased release contents on current production/main `15976ef` (v4.10.8), preserving supporter-ranking identity changes.
+- Release v4.10.9 coordinates canonical/runtime version, service-worker cache and entry script URLs.
+- Production deployment and billed savings must be verified after the release gates pass.

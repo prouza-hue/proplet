@@ -20,9 +20,9 @@ const scenario = {
  referral: reviewParams.get('account')==='guest'?'guest':reviewParams.get('account')==='incoming'?'incoming':'member',
  announcement:'none'
 };
-const patronInfoPreview=reviewParams.get('patronInfo')==='1';
+const patronInfoPreview=reviewParams.get('patronInfo')==='1',patronRankingsPreview=reviewParams.get('patronRankings')==='1';
 const fixtureState=['ready','done','complete'].includes(reviewParams.get('state'))?reviewParams.get('state'):patronInfoPreview?'done':'ready';
-const prefix = 'proplet:studio-review:20261021:v2:' + scenario.extra + ':' + scenario.referral + ':' + fixtureState + ':';
+const prefix = 'proplet:studio-review:20261021:v2:' + scenario.extra + ':' + scenario.referral + ':' + fixtureState + (patronRankingsPreview?':patron-rankings:':':');
 // Keep native Storage identity. WindowProxy property replacement is not reliable
 // across all embedded-browser realms; app controllers must see these same methods.
 const storagePrototype=Storage.prototype;
@@ -48,7 +48,7 @@ if(linkedReferral==='member')session.removeItem('proplet:referral-offer-hidden:v
 const read=(key,fallback)=>{try{return JSON.parse(local.getItem(key)||'null')??fallback;}catch{return fallback;}};
 const save=(key,value)=>local.setItem(key,JSON.stringify(value));
 const profileId='studio-review', token='REVIEW-ONLY-NOT-A-PRODUCTION-TOKEN';
-const fixtureProfile={id:profileId,name:'Ukázkový hráč',avatar:'🦊',token,hasPassword:true,supportMode:'none',
+const fixtureProfile={id:profileId,name:patronRankingsPreview?'Pavel':'Ukázkový hráč',avatar:'🦊',token,hasPassword:true,supportMode:'none',
  familyCode:null,leagueName:null,googleLinked:false,useGoogleAvatar:false,publicRankings:true};
 if (!local.getItem('initialized')) {
  local.setItem('initialized','1');
@@ -258,7 +258,7 @@ window.fetch=async(input,init={})=>{
  requests.push({path:url.pathname,method,reviewOnly:true});
  let body={};try{body=JSON.parse(init.body||'{}');}catch{}
  const path=url.pathname;
- if(path==='/api/patrons'&&method==='GET')return json({enabled:patronInfoPreview,authenticated:!!profile()?.token,patron:false,publicBadge:false,offersDisabled:true,canOffer:false,thanksPending:false,contributions:[],reviewOnly:true});
+ if(path==='/api/patrons'&&method==='GET')return json({enabled:patronInfoPreview||patronRankingsPreview,authenticated:!!profile()?.token,patron:(patronInfoPreview||patronRankingsPreview)&&reviewParams.get('patronOwn')!=='none',publicBadge:reviewParams.get('patronOwn')==='public'||patronRankingsPreview&&reviewParams.get('patronOwn')!=='private',offersDisabled:true,canOffer:false,thanksPending:false,contributions:[],reviewOnly:true});
  if(path.startsWith('/api/patrons/'))return json({detail:'Náhled podpory neprovádí platby ani zápisy.',reviewOnly:true},409);
  if(method==='GET'&&path==='/api/competition/monthly')return json(window.PropletMonthlyV2Fixture.response(reviewParams.get('monthlyCase')));
  if(method==='GET'&&path==='/api/config'){
@@ -308,6 +308,10 @@ window.fetch=async(input,init={})=>{
  if(path==='/api/play-session'&&method==='POST')return sessionCommand(body);
  if(path==='/api/rescue/status'||path==='/api/rescue-status')return json({state:'unavailable',reviewOnly:true});
  if(method==='GET'&&(path.includes('global-leaderboard')||path==='/api/rankings/daily-special'))return json(boardRanking(url));
+ if(patronRankingsPreview&&method==='GET'&&['/api/rankings/xp','/api/rankings/daily'].includes(path)){
+  const players=Array.from({length:24},(_,i)=>({id:i===20?profileId:'patron-ranking-'+i,name:i===20?'Pavel':i===0?'Ukázková podporovatelka':'Ukázkový hráč '+(i+1),avatar:i===20?'🦌':'🦊',patron:i===0||i===20,isMine:i===20,rank:i+1,xp:100000-i*2200,lifetimePoints:80000,teamName:'Propletové – Řeporyje',moves:11,hintsUsed:0,cleanSolve:true,elapsedMs:65000+i*1500}));
+  return json({players,teams:[],visibilityReady:true,period:url.searchParams.get('period')||'week',reviewOnly:true});
+ }
  if(method==='GET'&&(path.includes('rankings')||path.includes('leaderboard')))return json({
   players:[{id:'review-1',name:'Lukáš',avatar:'🦊',xp:32400,rank:1},{id:'review-2',name:'Klára',avatar:'🌺',xp:29600,rank:2},{id:profileId,name:'Alex',avatar:'🦊',xp:stats().points,rank:3}],
   teams:[{id:'review-team',code:'review-team',name:'Sazeči',xp:4820,rank:1}],rows:[],period:url.searchParams.get('period')||'all',reviewOnly:true});
@@ -369,7 +373,7 @@ window.PropletStudioFixture={...api,fixtureState,day:today,seedState,diagnostics
 
 document.addEventListener('proplet:ready',()=>{
  ready=true;
- seedState().then(()=>{if(patronInfoPreview)return showDailyResult(today(),getState().completed['daily:'+today()]);}).catch(error=>{console.error('Studio state seed failed',error);window.PROPLET_STUDIO_SEED_ERROR=error.message});
+ seedState().then(async()=>{if(patronRankingsPreview){await rankingsOrchestration().openView(reviewParams.get('rankingView')==='daily'?'daily':'xp');if(reviewParams.get('rankingView')!=='daily')document.querySelector('[data-ranking-period=week]')?.click();return;}if(patronInfoPreview)return showDailyResult(today(),getState().completed['daily:'+today()]);}).catch(error=>{console.error('Studio state seed failed',error);window.PROPLET_STUDIO_SEED_ERROR=error.message});
  if(!local.getItem('referralBaseline'))save('referralBaseline',completionIds());
  // Defaults are returning-player fixtures. Explicit announcement scenarios still
  // use the native eligibility/gating code; we never force-open a launch modal.
