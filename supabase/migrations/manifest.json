@@ -676,7 +676,7 @@
       "path": "supabase/migrations/20261101013000_monthly_quality_v2.sql",
       "type": "migration",
       "status": "prepared-dormant-explicit-activation",
-      "sha256": "5572cfb3f846ede4be789f66b21fe257985930f7b780708d58930736948f6a1c",
+      "sha256": "73d1919cb28043188ccfadc00571d8816a809556a88e13c5eeafdbdd00f586e0",
       "supersedes": [],
       "replaced_rpc_definitions": [
         "public.proplet_monthly_refresh_day_v1",
