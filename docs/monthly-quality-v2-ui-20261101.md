@@ -4,7 +4,7 @@ Datum: 1. 11. 2026. Pracovní větev: `codex/monthly-score-v2`; výchozí SHA `6
 
 ## Zobrazení
 
-Stávající měsíční obrazovka zachovává Tiskařskou dílnu, Fraunces, navigaci a detaily odznaků. Osobní skóre má maximum 2 500 a dvě položky: Denní výzvy 2 000 (80 % maxima), další hraní 500 (20 %). Rozpis uvádí vybraných 20 dnů, čtyři serverem dodané složky denního skóre a získané herní XP. Neověřený čas se výslovně označuje. Veškeré body, jejich rozpad i rozhodující shoda přicházejí ze serveru; klient je nepočítá z místního postupu ani celoživotních XP.
+Stávající měsíční obrazovka zachovává Tiskařskou dílnu, Fraunces, navigaci a detaily odznaků. Osobní skóre má maximum 2 500 a dvě položky: Denní výzvy 2 000 (80 % maxima), další hraní 500 (20 %). Rozpis uvádí vybraných 20 dnů, tři zobrazené složky denního skóre (dokončení, samostatnost a ověřenou rychlost) a získané herní XP. Neověřený čas se výslovně označuje. Veškeré body, jejich rozpad i rozhodující shoda přicházejí ze serveru; klient je nepočítá z místního postupu ani celoživotních XP.
 
 Pravidla popisují způsobilá první dohrání ostatních desek, strop 6 000 XP / 12, zaokrouhlení na desetinu a vyloučené odměny. Přehled i novinkové oznámení již nepoužívají stará pravidla 100/120, 2 400 bodů, rychlost nerozhoduje nebo konečná společná místa 1–1–3. Čas konce měsíce a uzávěrky čerpáme z API. Úplná průběžná shoda má hvězdičku, vysvětlení čekajícího losu a nemá obrázek přislíbené ceny. Finální výsledek rozlišuje rozhodnutí uloženým losem.
 
@@ -29,3 +29,7 @@ Prošly `test_release_contract.py`, `test_monthly_sw_install.cjs`, `test_patron_
 ## Kompatibilita již uzavřených měsíců
 
 Výslovná serverová verze `scoringVersion: 1` nebo `rulesVersion: monthly-basic-v1` zachovává historické maximum 2 400, denní pravidla 100/120 a společná umístění v osobním přehledu, pravidlech, rozpisu i poznámce k odznakům. Platí také pro přechodný stav před aktivací v2. Samotná URL ani výše bodů stará pravidla nezapne. Test ověřuje oba serverové příznaky, potlačení případných přidaných v2 polí i správný návrat na v2 po nové serverové odpovědi.
+
+## Sjednocení samostatnosti v rozpisu
+
+Po zpětné vazbě uživatele 1. 11. 2026 zobrazuje rozpis tři části: dokončení + samostatnost + ověřená rychlost. Samostatnost je pouze součet původních serverových složek `cleanPoints + hintPoints`; výsledné body a kritéria shody se nemění. Pravidla otevřeně uvádějí křivku 25/7/4/1/0 podle počtu nápověd 0/1/2/3/4+. Test kontroluje skutečně zobrazené řádky 82 = 55 + 7 + 20 a 90 = 55 + 25 + 10 i zachování historické v1.
