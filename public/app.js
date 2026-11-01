@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.5-monthly-clarity1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.6-offline-timing1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -827,11 +827,11 @@ function saveGameProgress(){
  if(currentGame?.mode==='playtest')return window.PropletPlaytest.persist(currentGame);
  const session=gameSession();if(session)return session.saveProgress(currentGame);
  const g=currentGame;if(!g||g.finished||g.mode==='rescue'||g.mode==='starter')return;if(g.mode==='tajenka')return saveTajenkaGameProgress(g);const key=challengeKey(g.mode,g.puzzle,g.dailyDate),s=getState();s.inProgress=s.inProgress||{},elapsed=gameElapsed(g);
- s.inProgress[key]={puzzleId:g.puzzle.id,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate||null,found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,cleanSolve:(g.hints||0)===0,elapsedMs:Math.round(elapsed),attemptId:g.attemptId||null,wordDiscoveryXpAwarded:Math.max(0,Number(g.wordDiscoveryXpAwarded)||0),helperOffered:!!g.helperOffered,helperHintUsed:!!g.helperHintUsed,postStarterWarmup:!!g.postStarterWarmup,savedAt:Date.now()};saveState(s);g.lastAutosaveAt=Date.now();
+ s.inProgress[key]={puzzleId:g.puzzle.id,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate||null,found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,cleanSolve:(g.hints||0)===0,elapsedMs:Math.round(elapsed),attemptId:g.attemptId||null,serverTimingAnchored:!!g.serverTimingAnchored,disconnected:!!g.disconnected,timingUnverified:!!g.timingUnverified,wordDiscoveryXpAwarded:Math.max(0,Number(g.wordDiscoveryXpAwarded)||0),helperOffered:!!g.helperOffered,helperHintUsed:!!g.helperHintUsed,postStarterWarmup:!!g.postStarterWarmup,savedAt:Date.now()};saveState(s);g.lastAutosaveAt=Date.now();
 }
 function saveTajenkaGameProgress(g=currentGame){
  if(!g||g.mode!=='tajenka'||g.finished)return;
- const state=tajenkaState();state.version=1;state.inProgress={puzzleId:g.puzzle.id,mode:'tajenka',wordDiscoveryXpAwarded:Math.max(0,Number(g.wordDiscoveryXpAwarded)||0),found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,elapsedMs:Math.round(gameElapsed(g)),attemptId:g.attemptId,timingUnverified:!!g.timingUnverified,mergedAttempts:!!g.mergedAttempts,calmMode:!!g.calmMode,savedAt:Date.now()};saveTajenkaState(state);g.lastAutosaveAt=Date.now();
+ const state=tajenkaState();state.version=1;state.inProgress={puzzleId:g.puzzle.id,mode:'tajenka',wordDiscoveryXpAwarded:Math.max(0,Number(g.wordDiscoveryXpAwarded)||0),found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,elapsedMs:Math.round(gameElapsed(g)),attemptId:g.attemptId,serverTimingAnchored:!!g.serverTimingAnchored,disconnected:!!g.disconnected,timingUnverified:!!g.timingUnverified,mergedAttempts:!!g.mergedAttempts,calmMode:!!g.calmMode,savedAt:Date.now()};saveTajenkaState(state);g.lastAutosaveAt=Date.now();
 }
 function clearGameProgress(mode,puzzle,dailyDate){if(mode==='playtest')return;const s=getState(),key=challengeKey(mode,puzzle,dailyDate);if(s.inProgress?.[key]){delete s.inProgress[key];saveState(s)}}
 function resumableFreePuzzle(diff,list){
@@ -912,7 +912,7 @@ function initNavigation(){
    if(modal.id==='onboardingModal'&&onboardingMandatory){history.pushState({proplet:true,screen:currentScreen},'',location.href);return}
    if(modal.id==='winModal'&&await maybeOfferFirstWinReturnNudge('menu')){}
    else if(modal.id==='winModal'&&shouldOfferAccountNudge())maybeOfferAccountNudge('menu');
-   else if(modal.id==='winModal'&&await maybeOfferPushNudge('menu')){} 
+   else if(modal.id==='winModal'&&await maybeOfferPushNudge('menu')){}
    else if(modal.id==='winModal'&&maybeOfferInstallNudge('menu','daily')){}
    else if(modal.id==='accountNudgeModal')dismissAccountNudge();
    else if(modal.id==='progressGuardModal')dismissProgressGuard();
@@ -1195,7 +1195,7 @@ async function startGame(puzzle,mode,dailyDate,options={}){
  currentGame={starterTrace,puzzle,mode,dailyDate,found,used,path:[],wrongPath:[],dragging:false,lastPointer:null,moves:restored?.moves||0,start:performance.now(),pausedAt:null,pauseReason:null,baseElapsedMs,elapsedMs:baseElapsedMs,finished:false,lastFound:[],hints:restored?.hints||0,wrongAttempts:restored?.wrongAttempts||0,maxHintLevel:restored?.maxHintLevel||0,cleanSolve:(restored?.hints||0)===0,attemptId:mode==='starter'?null:(restored?.attemptId||newAttemptId()),wordDiscoveryXpAwarded:Math.max(0,Number(restored?.wordDiscoveryXpAwarded)||0),rescueFinished:false,rescueTotalLimitMs:totalLimit,rescueOffsetMs:baseElapsedMs,lastAutosaveAt:Date.now(),lastProgressAt:performance.now(),helperOffered:!!restored?.helperOffered,helperHintUsed:!!restored?.helperHintUsed,nextHintSource:'manual',isReplay:mode==='tajenka'?!!tajenkaCompletion(puzzle):!!getState().completed[challengeKey(mode,puzzle,dailyDate)],contentBatchId:options.contentBatchId||null,postStarterWarmup:!!(options.postStarterWarmup||restored?.postStarterWarmup),starterHardDirect:!!options.starterHardDirect,starterHintUsed:false,starterHintOfferShown:false,starterTrackedWordCount:0,starterGuidePath:[],undoSnapshot:null};
  currentGame.firstStepsTelemetry=window.PropletFirstSteps?.captureFirstGame(puzzle,options)||null;
  if(mode==='playtest')window.PropletPlaytest.attach(currentGame);
- Object.assign(currentGame,{fairPlay:!!prepared.fairPlay,timingUnverified:!!restored?.timingUnverified,mergedAttempts:!!restored?.mergedAttempts});
+ Object.assign(currentGame,{fairPlay:!!prepared.fairPlay,serverTimingAnchored:!!restored?.serverTimingAnchored,disconnected:!!restored?.disconnected,timingUnverified:!!restored?.timingUnverified,mergedAttempts:!!restored?.mergedAttempts});
  $('#screen-game').classList.toggle('rescue-mode',mode==='rescue');$('#screen-game').classList.toggle('starter-mode',mode==='starter');$('#screen-game').classList.toggle('tajenka-mode',mode==='tajenka');$('#gameModeLabel').textContent=mode==='daily'?'Denní výzva':mode==='daily_special'?(puzzle.meta.dailySpecialBinding.rewardEligible?'Denní speciál':'Speciál · trénink'):mode==='rescue'?'Záchrana série':mode==='starter'?'První Proplet':mode==='tajenka'?'Víkendový bonus':mode==='playtest'?'Mozkokalypsa':'Volná hra';const levelNo=Number(puzzle.meta?.level)||null,firstStepsGame=window.PropletFirstSteps?.isFirstGame(currentGame);if(mode==='rescue'||mode==='starter')$('#gameDifficulty').textContent=mode==='rescue'?'🔥 6×6 · jeden pokus':'🎓 Trénink · 5×5';else if(mode==='tajenka')$('#gameDifficulty').innerHTML='<span class="tajenka-game-label">✦ Tajenka</span>';else if(mode==='playtest')$('#gameDifficulty').innerHTML=window.PropletPlaytest.labelMarkup();else $('#gameDifficulty').innerHTML=`${difficultyIconMarkup(puzzle.difficulty,'game-difficulty-icon')}<span>${esc(DIFF[puzzle.difficulty].label)}${firstStepsGame?' · první hra':mode==='free'&&levelNo?` ${levelNo}`:''}</span>`;
  $('#timer').textContent=mode==='rescue'?fmtCountdown(remaining):fmtTime(baseElapsedMs);message(restored?'Pokračuješ přesně tam, kde jsi skončil.':mode==='starter'||mode==='tajenka'?'':'Propleť všechna políčka. Slova můžou zatáčet.');$('#starterCoach')?.classList.toggle('hidden',mode!=='starter');nav('game');renderGameBoard();renderGameHUD();updateGameFeel();syncGameWakeLock();if(mode==='starter'){trackProductEvent('starter_started');updateStarterGuidance()}if(mode==='tajenka')renderTajenkaPhrase(currentGame);if(mode==='tajenka'&&!tajenkaRulesSeen())openTajenkaRules();else startTimer();if(mode!=='rescue'&&mode!=='starter')saveGameProgress();startAttemptTelemetry(currentGame).then(()=>{if(restored)sendAttemptCheckpoint('resume')});window.PropletFirstSteps?.recordStarted(currentGame);runGameSessionHooks('afterStart',{...sessionEvent,game:currentGame});window.PropletFirstSteps?.afterStart(currentGame);if(!currentGame.isReplay&&currentGame.found.length===puzzle.answers.length)queueMicrotask(()=>{if(currentGame?.puzzle===puzzle)finishGame()});
  trackStarterPhase(starterTrace,'ready');
@@ -1390,8 +1390,19 @@ async function finishTajenkaGame(g){
  await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);
  $('#screen-game').classList.add('tajenka-mode');$('#winModal').classList.remove('starter-win','hidden');$('#levelLeaderboardBox')?.classList.add('hidden');$('#winAccountBtn')?.classList.add('hidden');renderWinBadges();$('#winFeedback')?.classList.add('hidden');$('#winDetails')?.classList.add('hidden');$('#winBadge').textContent='✦';$('#winTitle').textContent='Tajenka odhalena!';$('#winPraise').classList.add('hidden');$('#winText').textContent=`${fmtTime(g.elapsedMs)} · ${countCz(g.moves,'tah','tahy','tahů')} · víkendový bonus`;setWinXpDisplay(rewardXp?`+${rewardXp} XP · jednou za tuto Tajenku`:'Znovu · bez dalších XP');$('#winClean').classList.remove('hidden','hinted');$('#winClean').textContent='Bonus bez žebříčku';const phrase=$('#tajenkaWinPhrase'),words=tajenkaPhraseWords(g.puzzle);if(phrase){phrase.classList.remove('hidden');phrase.innerHTML=`<span class="stat-label">TAJENKA</span><strong>${esc(g.puzzle.tajenka.phrase)}</strong><small>${countCz(words.length,'nalezené slovo','nalezená slova','nalezených slov')}</small>`}$('#winWords').innerHTML='';$('#winReplayBtn').classList.add('hidden');$('#winShareBtn').classList.add('hidden');$('#winMenuBtn').classList.add('hidden');$('#winPrimaryBtn').classList.remove('hidden');$('#winPrimaryBtn').textContent='Zpět na Dnes';confetti();fx('win');renderTajenkaEntry();
 }
+function retryPendingFinish(g){
+ clearTimeout(g.finishRetryTimer);
+ if(g.fairPlayError){g.finishRetryTimer=null;return}
+ g.finishRetryTimer=setTimeout(()=>{
+  g.finishRetryTimer=null;
+  if(currentGame!==g||g.finished||g.fairPlayConflict||g.fairPlayError)return;
+  if(navigator.onLine===false){retryPendingFinish(g);return}
+  fairPlay().resume(g).then(row=>{if(row&&currentGame===g&&!g.finished)finishGame();else if(currentGame===g&&!g.finished)retryPendingFinish(g)}).catch(()=>{if(currentGame===g&&!g.finished)retryPendingFinish(g)});
+ },10000);
+}
 async function finishGame(){
  if(!currentGame||currentGame.finished||currentGame.finishing)return;
+ clearTimeout(currentGame.finishRetryTimer);currentGame.finishRetryTimer=null;
  if(currentGame.mode==='daily_special'&&currentGame.puzzle?.meta?.dailySpecialBinding?.rewardEligible!==false&&navigator.onLine===false){saveGameProgress();message('Všechna slova jsou uložená. Dokončení Extra výzvy potvrdíme po připojení.');return}
  currentGame.finishing=true;
  const finishing=currentGame;
@@ -1411,8 +1422,8 @@ async function finishGame(){
   stopTimer();finishReceipt=await fairPlay().finish(finishing);
   if(currentGame!==finishing)return;
  }
- if(finishing.mode==='daily_special'&&finishing.puzzle?.meta?.dailySpecialBinding?.rewardEligible!==false&&finishReceipt?.finished!==true){
-  finishing.finishing=false;saveGameProgress();message('Všechna slova jsou uložená. Ještě čekám na potvrzení Extra výzvy ze serveru.');return;
+ if((finishing.serverTimingAnchored||(finishing.mode==='daily_special'&&finishing.puzzle?.meta?.dailySpecialBinding?.rewardEligible!==false))&&!finishing.remoteCommitted&&finishReceipt?.finished!==true){
+  finishing.finishing=false;saveGameProgress();if(finishing.fairPlayError){message(finishing.fairPlayError);return}retryPendingFinish(finishing);message('Všechna slova jsou uložená. Čekám na potvrzení dokončení a času po připojení; do času se započítá i doba odpojení.');return;
  }
  const g=currentGame,completion={game:g,data:Object.create(null)};await runGameCompletionHooks('before',completion);if(g?.puzzle?.meta?.archiveExperience)globalThis.PropletArchiveExperience.prepareCompletion(g);if(g?.mode==='starter'){const out=await finishStarterGame(g);await runGameCompletionHooks('after',completion);return out}if(g?.mode==='tajenka'){const out=await finishTajenkaGame(g);await runGameCompletionHooks('after',completion);return out}postWinEngagementNudgeShown=false;g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();releaseGameWakeLock();g.starterGuidePath=[];$('#tajenkaWinPhrase')?.classList.add('hidden');$('#winDetails')?.classList.remove('hidden');renderGameBoard();renderGameHUD();updateGameFeel();await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);if(g.puzzle?.meta?.archiveExperience&&(currentGame!==g||g.archiveScope!==playerScope()))return;const key=challengeKey(g.mode,g.puzzle,g.dailyDate),statsBefore=effectiveStats(),state=getState(),old=state.completed[key];
  const dailyGenerationUpgrade=g.mode==='daily'&&!!old&&old.puzzleId!==g.puzzle.id;
@@ -1624,7 +1635,8 @@ let fairPlayController=null;
 function fairPlay(){
  if(fairPlayController)return fairPlayController;
  if(!window.PropletFairPlay)return {prepare:async(p,m,d,restored)=>({restored}),pause(){},resume:async()=>null,start(){},stop(){},drain:async()=>{},finish:async()=>null};
- fairPlayController=window.PropletFairPlay.create({api,profile:getProfile,claim:()=>claimTelemetryAfterAuth(),restored:g=>{if(g===currentGame){renderGameBoard();renderGameHUD();saveGameProgress();if(!g.finished&&!g.isReplay&&g.found.length===g.puzzle.answers.length)queueMicrotask(()=>{if(g===currentGame&&!g.finished)finishGame()})}},completed:(p,m,d)=>m==='tajenka'?!!tajenkaCompletion(p):!!getState().completed[challengeKey(m,p,d)],completedAttempt:completedServerAttempt,elapsed:gameElapsed,key:challengeKey,now:()=>performance.now(),setInterval:(fn,ms)=>window.setInterval(fn,ms),clearInterval:id=>window.clearInterval(id),status:renderTimingStatus,
+ fairPlayController=window.PropletFairPlay.create({api,profile:getProfile,claim:()=>claimTelemetryAfterAuth(),restored:g=>{if(g===currentGame){renderGameBoard();renderGameHUD();saveGameProgress();if(!g.finished&&!g.isReplay&&g.found.length===g.puzzle.answers.length)queueMicrotask(()=>{if(g===currentGame&&!g.finished)finishGame()})}},completed:(p,m,d)=>m==='tajenka'?!!tajenkaCompletion(p):!!getState().completed[challengeKey(m,p,d)],completedAttempt:completedServerAttempt,elapsed:gameElapsed,key:challengeKey,now:()=>performance.now(),setInterval:(fn,ms)=>window.setInterval(fn,ms),clearInterval:id=>window.clearInterval(id),status:renderTimingStatus,persist:g=>{if(g===currentGame)saveGameProgress()},
+ failure:(g,text)=>{if(g!==currentGame)return;clearTimeout(g.finishRetryTimer);g.finishRetryTimer=null;pauseGameClock('timing-error');message(text);showToast(text)},
  conflict:(g,text)=>{if(g!==currentGame)return;g.fairPlayConflict=true;g.fairPlay=false;pauseGameClock('other-device');showToast(text)}});
  return fairPlayController;
 }
@@ -2455,7 +2467,7 @@ async function loadWinLevelLeaderboard(puzzle,rec){
 function renderDailyGlobalLeaderboardBox(container,data){
  const total=Number(data?.total||0),rank=Number(data?.myRank||0),rows=data?.rows||[];container.classList.remove('free-level-board');container.classList.add('daily-global-board');container.classList.remove('hidden');
  const special=data?.challengeKind==='special';
- if(!rank){const record=container.resultContext?.record,game=container.resultContext?.game;const unverified=record?.timingVerified===false||record?.timingUnverified===true||game?.timingVerified===false||game?.timingUnverified===true;const message=unverified?'Čas této hry se nepodařilo průběžně ověřit se serverem, například kvůli výpadku spojení. Proto tento výsledek není v časovém pořadí. Postup i získané XP zůstávají.':getProfile()?.token?'Tento výsledek není v aktivním globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.';container.innerHTML=`<div class="daily-world-head"><strong>🌍 ${special?'Pořadí speciálu':'Dnešní globální pořadí'}</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${unverified?'Výsledek bez ověřeného času':total?'Svět už proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${message}</small></div>${rankingExpandMarkup(data)}`;bindRankingExpansion(container,data);return}
+ if(!rank){const record=container.resultContext?.record,game=container.resultContext?.game;const unverified=record?.timingVerified===false||record?.timingUnverified===true||game?.timingVerified===false||game?.timingUnverified===true;const message=unverified?'Čas tohoto výsledku nemá úplné ověření serverem. Tento pokus proto není v časovém pořadí; postup i získané XP zůstávají.':getProfile()?.token?'Tento výsledek není v aktivním globálním pořadí.':'Ulož si postup a po synchronizaci uvidíš své přesné místo.';container.innerHTML=`<div class="daily-world-head"><strong>🌍 ${special?'Pořadí speciálu':'Dnešní globální pořadí'}</strong><span>${countCz(total,'hráč','hráči','hráčů')}</span></div><div class="leaderboard-empty"><strong>${unverified?'Výsledek bez ověřeného času':total?'Svět už proplétá.':'Zatím čekáš na prvního soupeře.'}</strong><small>${message}</small></div>${rankingExpandMarkup(data)}`;bindRankingExpansion(container,data);return}
  const topLine=total===1?(special?'První hráč speciálu. Království je zatím celé tvoje.':'První hráč dne. Království je zatím celé tvoje.'):special?`Patříš mezi nejlepších ${data.topPercent} % hráčů tohoto speciálu.`:`Patříš mezi nejlepších ${data.topPercent} % dnešních hráčů.`;
  container.innerHTML=`<div class="daily-world-summary"><div><strong>${rank}.</strong><span>místo</span></div><p>${topLine}</p></div><div class="daily-world-neighbours">${rankingExpandedRows(rows)}</div>${rankingExpandMarkup(data)}<small class="daily-world-privacy">Jméno se ukáže jen po souhlasu · ostatní mají anonymní přezdívku.</small>`;
  bindRankingExpansion(container,data);
@@ -2589,10 +2601,10 @@ function installOfflineSupport(){
   getProfile,hasCachedProgress:hasCachedAccountProgress,getPendingCount:()=>getQueue().length,onChange:renderOfflineStatus,
  });
  window.addEventListener('offline',()=>{
-  const g=currentGame;if(g&&!g.finished){g.timingUnverified=true;renderTimingStatus(g);saveGameProgress();}
+  const g=currentGame;if(g&&!g.finished){if(g.pausedAt==null)fairPlay().disconnected(g);renderTimingStatus(g);saveGameProgress();}
   renderOfflineStatus();
  });
- window.addEventListener('online',()=>{const g=currentGame;if(g?.mode==='daily_special'&&!g.finished&&g.found?.length===g.puzzle?.answers?.length)fairPlay().resume(g).then(row=>{if(row&&currentGame===g)finishGame()}).catch(()=>{});});
+ window.addEventListener('online',()=>{const g=currentGame;if(g&&(g.serverTimingAnchored||g.mode==='daily_special')&&!g.finished&&g.found?.length===g.puzzle?.answers?.length)fairPlay().resume(g).then(row=>{if(row&&currentGame===g)finishGame()}).catch(()=>{});});
  document.addEventListener('proplet:queue-changed',()=>renderOfflineStatus());
  renderOfflineStatus();
 }

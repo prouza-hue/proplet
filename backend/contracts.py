@@ -46,8 +46,8 @@ class HelperEventCreate(BaseModel):
     challenge_key: str
     event_type: str
     support_mode: str = Field(default="none", max_length=32)
-    elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
-    idle_ms: int = Field(default=0, ge=0, le=86_400_000)
+    elapsed_ms: int = Field(default=0, ge=0, le=2_147_483_647)
+    idle_ms: int = Field(default=0, ge=0, le=2_147_483_647)
     found_words: int = Field(default=0, ge=0, le=99)
     total_words: int = Field(default=0, ge=0, le=99)
 
@@ -60,7 +60,7 @@ class HintEventCreate(BaseModel):
     source: str = Field(default="manual", max_length=24)
     support_mode: str = Field(default="none", max_length=32)
     complimentary: bool = False
-    elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
+    elapsed_ms: int = Field(default=0, ge=0, le=2_147_483_647)
     found_words: int = Field(default=0, ge=0, le=99)
     total_words: int = Field(default=0, ge=0, le=99)
 
@@ -105,7 +105,7 @@ class ResultCreate(BaseModel):
     challenge_key: str
     mode: str
     difficulty: str
-    elapsed_ms: int = Field(ge=1000, le=86_400_000)
+    elapsed_ms: int = Field(ge=1000, le=2_147_483_647)
     moves: int = Field(ge=1, le=10000)
     daily_date: Optional[str] = None
     # Optional for cached legacy clients; a supplied special hash must match
@@ -139,7 +139,7 @@ class AttemptStart(BaseModel):
 class AttemptCheckpoint(BaseModel):
     attempt_id: str = Field(min_length=8, max_length=80)
     event_type: str
-    elapsed_ms: int = Field(default=0, ge=0, le=86_400_000)
+    elapsed_ms: int = Field(default=0, ge=0, le=2_147_483_647)
     found_words: int = Field(default=0, ge=0, le=99)
     calm_mode: Optional[bool] = None
 
@@ -150,7 +150,7 @@ class AttemptFinishTelemetry(BaseModel):
     challenge_key: str
     mode: str
     difficulty: str
-    elapsed_ms: int = Field(ge=1000, le=86_400_000)
+    elapsed_ms: int = Field(ge=1000, le=2_147_483_647)
     moves: int = Field(ge=1, le=10000)
     hints_used: int = Field(default=0, ge=0, le=99)
     wrong_attempts: int = Field(default=0, ge=0, le=999)

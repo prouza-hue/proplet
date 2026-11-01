@@ -2456,10 +2456,14 @@ def completion_discovery_rewards(player_id: str, completed: list[dict]) -> list[
         bonus = 0
         for reward in by_puzzle.get(record.get("puzzleId"), []):
             granted = parse_timestamp(reward.get("granted_at"))
-            if not granted or not end or granted > end:
+            if not granted or not end:
                 continue
-            # Dated boards can reuse a puzzle; do not attach another day's words.
-            if day and granted.astimezone(TZ).date().isoformat() != day:
+            # Dated recap includes delayed same-day offline claims. The ledger
+            # has no attempt/earned timestamp: do not guess across Prague dates.
+            if day:
+                if granted.astimezone(TZ).date().isoformat() != day:
+                    continue
+            elif granted > end:
                 continue
             bonus += max(0, int(reward.get("points") or 0))
         enriched.append({**record, "wordDiscoveryXpAwarded": bonus})

@@ -13,7 +13,7 @@ context.window=context;vm.createContext(context);vm.runInContext(source,context)
 let receipt={finished:true},savedPending=0,pendingMessage='';
 let state={completed:{},inProgress:{},rescues:{}},records=[],leaderboards=[];
 const game=Game.create({readState:()=>state,writeState:value=>state=value,performanceNow:()=>5000,dateNow:()=>Date.parse('2026-10-21T12:00:00Z'),colorCount:4});
-Object.assign(context,{document:{querySelector:node,querySelectorAll:()=>[],createElement:()=>node('generated')},gameSession:()=>game,getState:()=>state,saveState:value=>state=value,getProfile:()=>null,pragueDateISO:()=> '2026-10-21',localFreeSlotState:()=>({actual:new Set(),effective:new Set(),transferred:new Set()}),tajenkaState:()=>({completions:{}}),saveGameProgress:()=>savedPending++,message:text=>pendingMessage=text,fairPlay:()=>({finish:async()=>receipt}),runGameCompletionHooks:async()=>{},sleep:async()=>{},releaseGameWakeLock(){},renderGameBoard(){},renderGameHUD(){},updateGameFeel(){},renderCompletionPraise(){},completionAchievements:()=>[],renderWinBadges(){},positionWinBadges(){},updateWinAccountCta(){},renderWinFeedback(){},confetti(){},fx(){},renderDaily(){},renderFree(){},renderProfile(){},queueResult:record=>records.push(record),finishAttemptTelemetry:async()=>{},loadWinSpecialLeaderboard:async(_date,record)=>leaderboards.push(record.challengeKey),loadWinDailyGlobalLeaderboard:async(date)=>leaderboards.push('daily:'+date)});
+Object.assign(context,{document:{querySelector:node,querySelectorAll:()=>[],createElement:()=>node('generated')},gameSession:()=>game,getState:()=>state,saveState:value=>state=value,getProfile:()=>null,pragueDateISO:()=> '2026-10-21',localFreeSlotState:()=>({actual:new Set(),effective:new Set(),transferred:new Set()}),tajenkaState:()=>({completions:{}}),saveGameProgress:()=>savedPending++,message:text=>pendingMessage=text,fairPlay:()=>({finish:async()=>receipt}),runGameCompletionHooks:async()=>{},sleep:async()=>{},releaseGameWakeLock(){},renderGameBoard(){},renderGameHUD(){},updateGameFeel(){},renderCompletionPraise(){},completionAchievements:()=>[],renderWinBadges(){},positionWinBadges(){},updateWinAccountCta(){},renderWinFeedback(){},confetti(){},fx(){},renderDaily(){},renderFree(){},renderProfile(){},queueResult:record=>records.push(record),finishAttemptTelemetry:async()=>{},loadWinLevelLeaderboard:async()=>{},loadWinSpecialLeaderboard:async(_date,record)=>leaderboards.push(record.challengeKey),loadWinDailyGlobalLeaderboard:async(date)=>leaderboards.push('daily:'+date)});
 vm.runInContext('puzzleDB={freeGeneration:6,free:{}};',context);
 const date='2026-10-21',hash='a'.repeat(64),answer={word:'AB',path:[0,1]},base={id:'base',difficulty:'medium',answers:[answer],letters:['A','B'],meta:{cells:2}};
 const store=Special.create({dateISO:()=>date});
@@ -48,5 +48,21 @@ function run(puzzle,mode,attemptId){return {puzzle,mode,fairPlay:mode==='daily_s
   receipt={finished:true};await context.finishGame();
   assert.equal(Object.keys(state.completed).length,1);assert.equal(records.length,1);
  }
+ // Anchored Daily/Free completion cannot enter the result queue before server finish.
+ for(const mode of ['daily','free']){
+  receipt=null;state={completed:{},inProgress:{},rescues:{}};records=[];savedPending=0;
+  game.replace({...run(base,mode,'anchored-'+mode),fairPlay:true,serverTimingAnchored:true});
+  await context.finishGame();assert.equal(game.get().finished,false);assert.equal(records.length,0);assert.equal(savedPending,1);
+  receipt={finished:true};await context.finishGame();assert.equal(game.get().finished,true);assert.equal(records.length,1);
+ }
+ // Proof that the result already exists must not get stuck waiting for a second finish.
+ receipt=null;state={completed:{},inProgress:{},rescues:{}};records=[];
+ game.replace({...run(base,'daily','already-committed'),fairPlay:false,serverTimingAnchored:true,remoteCommitted:true});
+ await context.finishGame();assert.equal(game.get().finished,true);assert.equal(records.length,0,'remote receipt cannot enqueue another award');
+ // A terminal server duration limit is shown verbatim, never overwritten by a retry hint.
+ state={completed:{},inProgress:{},rescues:{}};records=[];pendingMessage='';
+ const terminal='Tento pokus přesáhl nejdelší podporovanou dobu měření (24 dní).';
+ game.replace({...run(base,'daily','duration-limit'),fairPlay:false,serverTimingAnchored:true,fairPlayError:terminal});
+ await context.finishGame();assert.equal(pendingMessage,terminal);assert.equal(game.get().finished,false);assert.equal(game.get().finishRetryTimer,null);assert.equal(records.length,0);
  console.log('PASS actual app finish: base/special in both orders,200XP isolation, unchanged badge/streak counters, practice once-only, payload/hash, result snapshot and share link');
 })().catch(error=>{console.error(error);process.exit(1)});

@@ -904,6 +904,10 @@
       {
         "path": "tests/current/test_completion_discovery_rewards.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_offline_timing_client.cjs",
+        "runner": "node"
       }
     ]
   },
