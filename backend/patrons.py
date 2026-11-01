@@ -81,6 +81,11 @@ class ConfirmBody(Body):
     amountCzk: StrictInt=Field(ge=1,le=100000)
     currency: Literal['CZK']
     recipientAccount: Literal['5531840001/5500']
+    paidOn: str=Field(pattern=r'^\d{4}-\d{2}-\d{2}$')
+    @model_validator(mode='after')
+    def bank_date(self):
+        date.fromisoformat(self.paidOn)
+        return self
 
 
 def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=feature_enabled):
@@ -148,7 +153,7 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
     def confirm(body:ConfirmBody,request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
         headers(response);active();admin=require_admin(authorization,write=True)
         enforce_rate_limit(request,'patron_confirm',limit=60,window_seconds=3600)
-        return run('proplet_patron_confirm_v1',{'p_actor':admin['player']['id'],'p_intent':str(body.intentId),'p_reference':body.reference,'p_bank_tx':body.bankTransactionId,'p_amount':body.amountCzk,'p_currency':body.currency,'p_account':body.recipientAccount})
+        return run('proplet_patron_confirm_v2',{'p_actor':admin['player']['id'],'p_intent':str(body.intentId),'p_reference':body.reference,'p_bank_tx':body.bankTransactionId,'p_amount':body.amountCzk,'p_currency':body.currency,'p_account':body.recipientAccount,'p_paid_on':body.paidOn})
 
 
 def annotate_players(players,db_rpc):
@@ -157,9 +162,12 @@ def annotate_players(players,db_rpc):
     ids=[str(p['id']) for p in players if p.get('id') and p.get('public_rankings') is True]
     if not ids:return players
     try:
-        public_ids=set()
+        public_ids=set();badges={}
         for start in range(0,len(ids),2000):
             value=db_rpc('proplet_patron_public_ids_v1',{'p_players':ids[start:start+2000]})
-            if isinstance(value,dict):public_ids.update(value.get('players',[]))
-    except HTTPException:public_ids=set()  # Optional decoration cannot break gameplay.
-    return [{**p,'_patron_public':str(p.get('id')) in public_ids} for p in players]
+            if isinstance(value,dict):
+                public_ids.update(value.get('players',[]))
+                badges.update({key:kind for key,kind in value.get('badges',{}).items() if kind in ('supporter','recurring')})
+    except HTTPException:public_ids=set();badges={}  # Optional decoration cannot break gameplay.
+    return [{**p,'_patron_public':str(p.get('id')) in public_ids,
+             '_patron_badge':badges.get(str(p.get('id')),'supporter') if str(p.get('id')) in public_ids else None} for p in players]

@@ -44,6 +44,40 @@ function fixture(query=''){
  const guest=fixture('?account=guest');assert.equal(guest.context.localStorage.getItem('proplet-v2-profile'),null);assert.notEqual(guest.context.PropletStudioFixture.getScenario().scope,f.context.PropletStudioFixture.getScenario().scope);
  const none=fixture('?extra=none');assert.equal((await none.context.fetch('/api/daily-special').then(r=>r.json())).special,null);
  report.checks.push('Once-only done/complete seeds, separate guest/member scopes, no-Extra scenario');
+ for(const period of ['first','current','grace','expired','reinstated','oneoff','private']){
+  const sample=fixture('?patronInfo=1&patronOwn=public&patronPeriod='+period);
+  const own=await sample.context.fetch('/api/patrons').then(r=>r.json());
+  assert.equal(own.reviewOnly,true);assert.equal(own.patron,true);assert.equal(own.badgeType,['expired','oneoff'].includes(period)?'supporter':'recurring');assert.equal(own.recurringStatus.graceDays,7);if(period!=='oneoff'){assert.equal(own.recurringStatus.nextDue,period==='reinstated'?'2027-01-10':'2026-12-01');assert.equal(own.recurringStatus.paidThrough,period==='reinstated'?'2027-01-09':'2026-11-30');}assert.equal(own.contributions.length,['first','oneoff'].includes(period)?1:2);
+  assert.equal(own.publicBadge,period!=='private');assert.equal(own.recurringStatus.state,period==='grace'?'grace':period==='expired'?'expired':period==='oneoff'?'none':'current');
+  const result=await sample.context.fetch('/api/global-leaderboard').then(r=>r.json());
+  assert.equal(result.rows.length,4);assert.equal(result.rows[0].patronBadge,'recurring');assert.equal(result.rows[2].patronBadge,'supporter');assert.equal(result.rows[3].patron,false);assert(!('patronBadge'in result.rows[3]));assert(!('recurringStatus'in result.rows[0]));
+  assert.equal(result.rows[1].patron,period!=='private');
+  assert.equal((await sample.context.fetch('/api/patrons/intents',{method:'POST',body:'{}'})).status,409,'preview cannot create payment intent');
+  await sample.context.fetch('/api/patrons/preferences',{method:'POST',body:JSON.stringify({publicBadge:false})});
+  assert.equal((await sample.context.fetch('/api/patrons').then(r=>r.json())).publicBadge,false,'preview privacy change stays in memory');
+  assert.equal(sample.calls.length,0,'patron fixtures never reach network transport');
+ }
+ const pendingPatron=fixture('?patronPeriod=first&patronOwn=none');assert.equal((await pendingPatron.context.fetch('/api/patrons').then(r=>r.json())).patron,false);
+ assert.equal((await fixture('?patronPeriod=unrecognized').context.fetch('/api/patrons').then(r=>r.json())).enabled,false,'unknown query does not enable fixtures');
+ report.checks.push('Seven explicit synthetic patron states, permanent blue fallback, private public-row redaction, pending offer unentitled, in-memory preferences and blocked payment creation');
+ for(const view of ['offer','thanks','settings']){
+  const sample=fixture('?patronPeriod=current&patronOwn=public&patronView='+view+'&patronFrequency=monthly');
+  let frames=0,opened=null,settingsOpen=false,radioClicks=0;
+  const model={enabled:false,paid:true,frequency:'once'},monthly={checked:false,click(){radioClicks++;this.checked=true;model.frequency='monthly'}};
+  sample.context.requestAnimationFrame=fn=>setTimeout(()=>{if(++frames>=2&&!sample.context.PropletPatrons)sample.context.PropletPatrons=nativeContract;fn();},0);sample.context.cancelAnimationFrame=clearTimeout;
+  sample.context.document.querySelector=selector=>selector==='#patronTodayLink'?model.enabled?{}:null:selector==='#settingsHeaderBtn'?{click(){settingsOpen=true}}:selector==='#screen-profile.settings-open'||selector==='#patronBadgePreference'?settingsOpen?{}:null:selector.includes('#patronDialog[open]')?opened===view?{}:null:selector.includes('[value="monthly"]:checked')?monthly.checked?monthly:null:selector.includes('[value="monthly"]')?opened==='offer'?monthly:null:selector.includes('.patron-avatar-demo.patron-recurring')?monthly.checked?{}:null:null;
+  const nativeContract={model,refresh:async()=>{model.enabled=true},open(step){assert(model.enabled,'fixture must wait for delayed native enablement');opened=step}};
+  assert.equal(sample.context.PropletPatrons,undefined,'native API is deliberately absent when ready fires; the old premature refresh must fail this test');
+  sample.listeners['proplet:ready'][0]();
+  const deadline=Date.now()+1000;
+  while(!sample.context.PROPLET_STUDIO_PATRON_VIEW&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,5));
+  assert.equal(sample.context.PROPLET_STUDIO_SEED_ERROR,undefined);assert.equal(sample.context.PROPLET_STUDIO_PATRON_VIEW?.ready,true,'explicit '+view+' link must open after asynchronous native readiness');
+  if(view==='offer'){assert.equal(radioClicks,1);assert.equal(model.frequency,'monthly','monthly deep link invokes the actual radio handler');}
+  else if(view==='thanks')assert.equal(opened,'thanks');else assert.equal(settingsOpen,true);
+ }
+ report.checks.push('Offer/monthly, thanks and settings deep links await delayed native readiness and verify the requested view');
+
+
  assert.equal((await f.context.fetch('https://hrajproplet.cz/api/config')).status,403);assert.equal((await f.context.fetch('/unlisted-write',{method:'POST',body:'x'})).status,403);
  assert.equal(f.context.navigator.sendBeacon('/api/result','x'),false);assert.throws(()=>new f.context.WebSocket('wss://example.com'));assert.throws(()=>new f.context.XMLHttpRequest());await assert.rejects(f.context.navigator.serviceWorker.register('/sw.js'));
  assert(f.calls.every(row=>new URL(row.url).origin==='https://studio.example'&&!new URL(row.url).pathname.startsWith('/api/')&&row.method==='GET'));

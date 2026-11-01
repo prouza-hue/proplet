@@ -736,6 +736,21 @@
       ]
     },
     {
+      "id": "20261101-patron-recurring-badge",
+      "order": 640,
+      "version": "2026.11.01",
+      "path": "supabase/migrations/20261101103408_patron_recurring_badge.sql",
+      "type": "migration",
+      "status": "prepared-preview-only-not-applied",
+      "sha256": "ea94368054c2a1aa55560747cba782255562c956fb2a184f2882847d48ac1a12",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_patron_state_v1",
+        "public.proplet_patron_admin_list_v1",
+        "public.proplet_patron_public_ids_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",
