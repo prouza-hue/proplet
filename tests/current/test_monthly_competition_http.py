@@ -81,3 +81,17 @@ with patch.object(server,'monthly_competition_available',return_value=True),patc
     assert [r['rank'] for r in body['standings']]==[1,2] and not any(r['sharedRank'] for r in body['standings'])
     assert private not in response.text and viewer['id'] not in response.text
 print('PASS v2 HTTP precision, audited quality facts, unique final ranks and identifier privacy')
+
+# V3 adds one explicit independence component; the HTTP adapter must retain its
+# zero value and keep the old precision/privacy contracts.
+raw['scoringVersion']=3;raw['rulesVersion']='monthly-independence-v3'
+raw['me']['days'][0].update(independencePoints=0,cleanPoints=0,hintPoints=0,points=55,speedPoints=0,hints=5,clean=False)
+with patch.object(server,'monthly_competition_available',return_value=True),patch.object(server,'enforce_rate_limit'), \
+     patch.object(server,'_ranking_viewer',return_value=viewer),patch.object(server,'db_rpc',return_value=raw), \
+     patch.object(server,'db_select_bounded',return_value=[]),patch.object(server.patrons,'annotate_players',side_effect=lambda rows,rpc:rows), \
+     patch.object(server,'_ranking_display_identity',return_value={'name':'Private','avatar':'X','anonymous':True}):
+    response=client.get('/api/competition/monthly?month=2026-11');body=response.json()
+    assert response.status_code==200 and body['scoringVersion']==3 and body['rulesVersion']=='monthly-independence-v3'
+    assert body['me']['days'][0]['independencePoints']==0 and body['me']['days'][0]['points']==55
+    assert private not in response.text and viewer['id'] not in response.text
+print('PASS v3 HTTP explicit zero independence component, version and privacy')

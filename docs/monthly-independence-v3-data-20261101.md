@@ -1,0 +1,11 @@
+# Monthly independence v3 — 2026-11-01
+
+Approved and based on production `3a9274e` / 4.10.2. New daily formula is 55 completion + max(25 - 5 * hints, 0) independence + unchanged verified relative speed. Independence for 0/1/2/3/4/5+ hints is 25/20/15/10/5/0; clean is retained only as a ranking fact and tie breaker. No gameplay XP, modes, best20 rules, timing verification, late-sync deadline, ranking keys or draw behavior changes.
+
+The forward migration `20261101013001_monthly_independence_v3.sql` is dormant: existing setting2 and November points stay unchanged until service-only `proplet_activate_monthly_independence_v3()` after the 4.10.3 deployment. It reconciles open eligible months atomically. Existing v1/v2 closed snapshots and audited corrections retain their original formula; new snapshots and correction receipts record version3. Old v2 activation retries cannot downgrade version3. The fresh unapplied CLI-generated migration was renamed after the existing v2 file to preserve chronological disposable-CI bootstrap order; no applied migration was edited.
+
+API uses scoringVersion3/rulesVersion monthly-independence-v3 and days.independencePoints. Standalone cleanPoints and hintPoints are zero in v3; clean/hints remain truthful tie facts. If historical authoritative metadata records maxHintLevel above0 with a zero hint count, effective hints is at least1, preventing a no-assistance bonus. Native atomic RPC already rejects this inconsistency; a synthetic legacy-row case verifies the defensive handling.
+
+Focused native acceptance covers hints0..6, clean=false with zero assistance, verified singleton/cohort speed, best20 and clean tie selection, activation/reconcile retries without XP changes, closed v2 correction compatibility and closed v3 snapshot/correction with the same draw seed. The existing Monthly competition integrity workflow runs the new stage after the unchanged v1/v2 acceptance. HTTP preserves explicit independence0 and UUID privacy. UI/release/cache checks are recorded separately.
+
+Production application, actual migration ID, candidate/merge SHA, guarded November reconciliation and unchanged source fingerprints are recorded outside the repository in ../monthly-independence-production-20261101/production-release.json when performed. Preparation alone is not production activation.
