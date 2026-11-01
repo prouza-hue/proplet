@@ -25,7 +25,7 @@
  async function createIntent(){if(model.pending)return;if(!model.authenticated){close();if(typeof openProfileModal==='function')openProfileModal('login');return;}const epoch=accountEpoch;if(model.requestAmount!==[model.amount,model.frequency,model.frequency==='monthly'?model.firstPaymentDate:''].join(':')||!model.requestId){model.requestId=crypto.randomUUID();model.requestAmount=[model.amount,model.frequency,model.frequency==='monthly'?model.firstPaymentDate:''].join(':');}model.pending=true;model.error='';render();try{const value=await request('/api/patrons/intents',{method:'POST',body:JSON.stringify({requestId:model.requestId,amountCzk:model.amount,frequency:model.frequency,...(model.frequency==='monthly'?{firstPaymentDate:model.firstPaymentDate}:{})})});if(epoch!==accountEpoch||!model.enabled)return;model.intent=value.intent;model.payment=value.payment;model.step='qr';model.canOffer=false;}catch(error){console.error('Patron QR preparation failed',error);if(epoch===accountEpoch)model.error='QR se nepodařilo připravit. Zkus to znovu — nevznikne tím druhá platba.';}finally{if(epoch===accountEpoch){model.pending=false;render();$('#patronTitle')?.focus({preventScroll:true});}}}
 
  const art='<img class="patron-art" src="/assets/support/patron-letterpress-v1.webp" alt="" width="144" height="144">';
- const seal=(name='Podporovatel')=>`<button type="button" class="patron-label" aria-label="${name} Propletu — poděkování" data-patron-thanks>${heart}<span>${name}</span></button>`;
+ const seal=(name='Podporovatel')=>`<button type="button" class="patron-label" aria-label="${name} Propletu — poděkování" data-patron-thanks><span>${name}</span></button>`;
  function ensure(){
   if($('#patronDialog'))return;
   const el=document.createElement('dialog');el.id='patronDialog';el.setAttribute('aria-labelledby','patronTitle');document.body.append(el);
@@ -84,7 +84,7 @@
 
  }
  function personName(row,name){return row.classList.contains('me')?profile()?.name||'Podporovatel':name.textContent.replace(/\s*Ty\s*$/,'').trim()||'Podporovatel';}
- function showPerson(row,name,from){if(!model.enabled||!row.classList.contains('patron-supported'))return;model.personName=personName(row,name);model.personAvatarNodes=Array.from(row.querySelector('.result-player-avatar')?.childNodes||[],node=>node.cloneNode(true));model.personAvatar=row.querySelector('.result-player-avatar')?.dataset.playerAvatar||null;model.personArt=row.querySelector('.result-player-avatar img,.leader-name img')?.getAttribute('src');open('other',from);}
+ function showPerson(row,name,from){if(!model.enabled||!row.classList.contains('patron-supported'))return;model.personName=personName(row,name);model.personAvatarNodes=Array.from(row.querySelector('.result-player-avatar,.ranking-avatar')?.childNodes||[]).filter(node=>!node.classList?.contains('patron-avatar-card')).map(node=>node.cloneNode(true));model.personAvatar=row.querySelector('.result-player-avatar,.ranking-avatar')?.dataset.playerAvatar||null;model.personArt=row.querySelector('.result-player-avatar img,.leader-name img')?.getAttribute('src');open('other',from);}
  function resultAvatarControl(avatar,supported){
   if(!avatar)return null;const wasButton=avatar.tagName==='BUTTON';if(wasButton===supported)return avatar;
   const next=document.createElement(supported?'button':'span');next.className=avatar.className.replace(/\s*patron-avatar-info/g,'');next.dataset.playerAvatar=avatar.dataset.playerAvatar||'';
@@ -93,14 +93,23 @@
   if(supported){next.type='button';next.classList.add('patron-avatar-info');}
   return next;
  }
+ function decorateAvatar(avatar,supported){
+  if(!avatar)return;
+  avatar.classList.toggle('patron-avatar-marked',supported);
+  const card=avatar.querySelector('.patron-avatar-card');
+  if(!supported){card?.remove();return;}
+  if(!card){const mark=document.createElement('i');mark.className='patron-avatar-card';mark.setAttribute('aria-hidden','true');mark.innerHTML=heart;avatar.append(mark);}
+ }
  function decorate(){
   if(!model.enabled){
    model.receiptId=null;close();model.thanksPending=false;model.contributions=[];model.intent=null;model.payment=null;model.pending=false;model.requestId=null;model.requestAmount=null;
    for(const node of document.querySelectorAll('#patronProfileEntry,#patronTodayLink,#patronOfferPreference,#patronOffer,.patron-label'))node.remove();
+   for(const avatar of document.querySelectorAll('.patron-avatar-marked'))decorateAvatar(avatar,false);
    for(const row of document.querySelectorAll('.patron-supported'))row.classList.remove('patron-supported');
    for(const avatar of document.querySelectorAll('.result-player-avatar.patron-avatar-info'))resultAvatarControl(avatar,false);
    return;
   }
+  for(const avatar of document.querySelectorAll('#profileChipAvatar,.profile-avatar-big'))decorateAvatar(avatar,model.authenticated&&model.paid);
   const card=$('#profileCard');if(card&&!$('#patronProfileEntry')){const entry=document.createElement('button');entry.type='button';entry.id='patronProfileEntry';entry.className='patron-profile-entry';card.after(entry);}
   const entry=$('#patronProfileEntry');if(entry){const html=`<span class="patron-entry-seal">${heart}</span><span><strong>${model.paid?'Díky, že jsi u toho.':'Baví tě Proplet?'}</strong><small>${model.paid?'Tvoje podpora a veřejná značka':'Podpoř jeho další příběh.'}</small></span><b aria-hidden="true">→</b>`;if(entry.innerHTML!==html)entry.innerHTML=html;}
   const footer=document.querySelector('.app-footer');if(footer&&!$('#patronTodayLink')){const link=document.createElement('button');link.type='button';link.id='patronTodayLink';link.className='text-btn patron-today-link';link.textContent='Podpořit Proplet';link.onclick=()=>open('offer',link);footer.before(link);}
@@ -113,7 +122,8 @@
    const mine=row.classList.contains('me'),supported=mine?model.paid&&model.public:row.dataset.patron==='true';
    const copy=row.querySelector('.result-player-copy,.leader-name')||name.parentElement;
    const badge=row.querySelector('.patron-label');if(supported&&!badge){const holder=document.createElement('span');holder.innerHTML=seal();const button=holder.firstElementChild;button.onclick=e=>{e.stopPropagation();if(mine)open('thanks',button);else showPerson(row,name,button)};copy.append(button);}else if(!supported&&badge)badge.remove();
-   row.classList.toggle('patron-supported',supported);
+   row.classList.toggle('patron-supported',supported);if(supported)name.setAttribute('title',personName(row,name));
+   for(const avatar of row.querySelectorAll('.result-player-avatar,.ranking-avatar,.home-ranking-avatar,.leader-avatar,.leaderboard-avatar'))decorateAvatar(avatar,supported);
    if(row.classList.contains('result-player-row')){const avatar=resultAvatarControl(row.querySelector('.result-player-avatar'),supported);if(supported&&avatar){avatar.setAttribute('aria-label','Podporovatel '+personName(row,name)+' — o podpoře Propletu');avatar.setAttribute('aria-haspopup','dialog');avatar.onclick=e=>{e.stopPropagation();showPerson(row,name,avatar)};}}
   }
  }

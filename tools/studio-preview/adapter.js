@@ -258,7 +258,7 @@ window.fetch=async(input,init={})=>{
  requests.push({path:url.pathname,method,reviewOnly:true});
  let body={};try{body=JSON.parse(init.body||'{}');}catch{}
  const path=url.pathname;
- if(path==='/api/patrons'&&method==='GET')return json({enabled:patronInfoPreview,authenticated:!!profile()?.token,patron:false,publicBadge:false,offersDisabled:true,canOffer:false,thanksPending:false,contributions:[],reviewOnly:true});
+ if(path==='/api/patrons'&&method==='GET')return json({enabled:patronInfoPreview,authenticated:!!profile()?.token,patron:patronInfoPreview&&reviewParams.get('patronOwn')!=='none',publicBadge:reviewParams.get('patronOwn')==='public',offersDisabled:true,canOffer:false,thanksPending:false,contributions:[],reviewOnly:true});
  if(path.startsWith('/api/patrons/'))return json({detail:'Náhled podpory neprovádí platby ani zápisy.',reviewOnly:true},409);
  if(method==='GET'&&path==='/api/competition/monthly')return json(window.PropletMonthlyV2Fixture.response(reviewParams.get('monthlyCase')));
  if(method==='GET'&&path==='/api/config'){

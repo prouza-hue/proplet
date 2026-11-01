@@ -66,3 +66,6 @@ The fixture lives in `monthly-v2-fixture.js`, is loaded only by this generated p
 ## Public supporter avatar detail (2026-11-01)
 
 `/?patronInfo=1` explicitly seeds one synthetic completed Daily and opens the native result with supported “Ukázkový Pavel” plus unsupported sample rows. Patron status is handled in memory; payment/preference/claim routes return 409 and create nothing. Clicking the supported avatar opens the current native patron dialog; its CTA switches to the existing support offer. This tests rendering and focus only, not an actual entitlement or payment. The clicked hydrated avatar nodes are cloned into the detail, so its identity does not fall back to the viewer’s avatar.
+
+
+The supporter-avatar consistency preview also accepts `patronOwn=public`, `private`, or `none` alongside `patronInfo=1`. Public marks the synthetic viewer in both their header and result; private marks only their own header/profile; none leaves the viewer unmarked. The other synthetic public supporter stays marked in each case. The card uses the existing blue keepsake inside the allocated avatar box, and result labels share the name line. These parameters change only in-memory UI fixtures and never issue payment or preference writes.
