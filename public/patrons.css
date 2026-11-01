@@ -148,3 +148,16 @@ html.tiskarna-ui body .patron-supported :is(.leader-name,.result-player-copy)>sm
 @media(max-width:359px){#patronDialog[data-patron-step=other]{padding:25px 20px 18px}#patronDialog .patron-person-intro{gap:12px}#patronDialog .patron-person-intro h2{font-size:25px}#patronDialog .patron-person-copy{font-size:15px}}
 
 .patron-person-avatar,.patron-person-avatar .organic-avatar{display:block!important;width:56px!important;height:56px!important}.patron-person-avatar>img{display:block;width:56px;height:56px;border-radius:50%}
+
+/* Keep every result readable in the narrowest supported phone viewport. */
+@media(max-width:359px){
+ html.tiskarna-ui body :is(#winModal,#levelDetailModal) .result-player-row{box-sizing:border-box;grid-template-columns:24px 32px minmax(0,1fr) 36px!important;gap:4px!important;padding:7px 4px!important;min-height:56px!important}
+ html.tiskarna-ui body :is(#winModal,#levelDetailModal) .result-player-avatar,html.tiskarna-ui body :is(#winModal,#levelDetailModal) .result-player-avatar .organic-avatar{width:32px!important;height:32px!important}
+ html.tiskarna-ui body :is(#winModal,#levelDetailModal) .result-player-rank .result-medal,html.tiskarna-ui body :is(#winModal,#levelDetailModal) .result-player-rank .result-medal :is(img,svg,.ribbon-art){box-sizing:border-box;width:24px!important;height:24px!important;max-width:24px!important;max-height:24px!important;min-width:0!important;min-height:0!important}
+ html.tiskarna-ui body :is(#winModal,#levelDetailModal) .result-player-row .result-player-copy{gap:3px!important}
+ html.tiskarna-ui body :is(#winModal,#levelDetailModal) .result-player-row .result-player-copy>strong{font-size:14px!important;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
+ html.tiskarna-ui body :is(#winModal,#levelDetailModal) .result-player-row .result-player-copy>small{display:block;min-width:0;font-size:11px!important;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
+ html.tiskarna-ui body :is(#winModal,#levelDetailModal) .patron-supported .result-player-copy{column-gap:4px}
+ html.tiskarna-ui body :is(#winModal,#levelDetailModal) .patron-supported .result-player-copy>.patron-label{font-size:10px!important}
+ html.tiskarna-ui body :is(#winModal,#levelDetailModal) .result-player-row .result-player-time{font-size:13px!important;text-align:right}
+}
