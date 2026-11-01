@@ -90,6 +90,14 @@ with patch.object(server,"enforce_rate_limit",lambda *a,**k:None),patch.object(s
         assert len(body["rows"])==2 and body["rows"][1]["isMine"] is True
         assert body["rows"][0]["anonymous"] is True and body["rows"][0]["name"]!="Private real name"
         assert client.get("/api/rankings/daily-special?challenge_key="+special["challengeKey"]).json()["myRank"] is None
+        # Forward the same public subtype as all other ranking endpoints, while
+        # the existing identity helper keeps private patrons anonymous.
+        people[other_id].update(public_rankings=True,_patron_public=True,_patron_badge='recurring')
+        regular=client.get("/api/rankings/daily-special?challenge_key="+special["challengeKey"]).json()['rows'][0]
+        assert regular['patron'] is True and regular['patronBadge']=='recurring'
+        people[other_id].update(public_rankings=False)
+        hidden=client.get("/api/rankings/daily-special?challenge_key="+special["challengeKey"]).json()['rows'][0]
+        assert hidden['anonymous'] and 'patron' not in hidden and 'patronBadge' not in hidden
     os.environ["PROPLET_DAILY_SPECIALS_PREVIEW_DATE"]="2026-10-15"
     archive=client.get("/api/daily-special?daily_date=2026-10-14").json()["special"]
     assert archive["official"] is False and archive["rewardEligible"] is False

@@ -112,5 +112,40 @@ class PatronHttpTests(unittest.TestCase):
   lookup.return_value={'players':['public']}
   with patch.object(patrons,'feature_enabled',return_value=True):
    self.assertEqual(patrons.annotate_players(rows,lookup)[0]['_patron_badge'],'supporter')
+ def test_actual_ranking_endpoints_forward_public_type_without_private_status(self):
+  from contextlib import ExitStack
+  import server
+  people=[{'id':pid,'name':name,'avatar':'A','public_rankings':visible}
+          for pid,name,visible in [('red','Public regular',True),('blue','Public supporter',True),
+                                   ('private','Private badge',True),('hidden','Hidden real name',False)]]
+  rows=[{'player_id':p['id'],'puzzle_id':'patron-api-puzzle','challenge_key':'daily:2026-11-01',
+         'daily_date':'2026-11-01','mode':'daily','elapsed_ms':10000+i*1000,'moves':8,
+         'hints_used':0,'clean_solve':True,'completed_at':'2026-11-01T10:00:00Z'} for i,p in enumerate(people)]
+  score={p['id']:100-i for i,p in enumerate(people)}
+  public={'players':['red','blue'],'badges':{'red':'recurring','blue':'supporter'}}
+  with ExitStack() as stack:
+   for name,value in {'enforce_rate_limit':lambda *a,**k:None,'free_puzzle_info':lambda *a:{'difficulty':'easy','level':1},
+                      'competitive_row':lambda row:True,'daily_leaderboard_puzzle_id':lambda *a:'patron-api-puzzle',
+                      'expected_daily_puzzle_id':lambda *a:'patron-api-puzzle','db_select_bounded':lambda *a,**k:[],
+                      'db_rpc':lambda *a,**k:public,'_ranking_xp_aggregates':lambda *a:(score,score,{},{}),
+                      '_ranking_viewer':lambda *a:None}.items():stack.enter_context(patch.object(server,name,value))
+   stack.enter_context(patch.object(server.ranking_queries,'ranking_runs',return_value=(rows,'test')))
+   stack.enter_context(patch.object(server.ranking_queries,'entity_context',return_value=(people,[])))
+   stack.enter_context(patch.object(patrons,'feature_enabled',return_value=True))
+   client=TestClient(server.app)
+   for url,key in [('/api/free-global-leaderboard?puzzle_id=patron-api-puzzle&offset=0','rows'),
+                   ('/api/daily-global-leaderboard?daily_date=2026-11-01&offset=0','rows'),
+                   ('/api/rankings/xp?period=all','players'),('/api/rankings/daily?daily_date=2026-11-01','players')]:
+    with self.subTest(endpoint=url):
+     response=client.get(url);self.assertEqual(response.status_code,200,response.text)
+     actual=response.json()[key];by_name={p['name']:p for p in actual}
+     self.assertEqual(by_name['Public regular']['patronBadge'],'recurring')
+     self.assertEqual(by_name['Public supporter']['patronBadge'],'supporter')
+     self.assertTrue(by_name['Public regular']['patron'])
+     self.assertFalse(by_name['Private badge']['patron']);self.assertNotIn('patronBadge',by_name['Private badge'])
+     self.assertNotIn('Hidden real name',by_name)
+     for row in actual:
+      self.assertFalse({'recurringStatus','paidOn','paidThrough','nextDue','graceUntil','contributions','amountCzk'}&set(row))
+      if row['anonymous']:self.assertNotIn('patronBadge',row);self.assertNotIn('patron',row)
 
 if __name__=='__main__':unittest.main()
