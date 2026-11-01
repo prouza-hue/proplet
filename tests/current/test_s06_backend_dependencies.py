@@ -39,6 +39,7 @@ assert "AppServices(" in server_source
 
 import server  # noqa: E402
 import account_auth  # noqa: E402
+from patron_contract import normalize_patron_routes, normalize_patrons
 from admin_workspace_contract import normalize_admin_routes, normalize_admin_workspace  # noqa: E402
 
 
@@ -80,7 +81,7 @@ route_keys = [
 for expected in EXPECTED_INSTALLER_ROUTES:
     assert route_keys.count(expected) == 1, f"expected exactly one installed route: {expected}"
 
-reviewed_admin_routes = normalize_admin_routes((route.path, tuple(sorted(route.methods or ())), route.name) for route in server.app.routes if route.path)
+reviewed_admin_routes = normalize_admin_routes(normalize_patron_routes((route.path, tuple(sorted(route.methods or ())), route.name) for route in server.app.routes if route.path))
 route_snapshot = sorted(
     (path, methods, name)
     for path, methods, name in reviewed_admin_routes
@@ -109,6 +110,7 @@ assert qa_schema["additionalProperties"] is False
 from google_oauth_contract import normalize_google_oauth
 normalize_google_oauth(openapi_contract)
 # Keep every old route/method/schema hashed; remove only validated admin additions.
+normalize_patrons(openapi_contract)
 normalize_admin_workspace(openapi_contract)
 # The private visual pilot is additive; its auth/state/RLS boundaries have
 # dedicated HTTP and real PostgreSQL acceptance. Keep the historical digest.

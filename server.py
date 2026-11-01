@@ -4318,6 +4318,7 @@ def free_global_leaderboard(
         (row.get("player_id") for row in ranked),
         rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
     )
+    players = patrons.annotate_players(players, db_rpc)
     players_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     used_aliases: set[str] = set()
     board = []
@@ -4333,6 +4334,7 @@ def free_global_leaderboard(
             "name": identity["name"],
             "avatar": identity["avatar"],
             "anonymous": identity["anonymous"],
+            **({"patron": identity["patron"]} if "patron" in identity else {}),
             "elapsedMs": int(row.get("elapsed_ms") or 0),
             "moves": int(row.get("moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0),
@@ -4426,6 +4428,7 @@ def daily_global_leaderboard(
         (row.get("player_id") for row in ranked),
         rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
     )
+    players = patrons.annotate_players(players, db_rpc)
     players_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     used_aliases: set[str] = set()
     board = []
@@ -4441,6 +4444,7 @@ def daily_global_leaderboard(
             "name": identity["name"],
             "avatar": identity["avatar"],
             "anonymous": identity["anonymous"],
+            **({"patron": identity["patron"]} if "patron" in identity else {}),
             "elapsedMs": int(row.get("elapsed_ms") or row.get("best_elapsed_ms") or 0),
             "moves": int(row.get("moves") or row.get("best_moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0),
@@ -4544,6 +4548,7 @@ def _ranking_display_identity(player: dict | None, viewer_id: str | None, scope:
             "name": player.get("name") or "Hráč",
             "avatar": player.get("avatar") or "🙂",
             "anonymous": False,
+            **({"patron": bool(player.get("_patron_public"))} if "_patron_public" in player else {}),
         }
     return _ranking_anonymous_identity(str(player.get("id") or "unknown"), scope, used_names)
 
@@ -4633,6 +4638,7 @@ def _ranking_context(player_ids: set[str], team_codes: set[str]):
         include_team_members=True,
         rpc=db_rpc if SUPABASE_URL and SUPABASE_SECRET_KEY else None,
     )
+    players = patrons.annotate_players(players, db_rpc)
     player_by_id = {str(p.get("id")): p for p in players if p.get("id")}
     league_by_code = {norm_family(str(l.get("code") or "")): l for l in leagues if l.get("code")}
     public_team_names = {
@@ -4785,7 +4791,7 @@ def monthly_competition_state(
     value = monthly_competition.state(
         rpc=db_rpc, player_id=str(viewer["id"]) if viewer else None,
         month=month + "-01" if month else None,
-        players=lambda ids: db_select_bounded("players", columns="id,name,avatar,public_rankings", filters={"id": "in.(" + ",".join(ids) + ")"}),
+        players=lambda ids: patrons.annotate_players(db_select_bounded("players", columns="id,name,avatar,public_rankings", filters={"id": "in.(" + ",".join(ids) + ")"}), db_rpc),
         identity=_ranking_display_identity,
     )
     return JSONResponse(value, headers={"Cache-Control": "no-store"})
@@ -4842,6 +4848,7 @@ def rankings_xp(
             team_name = (league or {}).get("name") or family
         player_rows.append({
             "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"],
+            **({"patron": identity["patron"]} if "patron" in identity else {}),
             "xp": score, "lifetimePoints": int(lifetime_points.get(pid, 0)),
             "teamName": team_name, "badgeCount": int(badge_counts.get(pid, 0)),
             "isMine": pid == viewer_id, "isPrivate": player.get("public_rankings") is False,
@@ -4951,7 +4958,8 @@ def rankings_daily(
             league = league_by_code.get(family) or {}
             team_name = league.get("name") or family
         player_rows.append({
-            "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"], "teamName": team_name,
+            "name": identity["name"], "avatar": identity["avatar"], "anonymous": identity["anonymous"],
+            **({"patron": identity["patron"]} if "patron" in identity else {}), "teamName": team_name,
             "elapsedMs": int(row.get("elapsed_ms") or row.get("best_elapsed_ms") or 0), "moves": int(row.get("moves") or row.get("best_moves") or 0),
             "hintsUsed": int(row.get("hints_used") or 0), "cleanSolve": row.get("clean_solve") is True,
             "isMine": pid == viewer_id, "rank": ranks[row_index],
@@ -5566,6 +5574,10 @@ admin_workspace.install(globals())
 from backend import release_news
 release_news.install(app, auth_player=auth_player, db_rpc=db_rpc,
                      enforce_rate_limit=enforce_rate_limit, enabled=release_news_enabled)
+
+from backend import patrons
+patrons.install(app, auth_player=auth_player, require_admin=require_admin, db_rpc=db_rpc,
+                enforce_rate_limit=enforce_rate_limit)
 
 if not os.environ.get("VERCEL"):
     app.mount("/", StaticFiles(directory=ROOT / "public", html=True), name="local-static")

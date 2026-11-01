@@ -880,6 +880,22 @@
       {
         "path": "tests/current/test_release_news_backend.py",
         "runner": "python"
+      },
+      {
+        "path": "tests/current/test_patrons.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_patron_client.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_patron_preview_qr.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_patron_release_package.py",
+        "runner": "python"
       }
     ]
   },

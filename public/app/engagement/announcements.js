@@ -24,11 +24,11 @@
     }
     function hasPending(id,context=deps.context()){
       const entry=entries.get(id);
-      try{return !!entry&&!!context.account&&!seen(id,context.account)&&entry.eligible(context)}
+      try{return !!entry&&!!context.account&&(entry.repeatable===true||!seen(id,context.account))&&entry.eligible(context)}
       catch(error){deps.onError?.(error);return false}
     }
     function acknowledge(id,account=deps.context()?.account){
-      const entry=entries.get(id);if(!entry||!account||seen(id,account))return false;
+      const entry=entries.get(id);if(!entry||!account||entry.repeatable===true||seen(id,account))return false;
       const key=receiptKey(id,account);receipts.add(key);write(deps.storage,key);
       entry.onShown?.(account);
       return true;
