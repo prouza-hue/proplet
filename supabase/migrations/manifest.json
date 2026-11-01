@@ -741,7 +741,7 @@
       "version": "2026.11.01",
       "path": "supabase/migrations/20261101103408_patron_recurring_badge.sql",
       "type": "migration",
-      "status": "prepared-preview-only-not-applied",
+      "status": "applied-production",
       "sha256": "ea94368054c2a1aa55560747cba782255562c956fb2a184f2882847d48ac1a12",
       "supersedes": [],
       "replaced_rpc_definitions": [
