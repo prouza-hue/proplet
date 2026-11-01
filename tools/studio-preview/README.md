@@ -56,3 +56,9 @@ node tools/studio-preview/serve.cjs ../studio-baseline-public
 ```
 
 This materializes original public files from exact Git base `9f8ae24bc4dc121e7e554f7aac370fada8c8b16d` into sibling `studio-baseline-public`. It verifies every copied blob against Git and adds the same fixture harness. Original index and runtime metadata receive only isolation changes; no Studio CSS/JS is loaded. All original gameplay JavaScript and styles remain byte-identical. Use the same URL parameters on ports 8892 and 8893 for browser geometry and behavior comparisons. Storage is isolated by origin as well as fixture prefix.
+
+## Monthly quality v2 preview (2026-11-01)
+
+The same native app and `/api/competition/monthly` response contract now have four explicit, synthetic UI fixtures. Open `/?open=monthly&monthlyCase=ready`, or use `provisional`, `ties`, `closed`. These states contain labelled sample players only, never database snapshots or production results. `ready` shows a clean-solve tiebreak; `ties` withholds podium art while the final draw is pending; `closed` shows an audited-draw outcome as a UI example, not evidence that a real draw ran.
+
+The fixture lives in `monthly-v2-fixture.js`, is loaded only by this generated preview and is exercised by `tests/current/test_monthly_competition_ui.cjs`. Production files do not import it. `node tools/studio-preview/verify.cjs` continues to verify transport isolation and exact gameplay bytes. This preview validates presentation, not scoring/database correctness. All other Studio gameplay uses the existing October model date; monthly sample results deliberately model a November month with 21 completed days.

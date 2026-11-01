@@ -670,6 +670,24 @@
       "replaced_rpc_definitions": []
     },
     {
+      "id": "20261101-monthly-quality-v2",
+      "order": 600,
+      "version": "2026.11.01",
+      "path": "supabase/migrations/20261101013000_monthly_quality_v2.sql",
+      "type": "migration",
+      "status": "prepared-dormant-explicit-activation",
+      "sha256": "5572cfb3f846ede4be789f66b21fe257985930f7b780708d58930736948f6a1c",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_monthly_refresh_day_v1",
+        "public.proplet_monthly_standings_v1",
+        "public.proplet_monthly_state_v1",
+        "public.proplet_reconcile_monthly_competition_v1",
+        "public.proplet_finalize_monthly_competition_v1",
+        "proplet_private.correct_monthly_competition_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

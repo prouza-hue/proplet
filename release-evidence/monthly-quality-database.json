@@ -1,0 +1,42 @@
+{
+  "database": "proplet_test_monthly_b9e0e9df90",
+  "host": "127.0.0.1",
+  "syntheticOnly": true,
+  "checks": [
+    "server-proven empty QA transfer:8 source kinds, strict marker/isolated/ACL guards, read-only/idempotent; original transfer quota untouched",
+    "actual official November Extra under monthly QA clock; no monthly points; legacy special policy preserved",
+    "trusted isolated moving clock: online/session/receive time, original offline day, real48h cutoff/badges, unmarked legacy wall clock",
+    "compact remote rollback acceptance passed on real local PG: shared podium, service ACL, audit, CAS, removal/regrant, unchanged XP",
+    "approved review-close default; competition disabled; explicit hold fails closed",
+    "RLS and explicit anon/authenticated table/RPC denial",
+    "first season empty, authenticated zero state and guest state",
+    "disabled delivery preserves gameplay; explicit predeadline activation reconciliation/retry recovers one official day",
+    "8 simultaneous same commands + lost-response replay: one 120-point day; repeat ignored; XP remains 987",
+    "best20 of25; clean120/assisted100; rank1\u20131\u20131\u20134; non-Daily and next-day completion excluded",
+    "Prague midnight boundary; preclose result correction/deletion/receipt rejection recomputes ledger",
+    "earlier assisted offline replaces official first without XP; approved review-close sync cutoff tested; exact cutoff excluded",
+    "48h boundary; 8 concurrent closures; immutable snapshot; 1\u20131\u20133 badges once; retry safe; DST close",
+    "explicit closed correction: mandatory reason/operator/CAS; unauthorized denied;6 concurrent same-key replays;6 distinct CAS commands only1 wins; injected audit failure rolls back snapshot/ledger/badges",
+    "closed correction atomically downgrades/removes/regrants badges and rank ties; immutable audit/revision; XP unchanged; aftercutoff offline retains eligible original",
+    "release news: inactive/pre-Nov1/new/under5 denied; assisted/offline progress eligible; service-only ACL; GET no writes; 8 concurrent devices exactly1 grant; retry/manual read no regrant",
+    "v2 real verified sessions: singleton10; same-day best-position percentile; equal times; hints/clean subparts; offline no speed; calm excluded; replay stable",
+    "v2 best20 of25, quality/stable date selection, clean/hints totals only chosen days, live provisional evidence",
+    "v2 other XP: actual first receipts free/tajenka; starter/account/referral/discovery/recovery/basicDaily excluded; /12 rounded aggregate; 6000 cap; old completed month excluded; transferred slots/player ownership fail closed",
+    "v2 accepted offline review-close cutoff exact; complete final cohort rebuild; 8 concurrent finalizers once; unique 1/2/3; immutable one seed; repeat preserves snapshot and XP",
+    "v2 audited closed correction: full cohort, unique badges, exact replay, CAS conflict, same draw seed, gameplay XP untouched",
+    "v2 SQL rank priority: total/daily/clean/hints/verified time; unknown never zero; exact live equality pending; 108 players ranked before top100 plus own108 privacy serialization",
+    "forward migration dormant through complete v1 suite; explicit v2 activation; legacy closed standings/revisions/rules remain unchanged",
+    "focused final reason fix: adjacent equal-total contender across 100/90/90 score groups; real local PG rollback PASS"
+  ],
+  "limitations": [
+    "Windows PostgreSQL has no pg_cron; existing weekly scheduler migration omitted explicitly. Monthly finalizer itself runs below."
+  ],
+  "qualityV2": {
+    "month": "2026-12-01",
+    "players": 13,
+    "seedStable": true,
+    "finalRanksUnique": true,
+    "migrationSha256": "5572cfb3f846ede4be789f66b21fe257985930f7b780708d58930736948f6a1c",
+    "focusedFollowup": "Only explanation-neighbor SQL changed after full PASS; replaced that function on same isolated DB and ran dedicated 100/90/90 regression."
+  }
+}

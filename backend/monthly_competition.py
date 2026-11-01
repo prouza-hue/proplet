@@ -43,8 +43,8 @@ def state(
     if not isinstance(standings, list) or not isinstance(previous, list):
         raise HTTPException(503, "Pořadí měsíční soutěže se nepodařilo načíst")
     mine = value.get("me")
-    # All ranks are calculated in SQL before pagination, with score as the only
-    # ordering key for placement. UUID order merely makes equal rows stable.
+    # SQL ranks before pagination using the versioned quality tie breakers.
+    # Live exact ties await the audited draw; closed v2 ranks are unique.
     selected = standings[:100]
     if isinstance(mine, dict) and mine.get("rank") is not None and not any(
         row.get("playerId") == player_id for row in selected
