@@ -1,0 +1,178 @@
+/* Shared printed XP sticker; compact native result, same nodes and handlers. */
+html body .xp-sticker{position:relative;display:inline-flex!important;flex-direction:column;align-items:center;justify-content:center;flex:0 0 auto;min-height:38px!important;width:auto!important;max-width:150px;padding:9px 13px!important;border:1px solid #a76609!important;border-radius:7px 7px 11px 7px!important;background:linear-gradient(135deg,#ffe598 0%,#f7c548 42%,#edae26 70%,#ffda70 100%)!important;color:#50310d!important;box-shadow:2px 3px 0 #a86b1c80,inset 0 1px 0 #fff2bc!important;font:750 18px/1.15 Outfit,system-ui,sans-serif!important;letter-spacing:-.2px;white-space:nowrap;transform:rotate(-3deg);margin:0!important}
+html body .xp-sticker:after{content:"";position:absolute;right:0;bottom:0;width:9px;height:9px;background:#bc7a13;clip-path:polygon(100% 0,0 100%,100% 100%);border-bottom-right-radius:8px}
+.ref-visual{display:flex;flex-direction:column;align-items:center;gap:15px;min-width:0}.ref-reward{display:flex;flex-direction:column;gap:5px;align-items:center}.ref-reward small{font:500 11px/1.3 Outfit,sans-serif;color:var(--ref-muted)}
+html body :is(#referralHome,#referralInviteHome):not(.ref-incoming) .ref-story{min-height:0;grid-template-columns:minmax(0,1fr) 160px;align-items:center}
+html body :is(#referralHome,#referralInviteHome):not(.ref-incoming) .ref-wide{margin-top:20px!important}
+html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) .ref-wide,html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) [data-ref-open]{background:#27694f!important;color:#fffaf0!important;border:1px solid #174c38!important;box-shadow:0 3px 0 #174c38!important;min-height:48px!important;cursor:pointer}
+html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) .ref-wide:hover{background:#205b44!important}
+html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) .ref-action-row{margin-top:14px}
+html body :is(#referralHome,#referralInviteHome) .ref-story .ref-art{transform:none;margin:0}
+html.tiskarna-ui body :is(#levelDetailShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta){background:#b84835!important;color:#fffaf0!important;border:1px solid #8f3426!important;box-shadow:0 3px 0 #8f3426!important}
+html body #winModal #referralWin{max-width:540px;margin:12px auto!important;padding:16px!important}
+html body #winModal #referralWin .ref-result-progress{display:flex;align-items:center;justify-content:space-between;gap:10px}
+html body #winModal #referralWin .ref-steps{margin:12px auto 0}
+html body #winModal #referralWin.ref-earned h3{font:650 22px/1.2 Fraunces,Georgia,serif!important;margin:0 25px 5px!important}
+html body #winModal #referralWin.ref-earned .ref-reward{margin-top:10px}
+.ref-choice{margin-top:24px}
+html body #referralDialog .ref-choice .primary-btn{width:100%;min-height:48px;background:#b84835!important;border-color:#8f3426!important;color:#fffaf0!important;box-shadow:0 3px 0 #8f3426!important}
+html body #referralDialog .ref-choice [data-ref-open]{background:#27694f!important;border-color:#174c38!important;box-shadow:0 3px 0 #174c38!important}
+.ref-choice p{font:400 13px/1.5 Outfit,sans-serif;color:var(--ref-muted);text-align:center;margin:12px 0 0}
+.ref-choice-bonus{display:flex;align-items:center;justify-content:center;gap:12px;border-top:1px solid var(--ref-line);margin:20px 0 16px;padding-top:20px}.ref-choice-bonus .ref-art{margin:0}
+html[data-theme=dark] body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) .ref-wide{background:#2b7457!important;border-color:#559074!important;box-shadow:0 3px 0 #183f30!important}
+html[data-theme=dark].tiskarna-ui body :is(#levelDetailShareBtn.challenge-share-cta,#shareDailyBtn.daily-challenge-cta){background:#a53e30!important;border-color:#cc7968!important;box-shadow:0 3px 0 #66271e!important}
+@media(max-width:580px){
+html body :is(#referralHome,#referralInviteHome):not(.ref-incoming) .ref-story{grid-template-columns:minmax(0,1fr) 115px;gap:12px}
+html body :is(#referralHome,#referralInviteHome) .ref-visual .ref-art{width:120px;transform:scale(.9);transform-origin:center center}
+html body :is(#referralHome,#referralInviteHome) .ref-visual .xp-sticker{font-size:16px!important;padding:8px 9px!important}.ref-visual{gap:8px}
+}
+
+@media(max-width:380px){
+html body :is(#referralHome,#referralInviteHome):not(.ref-incoming) .ref-story{grid-template-columns:minmax(0,1fr) 95px;gap:10px}
+html body :is(#referralHome,#referralInviteHome) .ref-visual .ref-art{width:120px;transform:scale(.75);transform-origin:center center;margin:0 -12px}
+html body :is(#referralHome,#referralInviteHome):not(.ref-incoming) h2{font-size:24px!important}
+html body :is(#referralHome,#referralInviteHome) .ref-visual .xp-sticker{font-size:14px!important;padding:7px 8px!important}
+}
+@media(max-width:359px){
+ html body #referralDialog .ref-sheet>h2{padding-right:32px;font-size:26px!important;line-height:1.15!important}
+}
+
+/* Review 12 October: one invitation treatment, compact reward, centered praise. */
+:root{--invite-fill:linear-gradient(135deg,#a93262 0%,#c83f67 56%,#dc5b70 100%);--invite-hover:linear-gradient(135deg,#9e2c59 0%,#bd395f 58%,#d55069 100%)}
+html:root.tiskarna-ui body :is(#levelDetailShareBtn,#shareDailyBtn,[data-tajenka-share],#referralDialog #refShare,#referralDialog #refShareBoard,#referralDialog [data-ref-open],:is(#referralHome,#referralInviteHome) [data-ref-open],:is(#referralProfile,#referralProfileReward) [data-ref-open]){
+ background:var(--invite-fill)!important;color:#fff!important;border:1px solid #d05677!important;box-shadow:0 4px 12px #8b244626,inset 0 1px 0 #ffffff2e!important;font-family:Outfit,system-ui,sans-serif!important;font-weight:400!important;text-shadow:none!important;
+}
+html:root.tiskarna-ui body :is(#levelDetailShareBtn,#shareDailyBtn,[data-tajenka-share],#referralDialog #refShare,#referralDialog #refShareBoard,#referralDialog [data-ref-open],:is(#referralHome,#referralInviteHome) [data-ref-open],:is(#referralProfile,#referralProfileReward) [data-ref-open]):hover{background:var(--invite-hover)!important}
+html:root.tiskarna-ui body :is(#winModal #winShareBtn,#levelDetailShareBtn,#shareDailyBtn,[data-tajenka-share],#referralDialog #refShare,#referralDialog #refShareBoard,[data-ref-open]):focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) .ref-incoming-layout{display:grid;grid-template-columns:minmax(0,1fr) 145px;gap:18px;align-items:center}
+.ref-incoming-main{min-width:0}
+html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) .ref-incoming-main h2{margin:0 0 6px!important;overflow-wrap:anywhere}
+html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) .ref-incoming-main p{margin:0!important;overflow-wrap:anywhere}
+.ref-incoming-layout .ref-steps{margin:14px 0 8px;max-width:420px}
+.ref-incoming-layout .ref-step{height:40px}
+.ref-incoming-layout .ref-visual{gap:10px}
+html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)).ref-incoming .ref-action-row{margin-top:14px}
+html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)).ref-incoming .ref-rule{margin-top:12px}
+html body #referralDialog .ref-sheet-art{margin:0 auto 18px}
+html body #referralDialog h2{margin:0!important;text-wrap:balance}
+html body #referralDialog .ref-how{margin:20px 0 16px;gap:14px}
+html body #referralDialog .ref-status:empty{display:none}
+@media(min-width:760px){
+ html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) .ref-incoming-layout{grid-template-columns:minmax(0,1fr) 275px;gap:24px}
+ .ref-incoming-layout .ref-visual{flex-direction:row;gap:16px}
+ .ref-incoming-layout .ref-art{width:145px}
+ html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)).ref-incoming h2{font-size:26px!important}
+}
+@media(max-width:580px){
+ html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) .ref-incoming-layout{grid-template-columns:minmax(0,1fr) 105px;gap:12px}
+ .ref-incoming-layout .ref-visual{gap:8px}
+ .ref-incoming-layout .ref-art{width:100px;height:82px}
+ .ref-incoming-layout .ref-art-card{width:54px;height:60px;border-radius:10px}
+ .ref-incoming-layout .ref-art-card img{width:52px;height:52px}
+ .ref-incoming-layout .ref-art-word{left:0;gap:2px}
+ .ref-incoming-layout .ref-art-word i{width:17px;height:22px;font-size:13px}
+ .ref-incoming-layout .ref-art-thread{display:none}
+ html body :is(#referralHome,#referralInviteHome) .ref-incoming-layout .ref-visual .ref-art{width:100px;transform:none;margin:0}
+ html body :is(:is(#referralHome,#referralInviteHome),:is(#referralProfile,#referralProfileReward)) .ref-incoming-main h2{font-size:23px!important}
+ .ref-incoming-layout .ref-steps{gap:5px}.ref-incoming-layout .ref-step{height:32px;border-radius:7px}
+ html body .ref-incoming-layout .xp-sticker{font-size:15px!important;padding:8px!important}
+}
+
+
+
+
+/* Invitations share the same drawn arrow as the primary forward actions. */
+html:root.tiskarna-ui body :is(#shareDailyBtn.daily-challenge-cta,#levelDetailShareBtn.challenge-share-cta,#referralHome [data-ref-open],#referralInviteHome [data-ref-open]){font-weight:650!important;gap:18px}
+html:root.tiskarna-ui body :is(#shareDailyBtn.daily-challenge-cta,#levelDetailShareBtn.challenge-share-cta,#referralHome [data-ref-open],#referralInviteHome [data-ref-open])::after{
+ content:"";display:inline-block!important;position:static;width:20px;height:20px;flex:0 0 20px;
+ background:currentColor;-webkit-mask:var(--pg-arrow) center/contain no-repeat;mask:var(--pg-arrow) center/contain no-repeat;
+}
+
+
+html:root.tiskarna-ui body :is(#referralHome,#referralInviteHome) [data-ref-open]>span[aria-hidden="true"]{display:none!important}
+
+/* Result headers stay stable; personal records remain in the native details disclosure. */
+html.tiskarna-ui body #winModal.result-compact .win-card{display:flex!important;flex-direction:column!important;gap:0!important;width:min(100%,680px)!important;max-height:calc(100dvh - 32px)!important;padding:24px!important;overflow-y:auto!important;scroll-padding-block:16px}
+html.tiskarna-ui body #winModal.result-compact .win-card>*{order:initial!important;flex-shrink:0}
+html.tiskarna-ui body #winModal.result-compact [hidden]{display:none!important}
+html.tiskarna-ui body #winModal.result-compact .win-result-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;margin:0 0 14px}
+html.tiskarna-ui body #winModal.result-compact #winTitle{min-width:0;text-align:left!important;margin:0!important;font:650 clamp(24px,3.2vw,32px)/1.15 Fraunces,Georgia,serif!important;letter-spacing:-.025em!important;overflow-wrap:anywhere}
+html.tiskarna-ui body #winModal.result-compact #winRewardValue{max-width:150px;justify-self:end}
+html.tiskarna-ui body #winModal.result-compact #winRewardValue strong{font:inherit}
+html.tiskarna-ui body #winModal.result-compact #winRewardValue small{display:block;max-width:100%;margin-top:5px;font:550 12px/1.3 Outfit,sans-serif;letter-spacing:0;white-space:normal;text-align:center;color:inherit}
+html.tiskarna-ui body #winModal.result-compact .win-performance-detail{margin:0 0 12px}
+/* Canonical XP remains available to its owners; the read-only mirror never awards points. */
+html.tiskarna-ui body #winModal.result-compact :is(#winBadge,#winXp){display:none!important}
+html.tiskarna-ui body #winModal.result-compact .win-summary{display:block!important;margin:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;text-align:left!important}
+html.tiskarna-ui body #winModal.result-compact #winText{display:block!important;margin:0!important;font:500 17px/1.45 Outfit,sans-serif!important;color:var(--ink)!important}
+html.tiskarna-ui body #winModal.result-compact #winText:empty{display:none!important}
+html.tiskarna-ui body #winModal.result-compact .win-summary-chips{display:block!important;margin:0!important}
+html.tiskarna-ui body #winModal.result-compact #winClean:not(.hidden){display:block!important;width:auto!important;margin:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;font:400 15px/1.4 Outfit,sans-serif!important;color:var(--muted)!important;text-align:left!important}
+/* Deduplicate only confirmed, currently visible own rows. Reward and timing
+   notices remain independent even when these two performance lines are hidden. */
+html.tiskarna-ui body #winModal.result-compact.result-metrics-in-ranking :is(#winText,#winClean,.win-summary-chips){display:none!important}
+html.tiskarna-ui body #winModal.result-compact.tajenka-daily-result .tajenka-result-source{justify-content:flex-start;text-align:left;margin:0 0 4px;font-size:13px;line-height:1.4}
+html.tiskarna-ui body #winModal.result-compact.tajenka-daily-result.result-metrics-in-ranking .win-result-heading{margin-bottom:8px}
+html.tiskarna-ui body #winModal.result-compact :is(#winTimingNotice,#winRewardStatus):not([hidden]){display:block!important;margin:8px 0 0!important;font:400 15px/1.45 Outfit,sans-serif!important;color:var(--muted)!important;overflow-wrap:anywhere;text-align:left!important}
+html.tiskarna-ui body #winModal.result-compact .win-praise:empty{display:none!important}
+html.tiskarna-ui body #winModal.result-compact #winResultActions{display:flex!important;flex-direction:column!important;gap:10px;width:100%!important;max-width:none!important;margin:18px 0 0!important}
+html.tiskarna-ui body #winModal.result-compact #winResultActions>:is(#winExtraBtn,#winPrimaryBtn){display:flex;align-items:center;justify-content:center;width:100%!important;min-height:50px!important;margin:0!important;padding:12px 16px!important;border-radius:12px!important;font:650 16px/1.3 Outfit,sans-serif!important}
+html:root.tiskarna-ui body #winModal.result-compact .win-secondary-actions{display:grid!important;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);grid-template-columns:none;align-items:stretch;gap:8px;margin:8px 0 0!important;width:100%}
+html:root.tiskarna-ui body #winModal.result-compact .win-secondary-actions>:is(#winPrimaryBtn,#winShareBtn,#winReplayBtn,#winMenuBtn){width:100%!important;min-width:0!important;max-width:none!important;min-height:44px!important;grid-column:auto!important;grid-row:auto!important;margin:0!important;padding:8px 3px!important;background:transparent!important;border:0!important;box-shadow:none!important;color:var(--blue,var(--ink))!important;font:550 15px/1.4 Outfit,sans-serif!important;text-align:center!important;justify-content:center;align-items:center;white-space:normal;overflow-wrap:anywhere}
+html:root.tiskarna-ui body #winModal.result-compact .win-secondary-actions>#winPrimaryBtn.result-secondary-action::after{content:none!important;display:none!important}
+html:root.tiskarna-ui body #winModal.result-compact .win-secondary-actions>#winShareBtn.challenge-share-cta{color:#9b365e!important}
+html:root.tiskarna-ui body #winModal.result-compact .win-secondary-actions>#winShareBtn .painted-action-icon{display:none!important}
+html:root.tiskarna-ui[data-theme=dark] body #winModal.result-compact .win-secondary-actions>#winShareBtn.challenge-share-cta{color:#f0a9c3!important}
+html.tiskarna-ui body #winModal.result-compact :is(#winResultActions,.win-secondary-actions) .hidden{display:none!important}
+html.tiskarna-ui body #winModal.result-compact :is(#winResultActions,.win-secondary-actions) button:focus-visible{outline:3px solid var(--blue,var(--ink))!important;outline-offset:3px}
+html.tiskarna-ui body #winModal.result-compact .level-leaderboard-box{width:100%!important;margin:16px 0 0!important;padding:16px 0 0!important;border:0!important;border-top:1px solid var(--line)!important;background:transparent!important;box-shadow:none!important}
+html.tiskarna-ui body #winModal.result-compact .free-board-tabs{display:none!important}
+html.tiskarna-ui body #winModal.result-compact .level-board-head{margin-bottom:8px!important}
+html.tiskarna-ui body #winModal.result-compact .daily-world-neighbours{gap:5px!important}
+html.tiskarna-ui body #winModal.result-compact .mini-leader-row{min-height:44px!important;padding:7px 9px!important}
+html.tiskarna-ui body #winModal.result-compact .win-details{margin-top:12px!important}
+html.tiskarna-ui body #winModal.result-compact .win-details>summary{min-height:44px;padding:10px 0;font-size:15px}
+/* Simultaneous earned rewards: one native artifact, the rest in a disclosure.
+   Detail targets and printshop decoration stay on the original unlock rows. */
+html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped{display:block;margin:18px 0 0!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important}
+html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-featured{grid-template-columns:84px minmax(0,1fr)!important;gap:14px!important;padding:14px!important;border:1px solid var(--td-line)!important;border-radius:14px!important;background:var(--td-paper)!important;min-height:112px;cursor:pointer}
+html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-featured>.emoji,
+html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-featured>.emoji :is(.ribbon-art,img){display:grid!important;place-items:center;width:84px!important;height:84px!important;margin:0!important;object-fit:contain}
+html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-featured strong{font:700 20px/1.2 Outfit,sans-serif!important;color:var(--td-ink);overflow-wrap:anywhere}
+html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-featured small{font:400 14px/1.4 Outfit,sans-serif!important;color:var(--td-muted);margin-top:5px!important}
+#winModal #newBadgeBox .win-awards-more{margin-top:8px}
+#winModal #newBadgeBox .win-awards-more>summary{display:flex;align-items:center;gap:10px;min-height:44px;padding:10px 2px;list-style:none;cursor:pointer;font:600 15px/1.4 Outfit,sans-serif;color:var(--td-blue)}
+#winModal #newBadgeBox .win-awards-more>summary::-webkit-details-marker{display:none}
+#winModal #newBadgeBox .win-awards-more>summary::after{content:'⌄';margin-left:auto}
+#winModal #newBadgeBox .win-awards-more[open]>summary::after{content:'⌃'}
+#winModal #newBadgeBox .win-awards-list{display:grid;gap:0;border-top:1px solid var(--td-line)}
+html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-compact{grid-template-columns:42px minmax(0,1fr)!important;gap:12px!important;min-height:64px;padding:10px 2px!important;border:0!important;border-bottom:1px solid var(--td-line)!important;border-radius:0!important;background:none!important;cursor:pointer}
+html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-compact>.emoji,
+html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-compact>.emoji :is(.ribbon-art,img){display:grid!important;place-items:center;width:42px!important;height:42px!important;margin:0!important;object-fit:contain}
+html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-compact strong{font:650 15px/1.3 Outfit,sans-serif!important;color:var(--td-ink)}
+html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-compact small{font:400 13px/1.4 Outfit,sans-serif!important;color:var(--td-muted);margin-top:3px!important}
+#winModal #newBadgeBox :is([data-achievement-detail],[data-streak-detail],summary):focus-visible{outline:3px solid var(--td-blue);outline-offset:3px}
+@media(max-width:359px){
+ html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-featured{grid-template-columns:64px minmax(0,1fr)!important;padding:12px!important;gap:10px!important}
+ html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-featured>.emoji,
+ html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-featured>.emoji :is(.ribbon-art,img){width:64px!important;height:64px!important}
+ html.tiskarna-ui body #winModal.result-compact #newBadgeBox.win-awards-grouped .win-award-featured strong{font-size:18px!important}
+}
+@media(max-width:580px){
+ html.tiskarna-ui body #winModal.result-compact .win-card{padding:20px 16px!important}
+ html.tiskarna-ui body #winModal.result-compact .win-result-heading{gap:12px}
+ html.tiskarna-ui body #winModal.result-compact #winRewardValue{font-size:16px!important;padding:8px 10px!important}
+}
+@media(max-width:380px){
+ html.tiskarna-ui body #winModal.result-compact .win-result-heading{grid-template-columns:minmax(0,1fr);gap:10px}
+ html.tiskarna-ui body #winModal.result-compact #winTitle{font-size:24px!important}
+ html.tiskarna-ui body #winModal.result-compact #winRewardValue{justify-self:start}
+}
+@media(min-width:600px){
+ html.tiskarna-ui body #winModal.result-compact .win-card{width:min(100%,880px)!important;padding:28px 32px!important}
+ html.tiskarna-ui body #winModal.result-compact #winTitle{font-size:36px!important}
+ html.tiskarna-ui body #winModal.result-compact .mini-leader-row{min-height:56px!important;padding:10px 12px!important}
+ html.tiskarna-ui body #winModal.result-compact #winResultActions>:is(#winExtraBtn,#winPrimaryBtn){min-height:56px!important;font-size:18px!important}
+}
+
+html.tiskarna-ui body #winModal #referralWin :is(.ref-result-invite h3,h3){font-family:Fraunces,Georgia,serif!important}

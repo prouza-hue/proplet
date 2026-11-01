@@ -1,4 +1,4 @@
-candidate-daily-gen6/**
-release-evidence/**
-# Synthetic patron QR encoder and fixtures are test-only, never deploy them.
-tests/fixtures/patrons/**
+*
+!preview-public/
+!preview-public/**
+!vercel.json

@@ -1,0 +1,44 @@
+{
+  "builtAt": "2026-11-01T03:02:19.791Z",
+  "sourceSha": "bca4131553d1a08e9b0b0bb2138f7b9e04e3e38c",
+  "files": 494,
+  "gameplay": [
+    {
+      "file": "app.js",
+      "sha256": "9b7975ee57488b8cafd35cb97cfbf86a067746d8e0b0104f8e60aba848bda775"
+    },
+    {
+      "file": "game.css",
+      "sha256": "c0e81a9e4816ba241bf5699713003bad0dd4bd5fd4021185be9e5b6896081390"
+    },
+    {
+      "file": "game-release-polish.css",
+      "sha256": "936fdfd0e1e1656b6195a53ea1038977d4d2a3c7f807780f6ae01d58eb68043b"
+    },
+    {
+      "file": "ribbon-ui.css",
+      "sha256": "899743b0b78f07a8f2156570cbfaacbb4853c351ba2a26c20cf5389dae072b6b"
+    },
+    {
+      "file": "app/game/board.js",
+      "sha256": "d206c1b69d97a3ef6736135d549db9d7c536287ebd6cc05116c6fb540322f9cb"
+    },
+    {
+      "file": "app/game/input.js",
+      "sha256": "77ee167a83e422ddb0a9741f66fd8460ee403600ad217e02dd39d3e2e73454cd"
+    },
+    {
+      "file": "app/game/hints.js",
+      "sha256": "38d2cb764b2ed634ac999c24cab454a3408ff93cf09298c087bef160c97fece5"
+    },
+    {
+      "file": "app/game/state.js",
+      "sha256": "5c1bcfd833070deb72d6deb7683d4903603485202bcc8f55d2f386805662499d"
+    },
+    {
+      "file": "app/game/fair-play.js",
+      "sha256": "db9e145be2460a957220d6dab7118c44d6d93e2cc7cee0f4c1ee7ef611f4ee19"
+    }
+  ],
+  "fixturesOnly": true
+}
