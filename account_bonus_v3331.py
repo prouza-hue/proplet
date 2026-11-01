@@ -45,7 +45,9 @@ def install_account_bonus(
     """
 
     def rows_for(player_id: str) -> list[dict]:
-        return db_select("account_rewards", player_id=player_id)
+        # This is a unique-key lookup, not the player's growing word ledger.
+        return db_select("account_rewards", columns="reward_key,points",
+                         player_id=player_id, reward_key=ACCOUNT_CREATION_BONUS_KEY)
 
     def reward_summary(player_id: str) -> dict:
         rows = rows_for(player_id)
@@ -139,3 +141,4 @@ def install_account_bonus(
             },
         )
         return {"ok": True}
+

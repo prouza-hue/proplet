@@ -311,14 +311,18 @@ def install_word_recognition(
             raise HTTPException(503, "Odměny za objevená slova ještě nejsou připravené")
 
     def reward_state(player_id: str) -> tuple[list[dict], set[str]]:
-        rows = [row for row in db_select("account_rewards", player_id=player_id)
+        # Keep id for db_select's complete keyset pagination. All other selected
+        # fields feed legacy/structured word identity and day/board XP summaries.
+        rows = [row for row in db_select("account_rewards",
+                columns="id,reward_key,points,granted_at,puzzle_id,reward_word", player_id=player_id)
                 if str(row.get("reward_key") or "").startswith(
                     (WORD_DISCOVERY_REWARD_PREFIX, WORD_DISCOVERY_RECOVERY_PREFIX))]
         keys = {str(row["reward_key"]) for row in _discovery_rows(rows)}
         return rows, keys
 
-    def response_state(player_id: str, *, puzzle_id: str = "", extra_row: Optional[dict] = None) -> dict:
-        rows, keys = reward_state(player_id)
+    def response_state(player_id: str, *, puzzle_id: str = "", extra_row: Optional[dict] = None,
+                       loaded_state: Optional[tuple[list[dict], set[str]]] = None) -> dict:
+        rows, keys = reward_state(player_id) if loaded_state is None else loaded_state
         if extra_row:
             rows = [*rows, extra_row]
             keys.add(str(extra_row.get("reward_key") or ""))
@@ -430,7 +434,8 @@ def install_word_recognition(
             raise HTTPException(400, "Slovo neodpovídá platné vedlejší cestě této desky")
 
         reward_key = _discovery_reward_key(payload.puzzle_id, normalized)
-        _rows, existing_keys = reward_state(player["id"])
+        loaded_state = reward_state(player["id"])
+        _rows, existing_keys = loaded_state
         if reward_key in existing_keys:
             return {
                 "ok": True,
@@ -440,7 +445,7 @@ def install_word_recognition(
                 "awardedPoints": 0,
                 "rewardKey": reward_key,
                 "limitReason": "duplicate",
-                **response_state(player["id"], puzzle_id=payload.puzzle_id),
+                **response_state(player["id"], puzzle_id=payload.puzzle_id, loaded_state=loaded_state),
             }
 
         now = datetime.now(tz) if tz else datetime.now().astimezone()
@@ -463,7 +468,8 @@ def install_word_recognition(
                 "rewardKey": reward_key,
                 "simulated": True,
                 "limitReason": None,
-                **response_state(player["id"], puzzle_id=payload.puzzle_id, extra_row=simulated_row),
+                **response_state(player["id"], puzzle_id=payload.puzzle_id, extra_row=simulated_row,
+                                 loaded_state=loaded_state),
             }
 
         if not callable(db_rpc):
@@ -488,3 +494,4 @@ def install_word_recognition(
             "limitReason": reason,
             **response_state(player["id"], puzzle_id=payload.puzzle_id),
         }
+
