@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.9-play-one-screen1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.9-play-one-screen2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -1051,8 +1051,9 @@ function renderNewContentBanner(selector='#newContentBanner'){
  const batch=latestContentBatch();if(!batch||!latestContentIsFresh())return;
  const left=latestContentUnplayed();
  if(!left.length)return;
- root.innerHTML=`<div class="new-content-main"><div class="new-content-spark">✨</div><div><span class="eyebrow">PONDĚLNÍ NOVINKY</span><h2>Pondělní pětka je tady</h2></div></div><div class="new-content-actions"><button id="${root.id==='newContentBanner'?'playNewContentBtn':'playTodayNewContentBtn'}" class="primary-btn">Hrát novinky</button></div>`;
- root.classList.remove('hidden');root.querySelector('.primary-btn').onclick=()=>{trackProductEvent('content_drop_cta_clicked');startLatestContent()};
+ const compact=root.id==='newContentBanner'&&$('#screen-free')?.classList.contains('play-compact');
+ root.innerHTML=compact?'<button type="button" id="playNewContentBtn" class="play-news-strip" aria-label="Pondělní pětka. Hrát novinky."><img src="/weekly-banner-icon-optimized.svg" alt="" width="34" height="34"><strong>Pondělní pětka</strong><span class="play-news-action">Hrát<span class="play-news-long"> novinky</span><svg class="play-news-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></span></button>':`<div class="new-content-main"><div class="new-content-spark">✨</div><div><span class="eyebrow">PONDĚLNÍ NOVINKY</span><h2>Pondělní pětka je tady</h2></div></div><div class="new-content-actions"><button id="${root.id==='newContentBanner'?'playNewContentBtn':'playTodayNewContentBtn'}" class="primary-btn">Hrát novinky</button></div>`;
+ root.classList.remove('hidden');root.querySelector(compact?'.play-news-strip':'.primary-btn').onclick=()=>{trackProductEvent('content_drop_cta_clicked');startLatestContent()};
 }
 
 let homeLayoutRecovery=null,homeLayoutRecoveryAttempted=false;
@@ -1071,7 +1072,7 @@ function renderFreeResumeCard(){
 function lastPlayedDifficulty(){try{const diff=localStorage.getItem('proplet:played-levels:difficulty');if(DIFF[diff])return diff}catch{}return 'easy';}
 function renderFree(){
  renderAccountProgressStatus();
- const news=$('#newContentBanner');if(news){news.classList.add('hidden');news.innerHTML='';}
+ renderNewContentBanner();
  $('#difficultyCards').innerHTML=Object.entries(DIFF).map(([key,d])=>{
   const {total,done,pct,resume}=freeProgress(key),complete=!!total&&done>=total,action=resume?'Pokračovat':complete?'Zahrát znovu':'Hrát',fresh=newContentCount(key)>0;
   const reward=complete?'Opakování bez dalších XP':`+${d.xp} XP za novou úroveň`;

@@ -97,6 +97,42 @@ class PatronHttpTests(unittest.TestCase):
   response=self.client.post('/api/patrons/intents',json={'requestId':str(uuid4()),'amountCzk':99},headers={'Authorization':'Bearer player-a'})
   self.assertEqual(response.status_code,503)
   with patch.dict(os.environ,{'PROPLET_PATRONS_ENABLED':'true','VERCEL_ENV':'preview'}):self.assertFalse(patrons.feature_enabled())
+ def test_support_preview_requires_exact_live_branch_and_own_flag(self):
+  env={'PROPLET_PATRONS_ENABLED':'true','PROPLET_LIVE_PLAYER_PREVIEW_ENABLED':'true',
+       'VERCEL_ENV':'preview','VERCEL_GIT_COMMIT_REF':'codex/play-one-screen',
+       'SUPABASE_URL':'https://iopyhluayfszskyqqpuc.supabase.co'}
+  with patch.dict(os.environ,env,clear=True):
+   self.assertTrue(patrons.feature_enabled())
+   for key,values in {
+    'PROPLET_PATRONS_ENABLED':['','false','0'],
+    'PROPLET_LIVE_PLAYER_PREVIEW_ENABLED':['','false','0'],
+    'VERCEL_GIT_COMMIT_REF':['main','codex/studio-edition','codex/today-one-screen','codex/monthly-competition-202611',
+      'codex/admin-modernization','codex/play-one-screen-other','codex/play-one-screen/child','codex/Play-one-screen'],
+    'SUPABASE_URL':['','https://eanzztstmwlamwfdskbf.supabase.co','https://iopyhluayfszskyqqpuc.supabase.co.invalid']
+   }.items():
+    for value in values:
+     with self.subTest(key=key,value=value),patch.dict(os.environ,{key:value}):self.assertFalse(patrons.feature_enabled())
+  for environment in ('production','development',''):
+   with self.subTest(environment=environment),patch.dict(os.environ,{'VERCEL_ENV':environment,'PROPLET_PATRONS_ENABLED':'true'},clear=True):
+    self.assertTrue(patrons.feature_enabled(),'non-preview opt-in keeps existing behavior')
+    with patch.dict(os.environ,{'PROPLET_PATRONS_ENABLED':'false'}):self.assertFalse(patrons.feature_enabled())
+ def test_live_preview_status_reads_real_handler_without_claim_and_keeps_private_gate(self):
+  app=FastAPI();read=Mock(return_value={'ok':True,'patron':True,'publicBadge':False,'thanksPending':False,'contributions':[]})
+  patrons.install(app,auth_player=lambda token:{'id':'synthetic-private','name':'Synthetic'},require_admin=Mock(),db_rpc=read,
+    enforce_rate_limit=lambda *a,**k:None,enabled=patrons.feature_enabled)
+  env={'PROPLET_PATRONS_ENABLED':'true','PROPLET_LIVE_PLAYER_PREVIEW_ENABLED':'true','VERCEL_ENV':'preview',
+       'VERCEL_GIT_COMMIT_REF':'codex/play-one-screen','SUPABASE_URL':'https://iopyhluayfszskyqqpuc.supabase.co'}
+  with patch.dict(os.environ,env,clear=True):
+   client=TestClient(app);guest=client.get('/api/patrons');self.assertTrue(guest.json()['enabled']);self.assertFalse(guest.json()['authenticated']);read.assert_not_called()
+   response=client.get('/api/patrons',headers={'Authorization':'Bearer synthetic-private'})
+   self.assertEqual(response.status_code,200);self.assertTrue(response.json()['patron']);self.assertFalse(response.json()['publicBadge'])
+   read.assert_called_once_with('proplet_patron_state_v1',{'p_player':'synthetic-private','p_claim':False})
+   lookup=Mock(return_value={'players':['public'],'badges':{'public':'recurring','private':'recurring'}})
+   rows=patrons.annotate_players([{'id':'public','public_rankings':True},{'id':'private','public_rankings':False}],lookup)
+   self.assertEqual(lookup.call_args.args[1],{'p_players':['public']})
+   self.assertTrue(rows[0]['_patron_public']);self.assertEqual(rows[0]['_patron_badge'],'recurring');self.assertFalse(rows[1]['_patron_public'])
+   with patch.dict(os.environ,{'VERCEL_GIT_COMMIT_REF':'other-preview'}):
+    read.reset_mock();self.assertEqual(client.get('/api/patrons').json(),{'enabled':False});read.assert_not_called()
  def test_spayd_cannot_inject_another_field(self):
   result=patrons.payment_data({'account':patrons.ACCOUNT,'currency':'CZK','reference':'1000000001','amountCzk':1,'message':'A*AM:999 podporuje Proplet'})
   self.assertEqual(result['spd'].count('*AM:'),1);self.assertIn('%2AAM%3A999',result['spd'])

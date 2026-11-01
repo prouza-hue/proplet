@@ -67,6 +67,11 @@ async function avatarInfoLifecycle(){
 (async()=>{
  events.get('proplet:ready')();await window.PropletPatrons.refresh();
  const entry=entries.get('patron-support-v1'),thanks=entries.get('patron-thanks-v1');
+ const signedInStatus={...status};Object.assign(status,{authenticated:false,canOffer:false,offersDisabled:true});
+ const guestRead=calls.length;await window.PropletPatrons.refresh();const guestLink=nodes.get('#patronTodayLink');
+ assert(guestLink,'enabled guest has the native manual Today support link');assert.equal(guestLink.textContent,'Podpořit Proplet');assert.equal(guestLink.hidden,false);
+ assert.equal(entry.eligible(),false,'guest page never creates an automatic support offer');assert.deepEqual(calls.slice(guestRead),['/api/patrons'],'guest decoration only reads status');
+ Object.assign(status,signedInStatus);await window.PropletPatrons.refresh();
  assert.equal(entry.eligible(),false,'initial page open never asks');
  window.PropletPatrons.resultCompleted();await Promise.resolve();assert.equal(entry.eligible(),true,'server policy determines eligibility across age preferences');
  assert.equal(await entry.show({isCurrent:()=>entry.eligible()}),true,'server claim must not invalidate its own display ticket');

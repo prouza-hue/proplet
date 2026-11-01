@@ -94,3 +94,5 @@ Only synthetic privacy preferences change in memory. Patron intents, payments an
 ## Compact native Play QA (2026-11-01)
 
 `/?open=free` opens the current app’s native Play screen without starting a game. Optional `playCase=resume`, `complete`, or `fresh` selects an isolated storage namespace: one valid Medium saved word, every released free board completed, or one explicitly synthetic fresh Hard release. The fixture GET history reflects these local records. All gameplay and catalogue actions remain the real native handlers; external/API writes are still guarded. These local cases are QA aids, not a replacement for the normal Vercel preview of the full app.
+
+`playCase=monday` (s `extra=none`) doplňuje pětideskovou nativní pondělní várku pro 2. 11. 2026 a starší postup mimo tuto várku. `monday-done` má všech pět dohraných; `monday-old` má původní období už prošlé. Jde o výslovné místní QA s veřejnými deskami, nikoli kopii produkčních výsledků nebo změnu odměn. Přímá akce novinek používá skutečný `startLatestContent` a pokračování stejné várky.
