@@ -117,7 +117,7 @@ async function run(viewport){
  // Real supporter identity and long metadata must survive narrow ranking columns.
  patronCase=true;await page.evaluate(()=>window.PropletPatrons.refresh());
  for(const view of ['xp','daily']){
-  await page.evaluate(async view=>{await rankingsOrchestration().openView(view);if(view==='xp')document.querySelector('[data-ranking-period="week"]').click();await rankingsOrchestration().renderLeaderboard({refresh:true})},view);
+  await page.evaluate(async view=>{await rankingsOrchestration().openView(view);if(view==='xp'){document.querySelector('[data-ranking-xp-scope="players"]').click();document.querySelector('[data-ranking-period="week"]').click();}await rankingsOrchestration().renderLeaderboard({refresh:true})},view);
   const own=page.locator(list(view)+' .ranking-row.me');await own.locator('.ranking-player-name').filter({hasText:'Pavel'}).waitFor();await own.locator('.patron-avatar-card').waitFor();await settle(page);
   const geometry=await own.evaluate(row=>{
    const identity=row.querySelector('.ranking-player-name'),avatar=row.querySelector('.ranking-avatar'),copy=row.querySelector('.leader-name'),meta=copy.querySelector('small'),score=row.querySelector('.leader-score');
