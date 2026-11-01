@@ -118,10 +118,10 @@
   if(settings&&!$('#patronOfferPreference')){const box=document.createElement('label');box.id='patronOfferPreference';box.className='card settings-card patron-visibility';box.innerHTML='<input type="checkbox"><span>Nenabízet mi podporu Propletu<small>Ruční odkaz na podporu zůstane dostupný.</small></span>';box.querySelector('input').onchange=e=>void preference({offersDisabled:e.target.checked});settings.after(box);}
   const opt=$('#patronOfferPreference input');if(opt)opt.checked=model.offersDisabled;
   for(const row of document.querySelectorAll('.ranking-row,.result-player-row')){
-   const name=row.querySelector('.leader-name strong,.result-player-copy strong,.leader-name');if(!name)continue;
+   const name=row.querySelector('.ranking-player-name')||row.querySelector('.leader-name strong,.result-player-copy strong')||row.querySelector('.leader-name');if(!name)continue;
    const mine=row.classList.contains('me'),supported=mine?model.paid&&model.public:row.dataset.patron==='true';
-   const copy=row.querySelector('.result-player-copy,.leader-name')||name.parentElement;
-   const badge=row.querySelector('.patron-label');if(supported&&!badge){const holder=document.createElement('span');holder.innerHTML=seal();const button=holder.firstElementChild;button.onclick=e=>{e.stopPropagation();if(mine)open('thanks',button);else showPerson(row,name,button)};copy.append(button);}else if(!supported&&badge)badge.remove();
+   const copy=row.querySelector('.ranking-player-identity')||row.querySelector('.result-player-copy,.leader-name')||name.parentElement;
+   const badge=row.querySelector('.patron-label');if(supported&&!badge){const holder=document.createElement('span');holder.innerHTML=seal();const button=holder.firstElementChild;button.onclick=e=>{e.stopPropagation();if(mine)open('thanks',button);else showPerson(row,name,button)};copy.append(button);}else if(!supported&&badge)badge.remove();if(supported&&badge&&badge.parentElement!==copy)copy.append(badge);
    row.classList.toggle('patron-supported',supported);if(supported)name.setAttribute('title',personName(row,name));
    for(const avatar of row.querySelectorAll('.result-player-avatar,.ranking-avatar,.home-ranking-avatar,.leader-avatar,.leaderboard-avatar'))decorateAvatar(avatar,supported);
    if(row.classList.contains('result-player-row')){const avatar=resultAvatarControl(row.querySelector('.result-player-avatar'),supported);if(supported&&avatar){avatar.setAttribute('aria-label','Podporovatel '+personName(row,name)+' — o podpoře Propletu');avatar.setAttribute('aria-haspopup','dialog');avatar.onclick=e=>{e.stopPropagation();showPerson(row,name,avatar)};}}

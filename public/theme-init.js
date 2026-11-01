@@ -241,7 +241,7 @@
 
   const loadExtras=async()=>{
     loadScript('/challenge-cta-v3333.js?v=result-sticker1','propletChallengeCtaV3333');
-    await loadScript('/runtime-meta.js?v=41007','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=41008','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=studio-recovery1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');

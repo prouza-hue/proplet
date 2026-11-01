@@ -69,3 +69,6 @@ The fixture lives in `monthly-v2-fixture.js`, is loaded only by this generated p
 
 
 The supporter-avatar consistency preview also accepts `patronOwn=public`, `private`, or `none` alongside `patronInfo=1`. Public marks the synthetic viewer in both their header and result; private marks only their own header/profile; none leaves the viewer unmarked. The other synthetic public supporter stays marked in each case. The card uses the existing blue keepsake inside the allocated avatar box, and result labels share the name line. These parameters change only in-memory UI fixtures and never issue payment or preference writes.
+
+
+`/?patronRankings=1` opens the native XP weekly player ranking with an explicitly public synthetic supporter at rank 21, outside the first-five summary. The sample has a long rank title and team “Propletové – Řeporyje”. Add `&rankingView=daily` for Daily, or `&patronOwn=private` to verify the own public mark disappears while the personal header remains marked. This fixture uses no real player data or backend writes.

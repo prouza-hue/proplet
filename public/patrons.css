@@ -96,11 +96,20 @@ html.tiskarna-ui .patron-avatar-card svg,.patron-avatar-demo>i svg{width:63%;hei
 .patron-mini-person{display:flex;flex-direction:column;align-items:center;gap:12px}
 .patron-mini-person .patron-label-static{font-size:11px;font-weight:500}
 /* A signature shares the name line; result metrics keep their existing line. */
-html.tiskarna-ui body .patron-supported :is(.leader-name,.result-player-copy){display:grid!important;grid-template-columns:minmax(0,max-content) max-content;justify-content:start;align-items:center;column-gap:6px;row-gap:4px;min-width:0;text-align:left!important}
+html.tiskarna-ui body .patron-supported .result-player-copy{display:grid!important;grid-template-columns:minmax(0,max-content) max-content;justify-content:start;align-items:center;column-gap:6px;row-gap:4px;min-width:0;text-align:left!important}
 html.tiskarna-ui body :is(#winModal,#levelDetailModal) .patron-supported .result-player-copy{display:grid!important}
-html.tiskarna-ui body .patron-supported .leader-name>strong,html.tiskarna-ui body :is(#winModal,#levelDetailModal) .patron-supported .result-player-copy>strong{grid-column:1;grid-row:1;min-width:0;max-width:100%;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
-html.tiskarna-ui body .patron-supported :is(.leader-name,.result-player-copy)>.patron-label{grid-column:2;grid-row:1;white-space:nowrap;font-size:11px!important;line-height:1.25!important}
-html.tiskarna-ui body .patron-supported :is(.leader-name,.result-player-copy)>small{grid-column:1/-1;grid-row:2}
+html.tiskarna-ui body :is(#winModal,#levelDetailModal) .patron-supported .result-player-copy>strong{grid-column:1;grid-row:1;min-width:0;max-width:100%;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
+html.tiskarna-ui body .patron-supported .result-player-copy>.patron-label{grid-column:2;grid-row:1;white-space:nowrap;font-size:11px!important;line-height:1.25!important}
+html.tiskarna-ui body .patron-supported .result-player-copy>small{grid-column:1/-1;grid-row:2}
+
+/* Leaderboards keep the avatar beside the whole identity, with wrapping metadata. */
+html.tiskarna-ui body #screen-leaderboard .ranking-row .leader-name{display:block!important;min-width:0;max-width:100%}
+html.tiskarna-ui body #screen-leaderboard .ranking-row .leader-name>strong{display:flex!important;align-items:center;min-width:0;max-width:100%;white-space:normal!important;overflow:visible}
+html.tiskarna-ui body #screen-leaderboard .ranking-player-identity{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px;min-width:0;flex:1}
+html.tiskarna-ui body #screen-leaderboard .ranking-player-name{min-width:0;max-width:100%;overflow-wrap:anywhere}
+html.tiskarna-ui body #screen-leaderboard .ranking-player-identity>.patron-label{flex:none;white-space:nowrap;font-size:11px!important}
+html.tiskarna-ui body #screen-leaderboard .ranking-row .leader-name>small{display:block!important;min-width:0;max-width:100%;white-space:normal!important;overflow-wrap:anywhere}
+html.tiskarna-ui body #screen-leaderboard :is(.ranking-rank-chip,.ranking-player-team){display:block;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
 
 .patron-bank-details{font-size:13px;margin:0;overflow-wrap:anywhere}.patron-bank-details dt{color:var(--td-muted);font-size:12px}.patron-bank-details dd{margin:0 0 5px}.patron-avatar-native{display:grid;place-items:center;width:56px;height:56px;font-size:36px}.patron-error{color:#a33131!important;padding-top:12px}.patron-today-link{display:block;margin:12px auto;font-size:13px!important;min-height:36px}.patron-offer{display:flex;align-items:center;gap:14px;padding:16px;margin:16px 0;border:1px solid var(--td-line);border-radius:14px;background:var(--td-paper)}.patron-offer>div{flex:1}.patron-offer p{font-size:13px;margin:3px 0 0}.patron-offer button{font-size:13px;min-height:40px}.patron-offer .patron-entry-seal{flex:none}@media(max-width:540px){.patron-offer{flex-wrap:wrap}.patron-offer>div{flex-basis:60%}}
 
