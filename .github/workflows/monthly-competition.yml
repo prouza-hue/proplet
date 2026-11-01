@@ -19,6 +19,7 @@ on:
       - 'supabase/tests/monthly*.sql'
       - 'tools/test_monthly_competition_db.py'
       - 'tools/test_monthly_quality_db.py'
+      - 'tools/test_monthly_independence_db.py'
       - 'tools/check_release_news_db.py'
       - 'tests/current/test_release_news*'
       - 'tests/current/test_monthly_competition*'

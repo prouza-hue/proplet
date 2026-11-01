@@ -688,6 +688,23 @@
       ]
     },
     {
+      "id": "20261101-monthly-independence-v3",
+      "order": 610,
+      "version": "2026.11.01",
+      "path": "supabase/migrations/20261101013001_monthly_independence_v3.sql",
+      "type": "migration",
+      "status": "prepared-dormant-explicit-activation",
+      "sha256": "2b3b95943554a4a98dd8ad51d4d649e5a13dfd4e5fc5543bbc87048e0e8c28d3",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "proplet_private.rebuild_monthly_quality_v2",
+        "public.proplet_monthly_state_v1",
+        "public.proplet_finalize_monthly_competition_v1",
+        "proplet_private.correct_monthly_competition_v1",
+        "public.proplet_activate_monthly_quality_v2"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

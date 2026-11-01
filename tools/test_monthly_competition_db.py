@@ -349,6 +349,8 @@ def main():
     with connect() as c:
         c.execute((ROOT/'supabase/tests/monthly_quality_rank_explanations.sql').read_text(encoding='utf8'))
     report['checks'].append('v2 rank reason compares adjacent equal-total contender across 100/90/90 groups')
+    from tools.test_monthly_independence_db import run_independence_acceptance
+    run_independence_acceptance(connect,report)
     report['checks'].append('forward migration dormant through complete v1 suite; explicit v2 activation; legacy closed standings/revisions/rules remain unchanged')
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report,indent=2),encoding='utf8')
