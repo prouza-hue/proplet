@@ -20,7 +20,8 @@ const scenario = {
  referral: reviewParams.get('account')==='guest'?'guest':reviewParams.get('account')==='incoming'?'incoming':'member',
  announcement:'none'
 };
-const fixtureState=['ready','done','complete'].includes(reviewParams.get('state'))?reviewParams.get('state'):'ready';
+const patronInfoPreview=reviewParams.get('patronInfo')==='1';
+const fixtureState=['ready','done','complete'].includes(reviewParams.get('state'))?reviewParams.get('state'):patronInfoPreview?'done':'ready';
 const prefix = 'proplet:studio-review:20261021:v2:' + scenario.extra + ':' + scenario.referral + ':' + fixtureState + ':';
 // Keep native Storage identity. WindowProxy property replacement is not reliable
 // across all embedded-browser realms; app controllers must see these same methods.
@@ -238,7 +239,7 @@ function boardRanking(url){
  const record=state().completed[key],elapsed=Number(record?.elapsedMs)||65000;
  // Reflect the same synthetic first result shown by the native recap; never
  // use an unrelated hard-coded own time to exercise duplicate presentation.
- const rows=[{id:'review-klara',name:'Klára',avatar:'🌺',rank:1,elapsedMs:Math.max(1000,elapsed-20000),moves:8,hintsUsed:0,cleanSolve:true},
+ const rows=[{id:'review-klara',name:patronInfoPreview?'Ukázkový Pavel':'Klára',avatar:patronInfoPreview?'🦊':'🌺',patron:patronInfoPreview,rank:1,elapsedMs:Math.max(1000,elapsed-20000),moves:8,hintsUsed:0,cleanSolve:true},
   {id:mine,isMine:!!profile()?.id,name:profile()?.name||'Alex',avatar:profile()?.avatar||'🦊',rank:2,elapsedMs:elapsed,moves:record?.moves??9,hintsUsed:record?.hintsUsed??0,cleanSolve:record?.cleanSolve??true,attemptId:record?.attemptId},
   {id:'review-matej',name:'Matěj',avatar:'🐉',rank:3,elapsedMs:elapsed+30000,moves:10,hintsUsed:0,cleanSolve:true}];
  return {rows,total:3,myRank:2,position:2,players:rows,nextOffset:null,reviewOnly:true,
@@ -257,6 +258,8 @@ window.fetch=async(input,init={})=>{
  requests.push({path:url.pathname,method,reviewOnly:true});
  let body={};try{body=JSON.parse(init.body||'{}');}catch{}
  const path=url.pathname;
+ if(path==='/api/patrons'&&method==='GET')return json({enabled:patronInfoPreview,authenticated:!!profile()?.token,patron:false,publicBadge:false,offersDisabled:true,canOffer:false,thanksPending:false,contributions:[],reviewOnly:true});
+ if(path.startsWith('/api/patrons/'))return json({detail:'Náhled podpory neprovádí platby ani zápisy.',reviewOnly:true},409);
  if(method==='GET'&&path==='/api/competition/monthly')return json(window.PropletMonthlyV2Fixture.response(reviewParams.get('monthlyCase')));
  if(method==='GET'&&path==='/api/config'){
   let config={"badges":[{"days":1,"icon":"🥉","name":"První zářez"},{"days":3,"icon":"❤️","name":"Srdcař"},{"days":5,"icon":"⭐","name":"Pětka"},{"days":7,"icon":"🔥","name":"Týden v plamenech"},{"days":10,"icon":"🏆","name":"Desítka"},{"days":14,"icon":"⚡","name":"Blesk"},{"days":21,"icon":"🦉","name":"Mistr slov"},{"days":30,"icon":"👑","name":"Koruna"},{"days":50,"icon":"💎","name":"Diamant"},{"days":100,"icon":"🚀","name":"Legenda"}],"points":{"daily":100,"easy":15,"medium":25,"hard":50,"hardcore":100,"mozkomor":150,"starter":10,"mozkokalypsa":200},"dictionarySize":13939,"dailyRotationSize":365,"dailyGeneration":4,"dailyGeneration3From":"2026-08-17","dailyCadence":{"weekdays":["easy","easy","medium","medium","medium","hard","hard"],"counts":{"easy":105,"medium":156,"hard":104}},"rescueBankSize":30,"pushAvailable":false,"environment":"preview","version":"4.09.12","historicalFreeWriteEnabled":false,"referralsEnabled":true,"dailySpecialsEnabled":true};
@@ -366,7 +369,7 @@ window.PropletStudioFixture={...api,fixtureState,day:today,seedState,diagnostics
 
 document.addEventListener('proplet:ready',()=>{
  ready=true;
- seedState().catch(error=>{console.error('Studio state seed failed',error);window.PROPLET_STUDIO_SEED_ERROR=error.message});
+ seedState().then(()=>{if(patronInfoPreview)return showDailyResult(today(),getState().completed['daily:'+today()]);}).catch(error=>{console.error('Studio state seed failed',error);window.PROPLET_STUDIO_SEED_ERROR=error.message});
  if(!local.getItem('referralBaseline'))save('referralBaseline',completionIds());
  // Defaults are returning-player fixtures. Explicit announcement scenarios still
  // use the native eligibility/gating code; we never force-open a launch modal.
