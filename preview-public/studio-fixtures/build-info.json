@@ -1,43 +1,43 @@
 {
-  "builtAt": "2026-11-01T00:45:28.978Z",
-  "sourceSha": "4b26d690cddb1564ab28e03bbd76009566eb7b76",
+  "builtAt": "2026-11-01T00:57:18.163Z",
+  "sourceSha": "ac5d8127f86190623ea74bdacf9ce833e03d0b8b",
   "files": 494,
   "gameplay": [
     {
       "file": "app.js",
-      "sha256": "298737f4c7af719829288ef731ca03d46e652486e4f5d1d2778df99e7c97c399"
+      "sha256": "4214ebad33fd8a86541d5f36d881878fb750ccf850dc81071628dac35bebca9d"
     },
     {
       "file": "game.css",
-      "sha256": "c0e81a9e4816ba241bf5699713003bad0dd4bd5fd4021185be9e5b6896081390"
+      "sha256": "a6329f07a63080cefa7931916a87f77a8e39e0aa0eb94311d772f581a39b0b22"
     },
     {
       "file": "game-release-polish.css",
-      "sha256": "936fdfd0e1e1656b6195a53ea1038977d4d2a3c7f807780f6ae01d58eb68043b"
+      "sha256": "67a85efd9abaee191f986cc3d007498759df9f1dc62f2c3aed93a008ab4f36e0"
     },
     {
       "file": "ribbon-ui.css",
-      "sha256": "899743b0b78f07a8f2156570cbfaacbb4853c351ba2a26c20cf5389dae072b6b"
+      "sha256": "341601f4957a4bb02b06b3e22d56b05ac4b025fbbbca96ef99dcdf9814929938"
     },
     {
       "file": "app/game/board.js",
-      "sha256": "d206c1b69d97a3ef6736135d549db9d7c536287ebd6cc05116c6fb540322f9cb"
+      "sha256": "6200b2b4f93dad28928ce3982fd24ec24370e7db9655b68bff96f46ca09c4b6e"
     },
     {
       "file": "app/game/input.js",
-      "sha256": "77ee167a83e422ddb0a9741f66fd8460ee403600ad217e02dd39d3e2e73454cd"
+      "sha256": "051d98bf59c2217926fac89ed7526146208d74774a6f80921ecd14b553540f90"
     },
     {
       "file": "app/game/hints.js",
-      "sha256": "38d2cb764b2ed634ac999c24cab454a3408ff93cf09298c087bef160c97fece5"
+      "sha256": "09eb8d2971c1681c8fdcf38f9c0fd18766d12d289c7e633faef92f19a3e238e4"
     },
     {
       "file": "app/game/state.js",
-      "sha256": "5c1bcfd833070deb72d6deb7683d4903603485202bcc8f55d2f386805662499d"
+      "sha256": "dcefd67188c30366f0be48dd5995ad8e7a68a4e7ea3f16486a7d22845f9c489c"
     },
     {
       "file": "app/game/fair-play.js",
-      "sha256": "db9e145be2460a957220d6dab7118c44d6d93e2cc7cee0f4c1ee7ef611f4ee19"
+      "sha256": "5448585b079bdfe157948a4bbe24a617b62b1e7d82aab88f6daf2499ff28fda2"
     }
   ],
   "fixturesOnly": true
