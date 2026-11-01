@@ -55,9 +55,13 @@ has(density,/priority:10/,'copy-density hook priority missing');
 has(density,/name==='finishGame'&&densityCompletionHookInstalled/,'copy-density fallback skip guard missing');
 has(density,/classList\.remove\('comparison-loaded'\)/,'comparison-loaded reset missing');
 
-has(theme,/loadScript\('\/copy-density-v3327\.js\?v=2'/,'copy-density loader missing');
-has(theme,/loadScript\('\/competitive-sharing-v3331\.js\?v=analytics2'/,'competitive-sharing loader missing');
-assert(theme.indexOf('/copy-density-v3327.js?v=2')<theme.indexOf('/competitive-sharing-v3331.js?v=analytics2'));
+const densityLoader=theme.match(/loadScript\('(\/copy-density-v3327\.js\?v=[^']+)'/)?.[1];
+const sharingLoader=theme.match(/loadScript\('(\/competitive-sharing-v3331\.js\?v=[^']+)'/)?.[1];
+assert(densityLoader,'copy-density loader missing');assert(sharingLoader,'competitive-sharing loader missing');
+const shell=fs.readFileSync(path.join(root,'public/sw.js'),'utf8');
+const offline=new Set(JSON.parse(fs.readFileSync(path.join(root,'public/offline-assets.json'),'utf8')).assets);
+for(const url of [densityLoader,sharingLoader]){assert(shell.includes("'"+url+"'"),'completion loader missing from shell: '+url);assert(offline.has(url),'completion loader missing from offline assets: '+url);}
+assert(theme.indexOf(densityLoader)<theme.indexOf(sharingLoader),'completion hook loader order drifted');
 
 const pipelinePath=path.join(root,'public/app/core/completion-pipeline.js');
 assert(fs.existsSync(pipelinePath),'completion pipeline module missing');

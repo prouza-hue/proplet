@@ -32,16 +32,42 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  check('native game starts approved new board',await page.evaluate(()=>currentGame?.puzzle?.id==='g6-refresh-easy-001'&&currentGame.mode==='free'));
  await page.screenshot({path:`${out}/new-board.png`});
 
- // Both tabs must resume the same saved board, without creating another run.
- const saved=await page.evaluate(()=>({id:currentGame.puzzle.id,found:currentGame.found.length}));
- await page.evaluate(()=>nav('free'));
- check('Play resume appears above difficulties',await page.evaluate(()=>(()=>{const card=document.querySelector('#freeResumeCard'),grid=document.querySelector('#difficultyCards');return !!card&&card.getBoundingClientRect().bottom<=grid.getBoundingClientRect().top})()));
- check('both tabs show the same resume',await page.evaluate(()=>document.querySelector('#freeResumeCard').textContent===document.querySelector('#homeResumeCard').textContent));
- await page.locator('#freeResumeCard').click();
- check('Play resume restores the saved board',await page.evaluate(saved=>currentGame.puzzle.id===saved.id&&currentGame.found.length===saved.found,saved));
+ // Continue is now inside the difficulty tile. Exercise a non-empty native run
+ // and keep the existing Today resume as a second entry to the same saved game.
+ await page.evaluate(()=>{currentGame.path=[...currentGame.puzzle.answers[0].path];submitPath()});
+ await page.waitForFunction(()=>currentGame.found.length===1&&currentGame.moves===1&&gameElapsed(currentGame)>=1000);
+ const puzzleId=await page.evaluate(()=>currentGame.puzzle.id);
+ const readSaved=()=>page.evaluate(id=>{const r=getState().inProgress['free:'+id];return {id:r.puzzleId,found:r.found,moves:r.moves,hints:r.hints,elapsedMs:r.elapsedMs,attemptId:r.attemptId}},puzzleId);
+ const verifyResume=async(label,saved)=>{
+  await page.waitForFunction(id=>currentScreen==='game'&&currentGame?.mode==='free'&&currentGame.puzzle.id===id,saved.id);
+  const actual=await page.evaluate(()=>({id:currentGame.puzzle.id,found:currentGame.found,moves:currentGame.moves,hints:currentGame.hints,baseElapsedMs:currentGame.baseElapsedMs,elapsedMs:gameElapsed(currentGame),attemptId:currentGame.attemptId}));
+  check(`${label}: same board and attempt`,actual.id===saved.id&&actual.attemptId===saved.attemptId);
+  check(`${label}: same found paths, moves and hints`,JSON.stringify(actual.found)===JSON.stringify(saved.found)&&actual.moves===saved.moves&&actual.hints===saved.hints);
+  check(`${label}: saved time retained`,saved.elapsedMs>=1000&&Math.abs(actual.baseElapsedMs-saved.elapsedMs)<=1&&actual.elapsedMs>=saved.elapsedMs);
+ };
+ await page.evaluate(()=>nav('free'));let saved=await readSaved();
+ check('one Continue tile owns the saved difficulty',await page.evaluate(()=>document.querySelectorAll('#difficultyCards [data-play-free]').length===6&&document.querySelector('#difficultyCards [data-play-free="easy"]').textContent.includes('Pokračovat')&&!document.querySelector('#freeResumeCard')));
+ check('Today retains the same difficulty resume',await page.evaluate(()=>document.querySelector('#homeResumeCard')?.dataset.diff==='easy'&&document.querySelector('#homeResumeCard').textContent.includes('Pokračovat')&&freeProgress('easy').resume.id===getState().inProgress['free:'+freeProgress('easy').resume.id].puzzleId));
+ await page.locator('#difficultyCards [data-play-free="easy"]').click();await verifyResume('Play tile resume',saved);
+ await page.evaluate(()=>nav('free'));saved=await readSaved();
+ await page.locator('#settingsHeaderBtn').click();
+ if(!await page.locator('#freeOrderSettings details').evaluate(el=>el.open))await page.locator('#freeOrderSettings summary').click();
+ await page.locator('#freeOrder-easy').selectOption('numeric');await page.waitForFunction(()=>freeOrder().record('easy').mode==='numeric');
+ await page.evaluate(()=>nav('free'));await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>document.querySelector('#freeOrderSettings')&&document.querySelectorAll('#difficultyCards [data-play-free]').length===6&&freeOrder().record('easy').mode==='numeric');
+ check('reload retains the preference and the original unfinished board',await page.evaluate(id=>freeOrder().record('easy').mode==='numeric'&&freeProgress('easy').resume?.id===id&&document.querySelector('#difficultyCards [data-play-free="easy"]').textContent.includes('Pokračovat'),saved.id));
+ await page.locator('#difficultyCards [data-play-free="easy"]').click();await verifyResume('Reload and changed-order resume',saved);
+ await page.evaluate(()=>nav('daily'));saved=await readSaved();
+ const todayResume=page.locator('#oneScreenToday [data-os-key="free"]');
+ await page.waitForFunction(()=>document.querySelector('#oneScreenToday [data-os-key="free"]')?.textContent.includes('Rozehráno'));
+ check('Today exposes its native resume through the visible tile',await todayResume.isVisible()&&(await todayResume.getAttribute('aria-label')).includes('Snadná'));
+ await todayResume.click();await verifyResume('Today resume',saved);
+ await page.evaluate(()=>nav('free'));await page.locator('#settingsHeaderBtn').click();
+ if(!await page.locator('#freeOrderSettings details').evaluate(el=>el.open))await page.locator('#freeOrderSettings summary').click();
+ await page.locator('#freeOrder-easy').selectOption('varied');await page.waitForFunction(()=>freeOrder().record('easy').mode==='varied');await page.evaluate(()=>nav('free'));
  // Fixture: completed results for every difficulty, no unfinished board.
  await page.evaluate(()=>{const state=getState();state.inProgress={};for(const diff of Object.keys(DIFF)){const p=sortedFreeBank(diff)[0];state.completed['free:'+p.id]={puzzleId:p.id,mode:'free',difficulty:diff,level:p.meta.level,contentGeneration:p.meta.contentGeneration||4,elapsedMs:125000,moves:25,hintsUsed:0,cleanSolve:true,points:DIFF[diff].xp,completedAt:new Date().toISOString()}}saveState(state);currentGame=null;nav('free')});
- check('finished games leave no stale resume on either tab',await page.locator('#homeResumeCard,#freeResumeCard').count()===0);
+ check('finished games leave no stale resume on either tab',await page.locator('#homeResumeCard,#freeResumeCard').count()===0&&await page.locator('#difficultyCards [data-play-free]').filter({hasText:'Pokračovat'}).count()===0);
  for(const theme of ['light','dark'])for(const width of [320,390,690,1440]){
   await page.setViewportSize({width,height:900});await page.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
   for(const diff of ['easy','medium','hard','hardcore','mozkomor','mozkokalypsa']){
