@@ -14,3 +14,6 @@
 /* A character illustrates the prize; the ordinal communicates the ranking. */
 .rank-list li,.rank-list li:has(.award-thumb){grid-template-columns:68px minmax(0,1fr) auto}.rank-list .rank{display:flex;align-items:center;gap:5px}.rank-number{font-size:16px;font-weight:650;min-width:18px}.rank-list .rank .award-thumb,.rank-list .rank .award-thumb img{width:40px}
 @media(max-width:360px){.rank-list li,.rank-list li:has(.award-thumb){grid-template-columns:58px minmax(0,1fr) auto}.rank-list .rank{gap:3px}.rank-list .rank .award-thumb,.rank-list .rank .award-thumb img{width:34px}}
+
+/* Keep the labelled point sources together across the available row width. */
+.rank-list li{row-gap:2px}.rank-list .rank{grid-row:1/3}.rank-list .player-meta{grid-column:2/-1;margin-top:0}.row-daily{display:flex;flex-wrap:wrap;gap:2px 10px}.row-daily>span{white-space:nowrap}.row-other{display:block}.row-days{color:var(--muted)}

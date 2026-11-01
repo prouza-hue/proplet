@@ -1,11 +1,11 @@
 {
-  "builtAt": "2026-11-01T00:57:18.163Z",
-  "sourceSha": "ac5d8127f86190623ea74bdacf9ce833e03d0b8b",
+  "builtAt": "2026-11-01T02:18:58.922Z",
+  "sourceSha": "f7f10bb4d4dd36a2f8c84ffe762e0e214ace27d9",
   "files": 494,
   "gameplay": [
     {
       "file": "app.js",
-      "sha256": "4214ebad33fd8a86541d5f36d881878fb750ccf850dc81071628dac35bebca9d"
+      "sha256": "7dc03adbe4dd727866265b22afedea4f3a6e77e17239b13647fd849f202ec04b"
     },
     {
       "file": "game.css",
@@ -40,5 +40,26 @@
       "sha256": "5448585b079bdfe157948a4bbe24a617b62b1e7d82aab88f6daf2499ff28fda2"
     }
   ],
-  "fixturesOnly": true
+  "fixturesOnly": true,
+  "nativeBaseSha": "f7f10bb4d4dd36a2f8c84ffe762e0e214ace27d9",
+  "sourceDirty": true,
+  "overlayMode": "Uncommitted monthly ranking clarity UI over production v4.10.3; preview only",
+  "productionModified": false,
+  "overlayFiles": [
+    {
+      "sourcePath": "public/app/monthly/competition.js",
+      "publicPath": "/app/monthly/competition.js",
+      "sha256": "2cfc412bfc2dfe4e9142371ba5d4fd1508a859513f6dad43e8acb0f103ba1e4a"
+    },
+    {
+      "sourcePath": "public/monthly-competition.css",
+      "publicPath": "/monthly-competition.css",
+      "sha256": "aed1c9b52ebfa329fa0b1fd571523bb31e6dcd8a5b236d897caee49a397dd347"
+    },
+    {
+      "sourcePath": "tools/studio-preview/monthly-v2-fixture.js",
+      "publicPath": "/studio-fixtures/monthly-v2-fixture.js",
+      "sha256": "1de70432b9388b0e5373179ac2876afc58bb2cdde5c01b5b822b7e4002cf483a"
+    }
+  ]
 }
