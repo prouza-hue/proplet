@@ -1,7 +1,8 @@
 const assert=require('node:assert/strict'),fs=require('fs'),path=require('path'),{spawn}=require('child_process');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const repo=path.resolve(__dirname,'..'),out=path.join(repo,'artifacts/competition-ui');
-const base=process.env.BASELINE==='1'?'https://hrajproplet.cz':'http://127.0.0.1:8894';
+if(process.env.BASELINE==='1')throw new Error('Live viewport matrices are disabled. Use the bounded check_live_release.py and a single scoped browser smoke.');
+const base='http://127.0.0.1:8894';
 const names=['Zvídavá sova','Klidný jezevec','Tajemná volavka','Propletený mýval','Hbitá vydra','Pavel'];
 const teams=['Slovní sokoli','Propletení','Noční sovy','Řeporyjští propletači','Písmenka'];
 const ranked=names.map((name,i)=>({rank:i+1,name,avatar:'🦊',isMine:i===5,xp:1700-i*183,lifetimePoints:15000,memberCount:3,players:3,score:100-i*3,moves:10,cleanSolve:true,elapsedMs:27000+i*1000}));

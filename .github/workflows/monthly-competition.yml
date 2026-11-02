@@ -2,32 +2,47 @@ name: Monthly competition integrity
 on:
   workflow_dispatch:
   pull_request:
-    paths:
-      - 'backend/monthly_competition.py'
-      - 'backend/release_news.py'
-      - 'public/release-news*'
-      - 'backend/config.py'
-      - 'server.py'
-      - 'public/app/monthly/**'
-      - 'public/monthly-competition.css'
-      - 'public/rewards/monthly/**'
-      - 'public/app/rankings/rankings.js'
-      - 'public/ranking-navigation.css'
-      - 'vercel.json'
-      - 'supabase/migrations/*monthly*.sql'
-      - 'supabase/migrations/*release_news*.sql'
-      - 'supabase/tests/monthly*.sql'
-      - 'tools/test_monthly_competition_db.py'
-      - 'tools/test_monthly_quality_db.py'
-      - 'tools/test_monthly_independence_db.py'
-      - 'tools/check_release_news_db.py'
-      - 'tests/current/test_release_news*'
-      - 'tests/current/test_monthly_competition*'
-      - '.github/workflows/monthly-competition.yml'
+    branches: [main]
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      relevant: ${{ steps.scope.outputs.relevant }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - id: scope
+        name: Select affected acceptance scope
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          SCOPED_PATHS: >-
+            ["backend/monthly_competition.py", "backend/release_news.py", "backend/config.py", "backend/db.py", "backend/postgres_rpc.py", "backend/contracts.py", "backend/results.py", "server.py", "requirements*.txt", "SUPABASE*.sql", "supabase/**", "docs/SUPABASE_MIGRATION_MANIFEST.md", "tools/test_isolated_result_db.py", "tools/test_monthly*.py", "tools/check_release_news_db.py", "data/monthly-preview-scenarios.json", "tests/current/test_monthly*.py", "tests/current/test_release_news*.py", ".github/workflows/monthly-competition.yml"]
+        shell: python
+        run: |
+          import fnmatch, json, os, subprocess
+          patterns = json.loads(os.environ['SCOPED_PATHS'])
+          if os.environ['EVENT_NAME'] != 'pull_request':
+              relevant = True
+          else:
+              base = os.environ['BASE_SHA']
+              if subprocess.run(['git', 'cat-file', '-e', base + '^{commit}'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False).returncode:
+                  subprocess.check_call(['git', 'fetch', '--no-tags', '--depth=1', 'origin', base])
+              changed = subprocess.check_output(['git', 'diff', '--name-only', '--no-renames', '-z', os.environ['BASE_SHA'], 'HEAD']).decode().split('\0')
+              relevant = any(fnmatch.fnmatchcase(path, pattern) for path in changed if path for pattern in patterns)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('relevant=' + str(relevant).lower() + '\n')
+
   database:
+    needs: changes
+    if: ${{ always() && (needs.changes.result != 'success' || needs.changes.outputs.relevant == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     services:
@@ -40,13 +55,14 @@ jobs:
         ports: ['55432:5432']
         options: --health-cmd "pg_isready -U proplet_test_admin -d postgres" --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
+      - name: Require successful scope classification
+        if: ${{ needs.changes.result != 'success' }}
+        run: exit 1
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install -r requirements-dev.txt 'psycopg[binary]==3.3.5'
-      - name: Complete current runtime gate
-        run: python tools/test_current.py
       - name: Real atomic results and race-safe monthly closure
         run: |
           set -euo pipefail

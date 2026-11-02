@@ -10,13 +10,17 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 from pathlib import Path
 import re
 import subprocess
 import sys
 import time
 from typing import Any
+
+try:
+    from .test_environment import isolated_environment
+except ImportError:  # Direct script invocation.
+    from test_environment import isolated_environment
 
 
 DEFAULT_MANIFEST = Path(__file__).resolve().parents[1] / "tests/current/manifest.json"
@@ -60,6 +64,17 @@ def _validate_manifest(manifest: dict[str, Any]) -> list[str]:
         elif test.get("runner") not in {"python", "node"}:
             errors.append(f"current.tests[{index}] runner must be python or node")
     return errors
+
+
+def _select_tests(tests: list[dict[str, Any]], requested: list[str] | None) -> list[dict[str, Any]]:
+    """Only registered exact paths can enter a focused guarded run."""
+    if requested is None:
+        return tests
+    registered = {test["path"]: test for test in tests}
+    unknown = sorted(set(requested) - registered.keys())
+    if unknown:
+        raise ValueError("--only paths are not registered in the manifest: " + ", ".join(unknown))
+    return [registered[path] for path in dict.fromkeys(requested)]
 
 
 def _syntax_checks(root: Path, manifest: dict[str, Any], env: dict[str, str]) -> tuple[int, int]:
@@ -135,6 +150,7 @@ def _asset_checks(root: Path, manifest: dict[str, Any]) -> tuple[int, int]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    parser.add_argument("--only", nargs="+", metavar="PATH", help="Run only these exact registered test paths, with isolation; skip global asset/syntax scans.")
     args = parser.parse_args(argv)
     manifest_path = args.manifest.resolve()
     root = manifest_path.parents[2]
@@ -152,16 +168,14 @@ def main(argv: list[str] | None = None) -> int:
             print(f"FAIL manifest: {error}")
         return 2
 
-    env = os.environ.copy()
-    env["PYTHONPATH"] = os.pathsep.join(filter(None, [str(root), env.get("PYTHONPATH", "")]))
-    env["PYTHONDONTWRITEBYTECODE"] = "1"
-    # Current tests use mocked HTTP transport.  Do not let an unrelated SOCKS
-    # proxy setting change whether importing the application succeeds.
-    env["NO_PROXY"] = "*"
-    env["no_proxy"] = "*"
+    env = isolated_environment(root)
 
     failures = 0
-    tests = manifest["current"]["tests"]
+    try:
+        tests = _select_tests(manifest["current"]["tests"], args.only)
+    except ValueError as exc:
+        print(f"FAIL {exc}")
+        return 2
     for test in tests:
         relative = test["path"]
         path = root / relative
@@ -174,10 +188,13 @@ def main(argv: list[str] | None = None) -> int:
         if not _run(command, root, f"current {relative}", env):
             failures += 1
     print(f"Current tests: {len(tests) - failures} PASS / {failures} FAIL")
-    _, asset_failures = _asset_checks(root, manifest)
-    failures += asset_failures
-    _, syntax_failures = _syntax_checks(root, manifest, env)
-    failures += syntax_failures
+    if args.only is None:
+        _, asset_failures = _asset_checks(root, manifest)
+        failures += asset_failures
+        _, syntax_failures = _syntax_checks(root, manifest, env)
+        failures += syntax_failures
+    else:
+        print("Focused run: global asset and syntax scans skipped")
     print(f"CURRENT GATE: {'PASS' if failures == 0 else 'FAIL'}")
     return 0 if failures == 0 else 1
 

@@ -5,11 +5,26 @@
   "current": {
     "description": "Current v4.00/v4.01 runtime contracts plus static migration-manifest validation.",
     "tests": [
-      {"path": "tests/current/test_free_expansion_push.py", "runner": "python"},
-      {"path": "tests/current/test_free_expansion.py", "runner": "python"},
-      {"path": "tests/current/test_completion_timestamp_http.py", "runner": "python"},
-      {"path": "tests/current/test_starter_presentation_detail.cjs", "runner": "node"},
-      {"path": "tests/current/test_starter_presentation_headers.py", "runner": "python"},
+      {
+        "path": "tests/current/test_free_expansion_push.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_free_expansion.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_completion_timestamp_http.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_starter_presentation_detail.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_starter_presentation_headers.py",
+        "runner": "python"
+      },
       {
         "path": "tests/current/test_reward_read_budget.py",
         "runner": "python"
@@ -929,6 +944,38 @@
       {
         "path": "tests/current/test_offline_timing_client.cjs",
         "runner": "node"
+      },
+      {
+        "path": "tools/test_gen4_preview_readonly.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_gen4_preview_runtime_meta.js",
+        "runner": "node"
+      },
+      {
+        "path": "tools/test_v334_quality_release.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_gen4_progress_migration.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_ci_resource_policy.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_vercel_build_decision.cjs",
+        "runner": "node"
+      },
+      {
+        "path": "tests/current/test_test_isolation.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_live_smoke_budget.py",
+        "runner": "python"
       }
     ]
   },

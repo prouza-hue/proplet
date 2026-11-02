@@ -34,6 +34,10 @@ class CompetitionHistoryTests(unittest.TestCase):
             self.calls.append((table, kwargs))
             if table == 'team_victory_rounds' and kwargs['columns'] == 'standings':
                 return self.snapshot
+            if table == 'team_victory_rounds' and kwargs['columns'] == 'week_start,week_end,standings':
+                week = kwargs['filters']['week_start'].removeprefix('eq.')
+                selected = next((row for row in self.rows[table] if row['week_start'] == week), None)
+                return [{**selected, **self.snapshot[0]}] if selected and self.snapshot else []
             return self.rows[table]
 
         def auth(token):
@@ -80,6 +84,46 @@ class CompetitionHistoryTests(unittest.TestCase):
         self.assertNotIn('Secret', result.text)
         read = next(args for table, args in self.calls if args['columns'] == 'standings')
         self.assertEqual(read['filters'], {'week_start': 'eq.2026-09-28'})
+
+    def test_narrow_snapshot_omits_all_history_awards_and_unrelated_leagues(self):
+        result = self.client.get('/api/team-victories/competition?week=2026-09-28&includeSummary=false',
+                                 headers={'Authorization': 'Bearer valid'})
+        self.assertEqual(result.status_code, 200)
+        data = result.json()
+        self.assertEqual(set(data), {'enabled', 'selectedWeek', 'teams'})
+        self.assertEqual(data['teams'][0], {'name': 'Historic A', 'xp': 100, 'rank': 1, 'isMine': True})
+        self.assertEqual([table for table, _ in self.calls], ['team_victory_settings', 'team_victory_rounds', 'leagues'])
+        self.assertEqual(self.calls[1][1]['columns'], 'week_start,week_end,standings')
+        self.assertEqual(self.calls[1][1]['filters']['week_start'], 'eq.2026-09-28')
+        self.assertIn('week_end', self.calls[1][1]['filters'])
+        self.assertEqual(self.calls[2][1]['filters'], {'public_opt_in': 'eq.true', 'code': 'in.(A,B,PRIVATE)'})
+        self.assertNotIn('Secret', result.text)
+        self.assertNotIn('team_code', result.text)
+
+    def test_narrow_snapshot_rechecks_visibility_and_auth_on_each_request(self):
+        url = '/api/team-victories/competition?week=2026-09-28&includeSummary=false'
+        first = self.client.get(url, headers={'Authorization': 'Bearer valid'})
+        self.assertTrue(first.json()['teams'][0]['isMine'])
+        self.rows['leagues'] = [self.rows['leagues'][1]]
+        second = self.client.get(url)
+        self.assertEqual(second.json()['teams'], [{'name': 'B team', 'xp': 100, 'rank': 1, 'isMine': False}])
+        self.assertNotIn('Historic A', second.text)
+        before = len(self.calls)
+        self.assertEqual(self.client.get(url, headers={'Authorization': 'Bearer bad'}).status_code, 401)
+        self.assertEqual(len(self.calls), before)
+
+    def test_narrow_snapshot_requires_real_finalized_week_and_valid_data(self):
+        self.assertEqual(self.client.get('/api/team-victories/competition?includeSummary=false').status_code, 422)
+        self.assertEqual(self.calls, [])
+        for week in ['2026-09-21', '2099-01-05', '2026-10-12']:
+            self.assertEqual(self.client.get('/api/team-victories/competition?includeSummary=false&week=' + week).status_code, 404)
+        self.snapshot = [{'standings': None}]
+        self.assertEqual(self.client.get('/api/team-victories/competition?includeSummary=false&week=2026-09-28').status_code, 503)
+        self.snapshot = [{'standings': []}]
+        self.calls.clear()
+        result = self.client.get('/api/team-victories/competition?includeSummary=false&week=2026-09-28')
+        self.assertEqual(result.json()['teams'], [])
+        self.assertEqual([table for table, _ in self.calls], ['team_victory_settings', 'team_victory_rounds'])
 
     def test_invalid_unknown_and_future_weeks_never_fabricate_results(self):
         for week in ['nonsense', '2026-09-29', '2026-13-01']:
