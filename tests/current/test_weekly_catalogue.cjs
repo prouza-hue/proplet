@@ -5,7 +5,9 @@ const source=fs.readFileSync('public/app/weekly/competition.js','utf8').replace(
 const render=source.slice(source.indexOf('function render(){'),source.indexOf("\nroot.addEventListener('click'"));
 assert(render.startsWith('function render(){'));
 const nodes=new Map(),$=selector=>{if(!nodes.has(selector))nodes.set(selector,{innerHTML:'',textContent:''});return nodes.get(selector)};
-const context={$,num:value=>Math.max(0,Number(value)||0),fmt:value=>String(value||0),esc:value=>String(value??''),weekLabel:()=> 'fixture week',retry:'<button data-retry>Retry</button>',data:null};
+// This focused catalogue fixture supplies the renderer's period dependency;
+// real paging, failures and stale responses run in test_weekly_competition_ui.cjs.
+const context={$,num:value=>Math.max(0,Number(value)||0),fmt:value=>String(value||0),esc:value=>String(value??''),weekLabel:()=> 'fixture week',retry:'<button data-retry>Retry</button>',data:null,selectedWeek:null,updateCountdown(){}};
 vm.createContext(context);
 for(const name of ['assets','names','thresholds'])vm.runInContext('const '+name+'='+source.match(new RegExp(name+'=(\\[[^\\]]+\\])'))[1]+';',context);
 vm.runInContext(render,context);

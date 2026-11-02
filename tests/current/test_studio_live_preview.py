@@ -22,7 +22,7 @@ LIVE = {
     "VERCEL_GIT_COMMIT_REF": "codex/studio-edition",
     "SUPABASE_URL": "https://iopyhluayfszskyqqpuc.supabase.co",
 }
-LIVE_BRANCHES = ("codex/studio-edition", "codex/today-one-screen", "codex/play-one-screen")
+LIVE_BRANCHES = ("codex/studio-edition", "codex/today-one-screen", "codex/play-one-screen", "codex/competition-ui")
 
 
 class LivePreview(unittest.TestCase):
@@ -47,7 +47,9 @@ class LivePreview(unittest.TestCase):
                                                "preview/today-one-screen", "codex/today-one-screen-other",
                                                "codex/today-one-screen/child", "codex/Today-one-screen",
                                                "preview/play-one-screen", "codex/play-one-screen-other",
-                                               "codex/play-one-screen/child", "codex/Play-one-screen"),
+                                               "codex/play-one-screen/child", "codex/Play-one-screen",
+                                               "preview/competition-ui", "codex/competition-ui-other",
+                                               "codex/competition-ui/child", "codex/Competition-ui"),
                     "SUPABASE_URL": ("", "https://eanzztstmwlamwfdskbf.supabase.co", LIVE["SUPABASE_URL"] + ".invalid"),
                 }.items():
                     for value in values:
@@ -56,11 +58,10 @@ class LivePreview(unittest.TestCase):
                 with patch.dict(os.environ, {"PROPLET_TAJENKA_RELEASE_ENABLED": "false"}):
                     self.assertFalse(config.load_settings().tajenka_release_enabled)
 
-    def test_play_preview_google_start_keeps_same_origin_without_persistence(self):
+    def test_live_preview_google_start_keeps_same_origin_without_persistence(self):
         from datetime import timezone
         from urllib.parse import parse_qs, urlparse
         from account_auth_core import install_account_auth
-        origin = "https://proplet-git-codex-play-one-screen-pavel-prouzas-projects.vercel.app"
         app = FastAPI()
         persistence = Mock(side_effect=AssertionError("OAuth start must not write player/session data"))
         install_account_auth(app, supabase_url=LIVE["SUPABASE_URL"], supabase_key="synthetic-preview-key",
@@ -70,17 +71,19 @@ class LivePreview(unittest.TestCase):
             enforce_rate_limit=lambda *a,**k:None, player_stats=persistence,
             public_family_code=lambda *a:None, league_name_for=lambda *a:None,
             canonical_origin="https://hrajproplet.cz", vercel_env="preview")
-        with patch.dict(os.environ,{**LIVE,"VERCEL_GIT_COMMIT_REF":"codex/play-one-screen"},clear=True):
-            client = TestClient(app,base_url=origin,headers={"Origin":origin})
-            response = client.get("/api/auth/google/start",follow_redirects=False)
-        self.assertEqual(response.status_code,302)
-        target = parse_qs(urlparse(response.headers["location"]).query)
-        self.assertEqual(urlparse(target["redirect_to"][0]).netloc,urlparse(origin).netloc)
-        self.assertEqual(parse_qs(urlparse(target["redirect_to"][0]).query)["auth"],["google"])
-        self.assertEqual(target["code_challenge_method"],["s256"])
-        self.assertIn("HttpOnly",response.headers["set-cookie"])
-        self.assertIn("Secure",response.headers["set-cookie"])
-        self.assertNotIn("Domain=",response.headers["set-cookie"])
+        for branch in LIVE_BRANCHES:
+            origin = f"https://proplet-git-{branch.replace('/', '-')}-pavel-prouzas-projects.vercel.app"
+            with self.subTest(branch=branch), patch.dict(os.environ,{**LIVE,"VERCEL_GIT_COMMIT_REF":branch},clear=True):
+                client = TestClient(app,base_url=origin,headers={"Origin":origin})
+                response = client.get("/api/auth/google/start",follow_redirects=False)
+                self.assertEqual(response.status_code,302)
+                target = parse_qs(urlparse(response.headers["location"]).query)
+                self.assertEqual(urlparse(target["redirect_to"][0]).netloc,urlparse(origin).netloc)
+                self.assertEqual(parse_qs(urlparse(target["redirect_to"][0]).query)["auth"],["google"])
+                self.assertEqual(target["code_challenge_method"],["s256"])
+                self.assertIn("HttpOnly",response.headers["set-cookie"])
+                self.assertIn("Secure",response.headers["set-cookie"])
+                self.assertNotIn("Domain=",response.headers["set-cookie"])
         persistence.assert_not_called()
 
     def test_real_paths_pass_guard_but_test_results_do_not(self):
@@ -110,6 +113,43 @@ class LivePreview(unittest.TestCase):
         response, called = asyncio.run(exercise(True, "/api/result", test=True))
         self.assertEqual(response.status_code, 409)
         self.assertEqual(called, [])
+
+    def test_monthly_live_preview_is_exactly_competition_branch_and_preserves_qa(self):
+        with patch.dict(os.environ, {'PROPLET_MONTHLY_ENABLED': 'true'}), \
+             patch.object(server, 'VERCEL_ENV', 'preview'), \
+             patch.object(server, 'SUPABASE_URL', LIVE['SUPABASE_URL']), \
+             patch.object(server, 'SUPABASE_SECRET_KEY', 'synthetic-key'):
+            for branch in (*LIVE_BRANCHES, 'codex/competition-ui-other', 'codex/competition-ui/child', 'main'):
+                for live in (False, True):
+                    with self.subTest(branch=branch, live=live), \
+                         patch.object(server, 'VERCEL_GIT_COMMIT_REF', branch), \
+                         patch.object(server, 'LIVE_PLAYER_PREVIEW', live):
+                        self.assertEqual(server.monthly_competition_available(), branch == 'codex/competition-ui' and live)
+            with patch.object(server, 'VERCEL_GIT_COMMIT_REF', 'codex/competition-ui'), \
+                 patch.object(server, 'LIVE_PLAYER_PREVIEW', True):
+                with patch.dict(os.environ, {'PROPLET_MONTHLY_ENABLED': 'false'}):
+                    self.assertFalse(server.monthly_competition_available())
+                with patch.object(server, 'SUPABASE_SECRET_KEY', ''):
+                    self.assertFalse(server.monthly_competition_available())
+                with patch.object(server.monthly_competition, 'state', return_value={'enabled': True, 'standings': []}) as read, \
+                     patch.object(server, 'enforce_rate_limit'), patch.object(server, '_ranking_viewer', return_value=None):
+                    response = TestClient(server.app).get('/api/competition/monthly?month=2026-11')
+                    self.assertEqual(response.status_code, 200)
+                    self.assertTrue(response.json()['enabled'])
+                    self.assertEqual(response.headers['cache-control'], 'no-store')
+                    self.assertEqual(read.call_args.kwargs['month'], '2026-11-01')
+                    self.assertIsNone(read.call_args.kwargs['player_id'])
+                with patch.object(server, 'CRON_SECRET', 'synthetic-cron'), \
+                     patch.object(server.monthly_competition, 'finalize') as finalize:
+                    for headers in ({}, {'Authorization': 'Bearer synthetic-cron'}):
+                        self.assertEqual(TestClient(server.app).get('/api/cron/monthly-competition', headers=headers).status_code, 404)
+                    finalize.assert_not_called()
+            with patch.object(server, 'VERCEL_GIT_COMMIT_REF', 'codex/monthly-competition-202611'), \
+                 patch.object(server, 'LIVE_PLAYER_PREVIEW', False), \
+                 patch.object(server, 'SUPABASE_URL', 'https://eanzztstmwlamwfdskbf.supabase.co'):
+                self.assertTrue(server.monthly_competition_available())
+            with patch.object(server, 'VERCEL_ENV', 'production'), patch.object(server, 'LIVE_PLAYER_PREVIEW', False):
+                self.assertTrue(server.monthly_competition_available())
 
     def test_sessions_use_canonical_policy_without_claiming_isolation(self):
         with patch.object(server, "VERCEL_ENV", "preview"), \

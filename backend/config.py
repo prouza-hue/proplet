@@ -29,7 +29,7 @@ def live_player_preview_enabled() -> bool:
     return (
         _env("PROPLET_LIVE_PLAYER_PREVIEW_ENABLED").lower() in {"1", "true", "yes"}
         and _env("VERCEL_ENV").lower() == "preview"
-        and _env("VERCEL_GIT_COMMIT_REF") in {"codex/studio-edition", "codex/today-one-screen", "codex/play-one-screen"}
+        and _env("VERCEL_GIT_COMMIT_REF") in {"codex/studio-edition", "codex/today-one-screen", "codex/play-one-screen", "codex/competition-ui"}
         and _env("SUPABASE_URL").rstrip("/") == "https://iopyhluayfszskyqqpuc.supabase.co"
     )
 
