@@ -42,7 +42,7 @@ assert all(token in css for token in ("tile-p", "feature-tajenka", "feature-mozk
 # The released bank and its historical metadata remain unchanged. Availability
 # policy now belongs to the current runtime, not the frozen release artifact.
 for payload in (puzzles, public_puzzles):
-    assert len(payload["free"]["mozkomor"]) == 150
+    assert len(payload["free"]["mozkomor"]) == 250
     bank = payload["free"]["mozkomor"][:100]
     assert [p["id"] for p in bank] == [f"g4-z-{i:03d}" for i in range(1, 101)]
     assert [int(p["meta"]["level"]) for p in bank] == list(range(1, 101))
@@ -52,7 +52,7 @@ for payload in (puzzles, public_puzzles):
         "requiresDifficulty": None,
         "requiresCurrentBaseLevels": 0,
         "persistentOnceEarned": False,
-        "levels": 150,
+        "levels": 250,
         "xpPerFirstCompletion": 150,
     }
 
