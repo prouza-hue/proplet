@@ -8,7 +8,8 @@ from __future__ import annotations
 import os
 from typing import Literal
 from uuid import UUID
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from fastapi import Header, HTTPException, Request
 from pydantic import BaseModel, ConfigDict
@@ -76,6 +77,74 @@ def personal_state(rows: list[dict]) -> dict:
 
 
 def install(app, *, auth_player, db_rpc, enforce_rate_limit, db_select_bounded=None):
+    @app.get('/api/team-victories/competition')
+    def competition(request: Request, week: date | None = None,
+                    authorization: str | None = Header(default=None)):
+        if week is not None and week.weekday() != 0:
+            raise HTTPException(422, 'Týden musí začínat pondělím.')
+        if not production_enabled():
+            return {'enabled': False, 'reason': 'non-production'}
+        enforce_rate_limit(request, 'team_competition_read', limit=120, window_seconds=3600)
+        viewer = auth_player(authorization) if authorization else None
+        viewer_team = str((viewer or {}).get('family_code') or '').strip().upper()
+        if db_select_bounded is None:
+            raise HTTPException(503, 'Historie soutěže teď není dostupná.')
+        settings = db_select_bounded('team_victory_settings', columns='enabled,launch_date',
+                                    filters={'singleton': 'eq.true'}, max_rows=1)
+        if not settings or settings[0].get('enabled') is not True:
+            return {'enabled': False}
+        today = datetime.now(ZoneInfo('Europe/Prague')).date()
+        current = today - timedelta(days=today.weekday())
+        launch = date.fromisoformat(settings[0]['launch_date'])
+        rounds = db_select_bounded('team_victory_rounds', columns='week_start,week_end',
+            filters={'week_start': f'gte.{launch.isoformat()}', 'week_end': f'lte.{current.isoformat()}'},
+            order='week_start.desc', max_rows=2000)
+        weeks = [{'start': row['week_start'], 'end': row['week_end']} for row in rounds]
+        selected = next((row for row in weeks if row['start'] == str(week)), None)
+        if week is not None and selected is None:
+            raise HTTPException(404, 'Tento týden ještě není v historii soutěže.')
+        leagues = db_select_bounded('leagues', columns='code,name,public_name',
+            filters={'public_opt_in': 'eq.true'}, order='code.asc', max_rows=20000)
+        public = {row['code']: row for row in leagues}
+        def public_name(code):
+            league = public[code]
+            return league.get('public_name') or league.get('name') or 'Tým'
+        teams = []
+        if selected:
+            snapshots = db_select_bounded('team_victory_rounds', columns='standings',
+                filters={'week_start': f'eq.{week.isoformat()}'}, max_rows=1)
+            if not snapshots or not isinstance(snapshots[0].get('standings'), list):
+                raise HTTPException(503, 'Výsledky týdne teď nejsou dostupné.')
+            for row in snapshots[0]['standings']:
+                code = row['team_code']
+                if code not in public:
+                    continue
+                # Preserve the published result and historic name, but respect a
+                # team's current opt-out. Never expose its membership/join code.
+                name = row.get('team_name') or public_name(code)
+                if name == code:
+                    name = public_name(code)
+                teams.append({'name': name, 'xp': row['xp'], 'rank': row['rank'],
+                              'isMine': bool(viewer_team and viewer_team == code)})
+        awards = db_select_bounded('team_victory_awards', columns='id,week_start,team_code',
+            filters={'week_start': f'gte.{launch.isoformat()}'}, order='id.asc', max_rows=20000)
+        finalized = {row['start'] for row in weeks}
+        counts = {}
+        for award in awards:
+            code = award['team_code']
+            if code in public and award['week_start'] in finalized:
+                counts[code] = counts.get(code, 0) + 1
+        gold = [{'name': public_name(code), 'gold': count,
+                 'isMine': bool(viewer_team and viewer_team == code)} for code, count in counts.items()]
+        gold.sort(key=lambda row: (-row['gold'], row['name'].casefold()))
+        rank, previous = 0, None
+        for index, row in enumerate(gold, 1):
+            if row['gold'] != previous:
+                rank, previous = index, row['gold']
+            row['rank'] = rank
+        return {'enabled': True, 'weeks': weeks, 'selectedWeek': selected,
+                'teams': teams, 'goldTeams': gold}
+
     @app.get('/api/team-victories')
     def state(request: Request, authorization: str | None = Header(default=None)):
         if not production_enabled():

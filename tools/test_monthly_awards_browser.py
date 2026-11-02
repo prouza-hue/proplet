@@ -4,6 +4,7 @@ Catalog and artwork load from the selected local/preview origin. No real account
 external browser requests, game results or backend writes are permitted.
 """
 import argparse
+from datetime import datetime, timezone
 import json
 import traceback
 from pathlib import Path
@@ -42,6 +43,7 @@ def main():
 
         context.route("**/*", routing)
         page = context.new_page()
+        page.clock.install(time=datetime(2026, 12, 2, 12, tzinfo=timezone.utc))
         page.set_default_timeout(15000)
         page.on("pageerror", lambda error: report["errors"].append(str(error)))
         monthly = page.locator("#screen-monthly")
@@ -105,19 +107,27 @@ def main():
                 screenshot(f"{label}-fold-landscape-detail.png")
                 page.keyboard.press("Escape")
                 report["checks"].append({"collection": key, "detailInteraction": "three actual clicks, exact catalog copy, Escape, focus restoration, narrow landscape close reachable"})
-            # Future collection browsing must never switch or invent December competition data.
-            assert not any("month=2026-12" in url for url in report["monthlyReads"])
+            # Collection arrows only change the catalog; they never request a different competition month.
+            reads_before_arrows = list(report["monthlyReads"])
             monthly.locator("#previousMonth").click()
             assert "collection=2026-11" in page.url
             assert monthly.locator("#monthLabel").inner_text() == "Listopad 2026"
             monthly.locator("#nextMonth").click()
             assert "collection=2026-12" in page.url
             assert monthly.locator("#monthLabel").inner_text() == "Prosinec 2026"
+            assert report["monthlyReads"] == reads_before_arrows
             # The ordinary disabled view still exposes the same award entry.
             monthly.locator('[data-monthly-panel="standings"]').click()
             monthly.locator("#content[aria-busy=false]").wait_for()
             monthly.locator('[data-monthly-panel="awards"]').click()
             monthly.locator(".collection-award").first.wait_for()
+            page.clock.set_fixed_time(datetime(2026, 11, 2, 12, tzinfo=timezone.utc))
+            open_collection("2026-12")
+            assert monthly.locator("#monthLabel").inner_text() == "Listopad 2026"
+            assert monthly.locator(".month-nav").is_hidden(), "November must not offer future award browsing"
+            screenshot("november-first-season-no-arrows.png")
+            monthly.locator('[data-monthly-panel="standings"]').click()
+            assert monthly.locator(".month-nav").is_hidden(), "The first competition month has no history arrows"
             assert not report["errors"], report["errors"]
             report["status"] = "PASS"
         except Exception:

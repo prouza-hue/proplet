@@ -127,6 +127,14 @@
         "runner": "python"
       },
       {
+        "path": "tests/weekly/test_competition_history.py",
+        "runner": "python"
+      },
+      {
+        "path": "tests/current/test_weekly_competition_ui.cjs",
+        "runner": "node"
+      },
+      {
         "path": "tools/test_weekly_team_victories_frontend.cjs",
         "runner": "node"
       },

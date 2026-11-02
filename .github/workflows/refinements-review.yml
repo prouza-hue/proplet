@@ -7,6 +7,9 @@ on:
       - 'public/app.js'
       - 'public/index.html'
       - 'public/app/rankings/**'
+      - 'public/app/weekly/**'
+      - 'public/app/monthly/**'
+      - 'public/monthly-competition.css'
       - 'public/ranking-navigation.css'
       - 'public/app/game/hints.js'
       - 'public/hints-printshop.css'
@@ -28,6 +31,7 @@ on:
       - 'tools/build_refinements_review.py'
       - 'tools/qa_refinements_review.cjs'
       - 'tools/test_rankings_navigation_browser.cjs'
+      - 'tools/competition_ui_visual_qa.cjs'
       - 'tools/browser_fixture_server.cjs'
       - 'tests/fixtures/browser/**'
       - '.github/workflows/refinements-review.yml'
@@ -69,6 +73,9 @@ jobs:
       - name: Verify ranking races, scroll, focus and failures
         if: ${{ !cancelled() }}
         run: node tools/test_rankings_navigation_browser.cjs
+      - name: Verify competition views, archive navigation and awards
+        if: ${{ !cancelled() }}
+        run: node tools/competition_ui_visual_qa.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -76,4 +83,5 @@ jobs:
           path: |
             artifacts/refinements-review/
             artifacts/ranking-navigation/
+            artifacts/competition-ui/
           retention-days: 7

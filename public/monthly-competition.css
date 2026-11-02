@@ -17,3 +17,16 @@
 
 /* Keep the labelled point sources together across the available row width. */
 .rank-list li{row-gap:2px}.rank-list .rank{grid-row:1/3}.rank-list .player-meta{grid-column:2/-1;margin-top:0}.row-daily{display:flex;flex-wrap:wrap;gap:2px 10px}.row-daily>span{white-space:nowrap}.row-other{display:block}.row-days{color:var(--muted)}
+
+/* The period and its views form one toolbar; scoring detail stays optional. */
+.month-toolbar{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.month-head{margin:0;gap:14px;min-height:44px}.month-head h2{font-size:24px}.status:empty{display:none}.month-nav button{width:44px;min-height:44px}
+.monthly-panels{margin:0;border:0;gap:18px}.monthly-panels button{min-height:44px;padding:8px 0}
+.personal{padding:16px 18px;margin-bottom:20px}.personal h3{font-family:Outfit,system-ui,sans-serif;font-size:15px;color:var(--muted)}.personal-score{margin-top:4px}.personal-score strong{font-size:30px}.personal-rank{font-size:20px}.personal-rank small:empty{display:none}
+.score-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;padding:10px 0 0;margin-top:12px;border:0}.score-breakdown>div{display:block;padding:0;font-size:14px}.score-breakdown dt{color:var(--muted)}.score-breakdown dd{font-size:17px;margin-top:2px}.score-breakdown dd small{font-size:13px}
+.progress{margin-top:10px}.progress-label{font-size:14px}.track{height:4px;margin:6px 0 0}.personal>p:first-child{margin-top:0}
+.breakdown-toggle{border:0;background:transparent;color:var(--accent);padding:7px 0;min-height:44px;font-size:14px;text-decoration:underline;text-underline-offset:3px}.breakdown-toggle[aria-pressed=true]{font-weight:600}
+.rank-list li,.rank-list li:has(.award-thumb){padding:10px 8px;min-height:58px;row-gap:3px}.rank-list .rank{grid-row:1}.rank-list .tie-reason{grid-column:2/-1;font-size:14px}.rank-list .player-meta{font-size:14px}.row-daily{gap:2px 6px}.row-other{margin-top:2px}.rank-list .points small{font-size:12px}
+.details{margin-top:12px;padding-top:8px}.details summary{min-height:44px;display:flex;align-items:center}.details summary::before{content:'+';margin-right:9px;font-size:20px;font-weight:400}.details[open] summary::before{content:'−'}
+@media(max-width:600px){.month-toolbar{gap:5px 14px;margin-bottom:14px}.month-head h2{font-size:22px}.monthly-panels{gap:16px}.personal{padding:14px}.details p,.details ul,.notice,.collection-note,.award-condition,.state-copy,.personal p{font-size:15px;line-height:1.4}.score-breakdown>div,.progress-label,.breakdown-toggle,.rank-list .player-meta,.rank-list .tie-reason{font-size:15px}.score-breakdown{gap:8px 12px}.month-toolbar .monthly-panels button{font-size:15px}.collection-award small{font-size:12px}}
+@media(max-width:420px){.month-head{width:100%;justify-content:space-between}.monthly-panels{margin-bottom:-10px}.month-toolbar{padding-bottom:10px}}
