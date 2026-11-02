@@ -41,9 +41,11 @@ class Services:
             raise HTTPException(400, "synthetic actor required")
         return {"player_id": None, "anonymous_id": anonymous_id}
 
-    def select(self, table, **filters):
+    def select(self, table, *, columns="*", **filters):
         assert table == "account_rewards"
-        return [row for row in self.rows if all(row.get(key) == value for key, value in filters.items())]
+        rows = [row for row in self.rows if all(row.get(key) == value for key, value in filters.items())]
+        return [{key: value for key, value in row.items()
+                 if columns == "*" or key in columns.split(",")} for row in rows]
 
     def insert(self, table, row):
         self.writes.append((table, dict(row)))

@@ -27,7 +27,7 @@ Poslední oprava přístupnosti ukládá skutečný původní prvek při otevře
 
 ## Nativní Vercel preview
 
-Preview ponechává kanonickou verzi 4.10.9 a používá samostatný marker `proplet-v4.10.9-play-one-screen1`. Třináct aktivních cache cílů včetně obou producentů Tajenky, klidného režimu, dynamického quality loaderu a náhradního home-layout URL má sjednocené odkazy; stávající rozdělení shellu a doplňkového offline manifestu zůstává zachované. Nezměněné patrony, měsíční pravidla a herní engine nedostávají jiné revize.
+První preview ponechávalo kanonickou verzi 4.10.9 a používalo samostatný marker `proplet-v4.10.9-play-one-screen1`. Aktuální iterace po začlenění produkční optimalizace čtení používá 4.10.10 a `proplet-v4.10.10-play-one-screen3`; schválené chování a styl Hrát zůstávají uzamčené. Třináct aktivních cache cílů včetně obou producentů Tajenky, klidného režimu, dynamického quality loaderu a náhradního home-layout URL má sjednocené odkazy; stávající rozdělení shellu a doplňkového offline manifestu zůstává zachované. Nezměněné patrony, měsíční pravidla a herní engine nedostávají jiné revize.
 
 Přesná větev `codex/play-one-screen` je nově povolena ve stávajícím `LIVE_PLAYER_PREVIEW` za současného explicitního opt-in, prostředí preview a produkčního projektu. Osm izolovaných testů hranic a Google-start návratu na tentýž preview origin prošlo bez síťového spojení a persistence. Existující přihlašovací účty a běžný postup může používat uživatel; tokeny ani localStorage se mezi originy nekopírují. Google souhlas skutečného uživatele nebyl agentem prováděn.
 
