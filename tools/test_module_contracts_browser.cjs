@@ -34,7 +34,10 @@ async function hintClose(page){await page.evaluate(()=>{document.querySelector('
   const saved=await page.evaluate(()=>({profile:localStorage.getItem('proplet-v2-profile'),state:JSON.stringify(getState())}));
   await page.evaluate(()=>{applyScreen('free');renderFree();renderFree();renderFree()});
   assert.equal(await page.evaluate(()=>typeof window.PropletHomeLayout?.renderResumeCard),'function');
-  await page.locator('#freeResumeCard').waitFor();
+  const resumeTile=page.locator('#difficultyCards [data-play-free="easy"]');
+  await resumeTile.waitFor();assert.match(await resumeTile.textContent(),/Pokračovat/,'approved Play tile owns resume');
+  assert.equal(await page.evaluate(()=>freeProgress('easy').resume?.id),'g4-e-009','native resume points to the exact saved board');
+  assert.equal(await page.locator('#freeResumeCard').count(),0,'compact Play does not recreate the retired separate card');
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'viewport must not overflow');
   assert.deepEqual(await page.evaluate(()=>({profile:localStorage.getItem('proplet-v2-profile'),state:JSON.stringify(getState())})),saved);
   for(const outcome of ['invalid','cancelled','empty','correct']){
