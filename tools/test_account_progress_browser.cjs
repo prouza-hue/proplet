@@ -15,7 +15,13 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
   const waitForRequests=async target=>{for(let i=0;i<80&&requests<target;i++)await page.waitForTimeout(50);assert(requests>=target,`expected ${target} progress reads, got ${requests}`)};
   // The committed Tajenka fixture is release slot 3; keep the test on that date.
   await page.clock.setFixedTime(new Date('2026-09-15T10:00:00Z'));
-  await context.addInitScript(()=>localStorage.setItem('proplet:content-release:g5-r1','1'));
+  await context.addInitScript(()=>{
+   localStorage.setItem('proplet:content-release:g5-r1','1');
+   // This models an existing account's progress boundary, not a first guest visit.
+   // Otherwise an asynchronous automatic starter may replace currentGame after
+   // the fixture has cleared it and make an unrelated training run look allowed.
+   for(const key of ['proplet-v3-7-required-onboarding','proplet-v3-16-2-helper-onboarding','proplet-v3-32-8-rule-principle-seen'])localStorage.setItem(key,'done');
+  });
   // Model the enabled production capability; the generic static fixture has no ordering API.
   const orderRecords=new Map();
   await page.route('**/api/free-order/config',r=>r.fulfill({json:{enabled:true}}));
@@ -43,8 +49,10 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
   await page.waitForTimeout(1000);assert.equal(requests,1,'login and sync share one snapshot read');
   assert.equal(await page.locator('#quickPlayCard').getAttribute('aria-busy'),'true');
   assert.equal(await page.locator('#quickPlayGrid').evaluate(e=>getComputedStyle(e).visibility),'hidden','unknown counts are hidden');
-  await page.evaluate(()=>{startFree('hardcore');startTajenka();startGame(puzzleDB.free.hardcore[0],'free',null)});
-  assert.equal(await page.evaluate(()=>!!currentGame),false,'all entry paths reject unknown progress');
+  assert.equal(await page.evaluate(()=>currentGame?.mode||null),null,'returning-account fixture has no automatic guest training in flight');
+  await page.evaluate(async()=>{await startFree('hardcore');startTajenka();await startGame(puzzleDB.free.hardcore[0],'free',null)});
+  const guardedGame=await page.evaluate(()=>currentGame&&{mode:currentGame.mode,puzzleId:currentGame.puzzle?.id});
+  assert.equal(guardedGame,null,'all entry paths reject unknown progress: '+JSON.stringify(guardedGame));
   await page.screenshot({path:(process.env.RESULT_PATH||'account-progress.json')+'.pending.png'});
   report.checks.push('delayed preview login hides unknown counts, deduplicates reads, blocks game entry');
   release();await page.waitForFunction(()=>accountProgressAvailable());

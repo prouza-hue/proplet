@@ -35,7 +35,7 @@ function configurationHarness({responses=[],online=true,cached=null}={}){
  const elements=new Map(),events=new Map();let requests=0,sessionHooks=0,completionHooks=0,reveals=0;
  const on=(name,fn)=>events.set(name,[...(events.get(name)||[]),fn]);
  const add=element=>{if(element.id)elements.set('#'+element.id,element)};
- const element=()=>({dataset:{},classList:{add(){},remove(){}},setAttribute(){},append:add,after:add,innerHTML:''});
+ const element=()=>({dataset:{},classList:{add(){},remove(){},contains(){return false}},setAttribute(){},append:add,after:add,innerHTML:''});
  const free=element();free.id='screen-free';add(free);
  const c={console,structuredClone,Set,Map,URLSearchParams,location:{search:''},currentScreen:'daily',currentGame:null,
   navigator:{onLine:online},ROUTE_SCREENS:new Set(),DIFF:Object.fromEntries(['easy','medium','hard','hardcore'].map(key=>[key,{label:key}])),

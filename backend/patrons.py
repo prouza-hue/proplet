@@ -13,8 +13,15 @@ ACCOUNT = '5531840001/5500'
 CURRENCY = 'CZK'
 
 def feature_enabled():
-    # The public design deployment is static. Never enable against preview's DB.
-    return os.getenv('PROPLET_PATRONS_ENABLED', '').lower() in {'1','true','yes'} and os.getenv('VERCEL_ENV','').lower() != 'preview'
+    if os.getenv('PROPLET_PATRONS_ENABLED', '').lower() not in {'1','true','yes'}:
+        return False
+    if os.getenv('VERCEL_ENV','').lower() != 'preview':
+        return True
+    # Only the explicitly approved real-account Play preview inherits support.
+    # Other previews, including isolated QA, retain their existing OFF policy.
+    from backend.config import live_player_preview_enabled
+    return (os.getenv('VERCEL_GIT_COMMIT_REF','') == 'codex/play-one-screen'
+            and live_player_preview_enabled())
 
 def iban_for_account():
     bban='5500'+'000000'+'5531840001'

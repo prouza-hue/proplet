@@ -116,7 +116,7 @@
       const wrapped=async function(diff,...args){
         ensurePlayedHeader();
         const result=await base.call(this,diff,...args);
-        polishPlayedLevels(diff);
+        if(result!==false&&(!$('#playedLevelsModal')?.__playedLevelsDifficulty||$('#playedLevelsModal').__playedLevelsDifficulty===diff))polishPlayedLevels(diff);
         return result;
       };
       wrapped.__copyDensity3327=true;

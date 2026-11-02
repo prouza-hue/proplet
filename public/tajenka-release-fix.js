@@ -71,6 +71,7 @@
     const source=q('#tajenkaPreviewCard'),screen=q('#screen-free');
     if(!screen)return;
     let current=q('#tajenkaPlayCard');
+    if(screen.classList.contains('play-compact')){current?.remove();return;}
     if(!source||source.classList.contains('hidden')){current?.classList.add('hidden');return}
     const exactSignature=exactCardSignature(source);
     if(!current||current.dataset.exactCloneSignature!==exactSignature){

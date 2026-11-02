@@ -112,6 +112,7 @@
       const screen=document.getElementById(screenId),anchor=screen?.querySelector(anchorSelector);
       if(!screen||!anchor)continue;
       let card=document.getElementById(cardId);
+      if(screenId==='screen-free'&&screen.classList.contains('play-compact')){card?.remove();continue;}
       if(!resume){card?.remove();continue}
       const {difficulty,q}=resume,d=DIFF[difficulty],level=Number(q.resume?.meta?.level)||1;
       if(!card){

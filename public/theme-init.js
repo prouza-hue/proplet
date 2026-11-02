@@ -241,9 +241,9 @@
 
   const loadExtras=async()=>{
     loadScript('/challenge-cta-v3333.js?v=result-sticker1','propletChallengeCtaV3333');
-    await loadScript('/runtime-meta.js?v=41010','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=41011play-release1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
-    loadScript('/home-layout.js?v=studio-recovery1','propletHomeLayout');
+    loadScript('/home-layout.js?v=play-one-screen1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=ui-refinement1','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
@@ -252,7 +252,7 @@
     loadScript('/gesture-guard-v3325.js?v=clienterrors2','propletGestureGuard');
     await loadScript('/recognition/lexicon.js?v=bonuscs1','propletBonusLexicon',{wait:true});
     loadScript('/valid-word-feedback-v3330.js?v=tajenka-xp1','propletValidWordFeedback');
-    loadScript('/copy-density-v3327.js?v=2','propletCopyDensity');
+    loadScript('/copy-density-v3327.js?v=play-one-screen1','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=analytics2','propletCompetitiveSharing');
@@ -261,8 +261,8 @@
     await loadScript('/account-conversion-v3331.js?v=ui-refinement1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=monthly-releaseprep6','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=ui-refinement1','propletSettingsPolishV40122');
-    await loadScript('/printshop-release-polish.js?v=ui-refinement1','propletPrintshopReleasePolish',{wait:true});
-    await loadScript('/tajenka-release-fix.js?v=ui-refinement5','propletTajenkaReleaseFix',{wait:true});
+    await loadScript('/printshop-release-polish.js?v=play-one-screen1','propletPrintshopReleasePolish',{wait:true});
+    await loadScript('/tajenka-release-fix.js?v=play-one-screen1','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
     loadScript('/tajenka-card-polish.js?v=result-heading2','propletTajenkaCardPolish');
     loadScript('/tajenka-runtime-polish.js?v=idleoffline1','propletTajenkaRuntimePolish');

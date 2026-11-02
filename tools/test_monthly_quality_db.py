@@ -153,8 +153,20 @@ def run_quality_acceptance(base_connect,report):
         key,puzzle,difficulty,content_hash=binding
         attempt='quality-extra-'+str(uuid.uuid4());owner=str(uuid.uuid4())
         for sequence,action,elapsed in ((1,'open',0),(2,'finish',3000)):
-            c.execute('select proplet_play_session_v1(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
-              ('p:'+ids[8],ids[8],key,puzzle,'daily_special',attempt,owner,sequence,action,Jsonb({'elapsedMs':elapsed,'moves':12,'found':[]})))
+            finished=c.execute('select proplet_play_session_v1(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+              ('p:'+ids[8],ids[8],key,puzzle,'daily_special',attempt,owner,sequence,action,Jsonb({'elapsedMs':elapsed,'moves':12,'found':[]}))).fetchone()[0]
+        assert finished['finished'] and finished['verified'],finished
+        # The current fair-play RPC deliberately uses wall-clock session stamps.
+        # Place this owned, verified finish on the synthetic QA calendar before
+        # Extra's writer derives its authoritative completion time from it.
+        updated=c.execute('update play_sessions set last_seen=proplet_monthly_preview_clock_v1() '
+          'where actor_key=%s and player_id=%s and challenge_key=%s and puzzle_id=%s '
+          'and attempt_id=%s and owner_id=%s and finished and verified '
+          'and proplet_monthly_preview_trusted_v1() returning last_seen',
+          ('p:'+ids[8],ids[8],key,puzzle,attempt,owner))
+        assert updated.rowcount==1
+        session=updated.fetchone()
+        assert session[0].date()==date(2026,12,2),session
         payload=ResultCreate(puzzle_id=puzzle,challenge_key=key,mode='daily_special',difficulty=difficulty,daily_date='2026-12-02',
           content_hash=content_hash,elapsed_ms=3000,moves=12,attempt_id=attempt,completed_at='2026-12-02T12:00:00+01:00',clean_solve=True)
         cmd=build_command(result_identity(ids[8],payload),payload,completed_at=payload.completed_at,points=200,content_generation=6,free_level=None,legacy_reward_slot=None,team_code_at_completion=None)
@@ -163,7 +175,13 @@ def run_quality_acceptance(base_connect,report):
         receipt=c.execute('select proplet_submit_daily_special_v1(%s,%s,%s,%s,%s)',(ids[8],cmd['idempotencyKey'],cmd['requestDigest'],cmd['commandDigest'],Jsonb(cmd))).fetchone()[0]
         assert receipt['awardedPoints']==200
         assert c.execute('select proplet_submit_daily_special_v1(%s,%s,%s,%s,%s)',(ids[8],cmd['idempotencyKey'],cmd['requestDigest'],cmd['commandDigest'],Jsonb(cmd))).fetchone()[0]==receipt
-    assert mine(ids[8])['otherEarnedXp']==200 and mine(ids[8])['otherPoints']==16.7 and mine(ids[8])['dailyPoints']==0
+        source=c.execute('select pr.completed_at,r.completed_at,rc.committed_at '
+          'from puzzle_runs pr join result_commands rc on rc.id=pr.result_command_id and rc.player_id=pr.player_id '
+          'join results r on r.player_id=pr.player_id and r.challenge_key=pr.challenge_key and r.puzzle_id=pr.puzzle_id and r.mode=pr.mode '
+          'where pr.player_id=%s and pr.attempt_id=%s',(ids[8],attempt)).fetchone()
+        assert source==(session[0],session[0],session[0]),source
+    own=mine(ids[8])
+    assert own['otherEarnedXp']==200 and own['otherPoints']==16.7 and own['dailyPoints']==0,own
     report['checks'].append('v2 other XP: actual first receipts free/tajenka/official bound Extra with receipt replay; starter/account/referral/discovery/recovery/basicDaily excluded; /12 rounded aggregate; 6000 cap; old completed month excluded; transferred slots/player ownership fail closed')
     # Late original-day offline qualifies through exact close, and adding an
     # accepted timed peer changes that whole day without any daily lockout.
