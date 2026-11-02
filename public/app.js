@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.12-patron-thanks1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.13-completion-presentation1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -1131,11 +1131,11 @@ async function ensureFirstStepsRuntime(){
  try{await firstStepsRuntimeRequest}finally{firstStepsRuntimeRequest=null}
 }
 function createStarterTrace(){return {id:newAttemptId(),started:performance.now(),seen:new Set(),provenance:Object.freeze({onboardingVersion:window.PropletFirstSteps?.analyticsVersion()||'board-v2',clientRelease:APP_PREVIEW_RELEASE})}}
-function trackStarterPhase(trace,phase,reason){
+function trackStarterPhase(trace,phase,reason,presentation={}){
  if(!trace||trace.seen.has(phase))return;
  trace.seen.add(phase);
  if(['interaction','completed','failed','cancelled','left'].includes(phase))clearTimeout(trace.idleTimer);
- try{trackProductEvent('starter_v1_'+phase,{starterRunId:trace.id,starterElapsedMs:Math.round(performance.now()-trace.started),starterReason:reason,starterProvenance:trace.provenance})}catch{}
+ try{trackProductEvent('starter_v1_'+phase,{...presentation,starterRunId:trace.id,starterElapsedMs:Math.round(performance.now()-trace.started),starterReason:reason,starterProvenance:trace.provenance})}catch{}
 }
 function trackStarterInput(outcome){
  const g=currentGame;
@@ -1143,23 +1143,36 @@ function trackStarterInput(outcome){
  g.starterTrace.seen.add('input_outcome');
  try{trackProductEvent('starter_v1_input_outcome',{starterRunId:g.starterTrace.id,starterElapsedMs:Math.round(performance.now()-g.starterTrace.started),starterProvenance:g.starterTrace.provenance,starterInputOutcome:outcome})}catch{}
 }
-function starterPresentationReason(g){
- if(currentGame!==g||currentScreen!=='game')return 'navigation';
- if(document.hidden)return 'visibility';
- if(g.pausedAt!=null)return 'paused';
+function starterPresentationSnapshot(g){
+ const detail={starterViewportWidth:Math.max(0,Math.min(8192,Math.round(Number(globalThis.innerWidth)||0))),starterViewportHeight:Math.max(0,Math.min(8192,Math.round(Number(globalThis.innerHeight)||0))),starterObscurer:'none',starterObscurerTag:'NONE'};
+ const result=reason=>({reason,...detail});
+ if(currentGame!==g||currentScreen!=='game')return result('navigation');
+ if(document.hidden)return result('visibility');
+ if(g.pausedAt!=null)return result('paused');
  const board=$('#board'),rect=board?.getBoundingClientRect();
- if(!rect?.width||!rect.height||board.querySelectorAll('.cell').length!==g.puzzle.mask.length)return 'not_visible';
+ if(!rect?.width||!rect.height||board.querySelectorAll('.cell').length!==g.puzzle.mask.length)return result('not_visible');
  const top=document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2);
- return top&&board.contains(top)?'visible':'obscured';
+ if(top&&board.contains(top))return result('visible');
+ // Only known static UI IDs and finite tags. Never collect arbitrary DOM IDs,
+ // text, classes, URLs, input values or third-party identifiers.
+ const ids=['starterCoach','profileModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','winModal','hintModal','helperOfferModal'];
+ detail.starterObscurer=top?'other':'outside_viewport';
+ let node=top,depth=0;
+ while(node&&depth++<8){if(ids.includes(node.id)){detail.starterObscurer=node.id;break}node=node.parentElement}
+ const tag=String(top?.tagName||'NONE').toUpperCase();
+ detail.starterObscurerTag=['NONE','DIV','BUTTON','IFRAME','DIALOG','SVG','CANVAS','BODY','HTML','SPAN','INPUT'].includes(tag)?tag:'OTHER';
+ return result('obscured');
 }
+function starterPresentationReason(g){return starterPresentationSnapshot(g).reason}
 function observeStarterPresentation(g){
  if(!g?.starterTrace)return;
+ const record=(phase,stage)=>{const {reason,...detail}=starterPresentationSnapshot(g);trackStarterPhase(g.starterTrace,phase,reason,{...detail,starterPresentationStage:stage})};
  requestAnimationFrame(()=>requestAnimationFrame(()=>{
   if(currentGame!==g||g.finished)return;
-  trackStarterPhase(g.starterTrace,'presentation_checked',starterPresentationReason(g));
+  record('presentation_checked','initial');
  }));
  g.starterTrace.idleTimer=setTimeout(()=>{
-  if(currentGame===g&&!g.finished&&!g.starterTrace.seen.has('interaction'))trackStarterPhase(g.starterTrace,'idle',starterPresentationReason(g));
+  if(currentGame===g&&!g.finished&&!g.starterTrace.seen.has('interaction'))record('idle','idle');
  },10000);
 }
 function freshStarterVisit(){
@@ -1729,6 +1742,12 @@ function analyticsHeaders(eventType,properties){
  const starterHeaders=eventType&&starterRun?{'X-Proplet-Starter-Run':starterRun,'X-Proplet-Starter-Ms':String(properties?.starterElapsedMs??Math.max(0,Math.round(performance.now()-starterTrace.started)))}:{};
  if(['correct','invalid','empty','cancelled'].includes(properties?.starterInputOutcome))starterHeaders['X-Proplet-Starter-Input']=properties.starterInputOutcome;
  if(properties?.starterReason)starterHeaders['X-Proplet-Starter-Reason']=properties.starterReason;
+ if(starterRun&&['starter_v1_presentation_checked','starter_v1_idle'].includes(eventType)){
+  if(['initial','idle'].includes(properties?.starterPresentationStage))starterHeaders['X-Proplet-Starter-Stage']=properties.starterPresentationStage;
+  if(['none','other','outside_viewport','starterCoach','profileModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','winModal','hintModal','helperOfferModal'].includes(properties?.starterObscurer))starterHeaders['X-Proplet-Starter-Obscurer']=properties.starterObscurer;
+  if(['NONE','DIV','BUTTON','IFRAME','DIALOG','SVG','CANVAS','BODY','HTML','SPAN','INPUT','OTHER'].includes(properties?.starterObscurerTag))starterHeaders['X-Proplet-Starter-Obscurer-Tag']=properties.starterObscurerTag;
+  for(const [property,header]of[['starterViewportWidth','X-Proplet-Starter-Viewport-Width'],['starterViewportHeight','X-Proplet-Starter-Viewport-Height']])if(Number.isInteger(properties?.[property])&&properties[property]>0&&properties[property]<=8192)starterHeaders[header]=String(properties[property]);
+ }
  const gameHeaders=puzzleId?{'X-Proplet-Puzzle':puzzleId,'X-Proplet-Run':properties?.attemptId||g?.attemptId||'','X-Proplet-Hints':String(g?.hints||0),'X-Proplet-Elapsed-Ms':String(Math.round(g?.elapsedMs||0))}:{};
  const experimentKey=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentKey||'')?properties.experimentKey:null,experimentVariant=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentVariant||'')?properties.experimentVariant:null,experimentBucket=Number.isInteger(properties?.experimentBucket)&&properties.experimentBucket>=0&&properties.experimentBucket<100?properties.experimentBucket:null;
  const experimentHeaders=experimentKey&&experimentVariant&&experimentBucket!==null?{'X-Proplet-Experiment':experimentKey,'X-Proplet-Experiment-Variant':experimentVariant,'X-Proplet-Experiment-Bucket':String(experimentBucket)}:{};
