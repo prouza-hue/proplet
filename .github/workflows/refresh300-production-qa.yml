@@ -6,6 +6,8 @@ on:
       - 'public/**'
       - 'data/puzzles.json'
       - 'tools/verify_refresh300_production.cjs'
+      - 'tools/verify_free_expansion_browser.cjs'
+      - 'tools/verify_free_expansion_news_browser.cjs'
       - '.github/workflows/refresh300-production-qa.yml'
 permissions:
   contents: read
@@ -30,6 +32,7 @@ jobs:
           for i in {1..30}; do curl -sf http://127.0.0.1:8000/api/config && break; sleep 1; done
           node tools/verify_refresh300_production.cjs
           node tools/verify_free_expansion_browser.cjs
+          PROPLET_QA_OUTPUT=qa-free-expansion-news node tools/verify_free_expansion_news_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -37,4 +40,5 @@ jobs:
           path: |
             qa-refresh300/
             qa-free-expansion/
+            qa-free-expansion-news/
             /tmp/proplet-qa.log

@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 
 from fastapi import Header, HTTPException, Query, Request
 from pydantic import BaseModel, Field
+import free_expansion_push as expansion_push
 
 try:
     from pywebpush import webpush
@@ -37,6 +38,8 @@ def install_push_diagnostics(
     current_prague_date=None,
     released_batches=None,
     logger=None,
+    clock=None,
+    free_expansion_content=None,
     **_kwargs,
 ):
     """v3.32.9: observable Daily push delivery + per-device self test.
@@ -55,7 +58,7 @@ def install_push_diagnostics(
     canonical_origin = str(_kwargs.get("canonical_origin") or "https://hrajproplet.cz").rstrip("/")
 
     def now():
-        return datetime.now(tz)
+        return clock() if callable(clock) else datetime.now(tz)
 
     def diagnostic_rows(table, *, columns="*", max_rows=5000):
         if callable(db_select_bounded):
@@ -83,6 +86,10 @@ def install_push_diagnostics(
         if existing:
             row = existing[0]
             status = str(row.get("status") or "pending")
+            # Both 3 November variants share one atomic per-device identity.
+            # A pending/failed attempt may already have reached the provider.
+            if event_key == expansion_push.DELIVERY_KEY:
+                return row["id"], "duplicate"
             if status == "sent":
                 return row["id"], "duplicate"
             if status == "removed":
@@ -90,7 +97,7 @@ def install_push_diagnostics(
             db_update("push_delivery_log", {"id": row["id"]}, {"status": "pending", "sent_at": None})
             return row["id"], "retry"
         delivery_id = str(uuid.uuid4())
-        db_insert("push_delivery_log", {
+        row = {
             "id": delivery_id,
             "subscription_id": sub["id"],
             "player_id": sub["player_id"],
@@ -99,7 +106,13 @@ def install_push_diagnostics(
             "category": category,
             "status": "pending",
             "created_at": now().isoformat(),
-        })
+        }
+        try:
+            db_insert("push_delivery_log", row)
+        except HTTPException as error:
+            if event_key == expansion_push.DELIVERY_KEY and error.status_code == 409:
+                return delivery_id, "duplicate"
+            raise
         return delivery_id, "new"
 
     def mark_delivery(delivery_id: str, status: str):
@@ -119,6 +132,9 @@ def install_push_diagnostics(
             pass
 
     def send_one(sub: dict, payload: dict, *, event_key: str, category: str, ttl: int):
+        is_expansion = payload.get("campaignId") == expansion_push.CAMPAIGN_ID
+        if is_expansion and not expansion_push.in_window(now()):
+            return "skippedWindow"
         # Do not let a delayed/retried Daily cron double-notify release recipients.
         if event_key == "daily:2026-10-04" and db_select(
             "push_delivery_log", subscription_id=sub["id"],
@@ -140,6 +156,12 @@ def install_push_diagnostics(
             "keys": {"p256dh": sub.get("p256dh"), "auth": sub.get("auth")},
         }
         delivery_payload = {**payload, "deliveryId": delivery_id}
+        if is_expansion:
+            current = now()
+            if not expansion_push.in_window(current):
+                mark_delivery(delivery_id, "expired")
+                return "skippedWindow"
+            ttl = min(ttl, max(1, int((expansion_push.END - current).total_seconds())))
         try:
             webpush(
                 subscription_info=info,
@@ -220,6 +242,12 @@ def install_push_diagnostics(
 
         today = today_iso()
         today_date = date.fromisoformat(today)
+        expansion_window = (vercel_env == "production" and today == expansion_push.DAY
+                            and expansion_push.in_window(now()))
+        if expansion_window:
+            content = free_expansion_content() if callable(free_expansion_content) else expansion_push.load_content()
+            if not expansion_push.validate_content(content):
+                raise HTTPException(503, "Schválených 600 nových úrovní není dostupných")
         tajenka_week = None
         if tajenka_release_enabled and today_date >= tajenka_first_saturday:
             release_day = today_date.weekday() == 5 if today_date < tajenka_twice_weekly_start else today_date.weekday() in {2, 5}
@@ -288,21 +316,32 @@ def install_push_diagnostics(
             }
             event_key = f"daily:{today}"
             category = "daily"
+        if today == expansion_push.DAY:
+            event_key = expansion_push.DELIVERY_KEY
         opted_in = already_completed = eligible = retention_targeted = 0
         counts = {"sent": 0, "failed": 0, "removed": 0, "duplicate": 0}
         for sub in subscriptions:
-            content_message = bool(batch or tajenka_id)
+            if expansion_window:
+                fresh = db_select("push_subscriptions", id=sub["id"])
+                if not fresh:
+                    continue
+                sub = fresh[0]
+            expansion_variant = (expansion_window and sub.get("content_enabled") is True
+                                 and expansion_push.in_window(now()))
+            content_message = bool(batch or tajenka_id or expansion_variant)
             enabled = bool(sub.get("daily_enabled", True) or (content_message and sub.get("content_enabled", False)))
             if not enabled:
                 continue
             opted_in += 1
             actor_key = f"p:{sub['player_id']}" if sub.get("player_id") else f"a:{sub.get('anonymous_id')}"
-            if not batch and actor_key in completed:
+            if not expansion_variant and not batch and actor_key in completed:
                 already_completed += 1
                 continue
             eligible += 1
             target_payload, target_category = payload, category
-            if not batch and not tajenka_id and str(sub.get("player_id") or "") in return_players:
+            if expansion_variant:
+                target_payload, target_category = expansion_push.payload(canonical_origin), "content"
+            elif not batch and not tajenka_id and str(sub.get("player_id") or "") in return_players:
                 target_payload = {
                     "title": "🧩 Proplet na tebe čeká",
                     "body": "Dnešní výzva i nové desky jsou připravené. Navážeš tam, kde jsi skončil?",
