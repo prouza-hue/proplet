@@ -1,0 +1,106 @@
+{
+  "sources": [
+    {
+      "path": "content/gen6/daily-specials-36/bank.json",
+      "sha256": "d02f697a110a64250c76fdd985a09c30c16dd597b0aca16227ad3aa74a2827c6",
+      "boards": 36
+    },
+    {
+      "path": "content/gen6/free-refresh-300/bank.json",
+      "sha256": "55cae68a3cbf12d2b9813ba62d22c70dedd15471869a6aa2646910922a55147f",
+      "boards": 300
+    },
+    {
+      "path": "content/gen6/mozkokalypsa-100/bank.json",
+      "sha256": "a7d359aed84a4eff1e142ffdc14460e092e922be4389aeed2b1275866adeee3f",
+      "boards": 100
+    },
+    {
+      "path": "data/daily_gen6_private.json",
+      "sha256": "532739f54f641d32d2b98d342e11ad5008dab9f128905a389b448c4e8aa55e3b",
+      "boards": 99
+    },
+    {
+      "path": "data/daily_specials_private.json",
+      "sha256": "238054bea2f2428322797ac1418244a4701b49e372d5df1c2a80e6d80648f1c9",
+      "boards": 36
+    },
+    {
+      "path": "data/gen5_preview_puzzles.json",
+      "sha256": "47f76f0d59309f0e3eb08a4db064f05c9f5406bd62bb1c0c7f96c8768909f483",
+      "boards": 1811
+    },
+    {
+      "path": "data/legacy_daily_gen1.json",
+      "sha256": "7a9a665b0e7f73156a22e1191fc359a724897537fa31c564d7455bf1aa209061",
+      "boards": 365
+    },
+    {
+      "path": "data/legacy_daily_gen2.json",
+      "sha256": "d9a4ddf81c141c6818ebaad83c4884667d8f2461809e7b79063670f43fb24aca",
+      "boards": 365
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v1.json",
+      "sha256": "f8367b8e9d9a2a656328c24e3cddb50e37f1f2761d28a6d359fcddf6650ce1fd",
+      "boards": 10
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v2.json",
+      "sha256": "20fc9627e5b4f244118155977e2a06913c5372630dcbea69c9cadb4835a52107",
+      "boards": 12
+    },
+    {
+      "path": "data/playtests/mozkokalypsa-v3.json",
+      "sha256": "798e9d34cb5c9a1b2ab92fc94b92291ded15e585c2ff583eb4c30cb705d5e84d",
+      "boards": 8
+    },
+    {
+      "path": "data/puzzles.json",
+      "sha256": "43b3949bc1c3b79d1b8bd59b8eaeed0db04eecbf654506148f2c1fa0838b9486",
+      "boards": 2146
+    },
+    {
+      "path": "data/puzzles_gen4_candidate_v334.json",
+      "sha256": "13d0eb0be5d7095f03fc95db0085497b04f03d4157b1b2a207e6da44a63603a5",
+      "boards": 1196
+    },
+    {
+      "path": "data/rolling_content_gen4_candidate_v334.json",
+      "sha256": "a68fb93e7c0170af2a10c21ff57ae22d9612d659c6ee1517c9774076e961d536",
+      "boards": 65
+    },
+    {
+      "path": "data/rolling_content_v1.json",
+      "sha256": "22666ea97cab0d40a7507a87c4f38863d43dd04d49a825422d15db19110c6449",
+      "boards": 65
+    },
+    {
+      "path": "data/tajenka_v2_approved.json",
+      "sha256": "50bc4126de1ad814a6df282b41ce34f564915c3e743ab0a454605a67dde9373d",
+      "boards": 37
+    },
+    {
+      "path": "data/tajenka_v2_board_candidates.json",
+      "sha256": "308190b111dd60c3436e98bbe863625380db306617ba7a498967a76522ef9da6",
+      "boards": 41
+    },
+    {
+      "path": "data/tajenka_weekend_v1.json",
+      "sha256": "3af056f00b9791713573d9ecb73e330edb62632bb8dfca5df393473defa0240d",
+      "boards": 10
+    },
+    {
+      "path": "data/tajenka_weekend_v2.json",
+      "sha256": "60818493d38ba58a7219abc9ead617f84b23a99bb70a06a97365d358deb65b79",
+      "boards": 37
+    },
+    {
+      "path": "public/puzzles.json",
+      "sha256": "4e508fd18131910c3ceb3480c32bbb11fe65a9f9c544f86b59867dae00de9894",
+      "boards": 1827
+    }
+  ],
+  "boards": 3167,
+  "personalExposure": "unknown-not-inferred"
+}

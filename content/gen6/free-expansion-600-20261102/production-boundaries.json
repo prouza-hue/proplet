@@ -1,0 +1,134 @@
+{
+  "sourceMain": "162a865c724b6c5a5402ccf83d338704d81c2401",
+  "batchId": "free-expansion-600-20261102",
+  "manufacturedContentHash": "dc3d73b05dc9ebc59d24b2c22ebed5a8954d1fcd3c29f5a5a38de31d3dcde855",
+  "free": {
+    "easy": "23f8f03f3b86a21e8d7c83549a59ed2f195abcc1889211c284ba59f729b54d1c",
+    "medium": "ee6b52d115325ab9877a2ed4b95335d7c12327f437797930ee18a7d3ce4a61e1",
+    "hard": "6ffb08bdd9f98bf5b2f16358f839c3eebf0c788396152c7eaf86049df9c42c0b",
+    "hardcore": "29ea1051a0006c9e87930110ab90e65a5d24632d25c7fbd3c6f741d9d973b1eb",
+    "mozkomor": "8faefbe111af3120760bfee88691bd6f1f8c3fd5d17ec21870808cbcf246529c",
+    "mozkokalypsa": "b26ff462c0d2120d0eab49f82d9578adc44009898c244a224be364ebe1b31d12"
+  },
+  "counts": {
+    "easy": 400,
+    "medium": 400,
+    "hard": 400,
+    "hardcore": 300,
+    "mozkomor": 150,
+    "mozkokalypsa": 100
+  },
+  "maxLevels": {
+    "easy": 417,
+    "medium": 416,
+    "hard": 416,
+    "hardcore": 316,
+    "mozkomor": 150,
+    "mozkokalypsa": 100
+  },
+  "preserved": {
+    "version": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+    "generatedAt": "370757f9e9997e24b2e5b4eb11adc43126cd1af95226c8731a506db4641cdbbb",
+    "dictionarySize": "d68bf29fb4c1a9469c2f80fbca43bcfb70a4b835ee530c0a4da1e869cc987d4d",
+    "dailyRotationSize": "4e47eb5525df25f94da777993dafa41d9ab2bfa80a89e28f76d42cd46ab082e7",
+    "freeGeneration": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+    "freeLevelsPerDifficulty": "983bd614bb5afece5ab3b6023f71147cd7b6bc2314f9d27af7422541c6558389",
+    "dailyGeneration": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+    "lexiconVersion": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+    "vocabularyVersion": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+    "vocabularyTierCounts": "b06c6a34bf01956efda76426ec590168aa7670814d17f811f622728850b1724e",
+    "tieredDailyFrom": "db12b9e5eb0e277ca499221304be7059df7b4d6d7a33cca131e1c6587e5b13d6",
+    "dailyGeneration2From": "db12b9e5eb0e277ca499221304be7059df7b4d6d7a33cca131e1c6587e5b13d6",
+    "dailyTieredFromVersion": "1f0d0fed66f2b73129a7fec78662615db2147b6c4c2eacb9b4b4bb52b3c0ebeb",
+    "dailyMigration": "21dccfacc94c186d4e055d5a6b9f8fa2f3fbb79192be6d8a8d48ed3915553d9d",
+    "freeTieredFromVersion": "0e563a4930857bd404e607355f7e4a47f8054ba60d083abe7b9ef6d3e1a1a17b",
+    "freeExtendedFromVersion": "327e5a9098bf5e17266cb4009f1b1421b769aa2f99101f0edc9c4d919eb51c44",
+    "freeMigration": "3a1d15d052cb29a1daf7f574bfb63929fe637ae5d51bd93aeb3c507afaf36058",
+    "dailyGeneration3From": "9d7b2faba38cb560ae6c4f63acf8f541cc24d83b688dd62f5e860f3fb0050a72",
+    "dailyRotationBaseDate": "2024c306bda50424575081bfa7d40d0ba40c56f8004a81fe87b173432ddaa415",
+    "dailyCadence": "9b3b6d9c1299cf90b5be48cdab282f74167a22ec79d4e873c3a2f51d6a087330",
+    "freeProgression": "17a9e5efffcfb310f9bee1a64f31be181d9f88a531e9748c7875db9572e2757c",
+    "daily": "cd4a1f6a1ff6372be85499dedc0c2abf0bc9765870dbde0688629fab48b2a111",
+    "rescue": "282cbeaed79f68af922f8dde76a8712249c0a417799fb96d5c73efa7dc27e00a",
+    "starter": "adf309690a8d21939727abdde7a519fa13d2d93b57eae3a32ccdc4e46b9ab1c1",
+    "legacyFreeIndex": "0d412683c160da78730ad1b8039dec1bd9870679d047a2119cc349d201fcb6a5",
+    "contentGeneration": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+    "generationKey": "1d7f834805757e8a8d58cc5cb10288b56100da5f9e58871f6aae08eeb42e712c",
+    "targetCooldownPolicy": "a68891b5e434b5b77752e4b574a521036c710c319b88eda78789f91e0f8182f6",
+    "archive": "4c31473a0001efcc7cb8df55cfb97304a43bc91fe9c17f79483d091721aa0177",
+    "release": "c011e61573a8a219ea54d128ba506f1ad0203ea175ca08dac2da1f7bd59b7e1d",
+    "dailyGeneration4From": "2024c306bda50424575081bfa7d40d0ba40c56f8004a81fe87b173432ddaa415",
+    "mozkokalypsaRelease": "6e1e8b46464b21e33fc3853d0913bbc658ac586ac4d79fa84c77410a71611fd9",
+    "freeRefreshRelease": "c74b9712b11b4dad7e14813e672c11298831ae14fe51998e7f978515995fc4f7"
+  },
+  "publicPreserved": {
+    "version": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+    "generatedAt": "370757f9e9997e24b2e5b4eb11adc43126cd1af95226c8731a506db4641cdbbb",
+    "dictionarySize": "d68bf29fb4c1a9469c2f80fbca43bcfb70a4b835ee530c0a4da1e869cc987d4d",
+    "dailyRotationSize": "4e47eb5525df25f94da777993dafa41d9ab2bfa80a89e28f76d42cd46ab082e7",
+    "freeGeneration": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+    "freeLevelsPerDifficulty": "983bd614bb5afece5ab3b6023f71147cd7b6bc2314f9d27af7422541c6558389",
+    "dailyGeneration": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+    "lexiconVersion": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+    "vocabularyVersion": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+    "vocabularyTierCounts": "b06c6a34bf01956efda76426ec590168aa7670814d17f811f622728850b1724e",
+    "tieredDailyFrom": "db12b9e5eb0e277ca499221304be7059df7b4d6d7a33cca131e1c6587e5b13d6",
+    "dailyGeneration2From": "db12b9e5eb0e277ca499221304be7059df7b4d6d7a33cca131e1c6587e5b13d6",
+    "dailyTieredFromVersion": "1f0d0fed66f2b73129a7fec78662615db2147b6c4c2eacb9b4b4bb52b3c0ebeb",
+    "dailyMigration": "21dccfacc94c186d4e055d5a6b9f8fa2f3fbb79192be6d8a8d48ed3915553d9d",
+    "freeTieredFromVersion": "0e563a4930857bd404e607355f7e4a47f8054ba60d083abe7b9ef6d3e1a1a17b",
+    "freeExtendedFromVersion": "327e5a9098bf5e17266cb4009f1b1421b769aa2f99101f0edc9c4d919eb51c44",
+    "freeMigration": "3a1d15d052cb29a1daf7f574bfb63929fe637ae5d51bd93aeb3c507afaf36058",
+    "dailyGeneration3From": "9d7b2faba38cb560ae6c4f63acf8f541cc24d83b688dd62f5e860f3fb0050a72",
+    "dailyRotationBaseDate": "2024c306bda50424575081bfa7d40d0ba40c56f8004a81fe87b173432ddaa415",
+    "dailyCadence": "9b3b6d9c1299cf90b5be48cdab282f74167a22ec79d4e873c3a2f51d6a087330",
+    "freeProgression": "17a9e5efffcfb310f9bee1a64f31be181d9f88a531e9748c7875db9572e2757c",
+    "daily": "cf3e42d10fcde62a5dcb89bd63177d7ede0f620d6a3322d51b5092831ec1a261",
+    "rescue": "282cbeaed79f68af922f8dde76a8712249c0a417799fb96d5c73efa7dc27e00a",
+    "starter": "adf309690a8d21939727abdde7a519fa13d2d93b57eae3a32ccdc4e46b9ab1c1",
+    "legacyFreeIndex": "0d412683c160da78730ad1b8039dec1bd9870679d047a2119cc349d201fcb6a5",
+    "contentGeneration": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+    "generationKey": "1d7f834805757e8a8d58cc5cb10288b56100da5f9e58871f6aae08eeb42e712c",
+    "targetCooldownPolicy": "a68891b5e434b5b77752e4b574a521036c710c319b88eda78789f91e0f8182f6",
+    "archive": "4c31473a0001efcc7cb8df55cfb97304a43bc91fe9c17f79483d091721aa0177",
+    "release": "c011e61573a8a219ea54d128ba506f1ad0203ea175ca08dac2da1f7bd59b7e1d",
+    "dailyGeneration4From": "2024c306bda50424575081bfa7d40d0ba40c56f8004a81fe87b173432ddaa415",
+    "mozkokalypsaRelease": "6e1e8b46464b21e33fc3853d0913bbc658ac586ac4d79fa84c77410a71611fd9",
+    "freeRefreshRelease": "c74b9712b11b4dad7e14813e672c11298831ae14fe51998e7f978515995fc4f7",
+    "datedDaily": "162ae00308398a0ac7230298cc48b718f78e1181cfb0a1cbd727b20f51d9c8f4"
+  },
+  "mozkomorUnlock": {
+    "requiresDifficulty": null,
+    "requiresCurrentBaseLevels": 0,
+    "persistentOnceEarned": false,
+    "levels": 150,
+    "xpPerFirstCompletion": 150
+  },
+  "routePrefixes": {
+    "easy": {
+      "count": 400,
+      "hash": "a1c8b4942c627d33a5211b47c8ad9b9dcb1a470507b111e745a614952a2798bf"
+    },
+    "medium": {
+      "count": 400,
+      "hash": "494651fc1399e67ad5e2e4053e61746814494057cefa0b2560b687cf906f32e3"
+    },
+    "hard": {
+      "count": 400,
+      "hash": "aee07d96246b8b31356d4ca31a625b070f2119d86d3eafe093f778d10e407ea2"
+    },
+    "hardcore": {
+      "count": 300,
+      "hash": "53f918a50536ee4bc5a91530f7af18cf3024e31ce7a9dbf357c730baf93aa275"
+    },
+    "mozkomor": {
+      "count": 150,
+      "hash": "1d766c3e3fb51ff0ceffedd56962618c971a8a9d6f56951e560293b29ce3412c"
+    },
+    "mozkokalypsa": {
+      "count": 100,
+      "hash": "82e70361c90fda3d96f758362427cd40f699e0b537ae20d5dd649123e85adc16"
+    }
+  },
+  "rollingSha256": "6e956ee5dfe26ee90e23e9c76ff86ec89b7361895c87f2dd9177ea5ea41a1a4c"
+}

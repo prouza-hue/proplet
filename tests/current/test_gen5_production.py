@@ -26,7 +26,7 @@ assert data['freeGeneration']==data['contentGeneration']==4
 assert data['release']['productionApproved'] and not data['release']['previewOnly']
 assert data['release']['totalNewLevels']==450
 assert data['mozkomorUnlock']['requiresCurrentBaseLevels']==0
-assert data['mozkomorUnlock']['levels']==150
+assert data['mozkomorUnlock']['levels']==len(data['free']['mozkomor'])==250
 new_hardcore=[{'mode':'free','difficulty':'hardcore','puzzle_id':p['id']} for p in data['free']['hardcore'] if p['id'].startswith('g5-r1-')]
 assert server.free_slot_summary(new_hardcore)['current']['hardcore']==100
 assert server.free_slot_summary(new_hardcore)['baseCurrent']['hardcore']==0
@@ -35,7 +35,7 @@ assert server.mozkomor_unlocked_from_rows([])
 old_hardcore=[{'mode':'free','difficulty':'hardcore','puzzle_id':p['id']} for p in data['free']['hardcore'][:200]]
 assert server.mozkomor_unlocked_from_rows(old_hardcore)
 for d in DIFFICULTIES:
-    old=[p for p in data['free'][d] if not p['id'].startswith(('g5-r1-', 'g6-refresh-'))]
+    old=[p for p in data['free'][d] if not p['id'].startswith(('g5-r1-', 'g6-refresh-', 'g6-expansion-'))]
     additions=[p for p in data['free'][d] if p['id'].startswith('g5-r1-')]
     assert digest(old)==package['manifest']['boundaries'][d]['baseHash'],d
     assert digest(old+rolling['puzzles'].get(d,[]))==package['manifest']['boundaries'][d]['historyHash'],d

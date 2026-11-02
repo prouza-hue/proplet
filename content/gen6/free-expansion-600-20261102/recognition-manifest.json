@@ -1,0 +1,9 @@
+{
+  "dictionaryHash": "ff87c0582750923a3b9f11d8a42a0f4e9f21e2c6bce5ab5386845f869d480a78",
+  "dictionarySize": 103837,
+  "sourceMain": "162a865c724b6c5a5402ccf83d338704d81c2401",
+  "overlayPolicy": "Current explicit runtime overlay + current static recognition + all approved v3 entries",
+  "sha256": "a65b218b4dd4e4b7904ee61cc39fc8de05a96ae40a091f006e64614539c7f0fd",
+  "manufacturePlaintextSha256": "ac403e6186cb11f9957c0f4eff6d20e10808a14ff207cd1b9e38497739a1c269",
+  "serialization": "UTF-8 LF"
+}

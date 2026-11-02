@@ -506,6 +506,15 @@ with (
     for fixture in (config_fixture, health_fixture):
         if isinstance(fixture, dict) and "version" in fixture:
             fixture["version"] = "4.01.40"
+    # The additive Gen6 expansion changes only finite bank totals. Normalize
+    # its explicitly verified delta before checking the captured API contract.
+    for difficulty, expected in zip(server.FREE_DIFFICULTIES, (500, 500, 500, 400, 250, 200)):
+        assert health_fixture['freeBaseLevelCounts'][difficulty] == expected
+        health_fixture['freeBaseLevelCounts'][difficulty] -= 100
+        if difficulty in health_fixture['rollingContentAvailableCounts']:
+            health_fixture['rollingContentAvailableCounts'][difficulty] -= 100
+    assert health_fixture['mozkomorUnlock']['levels'] == 250
+    health_fixture['mozkomorUnlock']['levels'] = 150
     # The new edition adds its own counts/XP and intentionally removes gating.
     assert config_fixture['points'].pop('mozkokalypsa') == 200
     assert health_fixture['freeXp'].pop('mozkokalypsa') == 200

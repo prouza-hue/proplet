@@ -2,7 +2,7 @@
   "$schema": "./generation-manifest.schema.json",
   "schemaVersion": 1,
   "manifestId": "proplet-runtime-content",
-  "manifestVersion": 5,
+  "manifestVersion": 6,
   "validatorVersion": "proplet-content-s14-v1",
   "provenance": {
     "baselineCommit": "b8de402ad676b823f72a905289945eff6f6b3e6c",
@@ -22,7 +22,13 @@
     "dailyGen6ManufacturedContentHash": "3abe6feda3e25262ed07aa25aa02687338a41ab6382e018760a13961f2ada104",
     "dailyGen6Cutover": "2026-10-08",
     "dailyRecognition": "103836 frozen acceptable manufacturing forms plus all 507 prior short forms; no prior recognition removed.",
-    "dailyG4EditorialCorrection": "2026-10-19: g4-d-042 MAMÁ → MÁMA; same paths and ID, one solution under 103837-word dictionary."
+    "dailyG4EditorialCorrection": "2026-10-19: g4-d-042 MAMÁ → MÁMA; same paths and ID, one solution under 103837-word dictionary.",
+    "freeExpansionGen6": {
+      "batchId": "free-expansion-600-20261102",
+      "sourceMain": "162a865c724b6c5a5402ccf83d338704d81c2401",
+      "manufacturedContentHash": "dc3d73b05dc9ebc59d24b2c22ebed5a8954d1fcd3c29f5a5a38de31d3dcde855",
+      "runtimeGeneration": 4
+    }
   },
   "generation": {
     "contentGeneration": 4,
@@ -31,15 +37,15 @@
     "generationKey": "gen4-v334-release-candidate",
     "dailyGeneration4From": "2026-08-24",
     "rollingFirstRelease": "2026-08-31",
-    "mozkomorLevels": 150
+    "mozkomorLevels": 250
   },
   "canonicalBuild": {
     "source": {
       "path": "data/puzzles.json",
       "role": "canonical-server-puzzle-source",
-      "sha256": "aa787d7acc45d868b79d416647f72b12487790b68f8185f7af77bca7efd6f232",
-      "sizeBytes": 4679666,
-      "gitBlob": "9f671055a9493ce88ff4b34be0c14e93d3b19f9a"
+      "sha256": "87f43f7e06202411c9172055b69620f54f9388393b4a9913ad956dd947699a9b",
+      "sizeBytes": 5496622,
+      "gitBlob": "60f95b80af3242020b2256858a42a174696c4dc0"
     },
     "compatibilitySource": {
       "path": "data/archive/v3.33.5/puzzles.json.gz",
@@ -71,9 +77,9 @@
     "output": {
       "path": "public/puzzles.json",
       "role": "public-puzzle-runtime",
-      "sha256": "004b623b5f4d506fa10088a46560f625673fa4d97f2ad00c18b32161fe8433d2",
-      "sizeBytes": 4095540,
-      "gitBlob": "adcdd4d63ffe32bb5d3a8f294d258c53c9fb95ff"
+      "sha256": "4515cea2fe24e6f2b447b91e58f754ee81eedcc1c3035db6dc722332a394dc40",
+      "sizeBytes": 4912496,
+      "gitBlob": "1f496a274cd880470bf186cf4f04c79438d920de"
     },
     "dailyProjection": {
       "cutover": "2026-10-08",

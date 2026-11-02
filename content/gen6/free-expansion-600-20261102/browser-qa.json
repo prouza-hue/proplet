@@ -1,0 +1,549 @@
+{
+  "date": "2026-11-02",
+  "scope": "Loopback synthetic guest; phone/Fold viewports, not physical devices",
+  "playwrightLocal": "1.55.0-beta-1756314050000",
+  "checks": {
+    "expansion": {
+      "checks": [
+        "all 600 fresh IDs available in the native full bank",
+        "veteran continues at g6-expansion-easy-001",
+        "g6-expansion-easy-001 uses normal free-game identity",
+        "g6-expansion-easy-001 records a new completion and expected XP",
+        "easy advances to the second appended board",
+        "g6-expansion-easy-001 replay gives no duplicate base XP",
+        "g6-expansion-easy-100 retains its saved board and found word across reload",
+        "veteran continues at g6-expansion-medium-001",
+        "g6-expansion-medium-001 uses normal free-game identity",
+        "g6-expansion-medium-001 records a new completion and expected XP",
+        "medium advances to the second appended board",
+        "g6-expansion-medium-001 replay gives no duplicate base XP",
+        "g6-expansion-medium-100 retains its saved board and found word across reload",
+        "veteran continues at g6-expansion-hard-001",
+        "g6-expansion-hard-001 uses normal free-game identity",
+        "g6-expansion-hard-001 records a new completion and expected XP",
+        "hard advances to the second appended board",
+        "g6-expansion-hard-001 replay gives no duplicate base XP",
+        "g6-expansion-hard-100 retains its saved board and found word across reload",
+        "veteran continues at g6-expansion-hardcore-001",
+        "g6-expansion-hardcore-001 uses normal free-game identity",
+        "g6-expansion-hardcore-001 records a new completion and expected XP",
+        "hardcore advances to the second appended board",
+        "g6-expansion-hardcore-001 replay gives no duplicate base XP",
+        "g6-expansion-hardcore-100 retains its saved board and found word across reload",
+        "veteran continues at g6-expansion-mozkomor-001",
+        "g6-expansion-mozkomor-001 uses normal free-game identity",
+        "g6-expansion-mozkomor-001 records a new completion and expected XP",
+        "mozkomor advances to the second appended board",
+        "g6-expansion-mozkomor-001 replay gives no duplicate base XP",
+        "g6-expansion-mozkomor-100 retains its saved board and found word across reload",
+        "veteran continues at g6-expansion-mozkokalypsa-001",
+        "g6-expansion-mozkokalypsa-001 uses normal free-game identity",
+        "Fold viewport has no horizontal page overflow",
+        "g6-expansion-mozkokalypsa-001 records a new completion and expected XP",
+        "mozkokalypsa advances to the second appended board",
+        "g6-expansion-mozkokalypsa-001 replay gives no duplicate base XP",
+        "g6-expansion-mozkokalypsa-100 retains its saved board and found word across reload",
+        "all old completion IDs survived the expansion and reloads",
+        "no browser runtime errors"
+      ],
+      "errors": []
+    },
+    "preferences": {
+      "checks": [
+        {
+          "name": "500 levels and preserved varied next board",
+          "pass": true
+        },
+        {
+          "name": "four opt-outs, endgames excluded",
+          "pass": true
+        },
+        {
+          "name": "explicit numeric preference takes effect",
+          "pass": true
+        },
+        {
+          "name": "native game starts approved new board",
+          "pass": true
+        },
+        {
+          "name": "one Continue tile owns the saved difficulty",
+          "pass": true
+        },
+        {
+          "name": "Today retains the same difficulty resume",
+          "pass": true
+        },
+        {
+          "name": "Play tile resume: same board and attempt",
+          "pass": true
+        },
+        {
+          "name": "Play tile resume: same found paths, moves and hints",
+          "pass": true
+        },
+        {
+          "name": "Play tile resume: saved time retained",
+          "pass": true
+        },
+        {
+          "name": "reload retains the preference and the original unfinished board",
+          "pass": true
+        },
+        {
+          "name": "Reload and changed-order resume: same board and attempt",
+          "pass": true
+        },
+        {
+          "name": "Reload and changed-order resume: same found paths, moves and hints",
+          "pass": true
+        },
+        {
+          "name": "Reload and changed-order resume: saved time retained",
+          "pass": true
+        },
+        {
+          "name": "Today exposes its native resume through the visible tile",
+          "pass": true
+        },
+        {
+          "name": "Today resume: same board and attempt",
+          "pass": true
+        },
+        {
+          "name": "Today resume: same found paths, moves and hints",
+          "pass": true
+        },
+        {
+          "name": "Today resume: saved time retained",
+          "pass": true
+        },
+        {
+          "name": "finished games leave no stale resume on either tab",
+          "pass": true
+        },
+        {
+          "name": "history layout easy 320 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars easy 320 light",
+          "pass": true
+        },
+        {
+          "name": "history layout medium 320 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars medium 320 light",
+          "pass": true
+        },
+        {
+          "name": "history layout hard 320 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hard 320 light",
+          "pass": true
+        },
+        {
+          "name": "history layout hardcore 320 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hardcore 320 light",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkomor 320 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkomor 320 light",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkokalypsa 320 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkokalypsa 320 light",
+          "pass": true
+        },
+        {
+          "name": "history close works",
+          "pass": true
+        },
+        {
+          "name": "history layout easy 390 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars easy 390 light",
+          "pass": true
+        },
+        {
+          "name": "history layout medium 390 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars medium 390 light",
+          "pass": true
+        },
+        {
+          "name": "history layout hard 390 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hard 390 light",
+          "pass": true
+        },
+        {
+          "name": "history layout hardcore 390 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hardcore 390 light",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkomor 390 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkomor 390 light",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkokalypsa 390 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkokalypsa 390 light",
+          "pass": true
+        },
+        {
+          "name": "history close works",
+          "pass": true
+        },
+        {
+          "name": "history layout easy 690 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars easy 690 light",
+          "pass": true
+        },
+        {
+          "name": "history layout medium 690 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars medium 690 light",
+          "pass": true
+        },
+        {
+          "name": "history layout hard 690 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hard 690 light",
+          "pass": true
+        },
+        {
+          "name": "history layout hardcore 690 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hardcore 690 light",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkomor 690 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkomor 690 light",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkokalypsa 690 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkokalypsa 690 light",
+          "pass": true
+        },
+        {
+          "name": "history close works",
+          "pass": true
+        },
+        {
+          "name": "history layout easy 1440 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars easy 1440 light",
+          "pass": true
+        },
+        {
+          "name": "history layout medium 1440 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars medium 1440 light",
+          "pass": true
+        },
+        {
+          "name": "history layout hard 1440 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hard 1440 light",
+          "pass": true
+        },
+        {
+          "name": "history layout hardcore 1440 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hardcore 1440 light",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkomor 1440 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkomor 1440 light",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkokalypsa 1440 light",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkokalypsa 1440 light",
+          "pass": true
+        },
+        {
+          "name": "history close works",
+          "pass": true
+        },
+        {
+          "name": "history layout easy 320 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars easy 320 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout medium 320 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars medium 320 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout hard 320 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hard 320 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout hardcore 320 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hardcore 320 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkomor 320 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkomor 320 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkokalypsa 320 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkokalypsa 320 dark",
+          "pass": true
+        },
+        {
+          "name": "history close works",
+          "pass": true
+        },
+        {
+          "name": "history layout easy 390 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars easy 390 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout medium 390 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars medium 390 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout hard 390 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hard 390 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout hardcore 390 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hardcore 390 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkomor 390 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkomor 390 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkokalypsa 390 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkokalypsa 390 dark",
+          "pass": true
+        },
+        {
+          "name": "history close works",
+          "pass": true
+        },
+        {
+          "name": "history layout easy 690 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars easy 690 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout medium 690 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars medium 690 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout hard 690 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hard 690 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout hardcore 690 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hardcore 690 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkomor 690 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkomor 690 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkokalypsa 690 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkokalypsa 690 dark",
+          "pass": true
+        },
+        {
+          "name": "history close works",
+          "pass": true
+        },
+        {
+          "name": "history layout easy 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars easy 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout medium 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars medium 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout hard 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hard 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout hardcore 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars hardcore 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkomor 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkomor 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "history layout mozkokalypsa 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "no duplicate progress or clean stars mozkokalypsa 1440 dark",
+          "pass": true
+        },
+        {
+          "name": "history close works",
+          "pass": true
+        },
+        {
+          "name": "no browser runtime errors",
+          "pass": true
+        }
+      ],
+      "errors": []
+    }
+  }
+}

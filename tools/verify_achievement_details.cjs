@@ -6,7 +6,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
  await page.route('**/*',r=>new URL(r.request().url()).hostname==='127.0.0.1'?r.continue():r.abort());
  await context.addInitScript(()=>{localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.now()}));localStorage.setItem('proplet-v3-7-required-onboarding','done');localStorage.setItem('proplet-v3-16-2-helper-onboarding','done');localStorage.setItem('proplet:content-release:refresh300-v1','1');localStorage.setItem('proplet:content-release:mk100-v2','1')});
  try{
-  await page.goto('http://127.0.0.1:8000/');await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB?.free?.mozkokalypsa?.length===100&&window.PropletAchievementDetails);
+  await page.goto('http://127.0.0.1:8000/');await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB?.free?.mozkokalypsa?.length===200&&window.PropletAchievementDetails);
   await page.evaluate(()=>{closeTransientModals();const s=getState();s.completed={};for(const p of puzzleDB.free.mozkokalypsa.slice(0,25))s.completed['free:'+p.id]={mode:'free',difficulty:'mozkokalypsa',puzzleId:p.id,level:p.meta.level,contentGeneration:4,elapsedMs:100000,points:200,completedAt:'2026-10-04T00:00:00Z'};saveState(s);nav('profile')});
   const baseline=await page.evaluate(()=>JSON.stringify(getState()));
   // Summary is interactive, too; opening it cannot change progress or mark a celebration seen.

@@ -1,0 +1,17 @@
+{
+  "originalPhysicalBytesPreserved": true,
+  "archives": [
+    {
+      "path": "manufacture-checkpoint-v2.json.gz",
+      "uncompressedSha256": "4ed6b68c921bcb28fe3479adc1b066998dcc1421a5440e999f60e84ff5d84943",
+      "uncompressedBytes": 5482001,
+      "sha256": "e06d918c16433fb7f434b1fea2174de39a43d82306e42add0e1632f5bb23d178"
+    },
+    {
+      "path": "manufacture-checkpoint.json.gz",
+      "uncompressedSha256": "216b05c5ca2563833188ad7daaed1930539af8262106a72dbe0cfd19259ddbbe",
+      "uncompressedBytes": 652970,
+      "sha256": "9b69380b87c54c90ccc9f5084b94287c075426fd147734304a303af42727e371"
+    }
+  ]
+}

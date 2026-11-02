@@ -38,6 +38,23 @@ def canonical_json(payload: object) -> bytes:
 
 for relative_path, (expected_size, expected_hash) in EXPECTED_FILES.items():
     raw = (ROOT / relative_path).read_bytes()
+    if relative_path in {"data/puzzles.json", "public/puzzles.json"}:
+        # Verify the reviewed additive release before recovering the exact
+        # historical bytes; all original source/output hashes stay protected.
+        payload = json.loads(raw)
+        expansion = payload.pop("freeExpansionRelease")
+        assert expansion["batchId"] == "free-expansion-600-20261102"
+        assert expansion["totalNewLevels"] == 600
+        boundary = json.loads((ROOT / "content/gen6/free-expansion-600-20261102/production-boundaries.json").read_bytes())
+        for difficulty, old_count in boundary["counts"].items():
+            added = payload["free"][difficulty][old_count:]
+            assert [p["id"] for p in added] == [f"g6-expansion-{difficulty}-{i:03d}" for i in range(1, 101)]
+            assert expansion["newLevelCounts"][difficulty] == 100
+            assert payload["freeLevelCounts"][difficulty] == old_count + 100
+            payload["free"][difficulty] = payload["free"][difficulty][:old_count]
+            payload["freeLevelCounts"][difficulty] = old_count
+        payload["mozkomorUnlock"] = boundary["mozkomorUnlock"]
+        raw = canonical_json(payload)
     assert len(raw) == expected_size, relative_path
     assert sha256(raw) == expected_hash, relative_path
 

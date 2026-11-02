@@ -29,10 +29,12 @@ jobs:
           PROPLET_FREE_ORDER_ENABLED=true python -m uvicorn server:app --port 8000 > /tmp/proplet-qa.log 2>&1 &
           for i in {1..30}; do curl -sf http://127.0.0.1:8000/api/config && break; sleep 1; done
           node tools/verify_refresh300_production.cjs
+          node tools/verify_free_expansion_browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: refresh300-production-qa
           path: |
             qa-refresh300/
+            qa-free-expansion/
             /tmp/proplet-qa.log
