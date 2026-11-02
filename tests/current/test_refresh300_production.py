@@ -11,12 +11,13 @@ assert public['free']==data['free'];assert data['contentGeneration']==data['free
 correction=read('content/editorial-corrections/g4-d-042-20261019.json')
 for k,digest in boundary['preserved'].items():
  actual=data[k]
+ if k=='mozkomorUnlock':actual={**actual,'levels':150}
  if k=='daily':
   assert h(next(p for p in actual if p['id']==correction['puzzleId']))==correction['afterHash']
   actual=[correction['before'] if p['id']==correction['puzzleId'] else p for p in actual]
  assert h(actual)==digest,k
 for diff,digest in boundary['free'].items():
- bank=data['free'][diff];old=[p for p in bank if not p['id'].startswith('g6-refresh-')]
+ bank=data['free'][diff];old=[p for p in bank if not p['id'].startswith(('g6-refresh-','g6-expansion-'))]
  assert h(old)==digest,diff
  assert len({p['id'] for p in bank})==len(bank)==len({p['meta']['level'] for p in bank})
 new=[p for bank in data['free'].values() for p in bank if p['id'].startswith('g6-refresh-')]
@@ -33,7 +34,7 @@ for original in source['boards']:
   path=a['path'];cells+=path;assert ''.join(p['letters'][i] for i in path)==a['word']
   for x,y in zip(path,path[1:]):assert max(abs(x//p['cols']-y//p['cols']),abs(x%p['cols']-y%p['cols']))==1
  assert sorted(cells)==sorted(p['mask']) and len(cells)==len(set(cells))
-assert [len(data['free'][d]) for d in ['easy','medium','hard','hardcore','mozkomor','mozkokalypsa']]==[400,400,400,300,150,100]
+assert [len(data['free'][d]) for d in ['easy','medium','hard','hardcore','mozkomor','mozkokalypsa']]==[500,500,500,400,250,200]
 html=(R/'public/index.html').read_text();assert 'free-refresh-preview' not in html and 'free-refresh-fixtures' not in html
 assert 'connect-src \'none\'' not in html
 # Release identity is shared, never pinned to the version that introduced this feature.

@@ -1,0 +1,23 @@
+{
+  "asOf": "2026-11-02",
+  "contentHash": "dc3d73b05dc9ebc59d24b2c22ebed5a8954d1fcd3c29f5a5a38de31d3dcde855",
+  "counts": {
+    "easy": 100,
+    "medium": 100,
+    "hardcore": 100,
+    "mozkomor": 100,
+    "hard": 100,
+    "mozkokalypsa": 100
+  },
+  "targetOccurrences": 5244,
+  "uniqueTargetWords": 3038,
+  "maximumUsesAcross600": 5,
+  "wordUseDistribution": {
+    "1": 1672,
+    "2": 830,
+    "3": 314,
+    "4": 140,
+    "5": 82
+  },
+  "humanPlaytest": "not performed"
+}

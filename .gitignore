@@ -6,6 +6,9 @@ lab-output/
 
 artifacts/
 
+# Authoring resume files retain their original bytes in committed gzip receipts.
+content/gen6/free-expansion-600-20261102/manufacture-checkpoint*.json
+
 # Local recovery runtimes, compiler, browser evidence and static build output.
 work/
 dist-mk100/

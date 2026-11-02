@@ -1,0 +1,5197 @@
+{
+  "schemaVersion": 1,
+  "reviewer": "Codex independent AI editorial reviewer /root/integration_audit",
+  "reviewDate": "2026-11-02",
+  "scope": [
+    "easy",
+    "medium",
+    "hard"
+  ],
+  "basis": "Individual reading of each listed ordered target composition; approved Lexicon v3 entries and tiers accepted; this is AI editorial review, not a human playtest.",
+  "boards": {
+    "g6-expansion-easy-001": {
+      "boardId": "g6-expansion-easy-001",
+      "difficulty": "easy",
+      "contentHash": "f5d27cd2a2d9a4ee43f9a2636aee95e645810237844440fc3c40c7cd043ce50d",
+      "targetWords": [
+        "KOVÁŘ",
+        "DÝNĚ",
+        "TISÍC",
+        "HRNČÍŘ"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě známá řemesla doplňuje plod a číslovka; příbuzné téma nezaměňuje význam ani slovní rodinu.",
+      "topic": "řemesla, zahrada, počítání",
+      "familiarity": "Běžná konkrétní slova; HRNČÍŘ je srozumitelné řemeslo i se dvěma náročnějšími souhláskami."
+    },
+    "g6-expansion-medium-001": {
+      "boardId": "g6-expansion-medium-001",
+      "difficulty": "medium",
+      "contentHash": "21504e197036dca2909fa0e4b9f1478b09b72ef71f81e3c94d7eb8a65f7867ef",
+      "targetWords": [
+        "TUŽKA",
+        "KMÍN",
+        "VICHR",
+        "SRŠEŇ",
+        "HŘIB",
+        "BÓJKA",
+        "PŘEDSÍŇ"
+      ],
+      "verdict": "accept",
+      "reason": "Pestrá sedmice s přírodou, domácností a vodou, bez shluku odborných nebo podobně znějících hesel.",
+      "topic": "psaní, kuchyně, příroda, voda, domov",
+      "familiarity": "SRŠEŇ a BÓJKA vyžadují pozornost, významy jsou však ve střední obtížnosti přístupné."
+    },
+    "g6-expansion-easy-002": {
+      "boardId": "g6-expansion-easy-002",
+      "difficulty": "easy",
+      "contentHash": "e2d9f525ac7eafb9e5e3e6f5f808011746b482f7a03482b1b6a493acc049872b",
+      "targetWords": [
+        "SMŮLA",
+        "KLÍN",
+        "HARFA",
+        "ZÁŘIVÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Tři dobře představitelné názvy a živé přídavné jméno; běžná víceznačnost SMŮLA a KLÍN nevadí.",
+      "topic": "příroda, předměty, hudba, vlastnost",
+      "familiarity": "Žádné okrajové heslo ani zavádějící izolovaný tvar."
+    },
+    "g6-expansion-medium-002": {
+      "boardId": "g6-expansion-medium-002",
+      "difficulty": "medium",
+      "contentHash": "7ad4c25bb589b7b623b43a3f0144dd2802799b384076364d61a1bd595402b6ac",
+      "targetWords": [
+        "HRÁBĚ",
+        "ŠPAGETA",
+        "VPUST",
+        "ČILÝ",
+        "FENYKL",
+        "PRŮTRŽ"
+      ],
+      "verdict": "accept",
+      "reason": "Kuchyně, zahrada, odvodnění a počasí se přirozeně střídají. VPUST je jediné užší technické slovo, další dvě B slova jsou z běžné zkušenosti.",
+      "topic": "zahrada, jídlo, stavba, vlastnost, počasí",
+      "familiarity": "Slovní zátěž je u horní hranice střední, ale nevytváří shluk neznámých odborností; schválená podoba ŠPAGETA zůstává přijatá."
+    },
+    "g6-expansion-hard-001": {
+      "boardId": "g6-expansion-hard-001",
+      "difficulty": "hard",
+      "contentHash": "affc3c04db6dd5a22fd73ae2a64bfa3e384ac76928e1403b38bf3119e3e49d20",
+      "targetWords": [
+        "LÁZNĚ",
+        "OTĚŽ",
+        "KÁČA",
+        "VÝLEVKA",
+        "ZADRŽENÍ",
+        "TVÁRNICE",
+        "HŘMĚNÍ",
+        "ÚŽLABINA"
+      ],
+      "verdict": "accept",
+      "reason": "Skladba spojuje známá pojmenování s několika stavebními a krajinnými výrazy; obtížnost stojí na hledání a pestrosti významů.",
+      "topic": "místo, jezdectví, hračka, stavba, děj, počasí, krajina",
+      "familiarity": "ÚŽLABINA je užší heslo, ale mezi ostatními zůstává přiměřenou těžší položkou. Žádné vrácení."
+    },
+    "g6-expansion-easy-003": {
+      "boardId": "g6-expansion-easy-003",
+      "difficulty": "easy",
+      "contentHash": "eb29813008d5aa292ed3ab9002d0376acfb0307ebeda752f4c75f14be21c77c2",
+      "targetWords": [
+        "ŠTÍTEK",
+        "HŘMĚNÍ",
+        "JEMNÝ",
+        "LÍPA"
+      ],
+      "verdict": "accept",
+      "reason": "Čtyři odlišné významové oblasti, konkrétní názvy doplněné známým zvukovým dějem a vlastností.",
+      "topic": "předmět, počasí, vlastnost, strom",
+      "familiarity": "HŘMĚNÍ je běžný základní tvar; nevzniká obtížnost z jazykové rarity."
+    },
+    "g6-expansion-medium-003": {
+      "boardId": "g6-expansion-medium-003",
+      "difficulty": "medium",
+      "contentHash": "177afadfbd7eb2ae6c99d87be499895b32e883326be8225c7008801b06ec8951",
+      "targetWords": [
+        "PLST",
+        "ANGREŠT",
+        "SUŠIT",
+        "NÉST",
+        "TŘÍDA",
+        "HEBKÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Materiál a ovoce doplňují běžná slovesa a školní/vlastnostní slovník; slovní druhy jsou vyvážené.",
+      "topic": "materiál, zahrada, činnosti, škola, vlastnost",
+      "familiarity": "Dvě méně každodenní konkrétní položky jsou opřené o čtyři velmi běžná slova."
+    },
+    "g6-expansion-easy-004": {
+      "boardId": "g6-expansion-easy-004",
+      "difficulty": "easy",
+      "contentHash": "febefa946ec14e436c9ef74a24ed54d7088d954153d55701dca66e3299c0e22a",
+      "targetWords": [
+        "DRSNÝ",
+        "ŠTĚNĚ",
+        "TÝDEN",
+        "PÁDLO"
+      ],
+      "verdict": "accept",
+      "reason": "Přístupná čtveřice s jasně odlišnými obrazy a bez vzájemně zaměnitelných tvarů.",
+      "topic": "vlastnost, zvíře, čas, voda",
+      "familiarity": "Všechna slova patří do běžné slovní zásoby snadné obtížnosti."
+    },
+    "g6-expansion-medium-004": {
+      "boardId": "g6-expansion-medium-004",
+      "difficulty": "medium",
+      "contentHash": "9c3405fcd17a55519ff4389b31aa1097a6f5500767cbc527318f97d6171f5a71",
+      "targetWords": [
+        "OKAP",
+        "BUBÁK",
+        "RORÝS",
+        "LÍSKA",
+        "DELTA",
+        "JEHLIČÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Domácnost a pohádkový motiv odlehčují přírodní a zeměpisnou část; žádná nevhodná koncentrace vzácných názvů.",
+      "topic": "dům, pohádka, pták, keř, zeměpis, les",
+      "familiarity": "RORÝS a DELTA jsou přípustné dvě náročnější položky vedle známějších čtyř."
+    },
+    "g6-expansion-hard-002": {
+      "boardId": "g6-expansion-hard-002",
+      "difficulty": "hard",
+      "contentHash": "8ea1c9699bf653660d951b36fe125bda4b48630177f52d3bfc870059bdd5987d",
+      "targetWords": [
+        "CHYT",
+        "MUDRC",
+        "HMOŽDINKA",
+        "KUŇKA",
+        "BŘÍŠKO",
+        "JAHODNÍK",
+        "FÓLIOVNÍK",
+        "POUTKO"
+      ],
+      "verdict": "accept",
+      "reason": "Konkrétní hesla z lezení, dílny, přírody a zahrady střídá pohádková postava a část těla; nevzniká jednolitý odborný seznam.",
+      "topic": "sport, pohádka, dílna, zvíře, tělo, zahrada, oděv",
+      "familiarity": "CHYT a FÓLIOVNÍK vyžadují širší zkušenost, pro těžkou obtížnost jsou mezi srozumitelnými hesly přiměřené."
+    },
+    "g6-expansion-easy-005": {
+      "boardId": "g6-expansion-easy-005",
+      "difficulty": "easy",
+      "contentHash": "33f354ad537b0abb505f360321b2147c709e5c363513f6c08fa309a8cb416f6a",
+      "targetWords": [
+        "ŽÍNKA",
+        "ŤUKAT",
+        "BŘÍZA",
+        "VENKU"
+      ],
+      "verdict": "accept",
+      "reason": "Známý předmět a strom doplňuje jednoduchá činnost a příslovce; pestrá snadná sestava.",
+      "topic": "domov, činnost, strom, místo",
+      "familiarity": "Běžná slova bez archaického nebo odborného shluku."
+    },
+    "g6-expansion-medium-005": {
+      "boardId": "g6-expansion-medium-005",
+      "difficulty": "medium",
+      "contentHash": "4a48bce5d7853efa6fbd1cc13a7881fe9e97d282e71f35248227b1853463e793",
+      "targetWords": [
+        "PĚŠINA",
+        "SMETÍ",
+        "MOTYKA",
+        "SVĚRÁK",
+        "ÚSEČKA",
+        "LÁTAT"
+      ],
+      "verdict": "accept",
+      "reason": "Zahradní a dílenské názvy střídá školní pojem a běžná opravářská činnost.",
+      "topic": "cesta, úklid, zahrada, dílna, geometrie, činnost",
+      "familiarity": "SVĚRÁK a ÚSEČKA jsou konkrétní naučené pojmy; LÁTAT zůstává srozumitelné sloveso."
+    },
+    "g6-expansion-hard-003": {
+      "boardId": "g6-expansion-hard-003",
+      "difficulty": "hard",
+      "contentHash": "b84aba15dc26359a250c24b7925eae7c544e3094e236f28e267b94db974a2ed5",
+      "targetWords": [
+        "PŘÍBOJ",
+        "BRHLÍK",
+        "ORGÁN",
+        "ZMIJE",
+        "HUKOT",
+        "HOLKA",
+        "SÍTOTISK",
+        "ŘEZBA",
+        "ILUZE"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě přírodovědná a dvě výtvarná hesla doplňuje každodenní slovník; pestré obtížnější významy.",
+      "topic": "moře, pták, tělo, zvíře, zvuk, člověk, tisk, umění, představa",
+      "familiarity": "BRHLÍK a SÍTOTISK jsou užší dvě položky v široké devítici, přiměřené těžké obtížnosti."
+    },
+    "g6-expansion-easy-006": {
+      "boardId": "g6-expansion-easy-006",
+      "difficulty": "easy",
+      "contentHash": "0bc6e192ae849812efedb4504e541bcd5141990982bfc594a5b6db2e0974b4ba",
+      "targetWords": [
+        "POHÁR",
+        "STRÁŇ",
+        "KAMNA",
+        "DŽBÁN"
+      ],
+      "verdict": "accept",
+      "reason": "Čtyři snadno představitelné známé názvy z domácnosti a krajiny.",
+      "topic": "nádoby, krajina, domov",
+      "familiarity": "Pomnožná KAMNA jsou přirozená; běžná slova bez podivných odvozenin."
+    },
+    "g6-expansion-medium-006": {
+      "boardId": "g6-expansion-medium-006",
+      "difficulty": "medium",
+      "contentHash": "ac11e91e72be4f8b90dfa2c9cba02d13a274501a3c3eee9fa257073a54c316d9",
+      "targetWords": [
+        "OMÍTKA",
+        "PLÁTEK",
+        "RŮŽE",
+        "KLIH",
+        "VEDRO",
+        "KUKLA"
+      ],
+      "verdict": "accept",
+      "reason": "Dílenský materiál vyvažují květina, počasí a hmatatelné předměty; bez tematického přetížení.",
+      "topic": "stavba, tvar, květina, dílna, počasí, předmět",
+      "familiarity": "KLIH je méně každodenní, ale stojí samostatně vedle pěti přístupných slov."
+    },
+    "g6-expansion-easy-007": {
+      "boardId": "g6-expansion-easy-007",
+      "difficulty": "easy",
+      "contentHash": "c735ee65b85f8062168891588bce566cf5bbc425724b50f137fdc74d7d579a0e",
+      "targetWords": [
+        "TALÍŘ",
+        "LÁVKA",
+        "LÍMEC",
+        "TÁCEK"
+      ],
+      "verdict": "accept",
+      "reason": "Domácí a oděvní předměty doplňuje venkovní objekt; TALÍŘ a TÁCEK sdílejí okolí, nikoli rodinu nebo totožný význam.",
+      "topic": "jídlo, cesta, oděv, domácnost",
+      "familiarity": "Všechna čtyři hesla jsou konkrétní a pro snadnou obtížnost běžná."
+    },
+    "g6-expansion-medium-007": {
+      "boardId": "g6-expansion-medium-007",
+      "difficulty": "medium",
+      "contentHash": "6ccab9bfb1fccf31a711b47a86474b2e407bfc8674dacd02629bd8b258b27e71",
+      "targetWords": [
+        "LILEK",
+        "TRPKÝ",
+        "NÁTĚR",
+        "VĚŠÁK",
+        "ČERNÉ",
+        "SYPAT",
+        "LÁSKA"
+      ],
+      "verdict": "accept",
+      "reason": "Pestrá sedmice zahrnuje jídlo, vlastnosti, domácnost, činnost a cit; žádný blok odborných slov.",
+      "topic": "zelenina, chuť, úprava povrchu, domácnost, barva, činnost, cit",
+      "familiarity": "ČERNÉ zachovává schválenou podobu Lexikonu v3; složení je jinak přístupné bez výhrad."
+    },
+    "g6-expansion-hard-004": {
+      "boardId": "g6-expansion-hard-004",
+      "difficulty": "hard",
+      "contentHash": "05cba06add6cd7284e5791f3d1b306ba94546a1af83668bc8ea338fdcca9f99b",
+      "targetWords": [
+        "TKADLEC",
+        "UHEL",
+        "NITRO",
+        "TĚŽIŠTĚ",
+        "BÁRKA",
+        "PŘEDMLUVA",
+        "VOJÍN",
+        "DŘEPĚT",
+        "LÝKO"
+      ],
+      "verdict": "accept",
+      "reason": "Řemeslné a přírodní materiály doplňují pohyb, kniha, doprava a fyzikální pojem; dostatečný významový rozptyl.",
+      "topic": "řemeslo, materiál, nitro, fyzika, loď, kniha, člověk, činnost, příroda",
+      "familiarity": "UHEL a LÝKO jsou tradiční užší názvy, ale mezi ostatními netvoří nepřiměřeně vzácný shluk."
+    },
+    "g6-expansion-easy-008": {
+      "boardId": "g6-expansion-easy-008",
+      "difficulty": "easy",
+      "contentHash": "8d744e9209c753322d86dd9f49170fbeb5c06ac39e71f4286b63596b0b1e857d",
+      "targetWords": [
+        "PRÁH",
+        "LEHKÝ",
+        "SNÍLEK",
+        "TEPLÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě běžné vlastnosti a dva známé názvy drží snadnou přístupnost i rozmanitost slovních druhů.",
+      "topic": "dům, vlastnost, člověk, teplota",
+      "familiarity": "SNÍLEK je živé běžné označení; žádné matoucí okrajové heslo."
+    },
+    "g6-expansion-medium-008": {
+      "boardId": "g6-expansion-medium-008",
+      "difficulty": "medium",
+      "contentHash": "38b2be9bfe0f1fd637dd3808cbe15fb238724888ff05678bfd2b131d75bae5b7",
+      "targetWords": [
+        "NĚHA",
+        "POUŤ",
+        "KOTLINA",
+        "SUŠÁK",
+        "MATNÝ",
+        "ŽLUTÁ"
+      ],
+      "verdict": "accept",
+      "reason": "Dvojice vlastností vyvažuje cit, událost, krajinu a domácí předmět; lexikální zátěž není jednotvárná.",
+      "topic": "cit, událost, krajina, domácnost, vlastnost, barva",
+      "familiarity": "ŽLUTÁ zachovává schválenou podobu; KOTLINA je jediný užší zeměpisný pojem."
+    },
+    "g6-expansion-easy-009": {
+      "boardId": "g6-expansion-easy-009",
+      "difficulty": "easy",
+      "contentHash": "638289dd782c7303e7de1fafde37cf2fde094318d919f67b879ef81ec7fcd795",
+      "targetWords": [
+        "MŘÍŽ",
+        "MOŠT",
+        "PLYŠÁK",
+        "UŠANKA"
+      ],
+      "verdict": "accept",
+      "reason": "Hmatatelné předměty a nápoj; PLYŠÁK odlehčuje dvě souhláskově hustší položky.",
+      "topic": "dům, nápoj, hračka, oděv",
+      "familiarity": "UŠANKA je konkrétní známá pokrývka hlavy; žádný shluk odborností."
+    },
+    "g6-expansion-medium-009": {
+      "boardId": "g6-expansion-medium-009",
+      "difficulty": "medium",
+      "contentHash": "43c3c8f5e73898d34fa6fd8f24451692e5bf0d76666b409ed4cb7e7fbf4286a1",
+      "targetWords": [
+        "DUNĚNÍ",
+        "DŘEŇ",
+        "SMUTEK",
+        "TŮNĚ",
+        "KBELÍK",
+        "PEDÁL"
+      ],
+      "verdict": "accept",
+      "reason": "Zvuk, příroda a cit se střídají s běžnými předměty.",
+      "topic": "zvuk, tělo, cit, voda, domácnost, doprava",
+      "familiarity": "DŘEŇ je jediná náročnější položka, ostatní drží přístupný základ."
+    },
+    "g6-expansion-easy-010": {
+      "boardId": "g6-expansion-easy-010",
+      "difficulty": "easy",
+      "contentHash": "f2ec2cbb47f759e2d0a22b2ff7709a54dfee1a57f86c5b06d9dab4f658055fdf",
+      "targetWords": [
+        "PECKA",
+        "LOUŽE",
+        "MUSET",
+        "TRÁVA"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní názvy doplňuje velmi běžné sloveso; žádná nepřístupná významová oblast.",
+      "topic": "plod, voda, nutnost, příroda",
+      "familiarity": "MUSET zachovává schválený infinitiv; vhodná snadná čtveřice."
+    },
+    "g6-expansion-medium-010": {
+      "boardId": "g6-expansion-medium-010",
+      "difficulty": "medium",
+      "contentHash": "b45ff913c4403fb6510424f277093bf923d9b408eba6b3da91261e5a701b682f",
+      "targetWords": [
+        "NŮŽKY",
+        "KŮRKA",
+        "VERŠ",
+        "SIRUP",
+        "JMÉNO",
+        "LUSK",
+        "MOŠNA"
+      ],
+      "verdict": "accept",
+      "reason": "Pestré konkrétní názvy doplňuje poezie a pojmenování; žádné blízké varianty.",
+      "topic": "domácnost, jídlo, poezie, řeč, rostlina, předmět",
+      "familiarity": "MOŠNA je tradičnější, ale osamocená vedle šesti známých slov."
+    },
+    "g6-expansion-easy-011": {
+      "boardId": "g6-expansion-easy-011",
+      "difficulty": "easy",
+      "contentHash": "391a4fd8fbd9cf63103e406a69245b0426ebca3c076177807fbe2b13862a8548",
+      "targetWords": [
+        "ŠŇŮRA",
+        "BĚŽET",
+        "ZÍVAT",
+        "BANÁN"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě jednoduché činnosti propojují známý předmět s ovocem.",
+      "topic": "předmět, pohyb, činnost, ovoce",
+      "familiarity": "Běžná přístupná slova bez zavádějících odvozenin."
+    },
+    "g6-expansion-medium-011": {
+      "boardId": "g6-expansion-medium-011",
+      "difficulty": "medium",
+      "contentHash": "9e16a23485c70fabee755c6131ff87bfc16dfc4d02b7bc9a247ddc9eb56fd0f3",
+      "targetWords": [
+        "SNĚŽENÍ",
+        "MĚCH",
+        "KOLEM",
+        "ŽALUZIE",
+        "DRÁT",
+        "PRYŽ"
+      ],
+      "verdict": "accept",
+      "reason": "Materiálové a domácí názvy vyvažuje počasí a běžné příslovce/předložka.",
+      "topic": "počasí, předmět, prostor, domácnost, materiály",
+      "familiarity": "PRYŽ je užší označení materiálu; MĚCH zůstává konkrétní a obklopený běžnými hesly."
+    },
+    "g6-expansion-hard-005": {
+      "boardId": "g6-expansion-hard-005",
+      "difficulty": "hard",
+      "contentHash": "debc86686b2b6549b100660368f8f5bd4088eb8f085c996ec6cedb168c962cdb",
+      "targetWords": [
+        "SÝKORA",
+        "CHLEBNÍK",
+        "VYKŘIČNÍK",
+        "HLÍZA",
+        "TOUHA",
+        "LYSKA",
+        "ŠPEJLE",
+        "LOUTKÁŘ"
+      ],
+      "verdict": "accept",
+      "reason": "Dva ptáci nevytvářejí celý seznam; domácnost, jazyk, rostlina a řemeslo drží pestrost.",
+      "topic": "ptáci, domácnost, jazyk, rostlina, cit, kuchyně, divadlo",
+      "familiarity": "LYSKA je užší přírodní název, ostatní těžší slova jsou dobře představitelná."
+    },
+    "g6-expansion-easy-012": {
+      "boardId": "g6-expansion-easy-012",
+      "difficulty": "easy",
+      "contentHash": "e55291aed4bf0f7e71910af786d6d89f84d711f23c9a57f1b2fa4d1bd0be89df",
+      "targetWords": [
+        "NŮŽKY",
+        "ŘEPA",
+        "BALÍK",
+        "MRKEV",
+        "ŠIBAL"
+      ],
+      "verdict": "accept",
+      "reason": "Pět přístupných názvů; dvě zeleniny jsou významově samostatné a doplněné jinými tématy.",
+      "topic": "domácnost, zelenina, zásilka, člověk",
+      "familiarity": "ŠIBAL je běžné hravé označení, vhodné ke snadné obtížnosti."
+    },
+    "g6-expansion-medium-012": {
+      "boardId": "g6-expansion-medium-012",
+      "difficulty": "medium",
+      "contentHash": "4013d4866052fdf6a76c150c3c7edc42737909a38dc10b10d5483cb69745174e",
+      "targetWords": [
+        "VÝVAR",
+        "NÁVES",
+        "PAŘEZ",
+        "TKÁT",
+        "DOPIS",
+        "PŘÍZE",
+        "PLNÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Jídlo, vesnice, příroda a řemeslo tvoří pestrou sedmici.",
+      "topic": "jídlo, místo, les, tkaní, komunikace, vlastnost",
+      "familiarity": "TKÁT a PŘÍZE tematicky souvisejí, ale nejsou duplicitní rodina; známá konkrétní dvojice."
+    },
+    "g6-expansion-hard-006": {
+      "boardId": "g6-expansion-hard-006",
+      "difficulty": "hard",
+      "contentHash": "1dc29921adb6f6464e13629cb74a9a83742a5334c2034e4499c3ca58c18c883d",
+      "targetWords": [
+        "HRST",
+        "BORŮVČÍ",
+        "HABR",
+        "VNUČKA",
+        "FORMA",
+        "LASTURA",
+        "KOLÍČEK",
+        "REMÍZEK",
+        "MĚŘIDLO"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní část je proložená rodinou a dílenskými předměty; bez odborně jednostranné skladby.",
+      "topic": "množství, les, strom, rodina, dílna, moře, krajina",
+      "familiarity": "REMÍZEK a BORŮVČÍ jsou konkrétní krajinné názvy, přiměřené těžké obtížnosti."
+    },
+    "g6-expansion-easy-013": {
+      "boardId": "g6-expansion-easy-013",
+      "difficulty": "easy",
+      "contentHash": "c3ccadde52f2dccac2aa5c5ec25702c4a6150f4de4e600e8e9b20d7d6d88c30a",
+      "targetWords": [
+        "PEŘINA",
+        "VÁHA",
+        "NÁKYP",
+        "VAZBA"
+      ],
+      "verdict": "accept",
+      "reason": "Domov, měření, jídlo a knižní/obecná vazba vytvářejí přístupné odlišné významy.",
+      "topic": "domov, měření, jídlo, spojení",
+      "familiarity": "NÁKYP není rarita; VAZBA je schválené běžné víceznačné heslo."
+    },
+    "g6-expansion-medium-013": {
+      "boardId": "g6-expansion-medium-013",
+      "difficulty": "medium",
+      "contentHash": "f6742615343eab2d7f8b3fbb2550f8133996751bcf7e3515e33d7b57ce6a72a2",
+      "targetWords": [
+        "HLADKÝ",
+        "BROD",
+        "POVOZ",
+        "KŘEN",
+        "JABLOŇ",
+        "PENÁL"
+      ],
+      "verdict": "accept",
+      "reason": "Cesta a doprava se střídají se zahradou a školou; žádný blok specialistických termínů.",
+      "topic": "vlastnost, voda, doprava, zahrada, škola",
+      "familiarity": "POVOZ je tradičnější, ale snadno představitelný; ostatní hesla běžná."
+    },
+    "g6-expansion-hard-007": {
+      "boardId": "g6-expansion-hard-007",
+      "difficulty": "hard",
+      "contentHash": "89181b941c24c5438a27eb6e2f4d2c888c2ed508a31e67a66fc45aced9ca1673",
+      "targetWords": [
+        "PLÍŽENÍ",
+        "SBORMISTR",
+        "ŠIŠKA",
+        "PLCH",
+        "KRAJKÁŘKA",
+        "BRÁZDA",
+        "POEZIE",
+        "ZÁPATÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě povolání doplňuje pohyb, příroda, kultura a text; dobré střídání oblastí.",
+      "topic": "pohyb, hudba, příroda, řemeslo, pole, poezie, text",
+      "familiarity": "PLCH a KRAJKÁŘKA jsou širší zkušenostní slovník, zátěž vhodná pro těžkou."
+    },
+    "g6-expansion-easy-014": {
+      "boardId": "g6-expansion-easy-014",
+      "difficulty": "easy",
+      "contentHash": "0968187503309d693b4537d061c7abce19089b1cbea044a6cca8186c9971fbc0",
+      "targetWords": [
+        "PLÁŠŤ",
+        "PLETÍ",
+        "KEFÍR",
+        "ÚSVIT"
+      ],
+      "verdict": "accept",
+      "reason": "Oděv, zahradní děj, nápoj a denní doba; konkrétní asociace bez jazykové pasti.",
+      "topic": "oděv, zahrada, jídlo, čas",
+      "familiarity": "PLETÍ je schválený běžný děj; KEFÍR dobře známý nápoj."
+    },
+    "g6-expansion-medium-014": {
+      "boardId": "g6-expansion-medium-014",
+      "difficulty": "medium",
+      "contentHash": "f75e242ee51c82324655f2074964be68c02d916f49faf47f436bd9a99581ff39",
+      "targetWords": [
+        "HNÍST",
+        "KOMODA",
+        "ŠABLONA",
+        "UHEL",
+        "KŮZLE",
+        "TÚRA"
+      ],
+      "verdict": "accept",
+      "reason": "Činnost a dílna se střídají s nábytkem, zvířetem a výletem.",
+      "topic": "činnost, nábytek, dílna, kresba, zvíře, pohyb",
+      "familiarity": "UHEL je jedna tradičnější položka; ostatní mají běžné konkrétní významy."
+    },
+    "g6-expansion-easy-015": {
+      "boardId": "g6-expansion-easy-015",
+      "difficulty": "easy",
+      "contentHash": "fc0942d7f6ebfe4a0e923290a664296077153d2ffc7cc897bc241d61aafdb2c9",
+      "targetWords": [
+        "PŘÍVĚS",
+        "CHTÍT",
+        "KOPR",
+        "ŽALUD"
+      ],
+      "verdict": "accept",
+      "reason": "Doprava a běžné sloveso doplňují známou bylinku a plod.",
+      "topic": "doprava, přání, zahrada, les",
+      "familiarity": "Přístupná čtveřice; významy ani podoby si nekonkurují."
+    },
+    "g6-expansion-medium-015": {
+      "boardId": "g6-expansion-medium-015",
+      "difficulty": "medium",
+      "contentHash": "68d5f02d59a16198fb1b6a5641819168bb748166c66009a948a0c172c9b7381d",
+      "targetWords": [
+        "RÁFEK",
+        "DRSNÝ",
+        "KŠILT",
+        "LŽÍCE",
+        "MĚŠEC",
+        "SÁZET"
+      ],
+      "verdict": "accept",
+      "reason": "Doprava, oděv, kuchyně a činnost zajišťují pestrost; tradiční předmět není izolovanou raritou.",
+      "topic": "doprava, vlastnost, oděv, kuchyně, předmět, činnost",
+      "familiarity": "RÁFEK a MĚŠEC jsou dvě konkrétní náročnější položky vedle běžného základu."
+    },
+    "g6-expansion-easy-016": {
+      "boardId": "g6-expansion-easy-016",
+      "difficulty": "easy",
+      "contentHash": "f8aebeda9b263efedda2f5bede1a0f0073dee48f0c2c2d22dd4cce10fbd216f8",
+      "targetWords": [
+        "ZAČÍT",
+        "SOUSTO",
+        "VÁPNO",
+        "ÚŽAS",
+        "ÚCTA"
+      ],
+      "verdict": "accept",
+      "reason": "Činnost, jídlo, materiál a dva běžné pocity jsou odlišné, přístupné významy.",
+      "topic": "činnost,jídlo,materiál,city",
+      "familiarity": "ÚŽAS a ÚCTA jsou známé odlišné abstraktní názvy."
+    },
+    "g6-expansion-medium-016": {
+      "boardId": "g6-expansion-medium-016",
+      "difficulty": "medium",
+      "contentHash": "348e8995acebcdd9ad57998cc320107df63903b2b65262eb608e4611520ed54f",
+      "targetWords": [
+        "ULITA",
+        "KRUPICE",
+        "ČÍŽEK",
+        "ČLEN",
+        "STEH",
+        "VÝMOL"
+      ],
+      "verdict": "accept",
+      "reason": "Pestré konkrétní názvy; pták je jediná méně každodenní položka.",
+      "topic": "příroda,kuchyně,člověk,šití,cesta",
+      "familiarity": "ČÍŽEK stojí vedle dobře známých ostatních slov."
+    },
+    "g6-expansion-easy-017": {
+      "boardId": "g6-expansion-easy-017",
+      "difficulty": "easy",
+      "contentHash": "872c30c28ea948f4bee3258d8f4407224fd5acba2be092c6b8353a601db26e3c",
+      "targetWords": [
+        "SVETR",
+        "ŠÍPEK",
+        "PÁDIT",
+        "PEKÁČ"
+      ],
+      "verdict": "accept",
+      "reason": "Oděv, plod, pohyb a kuchyně tvoří svěží snadnou čtveřici.",
+      "topic": "oděv,příroda,pohyb,kuchyně",
+      "familiarity": "PÁDIT je běžné živé sloveso."
+    },
+    "g6-expansion-medium-017": {
+      "boardId": "g6-expansion-medium-017",
+      "difficulty": "medium",
+      "contentHash": "2cccded8dc1fc9d530c8d80ae56d0bd011ae4f00dc01b89fa0ce69ea4d5350cd",
+      "targetWords": [
+        "DROZD",
+        "MÝTINA",
+        "PÉCT",
+        "VESLO",
+        "SLOUPEC",
+        "KÁČA"
+      ],
+      "verdict": "accept",
+      "reason": "Lesní dvojici vyvažuje kuchyně, voda, tabulka a hračka.",
+      "topic": "příroda,činnost,voda,text,hračka",
+      "familiarity": "MÝTINA je konkrétní přístupný název."
+    },
+    "g6-expansion-hard-008": {
+      "boardId": "g6-expansion-hard-008",
+      "difficulty": "hard",
+      "contentHash": "b14b4415630659f6e06ece9359646a14e19898d75031d8e8d028e8b648ba0150",
+      "targetWords": [
+        "ŘEŘICHA",
+        "TESAŘÍK",
+        "TUHA",
+        "KONÍČEK",
+        "VÝHEŇ",
+        "ÚHOR",
+        "PIJAVICE",
+        "VESLO",
+        "DÁVKA"
+      ],
+      "verdict": "accept",
+      "reason": "Příroda a řemeslo jsou proložené každodenními předměty a pojmy.",
+      "topic": "zahrada,hmyz,kresba,řemeslo,voda,množství",
+      "familiarity": "TESAŘÍK a VÝHEŇ jsou užší, nikoli dominantní shluk."
+    },
+    "g6-expansion-easy-018": {
+      "boardId": "g6-expansion-easy-018",
+      "difficulty": "easy",
+      "contentHash": "7a0d0a173a47ed2b628d2b0e0e30e5bbfc8e305e0665305c06199bcd7a3573d0",
+      "targetWords": [
+        "LEPIT",
+        "ULICE",
+        "SENÍK",
+        "TĚŽKÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Činnost, město, venkov a vlastnost drží snadnou pestrost.",
+      "topic": "činnost,místo,stavba,vlastnost",
+      "familiarity": "SENÍK je známý konkrétní venkovský objekt."
+    },
+    "g6-expansion-medium-018": {
+      "boardId": "g6-expansion-medium-018",
+      "difficulty": "medium",
+      "contentHash": "13fbea995136ad859e5b215f3c8370efa9ff741706a601b879ae12dc5d200150",
+      "targetWords": [
+        "VAŘEČKA",
+        "KOŠÍKÁŘ",
+        "LEZEČKA",
+        "OBĚD",
+        "FRÉZKA",
+        "MÁTA"
+      ],
+      "verdict": "accept",
+      "reason": "Dílenské a sportovní názvy vyvažuje velmi známá kuchyňská trojice.",
+      "topic": "kuchyně,řemeslo,sport,dílna,bylinka",
+      "familiarity": "Lexikálně horní střední; LEZEČKA a FRÉZKA konkrétní, bez neprůhledné odborné terminologie."
+    },
+    "g6-expansion-hard-009": {
+      "boardId": "g6-expansion-hard-009",
+      "difficulty": "hard",
+      "contentHash": "8f3a5321232930fd42262b2367f2bb169ef7cdd63826193d0ada57d54c9e7cc7",
+      "targetWords": [
+        "POŠŤÁK",
+        "VLEČKA",
+        "CVÁLAT",
+        "DROŽKA",
+        "LOUTKA",
+        "TUŘÍN",
+        "DOKLAD",
+        "POUPĚ",
+        "MORUŠE"
+      ],
+      "verdict": "accept",
+      "reason": "Doprava a rostliny se střídají s postavou, hračkou a dokumentem.",
+      "topic": "člověk,doprava,pohyb,hračka,zahrada,doklad",
+      "familiarity": "TUŘÍN a MORUŠE jsou dvě méně běžné, snadno představitelné položky."
+    },
+    "g6-expansion-easy-019": {
+      "boardId": "g6-expansion-easy-019",
+      "difficulty": "easy",
+      "contentHash": "b4e2762c07fecce6137c128f44480fd0bd487c4280f892c3a854d9ac46005b48",
+      "targetWords": [
+        "LETĚT",
+        "HŘMĚNÍ",
+        "MŠICE",
+        "ČISTÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Pohyb a počasí doplňuje zahrada a jednoduchá vlastnost.",
+      "topic": "pohyb,počasí,hmyz,vlastnost",
+      "familiarity": "MŠICE je běžný domácí zahradní název."
+    },
+    "g6-expansion-medium-019": {
+      "boardId": "g6-expansion-medium-019",
+      "difficulty": "medium",
+      "contentHash": "e3cea1b1606b1f90455fb758ae6ef2f46fb1ed17043f7f9c16567f3500cd1b9b",
+      "targetWords": [
+        "RŮŽOVÁ",
+        "ŠPUNT",
+        "VÝVRTKA",
+        "KŮRA",
+        "ROLÁK",
+        "TESAT"
+      ],
+      "verdict": "accept",
+      "reason": "Předměty a řemeslo doplňuje příroda a barva.",
+      "topic": "barva,předměty,kuchyně,příroda,oděv,činnost",
+      "familiarity": "ŠPUNT a VÝVRTKA mají blízké prostředí, ale samostatné známé významy."
+    },
+    "g6-expansion-hard-010": {
+      "boardId": "g6-expansion-hard-010",
+      "difficulty": "hard",
+      "contentHash": "871e909cc1f41361c401fcbb16f0eaf140e3a41d0080c4c682f9f3952dc185f3",
+      "targetWords": [
+        "LIŠTA",
+        "OHŇOSTROJ",
+        "TŘÍŠŤ",
+        "NAHRÁVÁNÍ",
+        "LÁTAT",
+        "PISTOL",
+        "PESTÍK",
+        "ÚZEMÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Činnosti a známé jevy vyvažují dva užší konkrétní názvy.",
+      "topic": "dílna,událost,děj,činnost,předmět,botanika,místo",
+      "familiarity": "PISTOL zachovává schválené heslo; PESTÍK tvoří jednu přírodovědnou položku."
+    },
+    "g6-expansion-easy-020": {
+      "boardId": "g6-expansion-easy-020",
+      "difficulty": "easy",
+      "contentHash": "b5dbc8a61026ac6da6962e8570db9dc8642f9b0e75d635fffc89b7eb11d81cec",
+      "targetWords": [
+        "ROZMAR",
+        "ÚTERÝ",
+        "HRUŠKA",
+        "JETEL"
+      ],
+      "verdict": "accept",
+      "reason": "Cit či nálada, den, ovoce a rostlina jsou dobře odlišné.",
+      "topic": "nálada,čas,ovoce,rostlina",
+      "familiarity": "ROZMAR je běžný známý výraz, nikoli okrajový termín."
+    },
+    "g6-expansion-medium-020": {
+      "boardId": "g6-expansion-medium-020",
+      "difficulty": "medium",
+      "contentHash": "874615ca34cdb80e29290df36bd0fa58221892ac6fe1c40642c31cb478be623e",
+      "targetWords": [
+        "VRCHOL",
+        "PŘÍMKA",
+        "KACHNA",
+        "HRABOŠ",
+        "KOZA",
+        "SJEZD"
+      ],
+      "verdict": "accept",
+      "reason": "Tři zvířata doplňuje krajina, geometrie a pohyb; přístupná skladba.",
+      "topic": "krajina,geometrie,zvířata,pohyb",
+      "familiarity": "HRABOŠ je jediný méně každodenní zvířecí název."
+    },
+    "g6-expansion-hard-011": {
+      "boardId": "g6-expansion-hard-011",
+      "difficulty": "hard",
+      "contentHash": "2715b4117694f444b1f534c9e22d677210b23eeefaff5628dcdfb26330c0a900",
+      "targetWords": [
+        "FUJARA",
+        "SPLAV",
+        "LOGO",
+        "KŘESŤAN",
+        "NÁŘADÍ",
+        "BUBLAT",
+        "VRUT",
+        "SPACÁK",
+        "ONDATRA"
+      ],
+      "verdict": "accept",
+      "reason": "Hudba, voda, člověk, nástroje a pobyt venku mají jasné odlišné obrazy.",
+      "topic": "hudba,voda,značka,člověk,dílna,zvuk,turistika,zvíře",
+      "familiarity": "FUJARA a ONDATRA jsou vhodná širší těžká zásoba."
+    },
+    "g6-expansion-easy-021": {
+      "boardId": "g6-expansion-easy-021",
+      "difficulty": "easy",
+      "contentHash": "b38241e37c2eb1ed3ce09b928126ce6b6d59ee98b2aea89df888cf242afd3c24",
+      "targetWords": [
+        "HUČET",
+        "SMETÁK",
+        "SRUB",
+        "HOUŠTÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Zvuk a úklid doplňuje stavba a přírodní prostředí.",
+      "topic": "zvuk,domácnost,stavba,příroda",
+      "familiarity": "Všechna čtyři hesla jsou živá a přístupná."
+    },
+    "g6-expansion-medium-021": {
+      "boardId": "g6-expansion-medium-021",
+      "difficulty": "medium",
+      "contentHash": "c399dc843d713642bb0828032636813cfade61679a5e547442c6d449cf3c23b0",
+      "targetWords": [
+        "HADICE",
+        "SEKANÁ",
+        "HROZNY",
+        "KNOT",
+        "RUKOLA",
+        "PŘÍVĚS"
+      ],
+      "verdict": "accept",
+      "reason": "Jídlo doplňují zahradní, světelný a dopravní předmět.",
+      "topic": "zahrada,jídlo,světlo,doprava",
+      "familiarity": "RUKOLA je běžná současná zelenina; žádný vzácný shluk."
+    },
+    "g6-expansion-hard-012": {
+      "boardId": "g6-expansion-hard-012",
+      "difficulty": "hard",
+      "contentHash": "c79377dc1db7983d7fd9f0f35256b3c114bffde48c4d54928b78830f43d0c07c",
+      "targetWords": [
+        "KNIHAŘ",
+        "JÍST",
+        "VIOLA",
+        "SMIREK",
+        "ZAJIŠTĚNÍ",
+        "KORÁB",
+        "PÉCT",
+        "METLA",
+        "DOUBRAVA"
+      ],
+      "verdict": "accept",
+      "reason": "Řemeslné a tradiční názvy jsou proložené běžnými činnostmi.",
+      "topic": "řemeslo,činnosti,hudba,dílna,loď,les",
+      "familiarity": "SMIREK a DOUBRAVA jsou užší, ale obklopené známými slovy."
+    },
+    "g6-expansion-easy-022": {
+      "boardId": "g6-expansion-easy-022",
+      "difficulty": "easy",
+      "contentHash": "e63ad7beaf972ad20a162d792e881cff572a98138d83eda984f6d0dae6478549",
+      "targetWords": [
+        "KŘEN",
+        "POSLAT",
+        "KMÍN",
+        "ŠIKULA"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě běžné kuchyňské rostliny doplňuje činnost a hravý člověk.",
+      "topic": "kuchyně,komunikace,člověk",
+      "familiarity": "KŘEN a KMÍN nejsou varianty jedné rodiny; snadná sestava."
+    },
+    "g6-expansion-medium-022": {
+      "boardId": "g6-expansion-medium-022",
+      "difficulty": "medium",
+      "contentHash": "a98d449db31af79536dcd7d1d5bb19ea1cebd8ce579da2a2150ddcf4b4fa5923",
+      "targetWords": [
+        "OTEC",
+        "DŘEŇ",
+        "VDĚK",
+        "BZUKOT",
+        "HRYZAT",
+        "HRABAT",
+        "OSTRÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Rodina, cit a zvuk střídají přírodu a dvě známé činnosti.",
+      "topic": "rodina,tělo,cit,zvuk,činnosti,vlastnost",
+      "familiarity": "DŘEŇ je jediný užší pojem; ostatní drží běžnou známost."
+    },
+    "g6-expansion-hard-013": {
+      "boardId": "g6-expansion-hard-013",
+      "difficulty": "hard",
+      "contentHash": "e21a5730a87ba563c46bad18af224f2503d999f60062bc3b44e3ada76f3e9fc4",
+      "targetWords": [
+        "KOUDEL",
+        "VDĚK",
+        "ORNICE",
+        "ZÁBAVA",
+        "ZÁSUVKA",
+        "LODĚNICE",
+        "SKLÍZET",
+        "MURÉNA"
+      ],
+      "verdict": "accept",
+      "reason": "Materiál a přírodní názvy vyvažuje domácnost, cit a činnost.",
+      "topic": "materiál,cit,pole,zábava,domácnost,místo,zvíře",
+      "familiarity": "KOUDEL a MURÉNA jsou dvě vhodné náročnější položky."
+    },
+    "g6-expansion-easy-023": {
+      "boardId": "g6-expansion-easy-023",
+      "difficulty": "easy",
+      "contentHash": "ca8787bbf60864c1d2f3a869ce2405cbee14df81f29ce242194921e55285f91a",
+      "targetWords": [
+        "TRÁM",
+        "KAŠNA",
+        "DÝNĚ",
+        "KLIKA",
+        "SMŮLA"
+      ],
+      "verdict": "accept",
+      "reason": "Konkrétní známé předměty a přírodní název vytvářejí pestrou pětici.",
+      "topic": "stavba,město,zahrada,předmět,příroda",
+      "familiarity": "Víceznačnost KLIKA a SMŮLA je přirozená a srozumitelná."
+    },
+    "g6-expansion-medium-023": {
+      "boardId": "g6-expansion-medium-023",
+      "difficulty": "medium",
+      "contentHash": "0ea3c83af3fa5cef4110ddf3a9e3f9ab66578ac119a1bcef48da6738624c9988",
+      "targetWords": [
+        "BADYÁN",
+        "POUŤ",
+        "SPONKA",
+        "NÁPĚV",
+        "ŽVÝKAT",
+        "KOMISE"
+      ],
+      "verdict": "accept",
+      "reason": "Kuchyni střídá událost, předmět, hudba, činnost a skupina lidí.",
+      "topic": "koření,událost,předmět,hudba,činnost,společnost",
+      "familiarity": "BADYÁN je konkrétní méně běžné koření, ostatní slova přístupná."
+    },
+    "g6-expansion-hard-014": {
+      "boardId": "g6-expansion-hard-014",
+      "difficulty": "hard",
+      "contentHash": "f550e0587352c53fb49b88b18b80c95396544d5d09773100aa111827bf672b8b",
+      "targetWords": [
+        "PRŮČELÍ",
+        "KDOULE",
+        "LOŽISKO",
+        "NÁLEPKA",
+        "KULIČKA",
+        "MECH",
+        "BUMERANG",
+        "DUDY"
+      ],
+      "verdict": "accept",
+      "reason": "Stavba, zahrada, technika, příroda a hravé předměty drží pestrost.",
+      "topic": "stavba,ovoce,technika,předměty,příroda,hra,hudba",
+      "familiarity": "KDOULE a LOŽISKO jsou širší zkušenostní zásoba pro těžkou."
+    },
+    "g6-expansion-easy-024": {
+      "boardId": "g6-expansion-easy-024",
+      "difficulty": "easy",
+      "contentHash": "6ea160b63b2959add97cfddd57ed4fa0d16179c390590138e6765f0c46dfdcae",
+      "targetWords": [
+        "ŠLEHAČ",
+        "BRLOH",
+        "VOLANT",
+        "STRUNA"
+      ],
+      "verdict": "accept",
+      "reason": "Domácnost, zvířecí obydlí, doprava a hudba jsou dobře odlišné.",
+      "topic": "kuchyně,zvířata,doprava,hudba",
+      "familiarity": "Běžné konkrétní názvy bez skrytě odborného významu."
+    },
+    "g6-expansion-medium-024": {
+      "boardId": "g6-expansion-medium-024",
+      "difficulty": "medium",
+      "contentHash": "24bfc42b76e4216f22ceae3089c7580bd3a2d1e93b50dea5df8b0ab7cd9c9020",
+      "targetWords": [
+        "RYBÍZ",
+        "GOLEM",
+        "PUMPA",
+        "DOBRO",
+        "MELOUN",
+        "DELTA"
+      ],
+      "verdict": "accept",
+      "reason": "Jídlo, pohádkový motiv a předmět vyvažují obecný a zeměpisný pojem.",
+      "topic": "ovoce,pohádka,technika,hodnota,zeměpis",
+      "familiarity": "GOLEM a DELTA jsou známé naučené pojmy, ne neprůhledná terminologie."
+    },
+    "g6-expansion-hard-015": {
+      "boardId": "g6-expansion-hard-015",
+      "difficulty": "hard",
+      "contentHash": "b2f80f058c507471643045c86354dc90322f3f8e69df5b2b758f8ff1641f1a0f",
+      "targetWords": [
+        "PILÍŘ",
+        "MINCE",
+        "ZÁŘIVÝ",
+        "MOZAIKA",
+        "DUŽINA",
+        "FAGOT",
+        "TVÁRNICE",
+        "POSÁDKA",
+        "ZÁVIT"
+      ],
+      "verdict": "accept",
+      "reason": "Technickou část vyvažuje umění, hudba, rostlina, hodnota a člověk.",
+      "topic": "stavba,peníze,vlastnost,umění,rostlina,hudba,doprava,dílna",
+      "familiarity": "FAGOT a DUŽINA jsou vhodné konkrétní názvy těžké obtížnosti."
+    },
+    "g6-expansion-easy-025": {
+      "boardId": "g6-expansion-easy-025",
+      "difficulty": "easy",
+      "contentHash": "10c11ea0763e8d95f94efd069cded09682e7517fd132e0547d477a40ffc52586",
+      "targetWords": [
+        "STOJAN",
+        "SMRK",
+        "SMUTNÝ",
+        "PLETÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Předmět, strom, citová vlastnost a zahradní děj zůstávají přístupné.",
+      "topic": "předmět,strom,nálada,zahrada",
+      "familiarity": "Žádné okrajové heslo ani zaměnitelné varianty."
+    },
+    "g6-expansion-medium-025": {
+      "boardId": "g6-expansion-medium-025",
+      "difficulty": "medium",
+      "contentHash": "d22e928d6fbc49d838d2b0a02f45627f10073c04b7a48a2233005246bbe3886a",
+      "targetWords": [
+        "BÍLÝ",
+        "KEJKLÍŘ",
+        "OŘEŠÁK",
+        "KARTÁČ",
+        "POMLČKA",
+        "HŘÍVA"
+      ],
+      "verdict": "accept",
+      "reason": "Vlastnost a pohádkově hravý člověk doplňují strom, domácnost a jazyk.",
+      "topic": "barva,člověk,strom,domácnost,jazyk,zvíře",
+      "familiarity": "KEJKLÍŘ je širší, ale srozumitelné označení; ostatní běžná."
+    },
+    "g6-expansion-hard-016": {
+      "boardId": "g6-expansion-hard-016",
+      "difficulty": "hard",
+      "contentHash": "b7c3fa53d1bcf161cbfc49e4adb81aa2ea44e22873f6559904393a40fcc735d6",
+      "targetWords": [
+        "ZÁTOKA",
+        "POTÁPNÍK",
+        "CIFERNÍK",
+        "PELECH",
+        "VYVOLÁNÍ",
+        "PŘESTÁVKA",
+        "STVOL",
+        "TMEL"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu vyvažuje měření času, domácnost, děj a dílna.",
+      "topic": "krajina,hmyz,čas,zvíře,děje,rostlina,dílna",
+      "familiarity": "POTÁPNÍK a STVOL jsou užší dvě položky, nikoli celý odborný blok."
+    },
+    "g6-expansion-easy-026": {
+      "boardId": "g6-expansion-easy-026",
+      "difficulty": "easy",
+      "contentHash": "c38995fb6daf895fc5c0a5c16a86e5adf95f32e662f351616f4ecbf6666ad9a1",
+      "targetWords": [
+        "HŮLKA",
+        "TŘÍSKA",
+        "VLNITÝ",
+        "ŠIŠKA"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní a drobné konkrétní předměty doplňuje známá vlastnost.",
+      "topic": "předmět,materiál,vlastnost,les",
+      "familiarity": "Jednoduchá známá čtveřice; žádná jazyková past."
+    },
+    "g6-expansion-medium-026": {
+      "boardId": "g6-expansion-medium-026",
+      "difficulty": "medium",
+      "contentHash": "fe338055d3f88d6cad52c5a7f78ccb7e967978740db4dafafe644059541d96f6",
+      "targetWords": [
+        "TŘÍŠŤ",
+        "DUSNO",
+        "JMELÍ",
+        "MODRÁ",
+        "NÁSEP",
+        "ŠKEBLE"
+      ],
+      "verdict": "accept",
+      "reason": "Počasí a přírodní názvy doplňuje barva a krajinná stavba.",
+      "topic": "jev,počasí,rostlina,barva,stavba,zvíře",
+      "familiarity": "NÁSEP je jediný užší technický výraz; JMELÍ a ŠKEBLE konkrétní známá příroda."
+    },
+    "g6-expansion-hard-017": {
+      "boardId": "g6-expansion-hard-017",
+      "difficulty": "hard",
+      "contentHash": "bcf6a746ff8a44916c2bcd29d05a0ec9c5bc7df077053f7dc24708a266309e16",
+      "targetWords": [
+        "KNEDLÍK",
+        "BUZOLA",
+        "ŠPRÝM",
+        "FOTON",
+        "HOLÍNKA",
+        "ŠÍDLO",
+        "BROSKVOŇ",
+        "ZEMĚPIS"
+      ],
+      "verdict": "accept",
+      "reason": "Vědecký a navigační pojem mají protiváhu v jídle, oděvu, dílně a zahradě.",
+      "topic": "jídlo,turistika,humor,fyzika,oděv,dílna,strom,škola",
+      "familiarity": "FOTON je jedna náročnější vědecká položka; skladba zůstává čitelná."
+    },
+    "g6-expansion-easy-027": {
+      "boardId": "g6-expansion-easy-027",
+      "difficulty": "easy",
+      "contentHash": "89472e06d0efcd1a9d932a250ec3065a1fd2a45cf60d7fdc7586a3d474c754e8",
+      "targetWords": [
+        "CHLAD",
+        "VSTÁT",
+        "HRNEK",
+        "JEDLE"
+      ],
+      "verdict": "accept",
+      "reason": "Vjem, jednoduchá činnost, domácí předmět a strom jsou pestré.",
+      "topic": "teplota,činnost,domov,strom",
+      "familiarity": "Velmi běžná slova vhodná pro snadnou obtížnost."
+    },
+    "g6-expansion-medium-027": {
+      "boardId": "g6-expansion-medium-027",
+      "difficulty": "medium",
+      "contentHash": "7f4ab3316d233be968fd3b4aefbc27a21ae735813de22fffb0456ebcca0f3363",
+      "targetWords": [
+        "NÁTĚR",
+        "STRUNA",
+        "ŘÍJEN",
+        "DENÍK",
+        "ŠERO",
+        "PLST",
+        "ÚSMĚV"
+      ],
+      "verdict": "accept",
+      "reason": "Sedm odlišných oblastí; materiálová dvojice je vyvážená časem a citovým výrazem.",
+      "topic": "úprava,hudba,čas,kniha,světlo,materiál,výraz",
+      "familiarity": "PLST je jediný méně každodenní konkrétní materiál."
+    },
+    "g6-expansion-hard-018": {
+      "boardId": "g6-expansion-hard-018",
+      "difficulty": "hard",
+      "contentHash": "89a7b636c21463a037492894eab50bfd5cd3694a6f9cd18aea5f8f44cdee02b9",
+      "targetWords": [
+        "ŘÍJEN",
+        "BOUŘE",
+        "MEANDR",
+        "VYDRA",
+        "VIRUS",
+        "KOUSNUTÍ",
+        "NAJÍT",
+        "STOLIČKA",
+        "SKOBA"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní pojmy doplňuje kalendář, činnost a dva běžné předměty.",
+      "topic": "čas,počasí,krajina,zvíře,biologie,děj,činnost,předměty",
+      "familiarity": "MEANDR a VIRUS jsou známé naučené termíny, bez odborného přetížení."
+    },
+    "g6-expansion-easy-028": {
+      "boardId": "g6-expansion-easy-028",
+      "difficulty": "easy",
+      "contentHash": "3ec0d729d9faaee33d4411c14223999a7bb35b52fba2361ff1d98d89c1a402a9",
+      "targetWords": [
+        "SLOUP",
+        "ŠŇŮRA",
+        "RÁDIO",
+        "SOLIT"
+      ],
+      "verdict": "accept",
+      "reason": "Tři známé předměty doplňuje jednoduchá kuchyňská činnost.",
+      "topic": "stavba,předmět,média,kuchyně",
+      "familiarity": "Běžná přístupná čtveřice bez vzácných podob."
+    },
+    "g6-expansion-medium-028": {
+      "boardId": "g6-expansion-medium-028",
+      "difficulty": "medium",
+      "contentHash": "24f00d5793bcee7419cf50d264ee787be2ed074b33cfb3ee7509ce084ba47ddc",
+      "targetWords": [
+        "POKLICE",
+        "VOLÁN",
+        "VĚŠÁK",
+        "FOŠNA",
+        "KONČIT",
+        "PATIZON"
+      ],
+      "verdict": "accept",
+      "reason": "Kuchyně a domov doplňují oděv, dílna, činnost a zelenina.",
+      "topic": "kuchyně,oděv,domov,dílna,činnost,zahrada",
+      "familiarity": "VOLÁN a PATIZON jsou užší konkrétní názvy; ostatní známá protiváha."
+    },
+    "g6-expansion-hard-019": {
+      "boardId": "g6-expansion-hard-019",
+      "difficulty": "hard",
+      "contentHash": "3595c96732ccb7d8bde0b97f0b90c550df31ea1d278cd1328d00fe9eb7a238e8",
+      "targetWords": [
+        "PRAMICE",
+        "DŽÍNY",
+        "DIVOŽENKA",
+        "SLAVÍK",
+        "MOTOCYKL",
+        "ŠÍPEK",
+        "SEŠIT",
+        "ÚSEČKA"
+      ],
+      "verdict": "accept",
+      "reason": "Doprava a příroda jsou proložené pohádkou, oděvem a školou.",
+      "topic": "loď,oděv,pohádka,pták,doprava,rostlina,škola",
+      "familiarity": "DIVOŽENKA je hravá známá postava; PRAMICE přiměřený širší název."
+    },
+    "g6-expansion-easy-029": {
+      "boardId": "g6-expansion-easy-029",
+      "difficulty": "easy",
+      "contentHash": "3f915f8a2a2d8579f980a158a056399b528823a6e5948998f2e92fb12f4a00ba",
+      "targetWords": [
+        "MLSAT",
+        "TOPOL",
+        "NÁČRT",
+        "ŠIBAL"
+      ],
+      "verdict": "accept",
+      "reason": "Činnost, strom, kresba a člověk vytvářejí jasné samostatné asociace.",
+      "topic": "činnost,strom,kresba,člověk",
+      "familiarity": "NÁČRT je běžný základní název, nikoli specialistický termín."
+    },
+    "g6-expansion-medium-029": {
+      "boardId": "g6-expansion-medium-029",
+      "difficulty": "medium",
+      "contentHash": "e747d9e9a88fcc2e76d4fa13083266724376d2b0b3764467c0f331dbb3929cda",
+      "targetWords": [
+        "VICHR",
+        "KLOVAT",
+        "VERŠ",
+        "HBITÝ",
+        "TISK",
+        "NĚHA",
+        "DĚLAT"
+      ],
+      "verdict": "accept",
+      "reason": "Počasí, činnosti, jazyk a cit se přirozeně střídají.",
+      "topic": "počasí,činnosti,poezie,vlastnost,tisk,cit",
+      "familiarity": "KLOVAT a HBITÝ jsou živá přístupná slova."
+    },
+    "g6-expansion-hard-020": {
+      "boardId": "g6-expansion-hard-020",
+      "difficulty": "hard",
+      "contentHash": "1653bbbeebc3f34a98f15e1b5ddc3bd34338169df302341701219185f1cdd71e",
+      "targetWords": [
+        "ÚČEL",
+        "HABR",
+        "MEDÚZA",
+        "NADHLED",
+        "PAŽITKA",
+        "STUPAČKA",
+        "KLAPOT",
+        "ZÁVITNÍK"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě dílenské položky doplňuje příroda, kuchyně, zvuk a obecné pojmy.",
+      "topic": "účel,strom,zvíře,pohled,bylinka,dílna,zvuk",
+      "familiarity": "ZÁVITNÍK je užší technický název, vhodný jako jednotlivá těžká položka."
+    },
+    "g6-expansion-easy-030": {
+      "boardId": "g6-expansion-easy-030",
+      "difficulty": "easy",
+      "contentHash": "2642c5bd3a408792fd2fe1752bde26a044cde118b40a5dac23a21bb8f34e0e25",
+      "targetWords": [
+        "TÁNÍ",
+        "PEČIVO",
+        "HRUŠEŇ",
+        "PLAVAT"
+      ],
+      "verdict": "accept",
+      "reason": "Známý přírodní děj, jídlo, strom a pohyb mají vyvážené podoby.",
+      "topic": "počasí,jídlo,strom,pohyb",
+      "familiarity": "Žádná z položek není raritní."
+    },
+    "g6-expansion-medium-030": {
+      "boardId": "g6-expansion-medium-030",
+      "difficulty": "medium",
+      "contentHash": "6d82a485f2ea7a4a9c3e98ae78de72434907b063a3ac87af9fe3c1a6a92d46ef",
+      "targetWords": [
+        "HŘIŠTĚ",
+        "FERMEŽ",
+        "CEDULE",
+        "POZOUN",
+        "VOŇAVÝ",
+        "SÍLA"
+      ],
+      "verdict": "accept",
+      "reason": "Specialističtější materiál je opřený o běžné místo, předmět, vlastnosti a hudbu.",
+      "topic": "sport,materiál,text,hudba,vlastnost,schopnost",
+      "familiarity": "FERMEŽ je jediná užší dílenská položka; horní střední, ale přijatelné."
+    },
+    "g6-expansion-hard-021": {
+      "boardId": "g6-expansion-hard-021",
+      "difficulty": "hard",
+      "contentHash": "31513e0e09bb96e6ae9297073f4361b8908142f077a786c01c96405e384529cc",
+      "targetWords": [
+        "ŽLUNA",
+        "OBVOD",
+        "PIXEL",
+        "LEDŇÁČEK",
+        "ČINEL",
+        "REJSTŘÍK",
+        "TRPKÝ",
+        "JASAN",
+        "BLUDIČKA"
+      ],
+      "verdict": "accept",
+      "reason": "Dvojici ptáků vyvažují technologie, hudba, text, vlastnost a pohádka.",
+      "topic": "ptáci,geometrie,technologie,hudba,text,vlastnost,strom,pohádka",
+      "familiarity": "ŽLUNA a REJSTŘÍK jsou širší srozumitelná zásoba těžké obtížnosti."
+    },
+    "g6-expansion-easy-031": {
+      "boardId": "g6-expansion-easy-031",
+      "difficulty": "easy",
+      "contentHash": "c99316f89ba856629d416529fdb0e3bcc697c44b9da18d9666856f8d13fade6c",
+      "targetWords": [
+        "VINICE",
+        "MOBIL",
+        "SÍTKO",
+        "PŘÍBĚH"
+      ],
+      "verdict": "accept",
+      "reason": "Krajinné místo, současný předmět, kuchyně a vyprávění tvoří známou čtveřici.",
+      "topic": "místo,technologie,kuchyně,vyprávění",
+      "familiarity": "Snadná sestava bez odborného shluku."
+    },
+    "g6-expansion-medium-031": {
+      "boardId": "g6-expansion-medium-031",
+      "difficulty": "medium",
+      "contentHash": "2140584017bb03e5e8cc730155163b91ea1a936774ef43ecdf294377b52bfc31",
+      "targetWords": [
+        "PRKNO",
+        "ŠALVĚJ",
+        "MILOST",
+        "RUBÍN",
+        "ŤUKAT",
+        "OSADA"
+      ],
+      "verdict": "accept",
+      "reason": "Materiál, bylinka, hodnota, drahokam, činnost a místo jsou odlišné.",
+      "topic": "materiál,bylinka,hodnota,minerál,činnost,místo",
+      "familiarity": "ŠALVĚJ a RUBÍN jsou konkrétní známé názvy, ostatní běžná."
+    },
+    "g6-expansion-hard-022": {
+      "boardId": "g6-expansion-hard-022",
+      "difficulty": "hard",
+      "contentHash": "a965be47321433db086e0173e7b10735757d9608e35198576197e8dc245fd0fd",
+      "targetWords": [
+        "VRATKÝ",
+        "JEŘÁB",
+        "PŘÍKOP",
+        "TŘEŠNĚ",
+        "STĚŽEŇ",
+        "KATAKOMBY",
+        "KUNA",
+        "ŠTOČEK",
+        "JANTAR"
+      ],
+      "verdict": "accept",
+      "reason": "Technickou a historickou část vyvažují příroda, jídlo a vlastnost.",
+      "topic": "vlastnost,stavba,ovoce,loď,historie,zvíře,tisk,minerál",
+      "familiarity": "KATAKOMBY a ŠTOČEK jsou náročnější, ale v devítici netvoří většinu."
+    },
+    "g6-expansion-easy-032": {
+      "boardId": "g6-expansion-easy-032",
+      "difficulty": "easy",
+      "contentHash": "f8e83ca29a2dc23ff42de3b924c0e8007a6ea0dd627fd79e6d4a2d7a8a1a4d48",
+      "targetWords": [
+        "KLEPAT",
+        "PŘÁT",
+        "CHVÍLE",
+        "PIŠKOT"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě běžné činnosti vyvažuje časový pojem a známé jídlo.",
+      "topic": "činnosti,čas,jídlo",
+      "familiarity": "Běžná snadná slova bez neobvyklé morfologie."
+    },
+    "g6-expansion-medium-032": {
+      "boardId": "g6-expansion-medium-032",
+      "difficulty": "medium",
+      "contentHash": "642c20f3638977aea7a85b64787b46a8d8de0cfa86954bc24c60ab90ecda6a5c",
+      "targetWords": [
+        "ATLAS",
+        "ŽEBŘINY",
+        "PRÁCE",
+        "LÍSKA",
+        "LOPATKA",
+        "MULČ"
+      ],
+      "verdict": "accept",
+      "reason": "Škola, sport, zahrada a domácí předmět drží přístupnou pestrost.",
+      "topic": "kniha,sport,činnost,rostlina,nástroj,zahrada",
+      "familiarity": "MULČ je jedno užší současné zahradnické heslo."
+    },
+    "g6-expansion-hard-023": {
+      "boardId": "g6-expansion-hard-023",
+      "difficulty": "hard",
+      "contentHash": "56ee29783b330e8edf9fedd911eec700417a2244ec23800d7e20b23d87d47acd",
+      "targetWords": [
+        "VIŠEŇ",
+        "POLNÍČEK",
+        "HUKOT",
+        "PRÁCE",
+        "PRÁM",
+        "ARCHITEKT",
+        "DÝKA",
+        "SKICA",
+        "TRADICE"
+      ],
+      "verdict": "accept",
+      "reason": "Rostlinná dvojice je proložená zvukem, člověkem, kresbou a předměty.",
+      "topic": "strom,zelenina,zvuk,činnost,loď,profese,předmět,kresba,kultura",
+      "familiarity": "POLNÍČEK a PRÁM jsou konkrétní přiměřené těžší položky."
+    },
+    "g6-expansion-easy-033": {
+      "boardId": "g6-expansion-easy-033",
+      "difficulty": "easy",
+      "contentHash": "8f04050edd71ffa3e2b80348b83094679dfc47c11f9eb1817fe214b98157ee22",
+      "targetWords": [
+        "PÍSEŇ",
+        "MÁTA",
+        "JABLOŇ",
+        "ZÁVAŽÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Hudbu a dvě známé rostliny doplňuje běžný hmatatelný předmět.",
+      "topic": "hudba,bylinka,strom,měření",
+      "familiarity": "JABLOŇ a MÁTA mají odlišné významy, nejsou varianty."
+    },
+    "g6-expansion-medium-033": {
+      "boardId": "g6-expansion-medium-033",
+      "difficulty": "medium",
+      "contentHash": "54b4bfc119fcecde6018d0de70e4df5975e20fa37168301fcfaf4322d141f657",
+      "targetWords": [
+        "LIJÁK",
+        "DRUHÝ",
+        "DROZD",
+        "PIPETA",
+        "TRÁM",
+        "PEKAŘ"
+      ],
+      "verdict": "accept",
+      "reason": "Počasí, pořadí, příroda a řemeslo vyvažují jediný laboratorní předmět.",
+      "topic": "počasí,pořadí,pták,laboratoř,stavba,profese",
+      "familiarity": "PIPETA je konkrétní školní/laboratorní název, ostatní běžná."
+    },
+    "g6-expansion-hard-024": {
+      "boardId": "g6-expansion-hard-024",
+      "difficulty": "hard",
+      "contentHash": "1658dcc6cd914498a5088348cf978b9e27b32ad3fed9886ccea621c0237ad5dd",
+      "targetWords": [
+        "TŘMEN",
+        "PŘEDMLUVA",
+        "ČUTORA",
+        "TAKT",
+        "KOMÍN",
+        "POTVRZENÍ",
+        "HEJKAL",
+        "STOŽÁR"
+      ],
+      "verdict": "accept",
+      "reason": "Jezdectví a turistiku střídá kniha, hudba, stavba, dokument a pohádka.",
+      "topic": "jezdectví,kniha,turistika,hudba,stavba,dokument,pohádka",
+      "familiarity": "TŘMEN a ČUTORA jsou širší konkrétní slova, skladba přístupná těžkým hráčům."
+    },
+    "g6-expansion-easy-034": {
+      "boardId": "g6-expansion-easy-034",
+      "difficulty": "easy",
+      "contentHash": "1ff99c557ebac391d1dab36480639dbc84d040181599742ffb6935a1fb4d38cd",
+      "targetWords": [
+        "MANGO",
+        "KŮRKA",
+        "HARFA",
+        "MADLO"
+      ],
+      "verdict": "accept",
+      "reason": "Jídlo, hudba a domácí předmět dávají snadno představitelné asociace.",
+      "topic": "ovoce,jídlo,hudba,předmět",
+      "familiarity": "Čtyři běžná konkrétní slova."
+    },
+    "g6-expansion-medium-034": {
+      "boardId": "g6-expansion-medium-034",
+      "difficulty": "medium",
+      "contentHash": "c3b5984b591404601c6f357985aa76d1bf1081e90a093a858b4afb96488ddf15",
+      "targetWords": [
+        "HYENA",
+        "JAVOR",
+        "CHATA",
+        "VYSÁVAT",
+        "PARNO",
+        "KŘOVÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Zvíře a příroda se střídají s bydlením, činností a počasím.",
+      "topic": "zvíře,strom,bydlení,úklid,počasí,příroda",
+      "familiarity": "HYENA je známý druh; žádný neprůhledný odborný název."
+    },
+    "g6-expansion-hard-025": {
+      "boardId": "g6-expansion-hard-025",
+      "difficulty": "hard",
+      "contentHash": "d2ba6e020840bfd41d5a61a9636821c4fd9b3a95dc3ac71826c1c4282b78efc3",
+      "targetWords": [
+        "JAHODNÍK",
+        "PĚNKAVA",
+        "VÝHERCE",
+        "TYMIÁN",
+        "MUŠKA",
+        "KOŠÍKÁŘ",
+        "BORŮVKA",
+        "TAPETA"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodně laděnou skladbu rozšiřují člověk, řemeslo a domácnost.",
+      "topic": "zahrada,pták,člověk,bylinka,hmyz,řemeslo,domov",
+      "familiarity": "PĚNKAVA a TYMIÁN jsou přiměřené konkrétní názvy, nikoli raritní seznam."
+    },
+    "g6-expansion-easy-035": {
+      "boardId": "g6-expansion-easy-035",
+      "difficulty": "easy",
+      "contentHash": "8579d4a70986dbf941b2001a58a465ede576bdd16313c618958fc7e3fdb01950",
+      "targetWords": [
+        "ŽALUD",
+        "DUPAT",
+        "ZPRÁVA",
+        "VZKAZ"
+      ],
+      "verdict": "accept",
+      "reason": "Les a pohyb doplňují dva známé pojmy komunikace s odlišným rozsahem.",
+      "topic": "les,pohyb,zpráva,komunikace",
+      "familiarity": "ZPRÁVA a VZKAZ významově souvisejí, ale nejde o rodinné varianty ani nesrozumitelná hesla."
+    },
+    "g6-expansion-medium-035": {
+      "boardId": "g6-expansion-medium-035",
+      "difficulty": "medium",
+      "contentHash": "bf15f0cc02b5567553a82a5493c95e97551a5ae59bd39bf88705846b5fd7c2f3",
+      "targetWords": [
+        "ÚHLOMĚR",
+        "HABR",
+        "SYPAT",
+        "ŘÁDEK",
+        "TITUL",
+        "RÁHNO"
+      ],
+      "verdict": "accept",
+      "reason": "Školní a textová část vyvažuje strom, činnost a lodní vybavení.",
+      "topic": "geometrie,strom,činnost,text,kniha,loď",
+      "familiarity": "RÁHNO je jediný užší námořní název; ÚHLOMĚR známý školní předmět."
+    },
+    "g6-expansion-hard-026": {
+      "boardId": "g6-expansion-hard-026",
+      "difficulty": "hard",
+      "contentHash": "3607bf19d9382ba0706786e254bc7c2451f7fde540042bdce630768d012be9ab",
+      "targetWords": [
+        "KŘUPAVÝ",
+        "POVĚTŘÍ",
+        "DOSLOV",
+        "VSTUPENKA",
+        "BÁBA",
+        "KROUŽEK",
+        "DLÁTO",
+        "LOUTKÁŘ"
+      ],
+      "verdict": "accept",
+      "reason": "Vlastnost a počasí se střídají s knihou, událostí, člověkem a řemeslem.",
+      "topic": "vlastnost,počasí,kniha,událost,člověk,tvar,řemeslo,divadlo",
+      "familiarity": "POVĚTŘÍ a DOSLOV jsou známé širší výrazy, ne blok neznámých termínů."
+    },
+    "g6-expansion-easy-036": {
+      "boardId": "g6-expansion-easy-036",
+      "difficulty": "easy",
+      "contentHash": "0fb11bd60daa64b6cbf5ab3816f5565349edbd89c0b34921ed368de9894626dd",
+      "targetWords": [
+        "DUPOT",
+        "ÚSVIT",
+        "PEDÁL",
+        "ZÁPAD"
+      ],
+      "verdict": "accept",
+      "reason": "Zvuk a konkrétní předmět doplňují dva dobře známé časové/prostorové pojmy.",
+      "topic": "zvuk,denní doba,předmět,světová strana",
+      "familiarity": "ÚSVIT a ZÁPAD příjemně kontrastují bez rodinného opakování."
+    },
+    "g6-expansion-medium-036": {
+      "boardId": "g6-expansion-medium-036",
+      "difficulty": "medium",
+      "contentHash": "03cd14d33782214228cbd300a728b090f3d41b78bc6f550408a7ceeae9531321",
+      "targetWords": [
+        "JEDLE",
+        "RYBÁK",
+        "ŽELVA",
+        "START",
+        "KŮZLE",
+        "UHEL",
+        "DŽBÁN"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodně laděnou sedmici vyvažuje událost, kreslířský materiál a nádoba.",
+      "topic": "strom,pták,zvířata,událost,materiál,nádoba",
+      "familiarity": "RYBÁK a UHEL jsou dvě širší položky mezi běžnými známými názvy."
+    },
+    "g6-expansion-hard-027": {
+      "boardId": "g6-expansion-hard-027",
+      "difficulty": "hard",
+      "contentHash": "08893e54a5fbd584edf0cb4b6dc3f36ed7daef23d9366fbb7dfc3f3f2236c0a7",
+      "targetWords": [
+        "DUPOT",
+        "LÁTAT",
+        "ZÁŽITEK",
+        "LÓŽE",
+        "RENDLÍK",
+        "ÚPATÍ",
+        "LÁVA",
+        "ODNOŽ",
+        "SKLÁDAČKA"
+      ],
+      "verdict": "accept",
+      "reason": "Domácnost a činnost vyvažují kulturu, krajinu, přírodní materiál a hru.",
+      "topic": "zvuk,činnost,prožitek,divadlo,kuchyně,krajina,příroda,hra",
+      "familiarity": "LÓŽE a ODNOŽ jsou vhodné širší pojmy, bez nepřiměřeného shluku."
+    },
+    "g6-expansion-easy-037": {
+      "boardId": "g6-expansion-easy-037",
+      "difficulty": "easy",
+      "contentHash": "0dabc6df296405d2a195f462fb4792ffb24cd492c40e2395f4bd38f5c304ec49",
+      "targetWords": [
+        "JÍDLO",
+        "SUŠÁK",
+        "VÁHA",
+        "KULICH"
+      ],
+      "verdict": "accept",
+      "reason": "Čtyři velmi známé názvy z každodenního života.",
+      "topic": "jídlo,domácnost,měření,oděv",
+      "familiarity": "Přístupné konkrétní asociace; vhodné i pro méně zkušené hráče."
+    },
+    "g6-expansion-medium-037": {
+      "boardId": "g6-expansion-medium-037",
+      "difficulty": "medium",
+      "contentHash": "88b7df99d5e5ac93c6b309207e38ec4b57307ad97cee0291ea420166d10be304",
+      "targetWords": [
+        "DUŠE",
+        "PRAMICE",
+        "ŠPINAVÝ",
+        "LUSK",
+        "SVĚŽÍ",
+        "ŠMEJDIT"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě odlišné vlastnosti doplňují loď, rostlinu, abstraktní pojem a živou činnost.",
+      "topic": "duše,loď,vlastnosti,rostlina,činnost",
+      "familiarity": "PRAMICE je jedna užší konkrétní položka; ŠMEJDIT běžné hovorové sloveso."
+    },
+    "g6-expansion-hard-028": {
+      "boardId": "g6-expansion-hard-028",
+      "difficulty": "hard",
+      "contentHash": "c6df19f693a06ce401eac4ad2dec337916432fe7f50be19326c78afebdc0b832",
+      "targetWords": [
+        "KRÁLÍK",
+        "ZRÁDKYNĚ",
+        "MĚCH",
+        "BAVLNA",
+        "JEŘABINA",
+        "KOUDEL",
+        "ROČNÍK",
+        "VĚZENÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Materiály jsou proložené zvířetem, člověkem, plodem a obecnými pojmy.",
+      "topic": "zvíře,člověk,předmět,materiály,příroda,čas,místo",
+      "familiarity": "KOUDEL je jediný výrazně tradiční materiál; zbytek má srozumitelné významy."
+    },
+    "g6-expansion-easy-038": {
+      "boardId": "g6-expansion-easy-038",
+      "difficulty": "easy",
+      "contentHash": "c79a015a51b6fa7b224bf4689f43129ca88ea76602035e3e8924655312fd20cb",
+      "targetWords": [
+        "STROM",
+        "UTĚRKA",
+        "VÍLA",
+        "BRÝLE"
+      ],
+      "verdict": "accept",
+      "reason": "Příroda, domácnost a pohádka tvoří jasnou přístupnou čtveřici.",
+      "topic": "příroda,domov,pohádka,předmět",
+      "familiarity": "Všechna slova běžná."
+    },
+    "g6-expansion-medium-038": {
+      "boardId": "g6-expansion-medium-038",
+      "difficulty": "medium",
+      "contentHash": "cd15b9c0c79522823acab30e8cbf33074609a8887315f2f4324a29a4dbd70f76",
+      "targetWords": [
+        "OBOJEK",
+        "DŘÍMAT",
+        "NUDA",
+        "HŘEJIVÝ",
+        "OKNO",
+        "TANČIT"
+      ],
+      "verdict": "accept",
+      "reason": "Předměty, stav a vlastnost se střídají se dvěma živými činnostmi.",
+      "topic": "zvíře,spánek,pocit,vlastnost,domov,pohyb",
+      "familiarity": "DŘÍMAT a HŘEJIVÝ jsou přístupné širší výrazy."
+    },
+    "g6-expansion-hard-029": {
+      "boardId": "g6-expansion-hard-029",
+      "difficulty": "hard",
+      "contentHash": "d5287438dd3158b2aee7dd3b0b06fd723dc92c18132c9db828d42fbfed6adb7b",
+      "targetWords": [
+        "VÍLA",
+        "ULTRAZVUK",
+        "POČET",
+        "CHLÉV",
+        "VÝHON",
+        "MASÍČKO",
+        "CIMBÁL",
+        "SUŠÁK",
+        "HROB"
+      ],
+      "verdict": "accept",
+      "reason": "Techniku a hudbu vyvažují jednoduché konkrétní a pohádkové názvy.",
+      "topic": "pohádka,technika,počet,venkov,rostlina,jídlo,hudba,domov,místo",
+      "familiarity": "ULTRAZVUK a CIMBÁL dvě přiměřené náročnější položky."
+    },
+    "g6-expansion-easy-039": {
+      "boardId": "g6-expansion-easy-039",
+      "difficulty": "easy",
+      "contentHash": "31efa19e28a1bcafc543c4aaaf96ad9fdb5f73e7563dcd28c91168ca689d4b4b",
+      "targetWords": [
+        "BŘICHO",
+        "KABELA",
+        "PÍSKAT",
+        "TISK"
+      ],
+      "verdict": "accept",
+      "reason": "Tělo a předmět doplňuje běžná činnost a známý pojem.",
+      "topic": "tělo,předmět,zvuk,tisk",
+      "familiarity": "Běžná snadná slovní zásoba."
+    },
+    "g6-expansion-medium-039": {
+      "boardId": "g6-expansion-medium-039",
+      "difficulty": "medium",
+      "contentHash": "240d2ddfc8bd1382e4a70627120cf7ad49eb48c4c22b08e7967389b38e21bc05",
+      "targetWords": [
+        "CEJN",
+        "KŘESLO",
+        "NUDLE",
+        "LÁTKA",
+        "DŽUNGLE",
+        "BOTA",
+        "MOLO"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě vodní položky rozšiřují domácnost, jídlo, příroda a oděv.",
+      "topic": "ryba,domov,jídlo,materiál,příroda,oděv,voda",
+      "familiarity": "CEJN je jediný užší druhový název."
+    },
+    "g6-expansion-hard-030": {
+      "boardId": "g6-expansion-hard-030",
+      "difficulty": "hard",
+      "contentHash": "d465e04eaaf360e025cc65f50cddcbbe9ff0ba7638628d4597d638a225957c06",
+      "targetWords": [
+        "STVOL",
+        "TRŮN",
+        "CHLADIVÝ",
+        "NÁMĚSTÍ",
+        "ŘEZÁNÍ",
+        "GLAZURA",
+        "HOBOJ",
+        "ŠVIHADLO"
+      ],
+      "verdict": "accept",
+      "reason": "Umělecké a přírodní názvy mají běžnou městskou a pohybovou protiváhu.",
+      "topic": "rostlina,historie,vlastnost,město,děj,keramika,hudba,sport",
+      "familiarity": "GLAZURA a HOBOJ konkrétní užší pojmy."
+    },
+    "g6-expansion-easy-040": {
+      "boardId": "g6-expansion-easy-040",
+      "difficulty": "easy",
+      "contentHash": "e6a49a7bd2f55515f1b59dc3ba55db286cac583ae6b332e97e7836e2621f6df9",
+      "targetWords": [
+        "KŮLNA",
+        "MRZUTÝ",
+        "BROUK",
+        "NÁJEZD"
+      ],
+      "verdict": "accept",
+      "reason": "Stavba, nálada, zvíře a pohyb vytvářejí odlišné známé asociace.",
+      "topic": "stavba,nálada,zvíře,doprava",
+      "familiarity": "Žádný vzácný nebo zavádějící tvar."
+    },
+    "g6-expansion-medium-040": {
+      "boardId": "g6-expansion-medium-040",
+      "difficulty": "medium",
+      "contentHash": "a1145d1f6306536ab659cbf8586e68f72c15ad4cabaa52b0a36d3fd96aebe509",
+      "targetWords": [
+        "PEKÁČ",
+        "ČÍSLO",
+        "ÚCTA",
+        "NOČNÍ",
+        "RÉVA",
+        "SRNEC",
+        "FÉNIX"
+      ],
+      "verdict": "accept",
+      "reason": "Pestrá sedmice od domácnosti přes přírodu po pohádku.",
+      "topic": "domov,počet,cit,čas,rostlina,zvíře,pohádka",
+      "familiarity": "FÉNIX je známá bájná postava, RÉVA běžná rostlina."
+    },
+    "g6-expansion-hard-031": {
+      "boardId": "g6-expansion-hard-031",
+      "difficulty": "hard",
+      "contentHash": "b00424f0556d3c6ed128703dc4a7e048bc6f3ec3ce84280c3284e416d1f607c1",
+      "targetWords": [
+        "ZÁVORKA",
+        "DLUH",
+        "ZÁPRAŽÍ",
+        "POPĚVEK",
+        "ODDENEK",
+        "ŘEZBA",
+        "ÚROVEŇ",
+        "SPLÁVEK"
+      ],
+      "verdict": "accept",
+      "reason": "Jazyk, hudba, příroda a řemeslo doplňují finance a obecný pojem.",
+      "topic": "jazyk,finance,dům,hudba,rostlina,řemeslo,pojem,rybaření",
+      "familiarity": "ODDENEK a SPLÁVEK jsou přiměřené dvě širší položky."
+    },
+    "g6-expansion-easy-041": {
+      "boardId": "g6-expansion-easy-041",
+      "difficulty": "easy",
+      "contentHash": "2d57a1900cb0b4b7aa656d94042a24024859ce3b53bd6578730d1097ccbf6bfd",
+      "targetWords": [
+        "CESTA",
+        "ÚCTA",
+        "PLECH",
+        "VRBA",
+        "KOVÁŘ"
+      ],
+      "verdict": "accept",
+      "reason": "Známé místo, cit, materiál, strom a profese mají dobrý rozptyl.",
+      "topic": "cesta,cit,materiál,strom,profese",
+      "familiarity": "Přístupná snadná pětice."
+    },
+    "g6-expansion-medium-041": {
+      "boardId": "g6-expansion-medium-041",
+      "difficulty": "medium",
+      "contentHash": "45438839c1e84b8748a0c25ba0f9fa9df61df42ef604923c63eb4683e1bce6a7",
+      "targetWords": [
+        "TÝDEN",
+        "HOŘKÝ",
+        "NÁDVOŘÍ",
+        "OKAP",
+        "BALÓN",
+        "ŠTĚRK"
+      ],
+      "verdict": "accept",
+      "reason": "Čas a vlastnost vyvažují místo, dům, hru a materiál.",
+      "topic": "čas,chuť,místo,dům,hra,materiál",
+      "familiarity": "Žádný shluk specialistických názvů."
+    },
+    "g6-expansion-hard-032": {
+      "boardId": "g6-expansion-hard-032",
+      "difficulty": "hard",
+      "contentHash": "4f4105d1edc906e0be4ce14770e5c628c83bf7b49e6a0dba7b68a45ce7f252b2",
+      "targetWords": [
+        "OLŠE",
+        "DRAMA",
+        "POMAZÁNKA",
+        "ÚŘAD",
+        "HRNČÍŘ",
+        "CIBULE",
+        "JÍŠKA",
+        "BURZA",
+        "CHAPADLO"
+      ],
+      "verdict": "accept",
+      "reason": "Domácí jídlo odlehčuje divadlo, instituci, řemeslo a přírodu.",
+      "topic": "strom,divadlo,jídlo,instituce,řemeslo,finance,zvíře",
+      "familiarity": "BURZA a CHAPADLO širší, ale známé významy."
+    },
+    "g6-expansion-easy-042": {
+      "boardId": "g6-expansion-easy-042",
+      "difficulty": "easy",
+      "contentHash": "2623889deab6e4fb05691057d79215d075b2e16f311694238f3fa6f5a81e4db6",
+      "targetWords": [
+        "PULEC",
+        "KOČKA",
+        "ŘEPA",
+        "NOVÝ",
+        "ÚDIV"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě běžná zvířata doplňuje zelenina, vlastnost a cit.",
+      "topic": "zvířata,zelenina,vlastnost,cit",
+      "familiarity": "PULEC známý základní přírodní název."
+    },
+    "g6-expansion-medium-042": {
+      "boardId": "g6-expansion-medium-042",
+      "difficulty": "medium",
+      "contentHash": "320dd5df205471934f66e983bd1d5350b8a212a53edb2eaf4c65e5f64f859b90",
+      "targetWords": [
+        "KLIKA",
+        "NÁPĚV",
+        "JEHLA",
+        "SPONA",
+        "DÁREK",
+        "BYSTRÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Předměty doplňuje hudba, oslava a známá vlastnost.",
+      "topic": "předmět,hudba,šití,oděv,dar,vlastnost",
+      "familiarity": "NÁPĚV je přístupný hudební pojem."
+    },
+    "g6-expansion-hard-033": {
+      "boardId": "g6-expansion-hard-033",
+      "difficulty": "hard",
+      "contentHash": "a3e9051b4751e3c7b43d14b470a588b470587cd0808a80f4d4c7f60f34ef8ca1",
+      "targetWords": [
+        "DÉLKA",
+        "KRYSA",
+        "SÝPKA",
+        "FÉNIX",
+        "MĚRKA",
+        "METLA",
+        "SKVRNITÝ",
+        "RÁHNO",
+        "LASTURA"
+      ],
+      "verdict": "accept",
+      "reason": "Příroda, dílna, venkov a pohádka zůstávají významově různorodé.",
+      "topic": "měření,zvíře,stavba,pohádka,předměty,vlastnost,loď,moře",
+      "familiarity": "RÁHNO a LASTURA konkrétní širší názvy."
+    },
+    "g6-expansion-easy-043": {
+      "boardId": "g6-expansion-easy-043",
+      "difficulty": "easy",
+      "contentHash": "5e2ad36d65aec977b2174ecd3c47a37826bfbf70c27736b725c6ed98a9b0a6c4",
+      "targetWords": [
+        "PÍLE",
+        "PAPÍR",
+        "ČÍST",
+        "DUSNO",
+        "KRUH"
+      ],
+      "verdict": "accept",
+      "reason": "Školní asociace doplňuje počasí a jednoduchý geometrický tvar.",
+      "topic": "vlastnost,materiál,činnost,počasí,tvar",
+      "familiarity": "Přístupná slova bez lexikální rarity."
+    },
+    "g6-expansion-medium-043": {
+      "boardId": "g6-expansion-medium-043",
+      "difficulty": "medium",
+      "contentHash": "fc4ede18b8e281bfdfd71a712cc8fc3a7172d0ef38b26dd9d035f544dd37f85f",
+      "targetWords": [
+        "SLANÝ",
+        "MLADÝ",
+        "MÁTA",
+        "RÁKOS",
+        "HUČET",
+        "OTISK",
+        "VÝMOL"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě různé vlastnosti doplňuje příroda, zvuk a předmětné jevy.",
+      "topic": "vlastnosti,rostliny,zvuk,tisk,cesta",
+      "familiarity": "RÁKOS a VÝMOL jsou konkrétní běžné pojmy."
+    },
+    "g6-expansion-hard-034": {
+      "boardId": "g6-expansion-hard-034",
+      "difficulty": "hard",
+      "contentHash": "eab747d03f56b6d25c9ddcfcbec1559058684a494f20ba01469d515b924432c6",
+      "targetWords": [
+        "MLÁZÍ",
+        "PLYN",
+        "DEVĚT",
+        "ŘÁDEK",
+        "BUBENÍK",
+        "TMAVÝ",
+        "DŘÍMOTA",
+        "ZÁPĚSTÍ",
+        "FIXKA"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě přírodně stavová hesla se střídají se školou, hudbou a tělem.",
+      "topic": "příroda,látka,počet,text,hudba,vlastnost,spánek,tělo,psaní",
+      "familiarity": "MLÁZÍ a DŘÍMOTA širší, ale dobře představitelné."
+    },
+    "g6-expansion-easy-044": {
+      "boardId": "g6-expansion-easy-044",
+      "difficulty": "easy",
+      "contentHash": "1316b9b218fc3b2b0612d6c5d771298bf2e9eed05bc2632e6b01c93fbe011f7a",
+      "targetWords": [
+        "HNÍZDO",
+        "PRÁT",
+        "PASEKA",
+        "PEČIVO"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu vyvažuje jednoduchá domácí činnost a jídlo.",
+      "topic": "zvířata,činnost,les,jídlo",
+      "familiarity": "Běžná snadná slovní zásoba."
+    },
+    "g6-expansion-medium-044": {
+      "boardId": "g6-expansion-medium-044",
+      "difficulty": "medium",
+      "contentHash": "23e05b4ce786c256c7a15113dca80b8c293b5f390cb8acb3bfcfa4f935a41791",
+      "targetWords": [
+        "ČOLEK",
+        "PŘEHOZ",
+        "VÁNICE",
+        "OSIKA",
+        "LEŽET",
+        "ROŠŤÁK"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní názvy vyvažuje domácnost, činnost a hravý člověk.",
+      "topic": "zvíře,domov,počasí,strom,činnost,člověk",
+      "familiarity": "ČOLEK a OSIKA přiměřené konkrétní názvy."
+    },
+    "g6-expansion-hard-035": {
+      "boardId": "g6-expansion-hard-035",
+      "difficulty": "hard",
+      "contentHash": "7a269c2ca5ee9581883f5904399b587800b6847da6ecd1d75cbd518acf75fd90",
+      "targetWords": [
+        "KYSELÝ",
+        "ŽELEZO",
+        "PLÁTNO",
+        "KLEŠTĚ",
+        "TARANTULE",
+        "PIRÁTI",
+        "ÚVAZEK",
+        "CIZRNA"
+      ],
+      "verdict": "accept",
+      "reason": "Materiály a nástroj střídá zvíře, lidé, pracovní pojem a jídlo.",
+      "topic": "chuť,materiály,dílna,zvíře,lidé,práce,jídlo",
+      "familiarity": "TARANTULE a ÚVAZEK jsou známé širší výrazy."
+    },
+    "g6-expansion-easy-045": {
+      "boardId": "g6-expansion-easy-045",
+      "difficulty": "easy",
+      "contentHash": "f6c62e3c855082686cffcec7c57ceb2776fef32ed04e677f1144c1b644b6c446",
+      "targetWords": [
+        "FARMA",
+        "DUPAT",
+        "VRÁNA",
+        "POUPĚ"
+      ],
+      "verdict": "accept",
+      "reason": "Venkovský motiv se střídá s činností a dvěma odlišnými přírodními názvy.",
+      "topic": "venkov,pohyb,pták,rostlina",
+      "familiarity": "Běžné konkrétní a činnostní významy."
+    },
+    "g6-expansion-medium-045": {
+      "boardId": "g6-expansion-medium-045",
+      "difficulty": "medium",
+      "contentHash": "70ab1df5ab3575f0fe677040cf30d648c64f155348309f916a7617173bd5462c",
+      "targetWords": [
+        "ŘADA",
+        "DŘEŇ",
+        "TUNDRA",
+        "SLUPKA",
+        "KLUBKO",
+        "ČILÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Obecný pojem a vlastnost vyvažují tělo, krajinu a domácí předměty.",
+      "topic": "pořadí,tělo,krajina,rostlina,předmět,vlastnost",
+      "familiarity": "DŘEŇ a TUNDRA dvě naučené, přístupné položky."
+    },
+    "g6-expansion-hard-036": {
+      "boardId": "g6-expansion-hard-036",
+      "difficulty": "hard",
+      "contentHash": "0194bf43b632d9c9475ec40bc072e7e1f0ff0133c97796ea7b5c74bb5bedcaf4",
+      "targetWords": [
+        "LIBEČEK",
+        "STEHLÍK",
+        "ÚZEMÍ",
+        "MANŽETA",
+        "AREÁL",
+        "MAŇÁSEK",
+        "PŮVAB",
+        "ZALÉVAT"
+      ],
+      "verdict": "accept",
+      "reason": "Zahrada a příroda jsou proložené oděvem, místem a hračkou.",
+      "topic": "bylinka,pták,místo,oděv,hračka,vlastnost,činnost",
+      "familiarity": "LIBEČEK a STEHLÍK vhodné dvě širší přírodní položky."
+    },
+    "g6-expansion-easy-046": {
+      "boardId": "g6-expansion-easy-046",
+      "difficulty": "easy",
+      "contentHash": "f1b1662ebabeeb94a60908e01ba70e845ea0eec92a938c84e1d548a8c5a4efc7",
+      "targetWords": [
+        "BRLOH",
+        "TUNEL",
+        "DÝNĚ",
+        "SLUNCE"
+      ],
+      "verdict": "accept",
+      "reason": "Zvířecí obydlí, stavba, plod a nebeský objekt mají jasné významy.",
+      "topic": "zvíře,stavba,zahrada,obloha",
+      "familiarity": "Přístupná známá čtveřice."
+    },
+    "g6-expansion-medium-046": {
+      "boardId": "g6-expansion-medium-046",
+      "difficulty": "medium",
+      "contentHash": "7d64935ce1ad720fe1ba988652e1b7d9401b7040eb7e91a03a3c78ebde9d4f11",
+      "targetWords": [
+        "RUSALKA",
+        "PRASE",
+        "BAZÉN",
+        "KLIH",
+        "ÚHOR",
+        "PECKA",
+        "VZTEK"
+      ],
+      "verdict": "accept",
+      "reason": "Pohádka, zvířata a domácí zkušenost rozptylují jediný dílenský materiál.",
+      "topic": "pohádka,zvířata,voda,dílna,plod,cit",
+      "familiarity": "KLIH jediná užší řemeslná položka."
+    },
+    "g6-expansion-hard-037": {
+      "boardId": "g6-expansion-hard-037",
+      "difficulty": "hard",
+      "contentHash": "8545f7f55c69876ed60e0f32b009f3a637fe1e31b359cead2a6a81ffa14dcc72",
+      "targetWords": [
+        "PRSKAVKA",
+        "MÁLO",
+        "DISPLEJ",
+        "JEHELNÍK",
+        "PŘIHRÁVKA",
+        "POŠTOLKA",
+        "KONEV",
+        "ČLUN"
+      ],
+      "verdict": "accept",
+      "reason": "Oslava, technologie, dílna, sport a příroda tvoří pestrou sestavu.",
+      "topic": "oslava,množství,technologie,šití,sport,pták,zahrada,loď",
+      "familiarity": "JEHELNÍK a POŠTOLKA konkrétní širší názvy."
+    },
+    "g6-expansion-easy-047": {
+      "boardId": "g6-expansion-easy-047",
+      "difficulty": "easy",
+      "contentHash": "2be009bce11290503615dee8bf6c117ade00a1386b9ffbe91726da5446ca098d",
+      "targetWords": [
+        "DVŮR",
+        "KARTÁČ",
+        "PUPEN",
+        "UHÝBAT"
+      ],
+      "verdict": "accept",
+      "reason": "Známé místo a předmět doplňuje rostlina a živá činnost.",
+      "topic": "místo,předmět,rostlina,pohyb",
+      "familiarity": "Běžná slova vhodná snadné obtížnosti."
+    },
+    "g6-expansion-medium-047": {
+      "boardId": "g6-expansion-medium-047",
+      "difficulty": "medium",
+      "contentHash": "df94a6c0ef8eaa88e0b44a818bf6d873e6d8d63d87658517311fd45becc6367c",
+      "targetWords": [
+        "ÚŽAS",
+        "LEPENKA",
+        "HŘEBÍK",
+        "OTĚŽ",
+        "LIŠKA",
+        "HOBOJ"
+      ],
+      "verdict": "accept",
+      "reason": "Dílenské předměty vyvažuje cit, zvíře a hudba.",
+      "topic": "cit,materiál,dílna,jezdectví,zvíře,hudba",
+      "familiarity": "OTĚŽ a HOBOJ jsou dvě přiměřené naučené položky."
+    },
+    "g6-expansion-hard-038": {
+      "boardId": "g6-expansion-hard-038",
+      "difficulty": "hard",
+      "contentHash": "32c5ee967a559977ea84ee734355035837db378cceba518f4dd979b0b86ca6cf",
+      "targetWords": [
+        "ZNÁMKA",
+        "DUNĚNÍ",
+        "ORNICE",
+        "OSTRUHA",
+        "BRZDA",
+        "SRPEK",
+        "KLOPA",
+        "HRABĚ",
+        "POHOVKA"
+      ],
+      "verdict": "accept",
+      "reason": "Pole a oděv střídají dopravu, člověka, domácnost a zvuk.",
+      "topic": "pošta,zvuk,pole,jezdectví,doprava,tvar,oděv,člověk,domov",
+      "familiarity": "OSTRUHA a ORNICE širší, ale konkrétní známé názvy."
+    },
+    "g6-expansion-easy-048": {
+      "boardId": "g6-expansion-easy-048",
+      "difficulty": "easy",
+      "contentHash": "dc301a4c0d7f7d82c97944f37181abddd73f9658c2c179e3e594759b5ac84229",
+      "targetWords": [
+        "ŽEHLIT",
+        "CHYTAT",
+        "OHEŇ",
+        "SOLIT"
+      ],
+      "verdict": "accept",
+      "reason": "Tři jednoduché odlišné činnosti vyvažuje známý přírodní jev.",
+      "topic": "domov,pohyb,oheň,kuchyně",
+      "familiarity": "Všechna slovesa patří do běžné snadné zásoby."
+    },
+    "g6-expansion-medium-048": {
+      "boardId": "g6-expansion-medium-048",
+      "difficulty": "medium",
+      "contentHash": "ad07972447b21155934d266f17682a3973d11214801dd6042d93fd1715ebfaa8",
+      "targetWords": [
+        "ODRÁŽKA",
+        "NÁRAMEK",
+        "VINA",
+        "PĚNKAVA",
+        "TUPÝ",
+        "TÚRA"
+      ],
+      "verdict": "accept",
+      "reason": "Text, ozdoba, cit, příroda a výlet drží odlišné asociace.",
+      "topic": "text,oděv,cit,pták,vlastnost,turistika",
+      "familiarity": "PĚNKAVA je jediný užší druhový název."
+    },
+    "g6-expansion-hard-039": {
+      "boardId": "g6-expansion-hard-039",
+      "difficulty": "hard",
+      "contentHash": "0b826aa26120aecfcf859295f94e8096ce5399b054b75bacefc498fff973e6d1",
+      "targetWords": [
+        "VÁLKA",
+        "KŠILT",
+        "ZÁTOKA",
+        "OKOUN",
+        "NÁLEVKA",
+        "ROSNIČKA",
+        "JISKRA",
+        "HNĚV",
+        "HOBLÍK"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu a dílnu vyvažují oděv, událost a cit.",
+      "topic": "událost,oděv,krajina,zvířata,kuchyně,oheň,cit,dílna",
+      "familiarity": "NÁLEVKA a HOBLÍK konkrétní nástroje, bez úzkého odborného bloku."
+    },
+    "g6-expansion-easy-049": {
+      "boardId": "g6-expansion-easy-049",
+      "difficulty": "easy",
+      "contentHash": "8591c91558d63190e14d12ece0db2fb502085c351b5a2e05bcf280486370ac32",
+      "targetWords": [
+        "HRAVÝ",
+        "VÁPNO",
+        "MORČE",
+        "ZÁVĚS"
+      ],
+      "verdict": "accept",
+      "reason": "Vlastnost, známý materiál, zvíře a domácí předmět jsou vyvážené.",
+      "topic": "vlastnost,materiál,zvíře,domov",
+      "familiarity": "Běžná přístupná sestava."
+    },
+    "g6-expansion-medium-049": {
+      "boardId": "g6-expansion-medium-049",
+      "difficulty": "medium",
+      "contentHash": "bee3d7a32ce0175f3451659e1fb5c8084368006ae7d192e42f45780e1621b178",
+      "targetWords": [
+        "TULÁK",
+        "KONIPAS",
+        "BÁBOVKA",
+        "VAFLE",
+        "VÁHA",
+        "VRUT"
+      ],
+      "verdict": "accept",
+      "reason": "Ptáka a dílenský název odlehčují člověk a známá jídla.",
+      "topic": "člověk,pták,jídlo,měření,dílna",
+      "familiarity": "KONIPAS a VRUT dvě širší konkrétní položky."
+    },
+    "g6-expansion-hard-040": {
+      "boardId": "g6-expansion-hard-040",
+      "difficulty": "hard",
+      "contentHash": "d28a5f8c58e30c89654f026c7358550ee31dba55616750c798f94baa5f45f95d",
+      "targetWords": [
+        "POJIŠTĚNÍ",
+        "VESLOVAT",
+        "ŽEBŘIŇÁK",
+        "LOUČ",
+        "CHAMELEON",
+        "PŘÍBORNÍK",
+        "SLOKA",
+        "ČERT"
+      ],
+      "verdict": "accept",
+      "reason": "Tradiční předměty se střídají s činností, přírodou a pohádkou.",
+      "topic": "smlouva,pohyb,doprava,světlo,zvíře,domov,poezie,pohádka",
+      "familiarity": "ŽEBŘIŇÁK a LOUČ mají srozumitelné tradiční významy."
+    },
+    "g6-expansion-easy-050": {
+      "boardId": "g6-expansion-easy-050",
+      "difficulty": "easy",
+      "contentHash": "c3e12362e73dfa0b94a6fb1040b3d89130b5201aa35982ee49553ace351a3f24",
+      "targetWords": [
+        "NUDLE",
+        "ŘÍKAT",
+        "TOPOL",
+        "ČEKAT"
+      ],
+      "verdict": "accept",
+      "reason": "Jídlo a strom doplňují dvě velmi běžné činnosti.",
+      "topic": "jídlo,řeč,strom,činnost",
+      "familiarity": "Snadná slova bez lexikální pasti."
+    },
+    "g6-expansion-medium-050": {
+      "boardId": "g6-expansion-medium-050",
+      "difficulty": "medium",
+      "contentHash": "5eb9c05862ad883dcd282623c1f16db207b1ba27f45b05b18e24ff7ab8803863",
+      "targetWords": [
+        "PÍSKOT",
+        "PLST",
+        "KŮRA",
+        "ČUTORA",
+        "SANDÁL",
+        "PUZZLE"
+      ],
+      "verdict": "accept",
+      "reason": "Zvuk a příroda doplňují materiál, turistiku, oděv a hru.",
+      "topic": "zvuk,materiál,strom,turistika,oděv,hra",
+      "familiarity": "PLST a ČUTORA dvě konkrétní náročnější položky."
+    },
+    "g6-expansion-hard-041": {
+      "boardId": "g6-expansion-hard-041",
+      "difficulty": "hard",
+      "contentHash": "8774c93941465e03202408a1efc86d49e90bca833193003d188fc5ea22ad6c9e",
+      "targetWords": [
+        "RORÝS",
+        "BAŇKA",
+        "SNAHA",
+        "ŠIBAL",
+        "OBSAH",
+        "DLÁTO",
+        "KRAJKÁŘKA",
+        "KŘIVÝ",
+        "SLADIT"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu a řemeslo vyvažují známé lidské a činnostní pojmy.",
+      "topic": "pták,laboratoř,snaha,člověk,pojem,dílna,řemeslo,vlastnost,činnost",
+      "familiarity": "KRAJKÁŘKA a RORÝS širší konkrétní názvy."
+    },
+    "g6-expansion-easy-051": {
+      "boardId": "g6-expansion-easy-051",
+      "difficulty": "easy",
+      "contentHash": "8397527616feec26db5351ffae484d24582d1af7ba7273318eaa8f90481e103e",
+      "targetWords": [
+        "ÚTERÝ",
+        "SBOR",
+        "ŠIKULA",
+        "LAMPA"
+      ],
+      "verdict": "accept",
+      "reason": "Čas, hudební skupina, člověk a předmět mají odlišné známé významy.",
+      "topic": "čas,hudba,člověk,domov",
+      "familiarity": "Přístupná čtveřice pro snadnou obtížnost."
+    },
+    "g6-expansion-medium-051": {
+      "boardId": "g6-expansion-medium-051",
+      "difficulty": "medium",
+      "contentHash": "e10620318764614319afcd0d5232f50fcaaa7ee96ae232ff1b99a3dd20e2bbe0",
+      "targetWords": [
+        "OKOLÍ",
+        "SEKANÁ",
+        "KUŇKA",
+        "ŽIDLE",
+        "LETĚT",
+        "BOMBA"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní název doplňuje každodenní prostor, jídlo, předmět a činnost.",
+      "topic": "prostor,jídlo,zvíře,domov,pohyb,předmět",
+      "familiarity": "KUŇKA je jediný užší název, ostatní známé."
+    },
+    "g6-expansion-hard-042": {
+      "boardId": "g6-expansion-hard-042",
+      "difficulty": "hard",
+      "contentHash": "1e26cc23bbe60ef82d8b507f03a54e5e74bc319eae59e31f2f403db642875da5",
+      "targetWords": [
+        "OSTRAHA",
+        "LEDOVKA",
+        "KŘOVÍ",
+        "NÁMOŘNÍK",
+        "TITUL",
+        "ZÁVLAČKA",
+        "NAPÁJEČKA",
+        "ZÁLESÁK"
+      ],
+      "verdict": "accept",
+      "reason": "Tři lidské role střídá počasí, příroda a konkrétní vybavení.",
+      "topic": "lidé,počasí,příroda,kniha,dílna,zvířata",
+      "familiarity": "ZÁVLAČKA a NAPÁJEČKA vhodné dvě užší technické položky."
+    },
+    "g6-expansion-easy-052": {
+      "boardId": "g6-expansion-easy-052",
+      "difficulty": "easy",
+      "contentHash": "25b205c68e36a03979dc0659907690b16b0ea7c8720d65ed63fffbf9325aaaad",
+      "targetWords": [
+        "PENÁL",
+        "RYCHLÝ",
+        "SNÍLEK",
+        "PIZZA"
+      ],
+      "verdict": "accept",
+      "reason": "Škola, vlastnost, člověk a jídlo tvoří známou přístupnou čtveřici.",
+      "topic": "škola,vlastnost,člověk,jídlo",
+      "familiarity": "Běžná snadná zásoba."
+    },
+    "g6-expansion-medium-052": {
+      "boardId": "g6-expansion-medium-052",
+      "difficulty": "medium",
+      "contentHash": "99f53f08ebcabda686ea8c0c42cf4e1f872d9c69ce12b436ad594248e42ceb2e",
+      "targetWords": [
+        "DOKTOR",
+        "LOUŽE",
+        "SIRUP",
+        "HABR",
+        "REHEK",
+        "BARVIVO"
+      ],
+      "verdict": "accept",
+      "reason": "Běžný člověk a jídlo vyvažují přírodu a materiál.",
+      "topic": "profese,voda,jídlo,strom,pták,materiál",
+      "familiarity": "REHEK je jediný méně běžný druhový název."
+    },
+    "g6-expansion-hard-043": {
+      "boardId": "g6-expansion-hard-043",
+      "difficulty": "hard",
+      "contentHash": "522a56487a5c81ac6a21daca40590e55127c80f96c671753f17bfaf27009d9e7",
+      "targetWords": [
+        "TURBÍNA",
+        "BÁSEŇ",
+        "CITERA",
+        "HOPSAT",
+        "VARAN",
+        "HROCH",
+        "SPRCHA",
+        "KOŠTĚ",
+        "PUŠTÍK"
+      ],
+      "verdict": "accept",
+      "reason": "Zvířecí část doplňuje technika, hudba, poezie a domácnost.",
+      "topic": "technika,poezie,hudba,pohyb,zvířata,domov",
+      "familiarity": "CITERA a PUŠTÍK jsou širší názvy, ostatní poskytují známé opory."
+    },
+    "g6-expansion-easy-053": {
+      "boardId": "g6-expansion-easy-053",
+      "difficulty": "easy",
+      "contentHash": "888664450083ccbddef5a0f5070a4c1cda302153480dce598ca7474a3ae14007",
+      "targetWords": [
+        "KLIKA",
+        "BŘÍZA",
+        "ŽÍNKA",
+        "VOLAT"
+      ],
+      "verdict": "accept",
+      "reason": "Předmět, strom, domácnost a činnost tvoří jasné odlišné asociace.",
+      "topic": "dům,strom,hygiena,řeč",
+      "familiarity": "Čtyři běžná slova."
+    },
+    "g6-expansion-medium-053": {
+      "boardId": "g6-expansion-medium-053",
+      "difficulty": "medium",
+      "contentHash": "092baf22d451fa0581c2664e550a6727980768db2eb8e54c3b1932a1bf643c64",
+      "targetWords": [
+        "CINKOT",
+        "PARNO",
+        "JETEL",
+        "LEGUÁN",
+        "FLÉTNA",
+        "DÁLAVA"
+      ],
+      "verdict": "accept",
+      "reason": "Zvuk, počasí a příroda se střídají s hudbou a prostorem.",
+      "topic": "zvuk,počasí,rostlina,zvíře,hudba,prostor",
+      "familiarity": "LEGUÁN a DÁLAVA jsou dvě širší přístupné položky."
+    },
+    "g6-expansion-hard-044": {
+      "boardId": "g6-expansion-hard-044",
+      "difficulty": "hard",
+      "contentHash": "712563ede31fc5de8c9f24eaab654b08b625aa92bd095d275380190e8852e635",
+      "targetWords": [
+        "MELODIE",
+        "SOUZVUK",
+        "PŘEZDÍVKA",
+        "MOŠT",
+        "KOKON",
+        "SVIŠŤ",
+        "KNÍŽE",
+        "KRESLIT",
+        "ŽULA"
+      ],
+      "verdict": "accept",
+      "reason": "Hudební dvojici vyvažuje jídlo, příroda, historie a činnost.",
+      "topic": "hudba,pojmenování,nápoj,příroda,zvíře,historie,kresba,minerál",
+      "familiarity": "KOKON a SVIŠŤ přiměřené přírodní názvy; MELODIE a SOUZVUK odlišné pojmy."
+    },
+    "g6-expansion-easy-054": {
+      "boardId": "g6-expansion-easy-054",
+      "difficulty": "easy",
+      "contentHash": "89d1c54aec43092b2fbb5709a133c71c77cb2373c533e54a7c580e910f7fdb45",
+      "targetWords": [
+        "POVĚST",
+        "SMÁT",
+        "SJEZD",
+        "RAJČE"
+      ],
+      "verdict": "accept",
+      "reason": "Vyprávění, známá činnost, pohyb a zelenina drží snadnou pestrost.",
+      "topic": "vyprávění,činnost,pohyb,zelenina",
+      "familiarity": "SMÁT ponechává schválenou podobu; žádná rarita."
+    },
+    "g6-expansion-medium-054": {
+      "boardId": "g6-expansion-medium-054",
+      "difficulty": "medium",
+      "contentHash": "d2deb93c9983a19823771320e90ebc3c0f0ddba199dcfc2e9db033a0878dd142",
+      "targetWords": [
+        "VEKA",
+        "FRÉZKA",
+        "FUJARA",
+        "DUŽINA",
+        "DLAŽBA",
+        "PALČÁK"
+      ],
+      "verdict": "accept",
+      "reason": "Kuchyně a oděv vyvažují dílnu, hudbu, rostlinu a stavbu.",
+      "topic": "jídlo,dílna,hudba,rostlina,stavba,oděv",
+      "familiarity": "Lexikálně horní střední, ale konkrétní a známé oblasti bez neprůhledné terminologie."
+    },
+    "g6-expansion-hard-045": {
+      "boardId": "g6-expansion-hard-045",
+      "difficulty": "hard",
+      "contentHash": "092140b9841409619020bb44222c43470c36e463e31eab2643cbd55574e31be1",
+      "targetWords": [
+        "JAHODA",
+        "KRŮPĚJ",
+        "TRAKAŘ",
+        "VIDLE",
+        "ODMĚNA",
+        "KALOUS",
+        "BZUČET",
+        "UŽOVKA",
+        "PLÁTEK"
+      ],
+      "verdict": "accept",
+      "reason": "Venkovskou a přírodní část vyvažuje odměna, zvuk a kuchyňský pojem.",
+      "topic": "zahrada,voda,venkov,odměna,pták,zvuk,zvíře,jídlo",
+      "familiarity": "KALOUS a KRŮPĚJ vhodné dvě širší položky."
+    },
+    "g6-expansion-easy-055": {
+      "boardId": "g6-expansion-easy-055",
+      "difficulty": "easy",
+      "contentHash": "4167ce93b13f707ba840a5c05392bffa563988eba5767fbf9dc2ed30ac8c5d61",
+      "targetWords": [
+        "NÁVES",
+        "PADAT",
+        "TCHOŘ",
+        "PANDA"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě odlišná známá zvířata doplňuje místo a činnost.",
+      "topic": "místo,pohyb,zvířata",
+      "familiarity": "TCHOŘ a PANDA nejsou úzce odborné názvy."
+    },
+    "g6-expansion-medium-055": {
+      "boardId": "g6-expansion-medium-055",
+      "difficulty": "medium",
+      "contentHash": "3caa846bb7d19ce723b50dabd9a49f53f20ac140a956c2864b47bab7e95ff264",
+      "targetWords": [
+        "MŘÍŽ",
+        "ZÍTRA",
+        "BOUŘE",
+        "KUKLA",
+        "ŠPRÝM",
+        "TUHA",
+        "VÁŽKA"
+      ],
+      "verdict": "accept",
+      "reason": "Předmět, čas a počasí rozšiřují hravý pojem, materiál a přírodu.",
+      "topic": "dům,čas,počasí,příroda,humor,kresba,hmyz",
+      "familiarity": "ŠPRÝM je tradičnější, ale známý výraz; ostatní běžné."
+    },
+    "g6-expansion-hard-046": {
+      "boardId": "g6-expansion-hard-046",
+      "difficulty": "hard",
+      "contentHash": "b830d0e6ec04dbc908651e8ef1bb9a0d2716092c1d78bb35ede5aff5edfab18d",
+      "targetWords": [
+        "SVODIDLO",
+        "ŠÍPEK",
+        "JEPICE",
+        "HOLUBICE",
+        "KLEKÁNICE",
+        "FOŠNA",
+        "PANÍ",
+        "ŠTĚRK",
+        "MAZÁNÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní názvy střídají pohádku, stavbu, člověka a činnostní děj.",
+      "topic": "doprava,rostlina,hmyz,pták,pohádka,stavba,člověk,materiál,děj",
+      "familiarity": "JEPICE a KLEKÁNICE širší, ale srozumitelné položky."
+    },
+    "g6-expansion-easy-056": {
+      "boardId": "g6-expansion-easy-056",
+      "difficulty": "easy",
+      "contentHash": "2d423e13ecbfc4b04b787b0f876a6eb7541e208c295083e250d183efbe2a4113",
+      "targetWords": [
+        "SRDCE",
+        "ČTYŘI",
+        "SÁZET",
+        "VIŠEŇ"
+      ],
+      "verdict": "accept",
+      "reason": "Tělo, číslo, zahradní činnost a strom vytvářejí jasné známé významy.",
+      "topic": "tělo,počet,činnost,strom",
+      "familiarity": "Snadná slovní zásoba bez okrajových výrazů."
+    },
+    "g6-expansion-medium-056": {
+      "boardId": "g6-expansion-medium-056",
+      "difficulty": "medium",
+      "contentHash": "b61e14f92aadb9b489b56ebbf8410bb51b11d2a80a6441f315b288fe4d2221b0",
+      "targetWords": [
+        "GARÁŽ",
+        "ŠABLONA",
+        "KAPSÁŘ",
+        "JEDNA",
+        "ZPĚVÁK",
+        "SURF"
+      ],
+      "verdict": "accept",
+      "reason": "Místo a předmět střídají člověka, číslo, hudbu a sport.",
+      "topic": "stavba,předmět,člověk,počet,hudba,sport",
+      "familiarity": "SURF je známý současný sportovní název, KAPSÁŘ běžné označení."
+    },
+    "g6-expansion-hard-047": {
+      "boardId": "g6-expansion-hard-047",
+      "difficulty": "hard",
+      "contentHash": "09d3b6a131758878e7b8d8bab2697c5f2460369d58aad088500f0e7ce52c87ad",
+      "targetWords": [
+        "VRTULNÍK",
+        "OVÁD",
+        "CVAKAT",
+        "ŠIŠATÝ",
+        "PROHLUBEŇ",
+        "DÝCHÁNÍ",
+        "FENA",
+        "LAZURA"
+      ],
+      "verdict": "accept",
+      "reason": "Doprava a příroda doplňují živou činnost, vlastnost a materiál.",
+      "topic": "doprava,hmyz,zvuk,tvar,krajina,děj,zvíře,materiál",
+      "familiarity": "LAZURA a OVÁD přiměřené dvě širší konkrétní položky."
+    },
+    "g6-expansion-easy-057": {
+      "boardId": "g6-expansion-easy-057",
+      "difficulty": "easy",
+      "contentHash": "109a780b4462855030eb6508c8f10c50b3494c34ed0d984514f44c0159413f4a",
+      "targetWords": [
+        "KŘÍDA",
+        "SENÍK",
+        "KYNOUT",
+        "SBÍRAT"
+      ],
+      "verdict": "accept",
+      "reason": "Dva známé předměty a dvě odlišné běžné činnosti.",
+      "topic": "škola,venkov,kuchyně,činnost",
+      "familiarity": "KYNOUT je přirozené známé sloveso."
+    },
+    "g6-expansion-medium-057": {
+      "boardId": "g6-expansion-medium-057",
+      "difficulty": "medium",
+      "contentHash": "ccd758b3fd75251f812b53be0006e1de4f36b0652f2b0730716660e371d53a60",
+      "targetWords": [
+        "PAVIÁN",
+        "MRÁZ",
+        "BÍLÝ",
+        "KBELÍK",
+        "SMETANA",
+        "ROLETA"
+      ],
+      "verdict": "accept",
+      "reason": "Zvíře a počasí doplňuje barva, domácnost a jídlo.",
+      "topic": "zvíře,počasí,barva,domov,jídlo",
+      "familiarity": "PAVIÁN známý zvířecí název; ostatní každodenní."
+    },
+    "g6-expansion-hard-048": {
+      "boardId": "g6-expansion-hard-048",
+      "difficulty": "hard",
+      "contentHash": "6462a11b909689b520916fdeff05adb6588fa5f1dd8716ef02f0a00f6dfc4b1c",
+      "targetWords": [
+        "LEKCE",
+        "ÚNOR",
+        "STŘÍDKA",
+        "SPÁSA",
+        "SBORMISTR",
+        "POJEM",
+        "LEMUR",
+        "MADLO",
+        "VÝHEŇ"
+      ],
+      "verdict": "accept",
+      "reason": "Školu a čas rozšiřuje jídlo, hudba, příroda a řemeslo.",
+      "topic": "škola,čas,jídlo,hodnota,hudba,pojem,zvíře,předmět,řemeslo",
+      "familiarity": "STŘÍDKA a VÝHEŇ širší názvy mezi známými oporami."
+    },
+    "g6-expansion-easy-058": {
+      "boardId": "g6-expansion-easy-058",
+      "difficulty": "easy",
+      "contentHash": "52e966296693f77d4951e645b37b1eaeeccf435c49eaaf50e58a4a017168272a",
+      "targetWords": [
+        "ŠPUNT",
+        "PŘÁNÍ",
+        "MOTOR",
+        "LIJÁK"
+      ],
+      "verdict": "accept",
+      "reason": "Předmět, citové přání, technika a počasí tvoří přístupný rozptyl.",
+      "topic": "předmět,přání,technika,počasí",
+      "familiarity": "Běžná snadná čtveřice."
+    },
+    "g6-expansion-medium-058": {
+      "boardId": "g6-expansion-medium-058",
+      "difficulty": "medium",
+      "contentHash": "068e11e68bcecde279c579ea933d198651a5ce45bdb0d506e735afcce9abda8f",
+      "targetWords": [
+        "DUDEK",
+        "MLÉKO",
+        "PLÁŠŤ",
+        "ZLATO",
+        "JAVOR",
+        "POKOJ"
+      ],
+      "verdict": "accept",
+      "reason": "Pták a strom vyvažují jídlo, oděv, materiál a domácnost.",
+      "topic": "pták,jídlo,oděv,kov,strom,domov",
+      "familiarity": "DUDEK a JAVOR přístupné známé přírodní názvy."
+    },
+    "g6-expansion-hard-049": {
+      "boardId": "g6-expansion-hard-049",
+      "difficulty": "hard",
+      "contentHash": "61166fe2f26b4b3abd6d2949ae8f4ddcf38c41cdc9ab648c933842144886f156",
+      "targetWords": [
+        "LUŠTIT",
+        "HLAVOLAM",
+        "BÓJKA",
+        "PRŮJEZD",
+        "HLOH",
+        "LILEK",
+        "ADRESA",
+        "NETEŘ",
+        "DUNA"
+      ],
+      "verdict": "accept",
+      "reason": "Hravou dvojici luštění doplňuje doprava, příroda a rodina.",
+      "topic": "hra,voda,doprava,rostlina,zelenina,komunikace,rodina,krajina",
+      "familiarity": "HLOH a DUNA širší, ale konkrétní a přístupné."
+    },
+    "g6-expansion-easy-059": {
+      "boardId": "g6-expansion-easy-059",
+      "difficulty": "easy",
+      "contentHash": "072888efb4187b99a3eac10a7609a3919e4d0774e61b073ef24963658c8a122e",
+      "targetWords": [
+        "HLÍNA",
+        "MADLO",
+        "PULEC",
+        "KOALA"
+      ],
+      "verdict": "accept",
+      "reason": "Materiál, předmět a dvě odlišná známá zvířata jsou jasně představitelné.",
+      "topic": "materiál,předmět,zvířata",
+      "familiarity": "KOALA běžný zvířecí název, nikoli specializovaná rarita."
+    },
+    "g6-expansion-medium-059": {
+      "boardId": "g6-expansion-medium-059",
+      "difficulty": "medium",
+      "contentHash": "1aacff02af2b7cc2ae11d2fdd9c2c8d64879a5f5d1490e6108874e835955ce24",
+      "targetWords": [
+        "TESAŘ",
+        "FENYKL",
+        "BYSTRÝ",
+        "DRUHÝ",
+        "MAJETEK",
+        "TRIKO"
+      ],
+      "verdict": "accept",
+      "reason": "Profese a koření doplňují známé vlastnosti, pořadí, obecný pojem a oděv.",
+      "topic": "profese,koření,vlastnost,pořadí,vlastnictví,oděv",
+      "familiarity": "FENYKL jedna užší konkrétní položka."
+    },
+    "g6-expansion-hard-050": {
+      "boardId": "g6-expansion-hard-050",
+      "difficulty": "hard",
+      "contentHash": "98fa21b9b9dadd0ae83355706c75cacd634797478f8e167b90bb1a101cf71527",
+      "targetWords": [
+        "RAŠPLE",
+        "NÁSEP",
+        "ROBOTIKA",
+        "ŽALÁŘ",
+        "TÁBOR",
+        "SOUVĚTÍ",
+        "ŠKVOR",
+        "OTAKÁREK",
+        "BAHNO"
+      ],
+      "verdict": "accept",
+      "reason": "Škola, dílna, příroda a místa mají široký významový rozptyl.",
+      "topic": "dílna,stavba,technologie,místo,jazyk,hmyz,příroda",
+      "familiarity": "OTAKÁREK a RAŠPLE dvě širší konkrétní položky; zátěž odpovídá těžké."
+    },
+    "g6-expansion-easy-060": {
+      "boardId": "g6-expansion-easy-060",
+      "difficulty": "easy",
+      "contentHash": "4d6cf0b1cd3bfc3b00fbb4687492ed79c04cadb50b9a90892b65221dce8fb063",
+      "targetWords": [
+        "PEDÁL",
+        "SUKNĚ",
+        "ŠUMĚT",
+        "JMELÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Dopravu, oděv a zvuk doplňuje známá rostlina.",
+      "topic": "doprava,oděv,zvuk,rostlina",
+      "familiarity": "Běžné snadné významy."
+    },
+    "g6-expansion-medium-060": {
+      "boardId": "g6-expansion-medium-060",
+      "difficulty": "medium",
+      "contentHash": "871ded7ef21b73a4c05459a4229063346f8c3dc77233bf9a08556849f88e2901",
+      "targetWords": [
+        "KRAJKA",
+        "KACHNĚ",
+        "PŘEVIS",
+        "ŽÁDOST",
+        "ROLÁK",
+        "SPOLU"
+      ],
+      "verdict": "accept",
+      "reason": "Oděvní dvojici vyvažuje zvíře, terén a obecný pojem.",
+      "topic": "oděv,zvíře,krajina,komunikace,vztah",
+      "familiarity": "PŘEVIS jediný užší konkrétní pojem."
+    },
+    "g6-expansion-hard-051": {
+      "boardId": "g6-expansion-hard-051",
+      "difficulty": "hard",
+      "contentHash": "ba054143318990e922ea356d6a17a6cd8affcfa7b4d0c5084e44d1683987a15f",
+      "targetWords": [
+        "SVOLENÍ",
+        "POLITIK",
+        "CHRASTÍ",
+        "NOTA",
+        "ŠATY",
+        "POPĚVEK",
+        "IMPÉRIUM",
+        "KOUZELNÍK"
+      ],
+      "verdict": "accept",
+      "reason": "Společnost, hudbu a historii vyvažuje příroda, oděv a pohádka.",
+      "topic": "společnost,příroda,hudba,oděv,historie,pohádka",
+      "familiarity": "IMPÉRIUM širší, ale známý pojem."
+    },
+    "g6-expansion-easy-061": {
+      "boardId": "g6-expansion-easy-061",
+      "difficulty": "easy",
+      "contentHash": "351686dd0e015912c7cc81e8fa35b5efa4a46e946f4b2449b2aef862237587b6",
+      "targetWords": [
+        "ŠÁLEK",
+        "VÝLET",
+        "KOMPOT",
+        "NÁJEZD"
+      ],
+      "verdict": "accept",
+      "reason": "Známé kuchyňské názvy střídá pohyb a cestování.",
+      "topic": "kuchyně,turistika,doprava",
+      "familiarity": "Čtyři běžná přístupná slova."
+    },
+    "g6-expansion-medium-061": {
+      "boardId": "g6-expansion-medium-061",
+      "difficulty": "medium",
+      "contentHash": "27103202d6aeb60aaa3bfebce8378cf91f9f404b850b13fa78e4b35578283633",
+      "targetWords": [
+        "VAZBA",
+        "CUPITAT",
+        "TESAŘÍK",
+        "ÚHOR",
+        "DŽBÁN",
+        "TENISKA"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní dvojici vyvažují činnost, předmět a oděv.",
+      "topic": "kniha,pohyb,hmyz,ryba,nádoba,oděv",
+      "familiarity": "TESAŘÍK a ÚHOR přiměřené konkrétní přírodní názvy."
+    },
+    "g6-expansion-hard-052": {
+      "boardId": "g6-expansion-hard-052",
+      "difficulty": "hard",
+      "contentHash": "fc608b4f64bae73bcb37385a7ffca97b7eec99a00196dd9af8030912ed65a300",
+      "targetWords": [
+        "KROPIT",
+        "KMOTR",
+        "PŘEDMLUVA",
+        "TŘPYTIVÝ",
+        "PASTINÁK",
+        "MOŠNA",
+        "ÚŘAD",
+        "DUCH",
+        "OBJEM"
+      ],
+      "verdict": "accept",
+      "reason": "Činnosti, knihu a vlastnost doplňují jídlo, místo a pohádka.",
+      "topic": "činnost,člověk,kniha,vlastnost,zelenina,předmět,instituce,pohádka,měření",
+      "familiarity": "PASTINÁK jediná méně každodenní zelenina, ostatní opory známé."
+    },
+    "g6-expansion-easy-062": {
+      "boardId": "g6-expansion-easy-062",
+      "difficulty": "easy",
+      "contentHash": "3795c8694ee6e9911d4d971c2a8940b3d54e36e56407925c83d83567289c1b06",
+      "targetWords": [
+        "TÁCEK",
+        "POMOC",
+        "NÁČRT",
+        "LÁHEV"
+      ],
+      "verdict": "accept",
+      "reason": "Předměty vyvažují běžný pojem pomoci a jednoduchá kresba.",
+      "topic": "domov,pomoc,kresba,nádoba",
+      "familiarity": "Snadná srozumitelná čtveřice."
+    },
+    "g6-expansion-medium-062": {
+      "boardId": "g6-expansion-medium-062",
+      "difficulty": "medium",
+      "contentHash": "bc44103d1ca3aaf8a9693421c627e64d79db34c8d08e299880e34f3623c2aaad",
+      "targetWords": [
+        "ZAČÁTEK",
+        "LÁVKA",
+        "KRYPTA",
+        "ANÝZ",
+        "RACEK",
+        "SMETÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Čas, stavbu a úklid doplňují historie, koření a pták.",
+      "topic": "čas,stavba,historie,koření,pták,úklid",
+      "familiarity": "KRYPTA a ANÝZ konkrétní dvě širší položky."
+    },
+    "g6-expansion-hard-053": {
+      "boardId": "g6-expansion-hard-053",
+      "difficulty": "hard",
+      "contentHash": "cdd1fdf0f895b97b5afb1c78795d39104dbc933904b47e771e363b5941c6e67b",
+      "targetWords": [
+        "SPOLUŽÁK",
+        "ŠKRABOŠKA",
+        "KAMENINA",
+        "LINIE",
+        "ŠPACHTLE",
+        "FUJAVICE",
+        "KAŇON",
+        "VRBA"
+      ],
+      "verdict": "accept",
+      "reason": "Materiál a nástroje vyvažuje člověk, počasí a krajina.",
+      "topic": "škola,maska,materiál,tvar,dílna,počasí,krajina,strom",
+      "familiarity": "ŠKRABOŠKA a FUJAVICE živé širší výrazy, ne neprůhledné odbornosti."
+    },
+    "g6-expansion-easy-063": {
+      "boardId": "g6-expansion-easy-063",
+      "difficulty": "easy",
+      "contentHash": "cc0cd943df613d4e6f89f153407ae62c657dc4aa4487d2b7b19b9aa8185d9087",
+      "targetWords": [
+        "DROŽDÍ",
+        "HRÁBĚ",
+        "PÁREK",
+        "ŠTÍTEK"
+      ],
+      "verdict": "accept",
+      "reason": "Kuchyňskou dvojici doplňují zahradní a obecný předmět.",
+      "topic": "kuchyně,zahrada,předmět",
+      "familiarity": "DROŽDÍ běžný domácí materiál."
+    },
+    "g6-expansion-medium-063": {
+      "boardId": "g6-expansion-medium-063",
+      "difficulty": "medium",
+      "contentHash": "c6bc4e307c675508b2c79047cbfc6ff4ad335f691175d9e9cb76d0609f56eb26",
+      "targetWords": [
+        "BALÓN",
+        "SRPEK",
+        "KÁMEN",
+        "TEPLÝ",
+        "KONEV",
+        "SÉPIE"
+      ],
+      "verdict": "accept",
+      "reason": "Tvar, příroda a vlastnost se střídají s hravým a zahradním předmětem.",
+      "topic": "hra,tvar,materiál,teplota,zahrada,zvíře",
+      "familiarity": "SÉPIE jediný užší zvířecí název."
+    },
+    "g6-expansion-hard-054": {
+      "boardId": "g6-expansion-hard-054",
+      "difficulty": "hard",
+      "contentHash": "fd95e02cf7a62f0a8626b0a68c99253ebff34f2caae55f237865f2470c3f67f2",
+      "targetWords": [
+        "ŠAKAL",
+        "DRES",
+        "TENIS",
+        "MINCÍŘ",
+        "POMLKA",
+        "CHYTRÝ",
+        "JINOVATKA",
+        "ZEDNÍK",
+        "TISKAŘ"
+      ],
+      "verdict": "accept",
+      "reason": "Sport, hudbu a profese vyvažují zvíře, vlastnost a počasí.",
+      "topic": "zvíře,sport,historie,hudba,vlastnost,počasí,profese",
+      "familiarity": "MINCÍŘ tradičnější schválené heslo; srozumitelný základ ostatních."
+    },
+    "g6-expansion-easy-064": {
+      "boardId": "g6-expansion-easy-064",
+      "difficulty": "easy",
+      "contentHash": "a13c17d374c63d861b627ae2b73d3f8207a4f5223361fad39151ab699a3a145d",
+      "targetWords": [
+        "MLÝNEK",
+        "KÁMEN",
+        "BRLOH",
+        "ČENICH"
+      ],
+      "verdict": "accept",
+      "reason": "Kuchyňský předmět, materiál a dvě odlišné zvířecí asociace.",
+      "topic": "kuchyně,materiál,zvířecí prostředí,tělo",
+      "familiarity": "Přístupná konkrétní slova."
+    },
+    "g6-expansion-medium-064": {
+      "boardId": "g6-expansion-medium-064",
+      "difficulty": "medium",
+      "contentHash": "5d515b310d53a47e16bf42780a2bf925dee9d45efc089c5026d9b9b686e3fc71",
+      "targetWords": [
+        "MASA",
+        "RUKOLA",
+        "PLÁTNO",
+        "ZÁKOUTÍ",
+        "KŘEHKÝ",
+        "NAHOŘE"
+      ],
+      "verdict": "accept",
+      "reason": "Jídlo a materiál vyvažují prostor a známá vlastnost.",
+      "topic": "množství,zelenina,materiál,místo,vlastnost,prostor",
+      "familiarity": "MASA zachovává schválené heslo; ostatní běžná konkrétní slovní zásoba."
+    },
+    "g6-expansion-hard-055": {
+      "boardId": "g6-expansion-hard-055",
+      "difficulty": "hard",
+      "contentHash": "b0603907afa09ff840fb5caa1965074a66a72c161edc4d4dc1a3e759f500f0bf",
+      "targetWords": [
+        "DÍVKA",
+        "ODLOUČENÍ",
+        "KOTVIŠTĚ",
+        "PETLICE",
+        "HRABĚNKA",
+        "ZINEK",
+        "HARFA",
+        "KÁČA"
+      ],
+      "verdict": "accept",
+      "reason": "Technické názvy doplňují lidé, citový děj, hudba a hračka.",
+      "topic": "lidé,cit,loď,dům,historie,kov,hudba,hračka",
+      "familiarity": "KOTVIŠTĚ a PETLICE dvě konkrétní širší položky."
+    },
+    "g6-expansion-easy-065": {
+      "boardId": "g6-expansion-easy-065",
+      "difficulty": "easy",
+      "contentHash": "6d9f781a8e0d2b784109870de8eb5d120f6f4202f91fa6b290e3e353cfc3d227",
+      "targetWords": [
+        "HŮLKA",
+        "LEPIT",
+        "VČERA",
+        "ŠIBAL"
+      ],
+      "verdict": "accept",
+      "reason": "Předmět, činnost, čas a člověk mají jasné odlišné významy.",
+      "topic": "předmět,činnost,čas,člověk",
+      "familiarity": "Známá hravá snadná čtveřice."
+    },
+    "g6-expansion-medium-065": {
+      "boardId": "g6-expansion-medium-065",
+      "difficulty": "medium",
+      "contentHash": "052d29e50cd0ec52100d8fc68631867cdccbd659ebfb65e4d630e953dc4952c1",
+      "targetWords": [
+        "LANOVKA",
+        "HABR",
+        "LÍMEC",
+        "DENÍK",
+        "HRAVÝ",
+        "SLOVO"
+      ],
+      "verdict": "accept",
+      "reason": "Dopravu a strom vyvažuje oděv, text a vlastnost.",
+      "topic": "doprava,strom,oděv,kniha,vlastnost,jazyk",
+      "familiarity": "HABR jediný širší druhový název, jinak velmi přístupné."
+    },
+    "g6-expansion-hard-056": {
+      "boardId": "g6-expansion-hard-056",
+      "difficulty": "hard",
+      "contentHash": "d8dc7b54bd8bc8af6e92b6d034b20d97b999d3bff12aaf7e7bc8aff021ec3ed7",
+      "targetWords": [
+        "KOMPAS",
+        "STUPNICE",
+        "HAVRAN",
+        "VRTÁNÍ",
+        "KOBLIHA",
+        "ÚPONEK",
+        "KVÁSEK",
+        "ZÁMINKA"
+      ],
+      "verdict": "accept",
+      "reason": "Navigaci a dílnu rozšiřuje příroda, jídlo a obecný pojem.",
+      "topic": "turistika,měření,pták,dílna,jídlo,rostlina,kuchyně,důvod",
+      "familiarity": "ÚPONEK a KVÁSEK konkrétní širší názvy."
+    },
+    "g6-expansion-easy-066": {
+      "boardId": "g6-expansion-easy-066",
+      "difficulty": "easy",
+      "contentHash": "91e36b7abbea02286850e3f9001731cb516192c1413a74a3624ef4d7d83f7334",
+      "targetWords": [
+        "VÝHRA",
+        "POUPĚ",
+        "HEZKÝ",
+        "PUMPA"
+      ],
+      "verdict": "accept",
+      "reason": "Úspěch, rostlinu a vlastnost doplňuje známý technický předmět.",
+      "topic": "hra,rostlina,vlastnost,předmět",
+      "familiarity": "Běžné snadné významy."
+    },
+    "g6-expansion-medium-066": {
+      "boardId": "g6-expansion-medium-066",
+      "difficulty": "medium",
+      "contentHash": "138e6de5e9926dffe1c273ab37ea4971ebc6f75fa2a855d718c7aa11f9d6f84c",
+      "targetWords": [
+        "JIŘIČKA",
+        "SNÍT",
+        "MALINÍK",
+        "ŠKRABKA",
+        "SLON",
+        "RUKA"
+      ],
+      "verdict": "accept",
+      "reason": "Dva druhové názvy vyvažují činnost, běžný nástroj, zvíře a tělo.",
+      "topic": "pták,snění,keř,kuchyně,zvíře,tělo",
+      "familiarity": "JIŘIČKA a MALINÍK známá konkrétní příroda."
+    },
+    "g6-expansion-hard-057": {
+      "boardId": "g6-expansion-hard-057",
+      "difficulty": "hard",
+      "contentHash": "42baaa8b66516e532e0cc65f115bef20a5b6e2bec6650ba9dad7a4491c0b7408",
+      "targetWords": [
+        "STRÝC",
+        "HEJNO",
+        "PRYŽ",
+        "ZÍTŘEK",
+        "DESETNÍK",
+        "DRHNOUT",
+        "KUCHAŘ",
+        "LOUBÍ",
+        "AKORD"
+      ],
+      "verdict": "accept",
+      "reason": "Rodinu, čas a činnost doplňují materiál, historie a hudba.",
+      "topic": "rodina,zvířata,materiál,čas,finance,činnost,profese,stavba,hudba",
+      "familiarity": "DESETNÍK a LOUBÍ širší, ale přístupné tradiční názvy."
+    },
+    "g6-expansion-easy-067": {
+      "boardId": "g6-expansion-easy-067",
+      "difficulty": "easy",
+      "contentHash": "88bdb1cebca5df919d646fe00357eab3c74abb53c0320b584783ba4faa87e88b",
+      "targetWords": [
+        "SANDÁL",
+        "KŮLNA",
+        "PRVNÍ",
+        "HRNČÍŘ"
+      ],
+      "verdict": "accept",
+      "reason": "Oděv, stavbu a pořadí doplňuje dobře představitelné řemeslo.",
+      "topic": "oděv,stavba,pořadí,profese",
+      "familiarity": "Běžná snadná slovní zásoba."
+    },
+    "g6-expansion-medium-067": {
+      "boardId": "g6-expansion-medium-067",
+      "difficulty": "medium",
+      "contentHash": "3e47fa6b092075e43f06458c0c28c3c19a482a71f7900f5d9606b2176dc7f7b1",
+      "targetWords": [
+        "ZOBAT",
+        "PEŘEJ",
+        "VĚŠÁK",
+        "FIXKA",
+        "ŽLUNA",
+        "DRŽET"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní dvojici vyvažují domácnost, psaní a dvě běžné činnosti.",
+      "topic": "činnosti,voda,domov,psaní,pták",
+      "familiarity": "PEŘEJ a ŽLUNA dvě užší přírodní položky."
+    },
+    "g6-expansion-hard-058": {
+      "boardId": "g6-expansion-hard-058",
+      "difficulty": "hard",
+      "contentHash": "8626d12d13cee7cd1386e63fe94074203fb151aa1eebf7b6485b249ab143efd4",
+      "targetWords": [
+        "KATAKOMBY",
+        "PLAVBA",
+        "KRÁJET",
+        "VYŠÍVAT",
+        "RUČNÍK",
+        "PODBĚL",
+        "OŘEŠÁK",
+        "KDOULE"
+      ],
+      "verdict": "accept",
+      "reason": "Historii a botaniku střídají běžné činnosti a domácí předmět.",
+      "topic": "historie,cesta,činnosti,domov,bylina,strom,ovoce",
+      "familiarity": "PODBĚL a KDOULE širší konkrétní názvy, běžné činnosti je vyvažují."
+    },
+    "g6-expansion-easy-068": {
+      "boardId": "g6-expansion-easy-068",
+      "difficulty": "easy",
+      "contentHash": "41850941db990e726d8ef27615148da814dac43bffc16869e7f6e900afbe3b3e",
+      "targetWords": [
+        "ČÍSLO",
+        "SPONA",
+        "BARVA",
+        "PRKNO"
+      ],
+      "verdict": "accept",
+      "reason": "Počet a barvu doplňují dva známé předměty.",
+      "topic": "počet,předmět,barva,materiál",
+      "familiarity": "Žádný raritní ani zavádějící tvar."
+    },
+    "g6-expansion-medium-068": {
+      "boardId": "g6-expansion-medium-068",
+      "difficulty": "medium",
+      "contentHash": "e472355dc73fe32e281780734b0e1b4980f48078b9ddf411b269fbd0f4787227",
+      "targetWords": [
+        "NÁPĚV",
+        "PÁTRAT",
+        "KOULE",
+        "PŘEZKA",
+        "KLÍN",
+        "HORNÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Hudba, činnost a prostor se střídají s tvarem a předměty.",
+      "topic": "hudba,činnost,tvar,oděv,předmět,prostor",
+      "familiarity": "PŘEZKA a NÁPĚV známé konkrétní pojmy."
+    },
+    "g6-expansion-hard-059": {
+      "boardId": "g6-expansion-hard-059",
+      "difficulty": "hard",
+      "contentHash": "29656895e1b770a3b1fc5a485f41b0eb12c16741833e0042d06db614b9ecb21a",
+      "targetWords": [
+        "VRCHOL",
+        "VÝBUCH",
+        "ROZBITÍ",
+        "NÁRŮST",
+        "LIBEČEK",
+        "KÁNĚ",
+        "ZATÁČKA",
+        "KOUDEL",
+        "DŘEPĚT"
+      ],
+      "verdict": "accept",
+      "reason": "Dějovou trojici vyvažují přírodní názvy, cesta, materiál a pohyb.",
+      "topic": "krajina,děje,bylina,pták,cesta,materiál,pohyb",
+      "familiarity": "KOUDEL a LIBEČEK širší konkrétní položky, nominalizace běžné."
+    },
+    "g6-expansion-easy-069": {
+      "boardId": "g6-expansion-easy-069",
+      "difficulty": "easy",
+      "contentHash": "3d780bb00f398ebc69cd3a1c59d3344b8127e917a779483d408db5fece777ca9",
+      "targetWords": [
+        "PLÉST",
+        "PRŠET",
+        "HOPSAT",
+        "PECKA"
+      ],
+      "verdict": "accept",
+      "reason": "Tři známé odlišné děje a konkrétní přírodní název.",
+      "topic": "řemeslo,počasí,pohyb,plod",
+      "familiarity": "Živá přístupná slovesa vhodná pro snadnou."
+    },
+    "g6-expansion-medium-069": {
+      "boardId": "g6-expansion-medium-069",
+      "difficulty": "medium",
+      "contentHash": "635e61c0314042292915efc38c81eb7b69e7e4db57d6d0d1ea1c53a50641f9c4",
+      "targetWords": [
+        "CHRASTÍ",
+        "VOŇAVÝ",
+        "MŘÍŽ",
+        "ŽENSKÁ",
+        "KLÍČ",
+        "KOMINÍK"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu a vlastnost doplňují předměty a dva odlišní lidé.",
+      "topic": "příroda,vlastnost,dům,lidé,předmět,profese",
+      "familiarity": "ŽENSKÁ zachovává schválený hovorový registr; žádný odborný shluk."
+    },
+    "g6-expansion-hard-060": {
+      "boardId": "g6-expansion-hard-060",
+      "difficulty": "hard",
+      "contentHash": "5e4d9e4faf99f336f86d0b389c32f5f27d26deab2156740d80585d8385d69db2",
+      "targetWords": [
+        "TUKAN",
+        "JÁMA",
+        "POTRAVA",
+        "ROZVODÍ",
+        "VERŠ",
+        "ŘÍDÍTKA",
+        "STAVIDLO",
+        "KATEDRÁLA"
+      ],
+      "verdict": "accept",
+      "reason": "Vodní a krajinné názvy vyvažují zvíře, jídlo, poezie a doprava.",
+      "topic": "pták,krajina,jídlo,voda,poezie,doprava,stavba",
+      "familiarity": "ROZVODÍ a STAVIDLO dvě širší technické přírodní položky."
+    },
+    "g6-expansion-easy-070": {
+      "boardId": "g6-expansion-easy-070",
+      "difficulty": "easy",
+      "contentHash": "f0039f33d03a88dfbdcca7712c8ba7b4b14707cbf858f2e891dc506f21c358e0",
+      "targetWords": [
+        "POHODA",
+        "VEČER",
+        "KABÁT",
+        "KACHNĚ"
+      ],
+      "verdict": "accept",
+      "reason": "Nálada, čas, oděv a zvíře drží snadnou přístupnost.",
+      "topic": "nálada,čas,oděv,zvíře",
+      "familiarity": "Běžná každodenní slova."
+    },
+    "g6-expansion-medium-070": {
+      "boardId": "g6-expansion-medium-070",
+      "difficulty": "medium",
+      "contentHash": "c54cf931878c4601c412134130944e7bca6b9c5a60011fe63f1d32025bbd329e",
+      "targetWords": [
+        "ROBOT",
+        "BANDA",
+        "FIRMA",
+        "NUDLE",
+        "ČISTÝ",
+        "ŠERO",
+        "MUSET"
+      ],
+      "verdict": "accept",
+      "reason": "Společenské a technické pojmy vyvažuje jídlo, vlastnost a běžné sloveso.",
+      "topic": "technologie,lidé,práce,jídlo,vlastnost,světlo,činnost",
+      "familiarity": "BANDA přirozený schválený registr, jinak přístupné významy."
+    },
+    "g6-expansion-hard-061": {
+      "boardId": "g6-expansion-hard-061",
+      "difficulty": "hard",
+      "contentHash": "aaeb454cdb33178e11d9d554ff83fd48b94a492d87ddcc1d4feafef2f4ca28a0",
+      "targetWords": [
+        "HRAZDA",
+        "KLOBOUČEK",
+        "ZPĚV",
+        "TRAKAŘ",
+        "ŠPAČEK",
+        "ŽRALOK",
+        "MOKŘAD",
+        "OPTIKA",
+        "ŠALVĚJ"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodně laděnou část doplňují sport, hudba, venkov a věda.",
+      "topic": "sport,oděv,hudba,venkov,zvířata,krajina,věda,bylina",
+      "familiarity": "OPTIKA a MOKŘAD dvě známé širší oblasti."
+    },
+    "g6-expansion-easy-071": {
+      "boardId": "g6-expansion-easy-071",
+      "difficulty": "easy",
+      "contentHash": "6e5d843972391e74f7519d56692373ebef741a1b82b9a5a8904bc6467dbdc50f",
+      "targetWords": [
+        "DÓZA",
+        "PENÍZE",
+        "TULÁK",
+        "HRAZDA"
+      ],
+      "verdict": "accept",
+      "reason": "Předměty, člověk a finance tvoří známé konkrétní asociace.",
+      "topic": "domov,finance,člověk,sport",
+      "familiarity": "Běžná přístupná čtveřice."
+    },
+    "g6-expansion-medium-071": {
+      "boardId": "g6-expansion-medium-071",
+      "difficulty": "medium",
+      "contentHash": "dfac36aaec4585368a0a5503219a36c6bd59a8cab0bc0497657df1aad0521644",
+      "targetWords": [
+        "ŠUSTOT",
+        "MĚŠEC",
+        "PAPÍR",
+        "TAPÍR",
+        "JAVOR",
+        "BUDÍK"
+      ],
+      "verdict": "accept",
+      "reason": "Zvuk, předměty a příroda jsou významově dobře rozptýlené.",
+      "topic": "zvuk,předmět,materiál,zvíře,strom,čas",
+      "familiarity": "MĚŠEC a TAPÍR dvě širší konkrétní položky."
+    },
+    "g6-expansion-hard-062": {
+      "boardId": "g6-expansion-hard-062",
+      "difficulty": "hard",
+      "contentHash": "1e5a119edf5ff011a476d4f58eb893245fd1981670437ad5dddca583531dde9e",
+      "targetWords": [
+        "BÍDA",
+        "PLOŠTICE",
+        "POBYT",
+        "RÁKOS",
+        "ŘEBŘÍČEK",
+        "METLA",
+        "SEVER",
+        "ZÁVIT",
+        "ZAKŘIVENÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu doplňují obecné pojmy, předmět a geometrie.",
+      "topic": "stav,hmyz,pobyt,rostliny,předmět,směr,dílna,geometrie",
+      "familiarity": "ŘEBŘÍČEK a PLOŠTICE přiměřené konkrétní názvy těžké obtížnosti."
+    },
+    "g6-expansion-easy-072": {
+      "boardId": "g6-expansion-easy-072",
+      "difficulty": "easy",
+      "contentHash": "2a8339a334edd8acc7cd1ab77f3b1dee40979529ba1066b94fa581705abac48e",
+      "targetWords": [
+        "LÍMEC",
+        "ŠKROB",
+        "MŠICE",
+        "OMÍTKA"
+      ],
+      "verdict": "accept",
+      "reason": "Oděv, známý materiál, zahrada a stavba mají odlišné konkrétní významy.",
+      "topic": "oděv,materiál,hmyz,stavba",
+      "familiarity": "ŠKROB a OMÍTKA běžné domácí názvy, ne okrajová terminologie."
+    },
+    "g6-expansion-medium-072": {
+      "boardId": "g6-expansion-medium-072",
+      "difficulty": "medium",
+      "contentHash": "20b5aacbb16f502857e4ad979948eec72d40bde1b5b324cbe65284378101d84d",
+      "targetWords": [
+        "KLIKA",
+        "ROKLE",
+        "PRÁCE",
+        "BOTY",
+        "POMLKA",
+        "VIDĚT",
+        "SRNEC"
+      ],
+      "verdict": "accept",
+      "reason": "Dům, krajina a činnost se střídají s hudbou, oděvem a přírodou.",
+      "topic": "dům,krajina,práce,oděv,hudba,činnost,zvíře",
+      "familiarity": "ROKLE a POMLKA známé naučené pojmy."
+    },
+    "g6-expansion-hard-063": {
+      "boardId": "g6-expansion-hard-063",
+      "difficulty": "hard",
+      "contentHash": "09e572b9a253059a469e948d9fbec5cc6c41678edeb9185ec3d83686208bad88",
+      "targetWords": [
+        "SELE",
+        "MEDUŇKA",
+        "SMĚNA",
+        "ŠERMÍŘ",
+        "BÁJE",
+        "CELEK",
+        "HLÍZA",
+        "SLABOST",
+        "BABOČKA"
+      ],
+      "verdict": "accept",
+      "reason": "Zvíře a rostliny vyvažuje práce, sport, příběh a obecné pojmy.",
+      "topic": "zvíře,bylina,práce,sport,příběh,pojem,rostlina,vlastnost,hmyz",
+      "familiarity": "BABOČKA a MEDUŇKA konkrétní širší příroda."
+    },
+    "g6-expansion-easy-073": {
+      "boardId": "g6-expansion-easy-073",
+      "difficulty": "easy",
+      "contentHash": "1223fa2846307568cfe0596bf20de5a9a20a2a1dd15cc73af5e9f9b539482dd4",
+      "targetWords": [
+        "VIŠEŇ",
+        "ZAJÍC",
+        "OBŘÍ",
+        "POKLOP"
+      ],
+      "verdict": "accept",
+      "reason": "Strom, zvíře a vlastnost doplňuje známý předmět.",
+      "topic": "strom,zvíře,vlastnost,předmět",
+      "familiarity": "Snadná srozumitelná sestava."
+    },
+    "g6-expansion-medium-073": {
+      "boardId": "g6-expansion-medium-073",
+      "difficulty": "medium",
+      "contentHash": "fbe6b39753be766e4a53e85a491a41ee656876dc67c9bf30405239000f6f5659",
+      "targetWords": [
+        "VIŠEŇ",
+        "NÁČRT",
+        "RÉVA",
+        "KNOT",
+        "ZIMNÍ",
+        "PŘÁNÍ",
+        "STRŽ"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní část vyvažuje kresba, světlo, časová vlastnost a cit.",
+      "topic": "strom,kresba,rostlina,světlo,čas,přání,krajina",
+      "familiarity": "STRŽ a RÉVA známé konkrétní názvy."
+    },
+    "g6-expansion-hard-064": {
+      "boardId": "g6-expansion-hard-064",
+      "difficulty": "hard",
+      "contentHash": "b49202088afeda99a0875b10aef06ee71e824740c301713ee638e0d0387c7efc",
+      "targetWords": [
+        "ČÁRA",
+        "STRAŠIDLO",
+        "ONDATRA",
+        "POLICISTA",
+        "TRÁVENÍ",
+        "ČARODĚJ",
+        "ŽEHLIT",
+        "SOUTĚŽ"
+      ],
+      "verdict": "accept",
+      "reason": "Pohádkovou dvojici doplňuje příroda, profese, děj a činnost.",
+      "topic": "tvar,pohádka,zvíře,profese,biologie,činnost,hra",
+      "familiarity": "ONDATRA jediný užší druhový název; pohádkové významy odlišné."
+    },
+    "g6-expansion-easy-074": {
+      "boardId": "g6-expansion-easy-074",
+      "difficulty": "easy",
+      "contentHash": "d43d68b2d5ed2fe807abda8f574def4cacd2d9f922d4a88957e77feba069a2c2",
+      "targetWords": [
+        "ATLAS",
+        "NÁPAD",
+        "SILNÝ",
+        "KAŠNA"
+      ],
+      "verdict": "accept",
+      "reason": "Známou knihu doplňuje myšlenka, vlastnost a městský objekt.",
+      "topic": "kniha,myšlenka,vlastnost,město",
+      "familiarity": "ATLAS běžná školní asociace, bez složitého registru."
+    },
+    "g6-expansion-medium-074": {
+      "boardId": "g6-expansion-medium-074",
+      "difficulty": "medium",
+      "contentHash": "76e186c2c40dfafb5d7bb5ce87854ac8dede37bde27d7b1b1ca343249b9cd284",
+      "targetWords": [
+        "BEDNĚNÍ",
+        "OSUD",
+        "VAŘEČKA",
+        "KAŠNA",
+        "JEMNÝ",
+        "SENDVIČ"
+      ],
+      "verdict": "accept",
+      "reason": "Stavební název vyvažuje každodenní kuchyně, město a vlastnost.",
+      "topic": "stavba,osud,kuchyně,město,vlastnost,jídlo",
+      "familiarity": "BEDNĚNÍ jediný užší technický pojem."
+    },
+    "g6-expansion-hard-065": {
+      "boardId": "g6-expansion-hard-065",
+      "difficulty": "hard",
+      "contentHash": "d093f0c4b49d631e100eeaab8f39ee1c5a4ca7569a301adb8bed1c79ffca7cb8",
+      "targetWords": [
+        "MOCNINA",
+        "SMŮLA",
+        "LÁVA",
+        "PONORKA",
+        "RUKOLA",
+        "VÝHEŇ",
+        "HRÁCH",
+        "LOĎSTVO",
+        "RYTINA"
+      ],
+      "verdict": "accept",
+      "reason": "Matematiku, řemeslo a dopravu vyvažuje známé jídlo a příroda.",
+      "topic": "matematika,příroda,doprava,zelenina,řemeslo,umění",
+      "familiarity": "VÝHEŇ a RYTINA širší konkrétní řemeslná slovní zásoba."
+    },
+    "g6-expansion-easy-075": {
+      "boardId": "g6-expansion-easy-075",
+      "difficulty": "easy",
+      "contentHash": "d3d97e52df5f72213e04e0ac40015b244bcb56ddd1abd71413eef76d4a143756",
+      "targetWords": [
+        "FOTKA",
+        "MODŘÍN",
+        "KOPYTO",
+        "VDĚK"
+      ],
+      "verdict": "accept",
+      "reason": "Obraz, strom, část těla a cit mají jasné odlišné významy.",
+      "topic": "obraz,strom,zvířecí tělo,cit",
+      "familiarity": "MODŘÍN známý základní strom."
+    },
+    "g6-expansion-medium-075": {
+      "boardId": "g6-expansion-medium-075",
+      "difficulty": "medium",
+      "contentHash": "9ca2c9992a51a7528fde44eec34d9a6c155f1ee6d330fc11053acc0b9b3b8586",
+      "targetWords": [
+        "PITÍ",
+        "LOUČ",
+        "ZEBRA",
+        "MÍSA",
+        "ODMĚRKA",
+        "JMELÍ",
+        "PRAŽEC"
+      ],
+      "verdict": "accept",
+      "reason": "Domácnost, příroda a světlo vyvažují jednu dopravně stavební položku.",
+      "topic": "nápoj,světlo,zvíře,kuchyně,rostlina,doprava",
+      "familiarity": "LOUČ a PRAŽEC dvě tradiční konkrétní položky."
+    },
+    "g6-expansion-hard-066": {
+      "boardId": "g6-expansion-hard-066",
+      "difficulty": "hard",
+      "contentHash": "ed767881455c84ec6c3b77e5a185906b71776a77c641b506a40d24f281c83ea2",
+      "targetWords": [
+        "SAFÍR",
+        "CHIMÉRA",
+        "STŘÍDKA",
+        "KLOKAN",
+        "TVÁRNICE",
+        "DŘÍMOTA",
+        "ROZMĚR",
+        "LEŠTIT"
+      ],
+      "verdict": "accept",
+      "reason": "Minerál a bájný pojem vyvažují jídlo, zvíře, stavba a činnost.",
+      "topic": "minerál,pohádka,jídlo,zvíře,stavba,spánek,měření,činnost",
+      "familiarity": "CHIMÉRA širší schválené heslo, známá slova poskytují opory."
+    },
+    "g6-expansion-easy-076": {
+      "boardId": "g6-expansion-easy-076",
+      "difficulty": "easy",
+      "contentHash": "57276ae8839304caa1c1bbb592ac29c62c0779b708c89aa7e25ef3a9be8ccd52",
+      "targetWords": [
+        "BRAŠNA",
+        "ŠUSTIT",
+        "PODNOS",
+        "STÁT"
+      ],
+      "verdict": "accept",
+      "reason": "Dva známé předměty a dvě odlišné jednoduché činnosti.",
+      "topic": "předmět,zvuk,domov,činnost",
+      "familiarity": "Běžná snadná slovní zásoba."
+    },
+    "g6-expansion-medium-076": {
+      "boardId": "g6-expansion-medium-076",
+      "difficulty": "medium",
+      "contentHash": "e7bee031d2669bc49457ad2b0e427479862e68638a2b08c504e989468050d05d",
+      "targetWords": [
+        "SEKERA",
+        "HRYZAT",
+        "PAVIÁN",
+        "HROM",
+        "SPONKA",
+        "PAŘÁT"
+      ],
+      "verdict": "accept",
+      "reason": "Nástroj, činnost a předmět vyvažují přírodu a počasí.",
+      "topic": "dílna,činnost,zvíře,počasí,předmět,tělo",
+      "familiarity": "PAVIÁN a PAŘÁT konkrétní známé přírodní názvy."
+    },
+    "g6-expansion-hard-067": {
+      "boardId": "g6-expansion-hard-067",
+      "difficulty": "hard",
+      "contentHash": "f6cd2392af7222b4034f1d5e5ba8e9a1c6f9a1335bfa6cd993c3e1107a2d5807",
+      "targetWords": [
+        "STVOL",
+        "PROJEKT",
+        "SLOKA",
+        "KOZEL",
+        "TRASA",
+        "PLÁŠTĚNKA",
+        "HROZNY",
+        "DŘEŇ",
+        "DELTA"
+      ],
+      "verdict": "accept",
+      "reason": "Pestrá devítice propojuje přírodu, plánování, poezii a cestování.",
+      "topic": "rostlina,plán,poezie,zvíře,cesta,oděv,ovoce,tělo,zeměpis",
+      "familiarity": "DŘEŇ a DELTA dvě přiměřené naučené položky."
+    },
+    "g6-expansion-easy-077": {
+      "boardId": "g6-expansion-easy-077",
+      "difficulty": "easy",
+      "contentHash": "c21b0cf0c9b9673985cb9f99616c95fe4b042b896822ee84cc8a7f4e8abdbde9",
+      "targetWords": [
+        "JMÉNO",
+        "ZÍVAT",
+        "KUKLA",
+        "ŠACHY"
+      ],
+      "verdict": "accept",
+      "reason": "Pojmenování, jednoduchý děj, předmět a hra mají běžné významy.",
+      "topic": "jméno,činnost,předmět,hra",
+      "familiarity": "Snadná přístupná čtveřice."
+    },
+    "g6-expansion-medium-077": {
+      "boardId": "g6-expansion-medium-077",
+      "difficulty": "medium",
+      "contentHash": "6875f44ba762f214bb622cdf28d399c6c93379f4ef6bb7eda185ce66ad8acd88",
+      "targetWords": [
+        "ZÍVAT",
+        "ČARODĚJ",
+        "ÚZKÝ",
+        "KRTEK",
+        "PLYŠÁK",
+        "ATLAS"
+      ],
+      "verdict": "accept",
+      "reason": "Pohádku a hračku vyvažuje činnost, vlastnost, zvíře a kniha.",
+      "topic": "činnost,pohádka,vlastnost,zvíře,hračka,kniha",
+      "familiarity": "Přístupná střední skladba bez vzácné položky."
+    },
+    "g6-expansion-hard-068": {
+      "boardId": "g6-expansion-hard-068",
+      "difficulty": "hard",
+      "contentHash": "eea14633c0ffcfa697d11904244af4e637f253b055444050533c8983b049e22f",
+      "targetWords": [
+        "STĚŽEŇ",
+        "HESLO",
+        "ALIGÁTOR",
+        "KMÍN",
+        "SAMOLEPKA",
+        "LÉKAŘKA",
+        "TŮNĚ",
+        "PODEZŘENÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Technické a přírodní názvy doplňuje kuchyně, předmět, profese a obecný pojem.",
+      "topic": "loď,jazyk,zvíře,koření,předmět,profese,voda,pojem",
+      "familiarity": "STĚŽEŇ a ALIGÁTOR dvě širší konkrétní položky."
+    },
+    "g6-expansion-easy-078": {
+      "boardId": "g6-expansion-easy-078",
+      "difficulty": "easy",
+      "contentHash": "d4a72831963c90b9c30fcebe389653dc528787bb501d04fef679403f47071263",
+      "targetWords": [
+        "ZNÁMKA",
+        "BĚŽET",
+        "MÁSLO",
+        "KOSIT"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě jednoduché činnosti střídají školní/poštovní předmět a jídlo.",
+      "topic": "předmět,pohyb,jídlo,zahrada",
+      "familiarity": "Běžná snadná zásoba."
+    },
+    "g6-expansion-medium-078": {
+      "boardId": "g6-expansion-medium-078",
+      "difficulty": "medium",
+      "contentHash": "40f3476c4dee6374ae1bef5983981f315563b0c1b3fb6c6d64390f8321225c1d",
+      "targetWords": [
+        "ŘÁDEK",
+        "LEZEC",
+        "NÁKYP",
+        "HOŘKÝ",
+        "VIOLKA",
+        "TULÁK"
+      ],
+      "verdict": "accept",
+      "reason": "Text, lidi a jídlo doplňuje známá vlastnost a květina.",
+      "topic": "text,sport,jídlo,chuť,rostlina,člověk",
+      "familiarity": "VIOLKA jediný užší druhový název."
+    },
+    "g6-expansion-hard-069": {
+      "boardId": "g6-expansion-hard-069",
+      "difficulty": "hard",
+      "contentHash": "c8d62b1ff140938c4db0024cf15336b05b820862421680b558c62043726a685e",
+      "targetWords": [
+        "MOŘSKÝ",
+        "POČASÍ",
+        "POLICE",
+        "NÁMRAZA",
+        "JESETER",
+        "DRÁTENÍK",
+        "PÁDLOVAT",
+        "RODINKA"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní část vyvažuje domov, řemeslo, pohyb a rodina.",
+      "topic": "vlastnost,počasí,domov,ryba,řemeslo,pohyb,rodina",
+      "familiarity": "JESETER a DRÁTENÍK dvě konkrétní širší položky."
+    },
+    "g6-expansion-easy-079": {
+      "boardId": "g6-expansion-easy-079",
+      "difficulty": "easy",
+      "contentHash": "fcacc177cbde349f3a97b7b2d657099b01b47e07a6346f32fdb5db5de3f90aa2",
+      "targetWords": [
+        "SPORT",
+        "ŠPUNT",
+        "VČELA",
+        "SIRUP"
+      ],
+      "verdict": "accept",
+      "reason": "Hru a předmět doplňuje známé zvíře a potravina.",
+      "topic": "sport,předmět,hmyz,jídlo",
+      "familiarity": "Přístupná známá čtveřice."
+    },
+    "g6-expansion-medium-079": {
+      "boardId": "g6-expansion-medium-079",
+      "difficulty": "medium",
+      "contentHash": "815c4c6f897d9f6976689ed2287e59f9ee04997793247e0334d0b832db5e80a7",
+      "targetWords": [
+        "ŠKOLNÍ",
+        "ČINEL",
+        "MALÍŘ",
+        "VRTAT",
+        "BROD",
+        "ZÁVĚS"
+      ],
+      "verdict": "accept",
+      "reason": "Hudbu a řemeslo střídá činnost, voda a domácnost.",
+      "topic": "vlastnost,hudba,profese,činnost,voda,domov",
+      "familiarity": "ČINEL a BROD konkrétní známé širší pojmy."
+    },
+    "g6-expansion-hard-070": {
+      "boardId": "g6-expansion-hard-070",
+      "difficulty": "hard",
+      "contentHash": "2a204ef9fc88b1391085388234dcba87ffb39d09facc7f6704022324075ef7a8",
+      "targetWords": [
+        "PASTOREK",
+        "OŘECH",
+        "TRPKÝ",
+        "ZÁVAN",
+        "KOZOROH",
+        "ŠKOLA",
+        "HOSTINA",
+        "LOUBÍ",
+        "KRUCIFIX"
+      ],
+      "verdict": "accept",
+      "reason": "Dva užší technicko-historické názvy vyvažují běžné jídlo, škola a příroda.",
+      "topic": "technika,plod,chuť,vzduch,zvíře,škola,jídlo,stavba,historie",
+      "familiarity": "PASTOREK a KRUCIFIX jsou širší těžká zásoba, opřená o známá hesla."
+    },
+    "g6-expansion-easy-080": {
+      "boardId": "g6-expansion-easy-080",
+      "difficulty": "easy",
+      "contentHash": "6f74359b778549001f7a514b1fa8a6b85772346b9f98355f3efae2e63b0f9709",
+      "targetWords": [
+        "LEHKÝ",
+        "OSADA",
+        "VÝVAR",
+        "SLOVO"
+      ],
+      "verdict": "accept",
+      "reason": "Vlastnost, místo, jídlo a jazyk mají odlišné snadné významy.",
+      "topic": "vlastnost,místo,jídlo,jazyk",
+      "familiarity": "Běžná přístupná slova."
+    },
+    "g6-expansion-medium-080": {
+      "boardId": "g6-expansion-medium-080",
+      "difficulty": "medium",
+      "contentHash": "aa1667d9128d9a099cde7b8bc9b0a1565439e56e21f0ca816fda5bb6764cf115",
+      "targetWords": [
+        "ŠPENÁT",
+        "KÁMEN",
+        "TŘÍŠŤ",
+        "DÁREK",
+        "TRPKÝ",
+        "SKAUT",
+        "OÁZA"
+      ],
+      "verdict": "accept",
+      "reason": "Jídlo a materiál střídá dárek, člověk, vlastnost a krajina.",
+      "topic": "jídlo,materiál,jev,dar,chuť,člověk,krajina",
+      "familiarity": "OÁZA jediný užší zeměpisný pojem."
+    },
+    "g6-expansion-hard-071": {
+      "boardId": "g6-expansion-hard-071",
+      "difficulty": "hard",
+      "contentHash": "f432f99d130dd15dc4b248c52a6b4f21136b3672461ff750dbe7fc23325e3fee",
+      "targetWords": [
+        "RÁHNO",
+        "LIŠAJ",
+        "HARMONIKA",
+        "OŠTĚP",
+        "VOLAVKA",
+        "VÁNOČKA",
+        "CHLÁPEK",
+        "HLUK",
+        "KURT"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu a vybavení vyvažují hudba, jídlo, člověk a sport.",
+      "topic": "loď,hmyz,hudba,sport,pták,jídlo,člověk,zvuk",
+      "familiarity": "LIŠAJ a RÁHNO dvě širší konkrétní položky."
+    },
+    "g6-expansion-easy-081": {
+      "boardId": "g6-expansion-easy-081",
+      "difficulty": "easy",
+      "contentHash": "a27213c884e2e9d79815cc706ec4c06f432025f2c1dfaafcd3545d895094c20a",
+      "targetWords": [
+        "PÁDIT",
+        "LÁSKA",
+        "PENÁL",
+        "ŽALUD"
+      ],
+      "verdict": "accept",
+      "reason": "Pohyb a cit střídá známý školní předmět a plod.",
+      "topic": "pohyb,cit,škola,les",
+      "familiarity": "Snadná živá slovní zásoba."
+    },
+    "g6-expansion-medium-081": {
+      "boardId": "g6-expansion-medium-081",
+      "difficulty": "medium",
+      "contentHash": "d80930a0a197bd5d4245b893544b69ec15763bca436bc54f32062a7fe066b4ec",
+      "targetWords": [
+        "ŘIDIČ",
+        "PAŘEZ",
+        "HMOŽDÍŘ",
+        "KUŇKA",
+        "MOLO",
+        "ZÁPLATA"
+      ],
+      "verdict": "accept",
+      "reason": "Profese, příroda a oprava vyvažují kuchyňský a vodní předmět.",
+      "topic": "profese,les,kuchyně,zvíře,voda,oprava",
+      "familiarity": "HMOŽDÍŘ a KUŇKA dvě přiměřené konkrétní širší položky."
+    },
+    "g6-expansion-hard-072": {
+      "boardId": "g6-expansion-hard-072",
+      "difficulty": "hard",
+      "contentHash": "bf7a578896ad97705d465525f5c9c0b0a68b509e28d8008c2c782d40f85b906a",
+      "targetWords": [
+        "LÁTAT",
+        "MAKAK",
+        "SNOWBOARD",
+        "HMOŽDÍŘ",
+        "PÁDLO",
+        "KŮŽE",
+        "SKOŘÁPKY",
+        "ŠLECHTA"
+      ],
+      "verdict": "accept",
+      "reason": "Sport, přírodu a historii střídají známé předměty a činnost.",
+      "topic": "činnost,zvíře,sport,kuchyně,voda,materiál,plod,historie",
+      "familiarity": "MAKAK jediný užší druh; ostatní mají známé konkrétní asociace."
+    },
+    "g6-expansion-easy-082": {
+      "boardId": "g6-expansion-easy-082",
+      "difficulty": "easy",
+      "contentHash": "dfa14231bbc4515f300ea7c12f63efca63257ad0839d27f4bd51f812c353421b",
+      "targetWords": [
+        "HNÍZDO",
+        "ŠÁLEK",
+        "ŤUKAT",
+        "ČERNÁ"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu a domácí předmět doplňuje jednoduchá činnost a barva.",
+      "topic": "příroda,domov,zvuk,barva",
+      "familiarity": "ČERNÁ zachovává schválenou podobu; běžná snadná sestava."
+    },
+    "g6-expansion-medium-082": {
+      "boardId": "g6-expansion-medium-082",
+      "difficulty": "medium",
+      "contentHash": "789abf73b5bddcd94776905566efb63b637289721cb9396d174938f5f86c5c5a",
+      "targetWords": [
+        "OSIKA",
+        "ŠUSTOT",
+        "PÍSEK",
+        "KŘÍDA",
+        "OBTISK",
+        "DOPIS"
+      ],
+      "verdict": "accept",
+      "reason": "Strom, zvuk a materiály vyvažuje tisk a komunikace.",
+      "topic": "strom,zvuk,materiály,škola,tisk,komunikace",
+      "familiarity": "OSIKA a OBTISK přístupné konkrétní pojmy."
+    },
+    "g6-expansion-hard-073": {
+      "boardId": "g6-expansion-hard-073",
+      "difficulty": "hard",
+      "contentHash": "aded378dc870e0e61d36a2754a504df5cf4b90248e9634e196aa26650f774db6",
+      "targetWords": [
+        "DISPLEJ",
+        "JEŽEK",
+        "SPLÉTAT",
+        "BLATNÍK",
+        "ÚHOŘ",
+        "NEDĚLE",
+        "TRUP",
+        "PREMIÉRA",
+        "BROSKVOŇ"
+      ],
+      "verdict": "accept",
+      "reason": "Techniku, zvířata a činnost doplňuje čas, kultura a strom.",
+      "topic": "technologie,zvířata,činnost,doprava,čas,tělo,kultura,strom",
+      "familiarity": "BLATNÍK a PREMIÉRA širší známé názvy, bez odborného shluku."
+    },
+    "g6-expansion-easy-083": {
+      "boardId": "g6-expansion-easy-083",
+      "difficulty": "easy",
+      "contentHash": "d1caf2fe5275d1d5d9ce14d5a89ff3bb48a2a211ba403cf0a82d657fceb9cc0c",
+      "targetWords": [
+        "FILM",
+        "LESKLÝ",
+        "ČLOVĚK",
+        "TÚRA"
+      ],
+      "verdict": "accept",
+      "reason": "Kulturu a vlastnost střídá člověk a známá pohybová aktivita.",
+      "topic": "kultura,vlastnost,člověk,turistika",
+      "familiarity": "Běžná snadná čtveřice."
+    },
+    "g6-expansion-medium-083": {
+      "boardId": "g6-expansion-medium-083",
+      "difficulty": "medium",
+      "contentHash": "29b0f36fbb85de7ab8cd688122fdc8d6479a69ab2b484175c9c193e868fe8eae",
+      "targetWords": [
+        "SOUD",
+        "TRUHLÍK",
+        "DROŽKA",
+        "BOTA",
+        "RYBA",
+        "KRAJTA"
+      ],
+      "verdict": "accept",
+      "reason": "Instituci a předměty doplňuje doprava a dvě různé zvířecí asociace.",
+      "topic": "instituce,zahrada,doprava,oděv,zvířata",
+      "familiarity": "DROŽKA a KRAJTA dvě konkrétní širší položky."
+    },
+    "g6-expansion-hard-074": {
+      "boardId": "g6-expansion-hard-074",
+      "difficulty": "hard",
+      "contentHash": "346c625f3c3e849ec37a8d045daade399d75b6de7ebd5fce6dc98c3f3236db58",
+      "targetWords": [
+        "VAČICE",
+        "PROUTĚNÝ",
+        "TESAT",
+        "DÝNĚ",
+        "NÁHORNÍ",
+        "SOUTĚSKA",
+        "STÍHAČKA",
+        "KVĚT"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě různé vlastnosti doplňují zvíře, řemeslo, příroda a doprava.",
+      "topic": "zvíře,materiál,činnost,zahrada,krajina,doprava,rostlina",
+      "familiarity": "VAČICE a SOUTĚSKA přiměřená konkrétní těžší zásoba."
+    },
+    "g6-expansion-easy-084": {
+      "boardId": "g6-expansion-easy-084",
+      "difficulty": "easy",
+      "contentHash": "fa548ba5d87fb5dc86ae48f44e48d5e29fa26a8b1f51e8c846aed3f2e212b6ca",
+      "targetWords": [
+        "TCHOŘ",
+        "SLOUP",
+        "HORNÍ",
+        "BUNDA"
+      ],
+      "verdict": "accept",
+      "reason": "Zvíře, stavbu a polohu doplňuje známý oděv.",
+      "topic": "zvíře,stavba,prostor,oděv",
+      "familiarity": "Čtyři běžná přístupná slova."
+    },
+    "g6-expansion-medium-084": {
+      "boardId": "g6-expansion-medium-084",
+      "difficulty": "medium",
+      "contentHash": "54b80e60e5186ab4f1b9100286ee9a47f2c92eee0fe6c2e0fcd7b7ad845391a1",
+      "targetWords": [
+        "DUDEK",
+        "KRAB",
+        "ZÁVIT",
+        "POBÍHAT",
+        "NADHLED",
+        "PEKÁČ"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní dvojici střídá technika, činnost, pohled a kuchyně.",
+      "topic": "pták,zvíře,dílna,pohyb,pohled,kuchyně",
+      "familiarity": "ZÁVIT jediný užší technický pojem, známé opory dostatečné."
+    },
+    "g6-expansion-hard-075": {
+      "boardId": "g6-expansion-hard-075",
+      "difficulty": "hard",
+      "contentHash": "4624d96f1992c190a849f8af28ff4d0fe466067d79614cd54b0a97e1a3cb8e16",
+      "targetWords": [
+        "PRAŽEC",
+        "PRODÁVÁNÍ",
+        "KRUŽÍTKO",
+        "OBLAST",
+        "HUKOT",
+        "STRAKA",
+        "ZÁŘENÍ",
+        "ROLE"
+      ],
+      "verdict": "accept",
+      "reason": "Dopravu, obchod a geometrii vyvažuje příroda a obecné pojmy.",
+      "topic": "doprava,obchod,geometrie,místo,zvuk,pták,fyzika,role",
+      "familiarity": "KRUŽÍTKO a PRAŽEC konkrétní naučené názvy."
+    },
+    "g6-expansion-easy-085": {
+      "boardId": "g6-expansion-easy-085",
+      "difficulty": "easy",
+      "contentHash": "bcc0b6c4fe4e19fc21c0df3349011435d6d2d2a6a5d1e8aaeedb4773ef307e6d",
+      "targetWords": [
+        "VICHR",
+        "ZÁVĚS",
+        "SLABÝ",
+        "MUSET"
+      ],
+      "verdict": "accept",
+      "reason": "Počasí a domácnost doplňuje jednoduchá vlastnost a známé sloveso.",
+      "topic": "počasí,domov,vlastnost,činnost",
+      "familiarity": "Běžná snadná zásoba bez vzácného hesla."
+    },
+    "g6-expansion-medium-085": {
+      "boardId": "g6-expansion-medium-085",
+      "difficulty": "medium",
+      "contentHash": "36004e0d9327192909defc493084f987220e1a2378f408a5d6e641cb0b1b87f1",
+      "targetWords": [
+        "SMÍCH",
+        "PRÁM",
+        "DVŮR",
+        "SJEZD",
+        "ČEDIČ",
+        "VEVERKA"
+      ],
+      "verdict": "accept",
+      "reason": "Cit a místa vyvažuje loď, hornina a známé zvíře.",
+      "topic": "cit,loď,místo,pohyb,minerál,zvíře",
+      "familiarity": "ČEDIČ a PRÁM dvě konkrétní širší položky."
+    },
+    "g6-expansion-hard-076": {
+      "boardId": "g6-expansion-hard-076",
+      "difficulty": "hard",
+      "contentHash": "3c1f4c4aa2df5a52b8724021cba60dac566f3182221ba7b968d5d8a4438f3356",
+      "targetWords": [
+        "TATÍNEK",
+        "KREVETA",
+        "SRUB",
+        "POŽEHNÁNÍ",
+        "DELFÍN",
+        "ŘEŘICHA",
+        "ODMOCNINA",
+        "ČÍSLICE"
+      ],
+      "verdict": "accept",
+      "reason": "Rodinu a přírodu doplňuje stavba, duchovní pojem a matematika.",
+      "topic": "rodina,zvířata,stavba,hodnota,rostlina,matematika",
+      "familiarity": "ODMOCNINA známá školní položka, ostatní konkrétní opory."
+    },
+    "g6-expansion-easy-086": {
+      "boardId": "g6-expansion-easy-086",
+      "difficulty": "easy",
+      "contentHash": "a9352b2fa35e8c80b65827ca6b2e2140a98cefe1edb49667c36275e02480e78d",
+      "targetWords": [
+        "BLÍZKO",
+        "VLASY",
+        "VDĚK",
+        "PLETÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Prostor, tělo a cit střídá známý zahradní děj.",
+      "topic": "prostor,tělo,cit,zahrada",
+      "familiarity": "Přístupná čtveřice různých slovních druhů."
+    },
+    "g6-expansion-medium-086": {
+      "boardId": "g6-expansion-medium-086",
+      "difficulty": "medium",
+      "contentHash": "9bb923ab499f64d70fb41e132c4359de8b67b7d342db611496a8928774c408a9",
+      "targetWords": [
+        "PRŮVAN",
+        "VIKÝŘ",
+        "POŠTA",
+        "MAKOVEC",
+        "REJSEK",
+        "TUŘÍN"
+      ],
+      "verdict": "accept",
+      "reason": "Užší konkrétní trojici vyvažuje velmi běžné počasí, instituce a jídlo.",
+      "topic": "vzduch,stavba,instituce,jídlo,zvíře,zelenina",
+      "familiarity": "Horní střední: VIKÝŘ, REJSEK a TUŘÍN z odlišných běžně naučitelných oblastí."
+    },
+    "g6-expansion-hard-077": {
+      "boardId": "g6-expansion-hard-077",
+      "difficulty": "hard",
+      "contentHash": "fa50ed694e8998f8d88f48d2b1f1baf5aebef32ce88ad236ae13c9da43714e28",
+      "targetWords": [
+        "STUPAČKA",
+        "KLOPA",
+        "TĚSTO",
+        "ŘEZBA",
+        "PLOTICE",
+        "ŠVEC",
+        "ÚDOLÍ",
+        "ORANGUTAN",
+        "DŽBÁN"
+      ],
+      "verdict": "accept",
+      "reason": "Dílnu a přírodu střídá oděv, jídlo, profese a nádoba.",
+      "topic": "doprava,oděv,jídlo,řemeslo,ryba,profese,krajina,zvíře,nádoba",
+      "familiarity": "PLOTICE jedna užší ryba, ostatní srozumitelné konkrétní názvy."
+    },
+    "g6-expansion-easy-087": {
+      "boardId": "g6-expansion-easy-087",
+      "difficulty": "easy",
+      "contentHash": "d77911b7d589b1dc78612b8fbc067c6ba2b859715623efdf3c5ddc5062fa683d",
+      "targetWords": [
+        "DRÁT",
+        "LOUŽE",
+        "KAKAO",
+        "VIDEO",
+        "PEKÁČ"
+      ],
+      "verdict": "accept",
+      "reason": "Materiál a přírodu doplňují známé domácí, kuchyňské a současné pojmy.",
+      "topic": "materiál,voda,nápoj,média,kuchyně",
+      "familiarity": "Pět běžných přístupných slov."
+    },
+    "g6-expansion-medium-087": {
+      "boardId": "g6-expansion-medium-087",
+      "difficulty": "medium",
+      "contentHash": "0e4f0adcb876e792e29d786b5b2cd42ca55ec3e35f0fc419b8effeaeeee2a4ce",
+      "targetWords": [
+        "ÚVAZEK",
+        "TLAPKA",
+        "PLETÍ",
+        "KOLÁČ",
+        "LYŽE",
+        "ŠÍDLO"
+      ],
+      "verdict": "accept",
+      "reason": "Práci a řemeslo vyvažuje příroda, jídlo a sport.",
+      "topic": "práce,tělo,zahrada,jídlo,sport,dílna",
+      "familiarity": "ÚVAZEK a ŠÍDLO dvě přiměřené konkrétní širší položky."
+    },
+    "g6-expansion-hard-078": {
+      "boardId": "g6-expansion-hard-078",
+      "difficulty": "hard",
+      "contentHash": "470436361524b8ad56e2ce31eb70d32114a199cb770e8519c85f065c6d648854",
+      "targetWords": [
+        "SPORÁK",
+        "BUČINA",
+        "RAŠPLE",
+        "ŘEZBÁŘ",
+        "ZÁLIVKA",
+        "PALUBA",
+        "POLKA",
+        "DOMÁCÍ",
+        "HACKER"
+      ],
+      "verdict": "accept",
+      "reason": "Dílenskou dvojici vyvažuje domácnost, les, jídlo, loď a současná profese.",
+      "topic": "domov,les,dílna,řemeslo,jídlo,loď,tanec,vlastnost,technologie",
+      "familiarity": "BUČINA a RAŠPLE konkrétní širší názvy, zbytek dává známé opory."
+    },
+    "g6-expansion-easy-088": {
+      "boardId": "g6-expansion-easy-088",
+      "difficulty": "easy",
+      "contentHash": "a5f822c228961909ad6c9d6f242c7cbd15dca4fc047b3bd43b08326f0a8b8541",
+      "targetWords": [
+        "KŘÍDA",
+        "KABELA",
+        "PRÁT",
+        "DŘÍMAT"
+      ],
+      "verdict": "accept",
+      "reason": "Dva známé předměty střídají dvě odlišné běžné činnosti.",
+      "topic": "škola,předmět,úklid,spánek",
+      "familiarity": "DŘÍMAT přístupné živé sloveso."
+    },
+    "g6-expansion-medium-088": {
+      "boardId": "g6-expansion-medium-088",
+      "difficulty": "medium",
+      "contentHash": "0fe019ba7103c695e60432d534291168b01bebf54c0571f9a55175f16a095409",
+      "targetWords": [
+        "LÁVKA",
+        "KUKLA",
+        "CHRÁM",
+        "KOKOS",
+        "MATNÝ",
+        "NAJÍT"
+      ],
+      "verdict": "accept",
+      "reason": "Stavby a předmět doplňuje jídlo, vlastnost a činnost.",
+      "topic": "stavba,předmět,historie,jídlo,vlastnost,činnost",
+      "familiarity": "CHRÁM známý konkrétní pojem, žádný raritní shluk."
+    },
+    "g6-expansion-hard-079": {
+      "boardId": "g6-expansion-hard-079",
+      "difficulty": "hard",
+      "contentHash": "d1e9ca1a1c1d6040ac7741f12a5862454056633ea690b293507eaaf78615459e",
+      "targetWords": [
+        "PŘÍRUČKA",
+        "CHODIDLO",
+        "PADÁK",
+        "MODUL",
+        "RAJČE",
+        "ŘEBŘÍČEK",
+        "MALTA",
+        "SEKÁČ",
+        "STROUHA"
+      ],
+      "verdict": "accept",
+      "reason": "Technické názvy střídají knihu, tělo, jídlo a přírodu.",
+      "topic": "kniha,tělo,sport,technika,zelenina,bylina,stavba,zvíře,voda",
+      "familiarity": "ŘEBŘÍČEK a MODUL širší, ostatní položky konkrétní a známé."
+    },
+    "g6-expansion-easy-089": {
+      "boardId": "g6-expansion-easy-089",
+      "difficulty": "easy",
+      "contentHash": "2019ab5f2d46f3fd760a19ede42352131b7ab2db6753c60be078793845bb36f7",
+      "targetWords": [
+        "KONEC",
+        "KEFÍR",
+        "HŘÍVA",
+        "SOLIT"
+      ],
+      "verdict": "accept",
+      "reason": "Obecný pojem a nápoj doplňují zvířecí tělo a kuchyňskou činnost.",
+      "topic": "čas,nápoj,tělo,kuchyně",
+      "familiarity": "Běžná snadná čtveřice."
+    },
+    "g6-expansion-medium-089": {
+      "boardId": "g6-expansion-medium-089",
+      "difficulty": "medium",
+      "contentHash": "5bc7218c2d90560b92ced826f0bdb3ac62361972ac09af45ffad1a059ac19c70",
+      "targetWords": [
+        "PODÍL",
+        "CHLÉB",
+        "NETOPÝR",
+        "BŘÍZA",
+        "ŠUMĚT",
+        "HRŮZA"
+      ],
+      "verdict": "accept",
+      "reason": "Obecný pojem a cit vyvažuje jídlo, příroda a zvuk.",
+      "topic": "podíl,jídlo,zvíře,strom,zvuk,cit",
+      "familiarity": "NETOPÝR dobře známé zvíře, ostatní běžná slovní zásoba."
+    },
+    "g6-expansion-hard-080": {
+      "boardId": "g6-expansion-hard-080",
+      "difficulty": "hard",
+      "contentHash": "9c6318d0f6985791b1db991c4942d1220874cb0844e55614664455ffdbdf9d06",
+      "targetWords": [
+        "VODOVOD",
+        "JITŘENKA",
+        "MERUŇKA",
+        "ÚSTÍ",
+        "BAGR",
+        "FÁBOREK",
+        "STEHLÍK",
+        "BARIÉRA"
+      ],
+      "verdict": "accept",
+      "reason": "Stavbu a dopravu vyvažuje čas, jídlo, příroda a hravý předmět.",
+      "topic": "stavba,obloha,ovoce,voda,doprava,oslava,pták,překážka",
+      "familiarity": "JITŘENKA a FÁBOREK známé širší konkrétní názvy."
+    },
+    "g6-expansion-easy-090": {
+      "boardId": "g6-expansion-easy-090",
+      "difficulty": "easy",
+      "contentHash": "2609059f7b00e9c21c42a28919fdc5aefdc432c7f1a8b26321032c12650a729d",
+      "targetWords": [
+        "VELKÝ",
+        "HUČET",
+        "ŽÍNKA",
+        "OBZOR"
+      ],
+      "verdict": "accept",
+      "reason": "Vlastnost a zvuk doplňují domácí předmět a krajinu.",
+      "topic": "vlastnost,zvuk,domov,krajina",
+      "familiarity": "Přístupná čtyři známá hesla."
+    },
+    "g6-expansion-medium-090": {
+      "boardId": "g6-expansion-medium-090",
+      "difficulty": "medium",
+      "contentHash": "bf114a8345571694abd71fc5db8cbfcfcfab0f05aa269b151f46e70165ff4d8a",
+      "targetWords": [
+        "LOUPAT",
+        "OBŘÍ",
+        "PRÁT",
+        "NÁŠIVKA",
+        "GEKON",
+        "VĚTŠINA"
+      ],
+      "verdict": "accept",
+      "reason": "Dvě odlišné činnosti vyvažuje oděvní předmět, zvíře a obecný pojem.",
+      "topic": "činnosti,vlastnost,oděv,zvíře,množství",
+      "familiarity": "GEKON jediný širší druhový název."
+    },
+    "g6-expansion-hard-081": {
+      "boardId": "g6-expansion-hard-081",
+      "difficulty": "hard",
+      "contentHash": "0ae3e4e877b37cd261e19db0ac1071639d09a4fc2fe9e72eada2e045f623984c",
+      "targetWords": [
+        "OBDOBÍ",
+        "KAŇKA",
+        "PLAZ",
+        "TYKADLO",
+        "ÚNOR",
+        "PODMÁSLÍ",
+        "BEDNĚNÍ",
+        "NÁBOR",
+        "VĚTEV"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodně časovou část doplňují psaní, jídlo, stavba a společnost.",
+      "topic": "čas,psaní,zvíře,tělo,jídlo,stavba,společnost,rostlina",
+      "familiarity": "PODMÁSLÍ a BEDNĚNÍ konkrétní širší názvy, známé opory dostatečné."
+    },
+    "g6-expansion-easy-091": {
+      "boardId": "g6-expansion-easy-091",
+      "difficulty": "easy",
+      "contentHash": "8156cd43e9e8cd639a3b364d5c72f6a7345ca211de3c9c3b4273d15176f9d9c2",
+      "targetWords": [
+        "MĚSTO",
+        "LÍSKA",
+        "OSTRÝ",
+        "ÚSVIT"
+      ],
+      "verdict": "accept",
+      "reason": "Místo a keř vyvažuje vlastnost a známý časový jev.",
+      "topic": "místo,keř,vlastnost,čas",
+      "familiarity": "Běžná snadná slovní zásoba."
+    },
+    "g6-expansion-medium-091": {
+      "boardId": "g6-expansion-medium-091",
+      "difficulty": "medium",
+      "contentHash": "3c091a5c7f1b14c70056778bee015f4e2dbebbe7c0b5aaf5caa941f2fa9be131",
+      "targetWords": [
+        "PUMPA",
+        "RÉVA",
+        "DLÁTO",
+        "BRUSLE",
+        "ULICE",
+        "ŠŇŮRA"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu a dílnu vyvažuje sport, město a známý předmět.",
+      "topic": "technika,rostlina,dílna,sport,město,předmět",
+      "familiarity": "DLÁTO jediný užší řemeslný nástroj."
+    },
+    "g6-expansion-hard-082": {
+      "boardId": "g6-expansion-hard-082",
+      "difficulty": "hard",
+      "contentHash": "fcca926cc56ded2a9c04e2e22aafd0eba896beb5f099c22da9c1abb3bc974d92",
+      "targetWords": [
+        "ODPOLEDNE",
+        "TUCHA",
+        "KORZET",
+        "DROBEK",
+        "LOŽISKO",
+        "CHLADIVÝ",
+        "OSTRUHA",
+        "ŠPRÝMAŘ"
+      ],
+      "verdict": "accept",
+      "reason": "Techniku a oděv vyvažuje čas, pocit, jídlo a hravý člověk.",
+      "topic": "čas,pocit,oděv,jídlo,technika,vlastnost,jezdectví,člověk",
+      "familiarity": "OSTRUHA a KORZET širší konkrétní názvy, přiměřené těžké obtížnosti."
+    },
+    "g6-expansion-easy-092": {
+      "boardId": "g6-expansion-easy-092",
+      "difficulty": "easy",
+      "contentHash": "d8efa98ad9db013d9b074dee68d6e323534b1119a225d9f93110312c6c763808",
+      "targetWords": [
+        "PASEKA",
+        "ZÁVAŽÍ",
+        "NÁTĚR",
+        "HNÍZDO"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní dvojici doplňuje měření a známá domácí úprava.",
+      "topic": "les,měření,dům,zvířata",
+      "familiarity": "Běžné přístupné názvy bez technické rarity."
+    },
+    "g6-expansion-medium-092": {
+      "boardId": "g6-expansion-medium-092",
+      "difficulty": "medium",
+      "contentHash": "03923db3b099cf7a9b43340c3d14770c0ef1d4b20a27d5d3d7fd1a739f45e82b",
+      "targetWords": [
+        "SRŠEŇ",
+        "ŠIŠKA",
+        "VSTÁT",
+        "BUBÁK",
+        "TRENÉR",
+        "VODIČ"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu vyvažuje činnost, pohádka, sport a technický pojem.",
+      "topic": "hmyz,les,činnost,pohádka,profese,technika",
+      "familiarity": "VODIČ jediný užší technický název."
+    },
+    "g6-expansion-hard-083": {
+      "boardId": "g6-expansion-hard-083",
+      "difficulty": "hard",
+      "contentHash": "d964990f115778dd26b246af13ba4cecea69b84a68ec5fa213388a863a0f1e27",
+      "targetWords": [
+        "DUNA",
+        "BATOLE",
+        "ÚSILÍ",
+        "PLÁTNO",
+        "POŠTOLKA",
+        "ŽIDLE",
+        "MOKŘAD",
+        "MAGIE",
+        "MATICE"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní část střídá člověka, domácnost, materiál a obecné pojmy.",
+      "topic": "krajina,člověk,úsilí,materiál,pták,domov,pohádka,technika",
+      "familiarity": "POŠTOLKA a MOKŘAD dvě známé širší konkrétní položky."
+    },
+    "g6-expansion-easy-093": {
+      "boardId": "g6-expansion-easy-093",
+      "difficulty": "easy",
+      "contentHash": "e9304229025e038bd1f07e4e3dc4101e147faaeb547e0767addf548df10e74de",
+      "targetWords": [
+        "UHÁNĚT",
+        "VOUSY",
+        "LÍPA",
+        "ZEDNÍK"
+      ],
+      "verdict": "accept",
+      "reason": "Pohyb, tělo, strom a řemeslo mají jasné odlišné významy.",
+      "topic": "pohyb,tělo,strom,profese",
+      "familiarity": "UHÁNĚT běžné živé sloveso."
+    },
+    "g6-expansion-medium-093": {
+      "boardId": "g6-expansion-medium-093",
+      "difficulty": "medium",
+      "contentHash": "bf394bfa4b5286905a228c7f9c583f6c9d7e4b4369015f8f43f513f7bd042c81",
+      "targetWords": [
+        "PÍSEK",
+        "RÁFEK",
+        "VZKAZ",
+        "HLAVA",
+        "MROŽ",
+        "KULATÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Materiál a dopravu doplňuje komunikace, tělo, zvíře a vlastnost.",
+      "topic": "materiál,doprava,komunikace,tělo,zvíře,tvar",
+      "familiarity": "RÁFEK a MROŽ přiměřené konkrétní širší položky."
+    },
+    "g6-expansion-hard-084": {
+      "boardId": "g6-expansion-hard-084",
+      "difficulty": "hard",
+      "contentHash": "71b41a1ddcd88cd0ea65f58b8563969cb8526fed49e706dd688707241e0ac5ce",
+      "targetWords": [
+        "NÁSEP",
+        "ŠTĚTINA",
+        "KNOT",
+        "MARIONETA",
+        "ÚDĚL",
+        "NÍZKÝ",
+        "BRATRSTVO",
+        "PONORKA"
+      ],
+      "verdict": "accept",
+      "reason": "Technické předměty střídají divadlo, životní pojem, vlastnost a lidé.",
+      "topic": "stavba,tělo,světlo,divadlo,osud,vlastnost,společnost,doprava",
+      "familiarity": "MARIONETA a BRATRSTVO širší, ale srozumitelné názvy."
+    },
+    "g6-expansion-easy-094": {
+      "boardId": "g6-expansion-easy-094",
+      "difficulty": "easy",
+      "contentHash": "5426a8d9ef4a0ea96d93ac7e17c9be1c3c599f885681177295842e102754b502",
+      "targetWords": [
+        "ŠIBAL",
+        "LEŠTIT",
+        "NŮŽKY",
+        "PŘIJÍT"
+      ],
+      "verdict": "accept",
+      "reason": "Hravého člověka a předmět doplňují dvě jednoduché činnosti.",
+      "topic": "člověk,činnosti,domov",
+      "familiarity": "Běžná snadná čtveřice."
+    },
+    "g6-expansion-medium-094": {
+      "boardId": "g6-expansion-medium-094",
+      "difficulty": "medium",
+      "contentHash": "e67f5adee0613d8673a8094aed440ee36feb6a3fc7128b4124b1e7e4715cb627",
+      "targetWords": [
+        "HUMR",
+        "LOUČ",
+        "KRÁSA",
+        "TRÁM",
+        "TOPINKA",
+        "NEBOJSA"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu a tradiční předměty vyvažují jídlo, vlastnost a člověk.",
+      "topic": "zvíře,světlo,hodnota,stavba,jídlo,člověk",
+      "familiarity": "HUMR a LOUČ dvě konkrétní širší položky."
+    },
+    "g6-expansion-hard-085": {
+      "boardId": "g6-expansion-hard-085",
+      "difficulty": "hard",
+      "contentHash": "681a55f22e1392a4c846388525d79d1aa111267e2f692a2545463e204530c226",
+      "targetWords": [
+        "KAPSÁŘ",
+        "MÝTINA",
+        "ŠÍŘENÍ",
+        "STĚŽEŇ",
+        "DRÁTENÍK",
+        "STOPAŘ",
+        "DŮVĚRA",
+        "KŘESADLO"
+      ],
+      "verdict": "accept",
+      "reason": "Tři odlišní lidé střídají krajinu, děj, vybavení a cit.",
+      "topic": "lidé,krajina,děj,loď,řemeslo,cit,turistika",
+      "familiarity": "KŘESADLO a STĚŽEŇ užší konkrétní názvy, běžné opory dostatečné."
+    },
+    "g6-expansion-easy-095": {
+      "boardId": "g6-expansion-easy-095",
+      "difficulty": "easy",
+      "contentHash": "c16666c247de14961407e29b8bdfec2c345a904184b7f1dc7db4c54eed0598ff",
+      "targetWords": [
+        "TESAŘ",
+        "SIRUP",
+        "PRVNÍ",
+        "DESET",
+        "VRBA"
+      ],
+      "verdict": "accept",
+      "reason": "Profesi, nápoj a strom doplňují dvě odlišné číselné funkce.",
+      "topic": "profese,nápoj,pořadí,počet,strom",
+      "familiarity": "PRVNÍ a DESET nejsou varianty jednoho hesla; běžná slovní zásoba."
+    },
+    "g6-expansion-medium-095": {
+      "boardId": "g6-expansion-medium-095",
+      "difficulty": "medium",
+      "contentHash": "0fc98989c11e45faed994dab169eaaa0a24c619d46bb9f43591684575e194081",
+      "targetWords": [
+        "DUSNO",
+        "VESMÍR",
+        "BRÝLE",
+        "MĚSÍC",
+        "ŘEZBÁŘ",
+        "ŠPLHAT"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní a nebeské pojmy vyvažuje předmět, profese a pohyb.",
+      "topic": "počasí,obloha,předmět,řemeslo,pohyb",
+      "familiarity": "ŘEZBÁŘ konkrétní přístupná profese; ostatní běžná."
+    },
+    "g6-expansion-hard-086": {
+      "boardId": "g6-expansion-hard-086",
+      "difficulty": "hard",
+      "contentHash": "9fd2af7390650ed64c0f5f07062d78fedf1db02094c9a68487242d04c0bf23e2",
+      "targetWords": [
+        "PĚNKAVA",
+        "STŘIH",
+        "SKŘÍPAT",
+        "SAMURAJ",
+        "KAPSA",
+        "PARKA",
+        "PÍSMENO",
+        "TĚŽIŠTĚ"
+      ],
+      "verdict": "accept",
+      "reason": "Oděvní část střídá přírodu, zvuk, historii, jazyk a fyziku.",
+      "topic": "pták,řemeslo,zvuk,historie,oděv,jazyk,fyzika",
+      "familiarity": "PARKA a TĚŽIŠTĚ dvě přiměřené širší položky."
+    },
+    "g6-expansion-easy-096": {
+      "boardId": "g6-expansion-easy-096",
+      "difficulty": "easy",
+      "contentHash": "540dd7fd338f326a6d136c853c81dbad92a050a8ce2c26f808093ef8e35d83d6",
+      "targetWords": [
+        "PUPEN",
+        "TÁCEK",
+        "ZAVŘÍT",
+        "PRAVÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Rostlina a domácí předmět doplňují známou činnost a vlastnost.",
+      "topic": "rostlina,domov,činnost,vlastnost",
+      "familiarity": "Běžné snadné významy."
+    },
+    "g6-expansion-medium-096": {
+      "boardId": "g6-expansion-medium-096",
+      "difficulty": "medium",
+      "contentHash": "7f5364f2ab8fb5dffc919646e170a5d8196872cc772800e4a902ecf8601dc3f1",
+      "targetWords": [
+        "TÁNÍ",
+        "MĚCH",
+        "PRÁM",
+        "STUDENÝ",
+        "NÁLEPKA",
+        "RENDLÍK"
+      ],
+      "verdict": "accept",
+      "reason": "Počasí a vlastnost vyvažují předměty, loď a kuchyni.",
+      "topic": "počasí,předmět,loď,teplota,tisk,kuchyně",
+      "familiarity": "MĚCH a PRÁM dvě konkrétní širší položky."
+    },
+    "g6-expansion-hard-087": {
+      "boardId": "g6-expansion-hard-087",
+      "difficulty": "hard",
+      "contentHash": "e0ede80313e323d996b222187d22f5a7e73ba08ba8e9861781edfc4006da49d6",
+      "targetWords": [
+        "NÁŘADÍ",
+        "BÁDÁNÍ",
+        "KAMAŠE",
+        "ŠUNKA",
+        "DOVĚTEK",
+        "ŠŤAVNATÝ",
+        "VYSOKÝ",
+        "CANDÁT",
+        "RUKOLA"
+      ],
+      "verdict": "accept",
+      "reason": "Oděv a jazyk vyvažuje jídlo, věda, vlastnosti a příroda.",
+      "topic": "dílna,věda,oděv,jídlo,jazyk,vlastnosti,ryba,zelenina",
+      "familiarity": "KAMAŠE a DOVĚTEK širší známé názvy, ostatní srozumitelné opory."
+    },
+    "g6-expansion-easy-097": {
+      "boardId": "g6-expansion-easy-097",
+      "difficulty": "easy",
+      "contentHash": "964a1368f0fcdd92630f38ce8b5140341bbf88d94f24edaf39777b7475b1eb69",
+      "targetWords": [
+        "MÁSLO",
+        "OMÍTKA",
+        "DÝNĚ",
+        "BŘICHO"
+      ],
+      "verdict": "accept",
+      "reason": "Jídlo, stavba, zahrada a tělo mají odlišné konkrétní významy.",
+      "topic": "jídlo,stavba,zahrada,tělo",
+      "familiarity": "Čtyři běžná přístupná slova."
+    },
+    "g6-expansion-medium-097": {
+      "boardId": "g6-expansion-medium-097",
+      "difficulty": "medium",
+      "contentHash": "efd78eb8517e0fd3ba8bb65b3f2d058973c6971a4b40143f7dc5b5e92dfdd9fb",
+      "targetWords": [
+        "MASKA",
+        "KORUNA",
+        "PŘEVIS",
+        "ČILÝ",
+        "MELASA",
+        "DUCH"
+      ],
+      "verdict": "accept",
+      "reason": "Předměty, terén a vlastnost doplňuje potravinový materiál a pohádka.",
+      "topic": "předmět,historie,krajina,vlastnost,jídlo,pohádka",
+      "familiarity": "MELASA je jediný užší potravinářský název."
+    },
+    "g6-expansion-hard-088": {
+      "boardId": "g6-expansion-hard-088",
+      "difficulty": "hard",
+      "contentHash": "e03d517cc8078eae955117805bd094ab7c6ea1484112ca06d5bbcf45d1f6a92b",
+      "targetWords": [
+        "GLÓBUS",
+        "PŘÍVAL",
+        "TĚSNĚNÍ",
+        "NEKTAR",
+        "PUŠTÍK",
+        "KÁDINKA",
+        "ŽELEZA",
+        "STONEK"
+      ],
+      "verdict": "accept",
+      "reason": "Školu a techniku vyvažuje počasí, příroda a laboratorní předmět.",
+      "topic": "škola,voda,technika,rostlina,pták,laboratoř,předmět",
+      "familiarity": "PUŠTÍK a KÁDINKA přiměřené dvě širší konkrétní položky."
+    },
+    "g6-expansion-easy-098": {
+      "boardId": "g6-expansion-easy-098",
+      "difficulty": "easy",
+      "contentHash": "1ea12fbcfca41074a2b436dc9895693fa968c0802a3e2aea77215044dc541b04",
+      "targetWords": [
+        "OTISK",
+        "VEDRO",
+        "PÁDIT",
+        "HORKÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Tisk a pohyb střídají dva známé odlišné teplotní pojmy.",
+      "topic": "tisk,počasí,pohyb,vlastnost",
+      "familiarity": "VEDRO a HORKÝ tematicky souvisejí, nejsou totožné rodinné varianty."
+    },
+    "g6-expansion-medium-098": {
+      "boardId": "g6-expansion-medium-098",
+      "difficulty": "medium",
+      "contentHash": "846f0bb44c12dce7fc10f48c009a3da99b5799cbfe5e32552f109825eebda473",
+      "targetWords": [
+        "DOLNÍ",
+        "ZEBRA",
+        "HŘEBÍK",
+        "KRÁVA",
+        "ZMIJE",
+        "BAZÉN"
+      ],
+      "verdict": "accept",
+      "reason": "Zvířecí polovinu vyvažuje poloha, dílna a vodní místo.",
+      "topic": "prostor,zvířata,dílna,voda",
+      "familiarity": "Zvířata dobře známá; nevzniká specialistický zoologický shluk."
+    },
+    "g6-expansion-hard-089": {
+      "boardId": "g6-expansion-hard-089",
+      "difficulty": "hard",
+      "contentHash": "92ac9cb2ba055dbd2a179bbf019464f37ad4d397dd70d62cf848532a889508d4",
+      "targetWords": [
+        "MISTR",
+        "REFRÉN",
+        "MLSAT",
+        "SEMINÁŘ",
+        "SKICA",
+        "ZÁKRUT",
+        "ČOLEK",
+        "ZKOUŠKA",
+        "BRČKO"
+      ],
+      "verdict": "accept",
+      "reason": "Hudbu a výtvarnou část střídá škola, činnost, příroda a předmět.",
+      "topic": "člověk,hudba,činnost,škola,kresba,krajina,zvíře,předmět",
+      "familiarity": "SEMINÁŘ a ZÁKRUT jsou širší, ale srozumitelné názvy."
+    },
+    "g6-expansion-easy-099": {
+      "boardId": "g6-expansion-easy-099",
+      "difficulty": "easy",
+      "contentHash": "08f871c6dd6800cf4711466874df6faaece54ff719c7775cbb995043a1060e36",
+      "targetWords": [
+        "KRÁTKÝ",
+        "ZÁVĚS",
+        "TŘETÍ",
+        "ZÁVIN"
+      ],
+      "verdict": "accept",
+      "reason": "Vlastnost a pořadí vyvažuje domácí předmět a známé jídlo.",
+      "topic": "vlastnost,domov,pořadí,jídlo",
+      "familiarity": "ZÁVĚS a ZÁVIN mají odlišný význam i rodinu, žádná jazyková past."
+    },
+    "g6-expansion-medium-099": {
+      "boardId": "g6-expansion-medium-099",
+      "difficulty": "medium",
+      "contentHash": "5b780b1ddcce0aab835a77af80f0f67c75c78c2849399ef3026c3ccc8282e707",
+      "targetWords": [
+        "VOLÁN",
+        "ÚHLOMĚR",
+        "BÓJKA",
+        "ZELÍ",
+        "HRÁT",
+        "NÁHUBEK"
+      ],
+      "verdict": "accept",
+      "reason": "Oděv, geometrii a vodu vyvažuje jídlo, činnost a zvířecí předmět.",
+      "topic": "oděv,geometrie,voda,jídlo,hra,zvířata",
+      "familiarity": "VOLÁN a BÓJKA konkrétní širší názvy; ÚHLOMĚR známý školní předmět."
+    },
+    "g6-expansion-hard-090": {
+      "boardId": "g6-expansion-hard-090",
+      "difficulty": "hard",
+      "contentHash": "58830b42b207cc35c0496ace1a4c806c8792476f8fbd5e11396526b8533c9e25",
+      "targetWords": [
+        "KUCHAŘ",
+        "KOLEGYNĚ",
+        "HORSKÝ",
+        "ČELO",
+        "ŠPRÝM",
+        "TRASA",
+        "KLAPOT",
+        "POST",
+        "ZÁŘIVÝ"
+      ],
+      "verdict": "accept",
+      "reason": "Dva odlišné lidi střídají vlastnosti, tělo, humor, cesta a zvuk.",
+      "topic": "lidé,vlastnosti,tělo,humor,cesta,zvuk,pozice",
+      "familiarity": "ŠPRÝM a POST známé širší výrazy."
+    },
+    "g6-expansion-easy-100": {
+      "boardId": "g6-expansion-easy-100",
+      "difficulty": "easy",
+      "contentHash": "3a366d171ca3abda63b78d7dc9e2ceafc91f6ffad046d95103c16dfe3e6edf5b",
+      "targetWords": [
+        "ROHLÍK",
+        "DVŮR",
+        "ÚSVIT",
+        "KAPELA"
+      ],
+      "verdict": "accept",
+      "reason": "Jídlo, místo, denní doba a hudební skupina tvoří známou čtveřici.",
+      "topic": "jídlo,místo,čas,hudba",
+      "familiarity": "Přístupná snadná závěrečná skladba."
+    },
+    "g6-expansion-medium-100": {
+      "boardId": "g6-expansion-medium-100",
+      "difficulty": "medium",
+      "contentHash": "a19128034d79bfd052b574c9d9981f32cbcd307d7cc295cae5d85115c46b6529",
+      "targetWords": [
+        "GÉNIUS",
+        "LIJÁK",
+        "PRÁZDNÝ",
+        "SLOUP",
+        "TÝDEN",
+        "MOTOUZ"
+      ],
+      "verdict": "accept",
+      "reason": "Člověka, počasí a vlastnost doplňují stavba, čas a předmět.",
+      "topic": "člověk,počasí,vlastnost,stavba,čas,předmět",
+      "familiarity": "MOTOUZ jediný tradičnější konkrétní název."
+    },
+    "g6-expansion-hard-091": {
+      "boardId": "g6-expansion-hard-091",
+      "difficulty": "hard",
+      "contentHash": "d3bcbc4cfdd0e20edcc7408c9b5566460dae57af07d9df1aed37d6ed0cdcf1b8",
+      "targetWords": [
+        "VANDR",
+        "POHYB",
+        "ŽEBŘÍK",
+        "ŠKVOR",
+        "SNĚŽENKA",
+        "ŽEBRO",
+        "HAMBURGER",
+        "NOVOLUNÍ"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu a tělo vyvažuje turistika, předmět, jídlo a nebeský jev.",
+      "topic": "turistika,pohyb,předmět,hmyz,květina,tělo,jídlo,obloha",
+      "familiarity": "ŽEBŘÍK a ŽEBRO jsou samostatné významy; NOVOLUNÍ známý širší pojem."
+    },
+    "g6-expansion-hard-092": {
+      "boardId": "g6-expansion-hard-092",
+      "difficulty": "hard",
+      "contentHash": "3b66e44d8720fc5d20604ec25e8e7d3b5bc68177a6444c63e5aa34ef7202692a",
+      "targetWords": [
+        "NÁHUBEK",
+        "RAŠPLE",
+        "DOUBRAVA",
+        "ROVNÍK",
+        "RIZIKO",
+        "PAVLAČ",
+        "AKCE",
+        "ÚŽLABINA"
+      ],
+      "verdict": "accept",
+      "reason": "Konkrétní vybavení a krajinu vyvažuje zeměpis a obecné pojmy.",
+      "topic": "zvířata,dílna,les,zeměpis,riziko,stavba,událost,krajina",
+      "familiarity": "RAŠPLE a ÚŽLABINA širší konkrétní názvy vhodné pro těžkou."
+    },
+    "g6-expansion-hard-093": {
+      "boardId": "g6-expansion-hard-093",
+      "difficulty": "hard",
+      "contentHash": "24c28513c49ad526fb1e24a914251564f49644d58d64d97b32a68bc9cc0e6c08",
+      "targetWords": [
+        "ZÁVIN",
+        "DANĚK",
+        "MUNICE",
+        "ČUTORA",
+        "OBORA",
+        "POMLKA",
+        "NÁRŮST",
+        "SLEVA",
+        "VÝCVIK"
+      ],
+      "verdict": "accept",
+      "reason": "Venkovské a vybavovací názvy střídají jídlo, hudbu, děj a obchod.",
+      "topic": "jídlo,zvíře,vybavení,turistika,místo,hudba,děj,obchod,činnost",
+      "familiarity": "DANĚK a ČUTORA konkrétní známé širší položky."
+    },
+    "g6-expansion-hard-094": {
+      "boardId": "g6-expansion-hard-094",
+      "difficulty": "hard",
+      "contentHash": "e8d664d14c005e23bbef1cba20478ea01e9047fd0046c00c50ae5178bc45c780",
+      "targetWords": [
+        "LOUPEŽ",
+        "MLÁZÍ",
+        "SPLAV",
+        "TKADLEC",
+        "SNĚHOVÁ",
+        "DOPRAVA",
+        "NALEZIŠTĚ",
+        "NÁDIVKA"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodu a vodu vyvažuje řemeslo, doprava, děj a jídlo.",
+      "topic": "událost,příroda,voda,řemeslo,vlastnost,doprava,místo,jídlo",
+      "familiarity": "MLÁZÍ a NALEZIŠTĚ širší srozumitelné názvy."
+    },
+    "g6-expansion-hard-095": {
+      "boardId": "g6-expansion-hard-095",
+      "difficulty": "hard",
+      "contentHash": "3489691791efcae24e1b9de200da53f8a7156d57aeaeda38d019b4bdf3073a03",
+      "targetWords": [
+        "PŘÍĎ",
+        "HOUSLE",
+        "NAPLNĚNÍ",
+        "TRILOBIT",
+        "SLUNOVRAT",
+        "SLIVOŇ",
+        "VRATKÝ",
+        "ČERVÁNKY"
+      ],
+      "verdict": "accept",
+      "reason": "Přírodní školní pojmy vyvažuje loď, hudba, děj a vlastnost.",
+      "topic": "loď,hudba,děj,paleontologie,čas,strom,vlastnost,obloha",
+      "familiarity": "TRILOBIT a SLUNOVRAT známé naučené pojmy, nikoli neprůhledný odborný blok."
+    },
+    "g6-expansion-hard-096": {
+      "boardId": "g6-expansion-hard-096",
+      "difficulty": "hard",
+      "contentHash": "fc120bb6efc9d48f5d4de7ed2762c3a988ea7b7ad3529150b5bbc3f7ff70e4a7",
+      "targetWords": [
+        "KREJČÍ",
+        "VIDLICE",
+        "HOKEJ",
+        "POJEM",
+        "HRÁČKA",
+        "SLEPÝŠ",
+        "PLÁČ",
+        "TKÁT",
+        "ŠMEJDIT"
+      ],
+      "verdict": "accept",
+      "reason": "Řemeslo a sport střídají člověka, přírodu, cit a živé činnosti.",
+      "topic": "profese,předmět,sport,pojem,člověk,zvíře,cit,činnosti",
+      "familiarity": "SLEPÝŠ jediný užší druh, ostatní dobře přístupné."
+    },
+    "g6-expansion-hard-097": {
+      "boardId": "g6-expansion-hard-097",
+      "difficulty": "hard",
+      "contentHash": "e6e8d9528db02db5ce258d851a9a85620114facfdf144917f06856c7f79c9e90",
+      "targetWords": [
+        "KOPÍ",
+        "ŘEZÁNÍ",
+        "TELEVIZE",
+        "BAŇKA",
+        "LAZURA",
+        "TRYLEK",
+        "SARDINKA",
+        "MLÝNEK",
+        "MLHA"
+      ],
+      "verdict": "accept",
+      "reason": "Technické a umělecké názvy vyvažují média, jídlo, domácnost a počasí.",
+      "topic": "historie,děj,média,laboratoř,materiál,hudba,jídlo,domov,počasí",
+      "familiarity": "LAZURA a TRYLEK dvě užší známé oblasti."
+    },
+    "g6-expansion-hard-098": {
+      "boardId": "g6-expansion-hard-098",
+      "difficulty": "hard",
+      "contentHash": "fcf351e6cbfeb176c2293141572ff7b8272fe03bb287e49aa9837124fbf024a0",
+      "targetWords": [
+        "OCEL",
+        "ZÁVITEK",
+        "SKRBLÍK",
+        "JESTŘÁB",
+        "PEVNOST",
+        "RYTMUS",
+        "PANOŠ",
+        "DÁMA",
+        "SÝKORA"
+      ],
+      "verdict": "accept",
+      "reason": "Ptáky a historii vyvažuje materiál, jídlo, hudba a odlišní lidé.",
+      "topic": "kov,jídlo,člověk,ptáci,stavba,hudba,historie",
+      "familiarity": "PANOŠ je tradiční jednotlivá položka, ostatní známé konkrétní významy."
+    },
+    "g6-expansion-hard-099": {
+      "boardId": "g6-expansion-hard-099",
+      "difficulty": "hard",
+      "contentHash": "d91abe5580831c88930006ae7db6011bc210807a4ebad1a998a405ce9df2f319",
+      "targetWords": [
+        "HYDRANT",
+        "NEHODA",
+        "PLOCHA",
+        "ZÁLOŽKA",
+        "KŘIVÝ",
+        "NABĚRAČKA",
+        "BRUSIVO",
+        "KANCLÉŘ"
+      ],
+      "verdict": "accept",
+      "reason": "Technické a společenské názvy vyvažuje geometrie, kniha a kuchyně.",
+      "topic": "technika,událost,geometrie,kniha,vlastnost,kuchyně,materiál,profese",
+      "familiarity": "HYDRANT, BRUSIVO a KANCLÉŘ z různých srozumitelných oblastí, přiměřené těžké."
+    },
+    "g6-expansion-hard-100": {
+      "boardId": "g6-expansion-hard-100",
+      "difficulty": "hard",
+      "contentHash": "413ce723e20b4a4c55b2d663cefdc23e360077723596570c1153bb6ec30f2458",
+      "targetWords": [
+        "FOŠNA",
+        "BRLOH",
+        "SNÍDANĚ",
+        "AKTA",
+        "PŘADLENA",
+        "CELER",
+        "PERMONÍK",
+        "KOTVIŠTĚ"
+      ],
+      "verdict": "accept",
+      "reason": "Tradiční řemeslo a pohádku vyvažují jídlo, příroda, dokumenty a voda.",
+      "topic": "materiál,zvíře,jídlo,dokumenty,řemeslo,zelenina,pohádka,loď",
+      "familiarity": "PŘADLENA a KOTVIŠTĚ širší konkrétní názvy, ostatní známé opory."
+    }
+  },
+  "reviewedCount": 300,
+  "expectedCount": 300,
+  "status": "complete",
+  "verdictCounts": {
+    "accept": 300,
+    "return": 0
+  }
+}

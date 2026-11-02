@@ -40,9 +40,9 @@ class Gen5PreviewTests(unittest.TestCase):
         source=read('data/puzzles.json'); rolling=read('data/rolling_content_v1.json')
         preview=server.load_puzzles()
         for d in DIFFICULTIES:
-            history=[p for p in source['free'][d] if not p['id'].startswith(('g5-r1-', 'g6-refresh-'))]+rolling['puzzles'].get(d,[])
+            history=[p for p in source['free'][d] if not p['id'].startswith(('g5-r1-', 'g6-refresh-', 'g6-expansion-'))]+rolling['puzzles'].get(d,[])
             self.assertEqual(preview['free'][d][:len(history)],history,d)
-        for key in source.keys()-{'free','freeLevelsPerDifficulty','freeLevelCounts','release','mozkokalypsaRelease','mozkomorUnlock','freeRefreshRelease'}:
+        for key in source.keys()-{'free','freeLevelsPerDifficulty','freeLevelCounts','release','mozkokalypsaRelease','mozkomorUnlock','freeRefreshRelease','freeExpansionRelease'}:
             self.assertEqual(preview[key],source[key],key)
 
     def test_all_450_new_boards_are_ordered_and_keep_progress_generation(self):

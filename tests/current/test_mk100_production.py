@@ -12,15 +12,17 @@ baseline = read('content/gen6/mozkokalypsa-100/production-boundaries.json')
 digest = lambda value: hashlib.sha256(json.dumps(value,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
 assert data['freeGeneration'] == 4
 for difficulty, expected in baseline['free'].items():
-    assert digest([p for p in data['free'][difficulty] if not p['id'].startswith('g6-refresh-')]) == expected, difficulty
+    assert digest([p for p in data['free'][difficulty] if not p['id'].startswith(('g6-refresh-', 'g6-expansion-'))]) == expected, difficulty
 correction = read('content/editorial-corrections/g4-d-042-20261019.json')
 for key,expected in baseline['preserved'].items():
     actual = data.get(key)
+    if key == 'mozkomorUnlock':
+        actual = {**actual, 'levels': 150}
     if key == 'daily':
         assert digest(next(p for p in actual if p['id'] == correction['puzzleId'])) == correction['afterHash']
         actual = [correction['before'] if p['id'] == correction['puzzleId'] else p for p in actual]
     assert digest(actual) == expected, key
-boards = data['free']['mozkokalypsa']
+boards = [p for p in data['free']['mozkokalypsa'] if p['id'].startswith('mk100-v2-')]
 assert len(boards) == 100 and read('public/puzzles.json')['free'] == data['free']
 for index,(source,board) in enumerate(zip(frozen['boards'],boards),1):
     for key in ('id','letters','answers','mask','rows','cols'):
