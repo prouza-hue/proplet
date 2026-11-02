@@ -14,7 +14,7 @@ Implementace je ve větvi `codex/competition-ui`. Produkční nasazení nebylo p
 - Měsíční historie ani budoucí kolekce se neobjeví před začátkem příslušného měsíce v pražském čase. Listopad nemá šipky, prosinec už umožní návrat do listopadu.
 - Týdenní soutěž nabízí Pořadí, Celková zlata a Vitrínu týmu. Šipky procházejí pouze skutečné uzavřené týdny a aktuální týden.
 - Nový GET `/api/team-victories/competition` čte existující uzavřená pořadí a udělené medaile. Neprovádí finalizaci, změnu bodování ani migraci. Nevrací týmové kódy; respektuje současné soukromí týmů. Shodné počty medailí mají shodné pořadí.
-- Cache nových prostředků a kandidátní PWA marker jsou sjednocené; veřejné číslo produkční verze zůstává 4.10.15. Pro případné vydání zvolit aktuální následující verzi a standardní release postup.
+- Cache nových prostředků a PWA marker jsou sjednocené na 4.10.16. Pro vydání schválené uživatelem je připravena verze 4.10.16 se sjednoceným release/cache kontraktem.
 
 ## Ověření
 
@@ -29,7 +29,7 @@ Implementace je ve větvi `codex/competition-ui`. Produkční nasazení nebylo p
 
 ## Otevřené body
 
-Vizuální posouzení uživatelem a případné produkční vydání. Screenshoty představují emulované rozměry, nikoli test fyzického Foldu. Před vydáním znovu ověřit aktuální main, produkční SHA a prostředí.
+Uživatel 3. 11. 2026 schválil online náhled a výslovně požádal „Nasaď na ostrou.“ Následuje standardní merge a produkční deployment po zelených kontrolách finálního commitu. Screenshoty představují emulované rozměry, nikoli test fyzického Foldu. Před vydáním znovu ověřit aktuální main, produkční SHA a prostředí.
 
 ## Online náhled se živými daty
 
