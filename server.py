@@ -3888,7 +3888,10 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
         try:
             attempts = db_select("puzzle_attempts", id=payload.attempt_id, player_id=player["id"])
             telemetry_values = {
-                "completed_at": datetime.now(TZ).isoformat(),
+                # Keep the declared completion, not the later account-sync time.
+                # The database guard preserves an already completed attempt even
+                # if finish and result requests race or an old client retries.
+                "completed_at": official_completed_at,
                 "elapsed_ms": payload.elapsed_ms,
                 "moves": payload.moves,
                 "wrong_attempts": payload.wrong_attempts,

@@ -131,6 +131,7 @@ jobs:
           python tools/test_admin_workspace_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_patrons_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_team_leave_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
+          python tools/test_attempt_completion_db.py --database-report /tmp/proplet-isolated-results.json --password-file /tmp/proplet-test-password
           python tools/test_admin_recovery_db.py --password-file /tmp/proplet-test-password --output /tmp/proplet-admin-recovery.json
       - name: Verify actual scheduler and background execution
         env:

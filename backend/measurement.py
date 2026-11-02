@@ -10,6 +10,7 @@ TABLES = {'product_events', 'puzzle_attempts', 'hint_events', 'helper_events', '
 ONBOARDING_VERSIONS = frozenset({'board-v2', 'board-v3-short'})
 REFERRAL_SOURCES = frozenset({'daily', 'tajenka', 'win', 'home', 'profile', 'announcement', 'landing'})
 REFERRAL_COPY_METHODS = frozenset({'copy_button', 'share_fallback', 'no_native'})
+STARTER_PRESENTATION_FIELDS = ('starter_presentation_stage', 'starter_obscurer', 'starter_obscurer_tag', 'starter_viewport_width', 'starter_viewport_height')
 
 
 def onboarding_version(value):
@@ -58,6 +59,17 @@ def request_context(request, environment):
     if starter_ms.isdigit() and 0<=int(starter_ms)<=86400000:details['starter_ms']=int(starter_ms)
     reason=request.headers.get('x-proplet-starter-reason','')
     if reason in {'data','prepare','render','superseded','navigation','visibility','module','paused','not_visible','visible','obscured'}:details['starter_reason']=reason; details['reason']=reason
+    if 'starter_run_id' in details:
+        for header,key,allowed in (
+            ('x-proplet-starter-stage','starter_presentation_stage',{'initial','idle'}),
+            ('x-proplet-starter-obscurer','starter_obscurer',{'none','other','outside_viewport','starterCoach','profileModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','winModal','hintModal','helperOfferModal'}),
+            ('x-proplet-starter-obscurer-tag','starter_obscurer_tag',{'NONE','DIV','BUTTON','IFRAME','DIALOG','SVG','CANVAS','BODY','HTML','SPAN','INPUT','OTHER'}),
+        ):
+            value=request.headers.get(header,'')
+            if value in allowed:details[key]=value
+        for dimension in ('width','height'):
+            value=request.headers.get('x-proplet-starter-viewport-'+dimension,'')
+            if 1<=len(value)<=4 and value.isascii() and value.isdigit() and 0<int(value)<=8192:details['starter_viewport_'+dimension]=int(value)
     first_steps_run=request.headers.get('x-proplet-first-steps-run','')
     try:
         if first_steps_run:details['first_steps_run_id']=str(uuid.UUID(first_steps_run))
@@ -96,6 +108,8 @@ def enrich(table, row):
     provenance = context.get()
     if table not in TABLES or not provenance:return row
     details={**provenance.get('_event_context',{})}
+    if table!='product_events' or row.get('event_type') not in {'starter_v1_presentation_checked','starter_v1_idle'}:
+        for key in STARTER_PRESENTATION_FIELDS:details.pop(key,None)
     if table!='product_events' or row.get('event_type')!='starter_v1_input_outcome':details.pop('starter_input_outcome',None)
     if table != 'product_events' or not str(row.get('event_type', '')).startswith('referral_'):
         details.pop('referral_entry_source', None)

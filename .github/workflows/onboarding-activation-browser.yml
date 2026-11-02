@@ -7,6 +7,7 @@ on:
       - 'public/**'
       - 'tools/test_onboarding_activation_browser.cjs'
       - 'tools/test_first_steps_browser.cjs'
+      - 'tools/test_starter_presentation_browser.cjs'
       - 'tools/test_profile_statistics_browser.cjs'
       - 'tools/test_module_contracts_browser.cjs'
       - 'tools/test_first_game_safety_browser.cjs'
@@ -57,6 +58,10 @@ jobs:
         env:
           RESULT_PATH: browser-results/first-steps.json
         run: node tools/test_first_steps_browser.cjs
+      - name: Verify initial and idle obstruction on phone and Fold
+        env:
+          RESULT_PATH: browser-results/starter-presentation.json
+        run: node tools/test_starter_presentation_browser.cjs
       - name: Verify selected challenger on desktop and mobile
         run: node tools/test_first_board_challenger_browser.cjs
       - name: Verify first-game measurement and result rendering safety
