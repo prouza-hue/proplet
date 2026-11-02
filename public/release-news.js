@@ -54,7 +54,7 @@
   function close(restore=true){if(dialog?.open)dialog.close();if(restore)restoreFocus();else opener=null;}
   function build(){
    dialog=doc.createElement('dialog');dialog.id='releaseNewsDialog';dialog.setAttribute('aria-labelledby','releaseNewsTitle');
-   dialog.innerHTML='<button type="button" class="release-news-close" data-news-close aria-label="Zavřít novinky">×</button><div class="release-news-intro"><img class="release-news-art" src="/assets/navigation/competitions-v1.webp" alt="" width="168" height="168"><h2 id="releaseNewsTitle" tabindex="-1">Každý měsíc nová soutěž o&nbsp;vládce Propletu.</h2></div><div class="release-news-copy"><p>Hraj Denní výzvy i&nbsp;další hry. Nejlepších 20&nbsp;Denních výzev tvoří 80&nbsp;% maxima, další hraní 20&nbsp;%. Rozhoduje kvalita řešení i&nbsp;ověřená rychlost. Na první tři čekají originální odznaky.</p><p>A&nbsp;to vše v&nbsp;čistším designu, kde je vše po ruce a&nbsp;lépe vypadá na mobilu, tabletu i&nbsp;monitoru.</p></div><div class="release-news-actions"><button type="button" class="release-news-primary" data-news-monthly>Prohlédnout měsíční soutěž <span aria-hidden="true">→</span></button><button type="button" class="release-news-secondary" data-news-close>Jdu hrát</button></div>';
+   dialog.innerHTML='<button type="button" class="release-news-close" data-news-close aria-label="Zavřít novinky">×</button><div class="release-news-intro"><img class="release-news-art" src="/assets/navigation/competitions-v1.webp" alt="" width="168" height="168"><h2 id="releaseNewsTitle" tabindex="-1">Každý měsíc nová soutěž o&nbsp;vládce Propletu.</h2></div><div class="release-news-copy"><p class="release-news-levels"><strong>600 nových úrovní.</strong> Po&nbsp;100 v&nbsp;každé obtížnosti.</p><p>Hraj Denní výzvy i&nbsp;další hry. Nejlepších 20&nbsp;Denních výzev tvoří 80&nbsp;% maxima, další hraní 20&nbsp;%. Rozhoduje kvalita řešení i&nbsp;ověřená rychlost. Na první tři čekají originální odznaky.</p><p>A&nbsp;to vše v&nbsp;čistším designu, kde je vše po ruce a&nbsp;lépe vypadá na mobilu, tabletu i&nbsp;monitoru.</p></div><div class="release-news-actions"><button type="button" class="release-news-primary" data-news-monthly>Prohlédnout měsíční soutěž <span aria-hidden="true">→</span></button><button type="button" class="release-news-secondary" data-news-close>Jdu hrát</button></div>';
    doc.body.append(dialog);
    dialog.querySelectorAll('[data-news-close]').forEach(button=>button.onclick=()=>close());
    dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
@@ -66,7 +66,7 @@
    if(!onToday()||blocked())return false;
    if(!dialog)build();opener=doc.activeElement===doc.body?null:doc.activeElement;requested=false;if(!automatic)manualUsed=true;displayScope=controller.sync();
    dialog.querySelector('[data-news-monthly]').disabled=typeof win.PropletMonthlyCompetition?.open!=='function';
-   dialog.showModal();dialog.querySelector('h2').focus({preventScroll:true});return true;
+   dialog.showModal();win.PropletAnnouncements?.acknowledge?.('free-expansion-600-20261102');dialog.querySelector('h2').focus({preventScroll:true});return true;
   }
   function reconcile(){
    if(!gate()){close(false);dialog?.remove();dialog=null;q('#releaseNewsSettings')?.remove();return;}

@@ -7,6 +7,8 @@
 #releaseNewsTitle{margin:0;color:inherit;font:650 32px/1.16 Fraunces,Georgia,serif;letter-spacing:-.025em;text-wrap:balance}
 #releaseNewsTitle:focus{outline:none}
 #releaseNewsDialog .release-news-copy p{margin:0 0 18px;color:inherit;font:inherit}
+#releaseNewsDialog .release-news-copy .release-news-levels{padding:12px 14px;border:1px solid #b5c9ad;border-radius:12px;background:#edf4e5;color:#254535}
+html[data-theme=dark] #releaseNewsDialog .release-news-copy .release-news-levels{border-color:#71856d;background:#2c4032;color:#f9f1d6}
 
 #releaseNewsDialog .release-news-actions{display:grid;gap:6px;margin-top:22px}
 #releaseNewsDialog .release-news-primary{display:flex;justify-content:center;align-items:center;gap:10px;min-height:48px;padding:12px 14px;border:1px solid #264a82;border-radius:10px;background:#315da8;box-shadow:0 3px 0 #233f70;color:#fffaf0;font:600 15px/1.3 Outfit,sans-serif;cursor:pointer;touch-action:manipulation}
