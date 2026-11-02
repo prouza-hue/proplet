@@ -80,7 +80,10 @@ async function avatarInfoLifecycle(){
  await window.PropletPatrons.refresh();assert.equal(thanks.eligible(),true);assert.equal(entry.eligible(),false);
  assert.equal(await thanks.show({isCurrent:()=>thanks.eligible()}),true);
  assert.equal(nodes.get('#patronDialog').open,true);assert.equal(thanks.eligible(),false);
- assert.match(nodes.get('#patronDialog').innerHTML,/Tvoje potvrzené příspěvky/);assert.match(nodes.get('#patronDialog').innerHTML,/Přispět znovu/);
+ assert.equal(nodes.get('#patronDialog').attrs['data-patron-step'],'welcome','automatic first confirmation opens the celebration');
+ assert.doesNotMatch(nodes.get('#patronDialog').innerHTML,/Tvoje potvrzené příspěvky|Přispět znovu|patronPublic/,'celebration has no payment management');
+ window.PropletPatrons.close();window.PropletPatrons.open('thanks');
+ assert.match(nodes.get('#patronDialog').innerHTML,/Tvoje potvrzené příspěvky/);assert.match(nodes.get('#patronDialog').innerHTML,/Přispět znovu/,'manual support management remains available');
  assert.equal(calls.filter(p=>p==='/api/patrons/thanks/claim').length,1);
  window.PropletPatrons.model.requestId='prior-confirmed-intent';window.PropletPatrons.open('offer');assert.equal(window.PropletPatrons.model.requestId,null,'manual support from an existing patron starts a new contribution');
  // Live disable must remove previously rendered support and bank details with no write.
