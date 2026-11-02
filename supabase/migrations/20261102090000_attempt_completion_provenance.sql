@@ -29,17 +29,23 @@ create trigger proplet_attempt_completion_guard_v1 before insert or update on pu
 -- Patch only the two acceptance-clock expressions in the current atomic writer.
 -- Preserve its reviewed timing, reward, monthly, receipt and privilege contracts.
 do $patch$
-declare source text; needle text; replacement text;
+declare source text; needle text; replacement text; clock_expression text; matched integer:=0; selected_clock text;
 begin
  source:=pg_get_functiondef('public.proplet_submit_result_v1(uuid,text,text,text,jsonb)'::regprocedure);
- needle:='completed_at = pg_catalog.clock_timestamp(),';
+ -- Production uses the real clock. The isolated monthly schema wraps the same
+ -- reviewed writer with its trusted QA clock; retain that existing behavior.
+ foreach clock_expression in array array['pg_catalog.clock_timestamp()','public.proplet_monthly_preview_clock_v1()'] loop
+  needle:='completed_at = '||clock_expression||',';
+  if (length(source)-length(replace(source,needle,'')))/length(needle)=1 then
+   matched:=matched+1;selected_clock:=clock_expression;
+  end if;
+ end loop;
+ if matched<>1 then raise exception 'ATTEMPT_COMPLETION_WRITER_CHANGED update'; end if;
+ needle:='completed_at = '||selected_clock||',';
  replacement:='completed_at = v_completed_at,';
- if (length(source)-length(replace(source,needle,'')))/length(needle)<>1 then
-  raise exception 'ATTEMPT_COMPLETION_WRITER_CHANGED update';
- end if;
  source:=replace(source,needle,replacement);
- needle:='pg_catalog.clock_timestamp(), pg_catalog.clock_timestamp(), v_elapsed_ms, v_moves,';
- replacement:='pg_catalog.clock_timestamp(), v_completed_at, v_elapsed_ms, v_moves,';
+ needle:=selected_clock||', '||selected_clock||', v_elapsed_ms, v_moves,';
+ replacement:=selected_clock||', v_completed_at, v_elapsed_ms, v_moves,';
  if (length(source)-length(replace(source,needle,'')))/length(needle)<>1 then
   raise exception 'ATTEMPT_COMPLETION_WRITER_CHANGED insert';
  end if;
