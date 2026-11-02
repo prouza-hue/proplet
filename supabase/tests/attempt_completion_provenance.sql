@@ -20,7 +20,7 @@ begin
   raise exception 'first finish did not separate completion and server receipt';
  end if;
  -- Guest -> owned account -> delayed result retry must retain the original day.
- update public.puzzle_attempts set player_id=p where id=a;
+ update public.puzzle_attempts set player_id=p,anonymous_id=null where id=a;
  update public.puzzle_attempts set completed_at=now(),completion_received_at=now()+interval '1 day' where id=a;
  update public.puzzle_attempts set completed_at=original-interval '1 day' where id=a;
  update public.puzzle_attempts set completed_at=null where id=a;

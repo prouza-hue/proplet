@@ -35,7 +35,7 @@ def main():
         c.execute("insert into players(id,name,family_code,token_hash)values(%s,'Atomic completion QA','SOLO_ATOMIC_QA',%s)",(player,player))
         c.execute("insert into puzzle_attempts(id,anonymous_id,puzzle_id,challenge_key,mode,difficulty,started_at,completed_at)values(%s,%s,'qa-time-owned','free:qa-time-owned','free','easy',%s,%s)",(attempt,'b'*64,original-timedelta(minutes=1),original))
         received=c.execute('select completion_received_at from puzzle_attempts where id=%s',(attempt,)).fetchone()[0]
-        c.execute('update puzzle_attempts set player_id=%s where id=%s',(player,attempt))
+        c.execute('update puzzle_attempts set player_id=%s,anonymous_id=null where id=%s',(player,attempt))
         for aid,puzzle,level in ((attempt,'qa-time-owned',218),(offline,'qa-time-offline',219)):
             payload=ResultCreate(puzzle_id=puzzle,challenge_key='free:'+puzzle,mode='free',difficulty='easy',elapsed_ms=42000,moves=12,attempt_id=aid,completed_at=original.isoformat(),clean_solve=True)
             command=build_command(result_identity(player,payload),payload,completed_at=original.isoformat(),points=15,content_generation=4,free_level=level,legacy_reward_slot=None,team_code_at_completion=None)
