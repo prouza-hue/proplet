@@ -1,7 +1,7 @@
 // Exercise native patron UI gates, durable claim coordination and kill switch.
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 const nodes=new Map(),events=new Map(),entries=new Map();let mounted=0,calls=[],removed=[];
-function element(){return {setAttribute(){},addEventListener(){},append(){},remove(){removed.push(this.id);nodes.delete('#'+this.id)},querySelector(){return {onclick:null,addEventListener(){}}},querySelectorAll:()=>[],classList:{contains:()=>false,remove(){}},innerHTML:'',textContent:'',showModal(){this.open=true},close(){this.open=false},focus(){}};}
+function element(){return {attrs:{},setAttribute(k,v){this.attrs[k]=v},addEventListener(){},append(){},remove(){removed.push(this.id);nodes.delete('#'+this.id)},querySelector(){return {onclick:null,addEventListener(){}}},querySelectorAll:()=>[],classList:{contains:()=>false,remove(){}},innerHTML:'',textContent:'',showModal(){this.open=true},close(){this.open=false},focus(){}};}
 const footer={before(node){if(node.id==='patronOffer')mounted++;nodes.set('#'+node.id,node)}};
 const document={createElement:element,body:{append(node){nodes.set('#'+node.id,node)}},querySelector(s){if(s==='.app-footer')return footer;return nodes.get(s)||null},querySelectorAll(s){return s.startsWith('#patronProfileEntry')?s.split(',').flatMap(key=>nodes.get(key)?[nodes.get(key)]:[]):[]},addEventListener(name,fn){events.set(name,fn)}};
 const status={enabled:true,authenticated:true,patron:false,publicBadge:false,offersDisabled:false,canOffer:true};
@@ -69,7 +69,7 @@ async function avatarInfoLifecycle(){
  const entry=entries.get('patron-support-v1'),thanks=entries.get('patron-thanks-v1');
  const signedInStatus={...status};Object.assign(status,{authenticated:false,canOffer:false,offersDisabled:true});
  const guestRead=calls.length;await window.PropletPatrons.refresh();const guestLink=nodes.get('#patronTodayLink');
- assert(guestLink,'enabled guest has the native manual Today support link');assert.equal(guestLink.textContent,'Podpořit Proplet');assert.equal(guestLink.hidden,false);
+ assert(guestLink,'enabled guest has the native manual Today support link');assert.equal(guestLink.attrs['aria-label'],'Podpořit Proplet');assert(guestLink.innerHTML.includes('>Podpořit Proplet</span>'));assert.equal(guestLink.hidden,false);
  assert.equal(entry.eligible(),false,'guest page never creates an automatic support offer');assert.deepEqual(calls.slice(guestRead),['/api/patrons'],'guest decoration only reads status');
  Object.assign(status,signedInStatus);await window.PropletPatrons.refresh();
  assert.equal(entry.eligible(),false,'initial page open never asks');
