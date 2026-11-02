@@ -186,6 +186,15 @@
     "starter_v1_idle",
     "starter_v1_input_outcome"
   ],
+  "starter_presentation_context": {
+    "events": ["starter_v1_presentation_checked", "starter_v1_idle"],
+    "requires": "validated starter_run_id",
+    "stage": ["initial", "idle"],
+    "obscurer": ["none", "other", "outside_viewport", "starterCoach", "profileModal", "accountNudgeModal", "progressGuardModal", "pushNudgeModal", "installNudgeModal", "winModal", "hintModal", "helperOfferModal"],
+    "tag": ["NONE", "DIV", "BUTTON", "IFRAME", "DIALOG", "SVG", "CANVAS", "BODY", "HTML", "SPAN", "INPUT", "OTHER"],
+    "viewport_dimension_range": [1, 8192],
+    "privacy": "Static UI allowlist only; no arbitrary DOM IDs, classes, text, URLs or input values. These fields are stripped from all other events."
+  },
   "bounded_provenance_headers": {
     "X-Proplet-Referral-Source": [
       "daily",
