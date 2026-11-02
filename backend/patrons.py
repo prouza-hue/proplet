@@ -17,10 +17,10 @@ def feature_enabled():
         return False
     if os.getenv('VERCEL_ENV','').lower() != 'preview':
         return True
-    # Only the explicitly approved real-account Play preview inherits support.
+    # Only the explicitly approved real-account Play and competition previews inherit support.
     # Other previews, including isolated QA, retain their existing OFF policy.
     from backend.config import live_player_preview_enabled
-    return (os.getenv('VERCEL_GIT_COMMIT_REF','') == 'codex/play-one-screen'
+    return (os.getenv('VERCEL_GIT_COMMIT_REF','') in {'codex/play-one-screen', 'codex/competition-ui'}
             and live_player_preview_enabled())
 
 def iban_for_account():

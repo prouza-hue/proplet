@@ -4776,6 +4776,8 @@ def monthly_competition_available() -> bool:
     if os.environ.get("PROPLET_MONTHLY_ENABLED", "").lower() not in {"true", "1"}:
         return False
     if VERCEL_ENV == "preview":
+        if VERCEL_GIT_COMMIT_REF == "codex/competition-ui" and LIVE_PLAYER_PREVIEW:
+            return supabase_ready()
         return (VERCEL_GIT_COMMIT_REF == "codex/monthly-competition-202611"
                 and SUPABASE_URL == "https://eanzztstmwlamwfdskbf.supabase.co"
                 and bool(SUPABASE_SECRET_KEY))
@@ -4833,6 +4835,9 @@ def monthly_competition_state(
 
 @app.get("/api/cron/monthly-competition")
 def monthly_competition_close(authorization: Optional[str] = Header(default=None)):
+    # This approved live preview reads actual standings; production owns closure.
+    if VERCEL_ENV == "preview" and VERCEL_GIT_COMMIT_REF == "codex/competition-ui":
+        raise HTTPException(404, "Uzávěrka není v tomto náhledu dostupná")
     if not monthly_competition_available():
         raise HTTPException(404, "Měsíční soutěž není aktivní")
     if not CRON_SECRET or not hmac.compare_digest(authorization or "", f"Bearer {CRON_SECRET}"):

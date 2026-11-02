@@ -30,3 +30,7 @@ Implementace je ve větvi `codex/competition-ui`. Produkční nasazení nebylo p
 ## Otevřené body
 
 Vizuální posouzení uživatelem a případné produkční vydání. Screenshoty představují emulované rozměry, nikoli test fyzického Foldu. Před vydáním znovu ověřit aktuální main, produkční SHA a prostředí.
+
+## Online náhled se živými daty
+
+3. 11. 2026 uživatel výslovně požádal o běžné přihlášení a živá data pro porovnání s produkcí. Větev `codex/competition-ui` proto používá stávající přísné podmínky live-player preview (příznak, přesná větev, preview prostředí a produkční databázová URL). Měsíční soutěž a zobrazení patronů jsou povoleny jen pro tuto konkrétní větev pomocí branch-scoped preview konfigurace. Produkční konfigurace ani nasazení se tím nemění. Samostatná preview doména vyžaduje přihlášení; hráčské akce používají skutečný účet. Ukázkové scénáře ani testovací hodiny se nepoužívají.
