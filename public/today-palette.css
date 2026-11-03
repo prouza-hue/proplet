@@ -1,0 +1,72 @@
+
+/* Section inks for Today. Other tabs retain the shared studio palette. */
+html.tiskarna-ui:has(body.one-screen-ready:not(.playing) #screen-daily.active) {
+  --studio-bg: #fcf5e8;
+}
+html.tiskarna-ui[data-theme=dark]:has(body.one-screen-ready:not(.playing) #screen-daily.active) {
+  --studio-bg: #222323;
+  --td-paper: #303233;
+  --td-line: #585957;
+}
+#oneScreenToday {
+  --daily-paper: #cce5ff;
+  --daily-ink: #152f56;
+  --daily-action: #21477e;
+  --day-highlight: #ffdb68;
+  --free-paper: #365c92;
+  --free-ink: #fff7e8;
+  --tajenka-paper: #cee5b7;
+  --tajenka-ink: #24442e;
+  --team-paper: #f0bdc2;
+  --team-ink: #632638;
+  --archive-paper: #decae6;
+  --archive-ink: #4d3158;
+  --extra-paper: #f4d9a2;
+  --extra-ink: #513821;
+}
+html[data-theme=dark] #oneScreenToday {
+  --daily-paper: #244c70;
+  --daily-ink: #fff5df;
+  --daily-action: #ffdf80;
+  --day-highlight: #ffe28a;
+  --free-paper: #304f86;
+  --tajenka-paper: #24614e;
+  --team-paper: #803b49;
+  --archive-paper: #52415e;
+  --extra-paper: #71502e;
+  --tajenka-ink: var(--daily-ink);
+  --team-ink: var(--daily-ink);
+  --archive-ink: var(--daily-ink);
+  --extra-ink: var(--daily-ink);
+}
+#oneScreenToday .os-feature,
+#oneScreenToday :is(.os-daily-choice, .os-daily-done) {
+  --card-paper: var(--daily-paper);
+  --card-ink: var(--daily-ink);
+}
+#oneScreenToday .os-free { --card-paper: var(--free-paper); --card-ink: var(--free-ink); }
+#oneScreenToday .os-tajenka { --card-paper: var(--tajenka-paper); --card-ink: var(--tajenka-ink); }
+#oneScreenToday .os-team { --card-paper: var(--team-paper); --card-ink: var(--team-ink); }
+#oneScreenToday .os-archive { --card-paper: var(--archive-paper); --card-ink: var(--archive-ink); }
+#oneScreenToday :is(.os-extra, .os-special) { --card-paper: var(--extra-paper); --card-ink: var(--extra-ink); }
+#oneScreenToday :is(.os-tile, .os-feature) {
+  background: var(--card-paper, var(--td-paper));
+  color: var(--card-ink, var(--td-ink));
+  border-color: color-mix(in srgb, currentColor 24%, var(--card-paper, var(--td-paper)));
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--card-paper, var(--td-paper)) 78%, #15191c);
+}
+#oneScreenToday :is(.os-tile, .os-feature):active:not(:disabled) { box-shadow: none; }
+#oneScreenToday :is(.os-detail, .os-metrics, .os-tile > .os-arrow, .os-special > .os-arrow) {
+  color: inherit;
+}
+#oneScreenToday .os-completion-row .os-arrow { color: var(--daily-action); }
+#oneScreenToday .os-feature:not(.os-special):not(.os-complete) > .os-arrow {
+  background: var(--daily-action);
+  color: var(--daily-paper);
+}
+#oneScreenToday .os-day.current {
+  background: var(--day-highlight);
+  color: #283448;
+  border-color: #c78b23;
+  box-shadow: inset 0 -2px 0 #c78b23;
+}
