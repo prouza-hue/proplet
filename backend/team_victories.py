@@ -11,7 +11,7 @@ from uuid import UUID
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from fastapi import Header, HTTPException, Request
+from fastapi import Header, HTTPException, Query, Request
 from pydantic import BaseModel, ConfigDict
 from backend.config import live_player_preview_enabled
 
@@ -76,10 +76,30 @@ def personal_state(rows: list[dict]) -> dict:
     ]}
 
 
+def _public_standings(rows: list[dict], leagues: list[dict], viewer_team: str) -> list[dict]:
+    public = {row['code']: row for row in leagues}
+    teams = []
+    for row in rows:
+        code = row['team_code']
+        if code not in public:
+            continue
+        league = public[code]
+        current_name = league.get('public_name') or league.get('name') or 'Tým'
+        name = row.get('team_name') or current_name
+        if name == code:
+            name = current_name
+        teams.append({'name': name, 'xp': row['xp'], 'rank': row['rank'],
+                      'isMine': bool(viewer_team and viewer_team == code)})
+    return teams
+
+
 def install(app, *, auth_player, db_rpc, enforce_rate_limit, db_select_bounded=None):
     @app.get('/api/team-victories/competition')
     def competition(request: Request, week: date | None = None,
+                    include_summary: bool = Query(default=True, alias="includeSummary"),
                     authorization: str | None = Header(default=None)):
+        if not include_summary and week is None:
+            raise HTTPException(422, 'Pro samostatný výsledek vyber týden.')
         if week is not None and week.weekday() != 0:
             raise HTTPException(422, 'Týden musí začínat pondělím.')
         if not production_enabled():
@@ -96,6 +116,29 @@ def install(app, *, auth_player, db_rpc, enforce_rate_limit, db_select_bounded=N
         today = datetime.now(ZoneInfo('Europe/Prague')).date()
         current = today - timedelta(days=today.weekday())
         launch = date.fromisoformat(settings[0]['launch_date'])
+        if not include_summary:
+            # Each archive read rechecks the feature and current public opt-ins.
+            # No all-weeks index, award ledger or unrelated league identities cross
+            # the database boundary when only one frozen result is requested.
+            if week < launch or week >= current:
+                raise HTTPException(404, 'Tento týden ještě není v historii soutěže.')
+            snapshots = db_select_bounded('team_victory_rounds',
+                columns='week_start,week_end,standings',
+                filters={'week_start': f'eq.{week.isoformat()}',
+                         'week_end': f'lte.{current.isoformat()}'}, max_rows=1)
+            if not snapshots:
+                raise HTTPException(404, 'Tento týden ještě není v historii soutěže.')
+            snapshot = snapshots[0]
+            if not isinstance(snapshot.get('standings'), list):
+                raise HTTPException(503, 'Výsledky týdne teď nejsou dostupné.')
+            # Snapshot codes are server-owned, never taken from a query parameter.
+            codes = sorted({row['team_code'] for row in snapshot['standings']})
+            leagues = db_select_bounded('leagues', columns='code,name,public_name',
+                filters={'public_opt_in': 'eq.true', 'code': 'in.(' + ','.join(codes) + ')'},
+                order='code.asc', max_rows=20000) if codes else []
+            return {'enabled': True,
+                    'selectedWeek': {'start': snapshot['week_start'], 'end': snapshot['week_end']},
+                    'teams': _public_standings(snapshot['standings'], leagues, viewer_team)}
         rounds = db_select_bounded('team_victory_rounds', columns='week_start,week_end',
             filters={'week_start': f'gte.{launch.isoformat()}', 'week_end': f'lte.{current.isoformat()}'},
             order='week_start.desc', max_rows=2000)
@@ -115,17 +158,7 @@ def install(app, *, auth_player, db_rpc, enforce_rate_limit, db_select_bounded=N
                 filters={'week_start': f'eq.{week.isoformat()}'}, max_rows=1)
             if not snapshots or not isinstance(snapshots[0].get('standings'), list):
                 raise HTTPException(503, 'Výsledky týdne teď nejsou dostupné.')
-            for row in snapshots[0]['standings']:
-                code = row['team_code']
-                if code not in public:
-                    continue
-                # Preserve the published result and historic name, but respect a
-                # team's current opt-out. Never expose its membership/join code.
-                name = row.get('team_name') or public_name(code)
-                if name == code:
-                    name = public_name(code)
-                teams.append({'name': name, 'xp': row['xp'], 'rank': row['rank'],
-                              'isMine': bool(viewer_team and viewer_team == code)})
+            teams = _public_standings(snapshots[0]['standings'], leagues, viewer_team)
         awards = db_select_bounded('team_victory_awards', columns='id,week_start,team_code',
             filters={'week_start': f'gte.{launch.isoformat()}'}, order='id.asc', max_rows=20000)
         finalized = {row['start'] for row in weeks}

@@ -6,6 +6,20 @@ Python tests can also be run with `PYTHONPATH=. python tests/current/<test>.py`.
 `manifest.json` is the explicit list of active tests. Historical filenames in that
 list still protect current behavior, not the release number in their name.
 
+For a focused rerun, use `python tools/test_current.py --only <registered-path> ...`.
+It uses the same offline guard and skips only the unrelated global asset/syntax scan.
+The default complete gate strips inherited live credentials and denies external
+Python/Node socket connections; loopback fixtures remain available. See
+`tools/test_isolation/README.md` for its explicit accident-prevention boundary.
+Do not work around the guard to test a live endpoint.
+
+Live verification is separate and budgeted: `python tools/check_live_release.py
+--url https://hrajproplet.cz --version <release>` prints a dry-run plan. Add `--live`
+only for an authorized release check. `--weekly`, `--monthly`, and `--week YYYY-MM-DD`
+select changed contracts within a hard maximum of four public GETs, with no automatic
+retry or account credentials. HTTP response bytes are not Supabase billed egress.
+The competition viewport matrix is local-only, including when BASELINE is set.
+
 Maintenance rules:
 
 - Check release consistency with `tools/release_contract.py`. Do not pin the current

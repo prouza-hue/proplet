@@ -7,8 +7,8 @@ root.innerHTML="<style>\n:host{display:block;max-width:760px;width:100%;margin-i
 
 const $=s=>root.querySelector(s),assets=['/rewards/team-victories/first-imprint.webp','/rewards/team-victories/golden-party.webp','/rewards/team-victories/workshop-masters.webp','/rewards/team-victories/proplet-legend.webp'],names=['První otisk','Zlatá parta','Mistři dílny','Legendy Propletu'],thresholds=[1,3,10,25];let active='week';
 function tab(id){active=id;$('.period').hidden=id!=='week';for(const x of ['week','medals','cabinet']){$('#'+x).hidden=x!==id;$('#'+x+'Tab').setAttribute('aria-selected',String(x===id));$('#'+x+'Tab').tabIndex=x===id?0:-1;}}
-$('#weekTab').onclick=()=>tab('week');$('#medalsTab').onclick=()=>tab('medals');$('#cabinetTab').onclick=()=>tab('cabinet');
-root.querySelector('.tabs').onkeydown=e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const next=e.key==='Home'?'week':e.key==='End'?'cabinet':['week','medals','cabinet'][(['week','medals','cabinet'].indexOf(active)+(e.key==='ArrowLeft'?2:1))%3];tab(next);$('#'+next+'Tab').focus();};
+$('#weekTab').onclick=()=>{tab('week');load();};$('#medalsTab').onclick=()=>{tab('medals');load();};$('#cabinetTab').onclick=()=>{tab('cabinet');load();};
+root.querySelector('.tabs').onkeydown=e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const next=e.key==='Home'?'week':e.key==='End'?'cabinet':['week','medals','cabinet'][(['week','medals','cabinet'].indexOf(active)+(e.key==='ArrowLeft'?2:1))%3];tab(next);load();$('#'+next+'Tab').focus();};
 function show(html){$('#detailBody').innerHTML=html;$('#detail').showModal();$('#detail .close').focus();}
 $('#detail .close').onclick=()=>$('#detail').close();$('#detail').onclick=e=>{if(e.target===$('#detail')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}};
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -16,7 +16,24 @@ const num=v=>Math.max(0,Number(v)||0),fmt=v=>num(v).toLocaleString('cs-CZ');
 const profile=()=>{const p=getProfile();return p?.id&&p?.token?{...p}:null;};
 const identity=p=>JSON.stringify([p?.id,p?.token,p?.familyCode]);
 let selectedWeek=null,availableWeeks=[];
-let data=null,sequence=0,inflight=null,loadedAt=0,loadedKey='';
+let data=null,sequence=0,inflight=null,loadedIdentity='';
+const resourceTtl=30000,resourceCache=new Map(),resourceInflight=new Map();
+let resourceEpoch=0;
+function clearResources(){resourceEpoch++;resourceCache.clear();resourceInflight.clear();}
+function cachedResource(key){const entry=resourceCache.get(key);return entry&&Date.now()-entry.at<resourceTtl?entry.value:null;}
+function readResource(url,p,{force=false}={}){
+ for(const [key,entry] of resourceCache)if(Date.now()-entry.at>=resourceTtl)resourceCache.delete(key);
+ const key=identity(p)+':'+round().start+':'+url,entry=resourceCache.get(key);
+ if(!force&&entry&&Date.now()-entry.at<resourceTtl)return Promise.resolve(entry.value);
+ if(resourceInflight.has(key))return resourceInflight.get(key);
+ if(force)resourceCache.delete(key);
+ const epoch=resourceEpoch;
+ const pending=api(url,{authProfile:p}).then(value=>{
+  if(epoch===resourceEpoch&&identity(profile())===identity(p))resourceCache.set(key,{value,at:Date.now()});
+  return value;
+ }).finally(()=>{if(resourceInflight.get(key)===pending)resourceInflight.delete(key);});
+ resourceInflight.set(key,pending);return pending;
+}
 function dayString(d){return d.toISOString().slice(0,10);}
 function pragueMidnight(day){const wall=Date.parse(day+'T00:00:00Z');let t=wall;for(let i=0;i<3;i++){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(t));const p=Object.fromEntries(parts.map(x=>[x.type,x.value]));const local=Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute,+p.second);t+=wall-local;}return t;}
 function round(now=Date.now()){const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Prague',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(now));const p=Object.fromEntries(parts.map(x=>[x.type,x.value]));const d=new Date(Date.UTC(+p.year,+p.month-1,+p.day));d.setUTCDate(d.getUTCDate()-(d.getUTCDay()+6)%7);const start=dayString(d);d.setUTCDate(d.getUTCDate()+7);return {start,end:dayString(d)};}
@@ -29,11 +46,36 @@ function updateCountdown(){
  $('#previousWeek').disabled=index<0||index>=weeks.length-1;$('#nextWeek').disabled=index<=0;
  $('.week-nav').hidden=weeks.length<2;
 }
-function selectWeek(delta){const weeks=[round(),...availableWeeks.filter(w=>w.start<round().start)],index=weeks.findIndex(w=>w.start===(selectedWeek||round()).start),next=weeks[index+delta];if(!next)return;selectedWeek=next.start===round().start?null:next;load(true);}
+function selectWeek(delta){const weeks=[round(),...availableWeeks.filter(w=>w.start<round().start)],index=weeks.findIndex(w=>w.start===(selectedWeek||round()).start),next=weeks[index+delta];if(!next)return;selectedWeek=next.start===round().start?null:next;load();}
 $('#previousWeek').onclick=()=>selectWeek(1);$('#nextWeek').onclick=()=>selectWeek(-1);
 const retry='<button class="btn" data-retry>Zkusit znovu</button>';
 function loading(){updateCountdown();$('#medalList').innerHTML='<li role="status">Načítám získaná zlata…</li>';for(const id of ['teamCard','cabinetIntro'])$('#'+id).innerHTML='<p role="status">Načítám soutěž…</p>';for(const id of ['shelf','goal','history'])$('#'+id).innerHTML='';$('.rank-list').innerHTML='';}
-async function load(force=false){const p=profile(),key=identity(p)+':'+(selectedWeek?.start||round().start);if(!force&&inflight?.key===key)return inflight.promise;if(!force&&data&&loadedKey===key&&Date.now()-loadedAt<30000){render();return;}const request=++sequence;loading();data=null;const promise=(async()=>{const [r,v,c]=await Promise.allSettled([api('/api/rankings/xp?period=week',{authProfile:p}),p?api('/api/team-victories',{authProfile:p}):Promise.resolve(null),api('/api/team-victories/competition'+(selectedWeek?'?week='+encodeURIComponent(selectedWeek.start):''),{authProfile:p})]);if(request!==sequence||key!==identity(profile())+':'+(selectedWeek?.start||round().start))return;data={competition:c.status==='fulfilled'&&c.value?.enabled?c.value:null,profile:p,rankings:selectedWeek?(c.status==='fulfilled'&&Array.isArray(c.value?.teams)?{teams:c.value.teams}:null):r.status==='fulfilled'&&Array.isArray(r.value?.teams)?r.value:null,victories:v.status==='fulfilled'?v.value:null};if(data.competition?.weeks)availableWeeks=data.competition.weeks;loadedKey=key;loadedAt=Date.now();render();})().finally(()=>{if(inflight?.request===request)inflight=null;});inflight={key,request,promise};return promise;}
+async function load(force=false){
+ const p=profile(),owner=identity(p),week=selectedWeek?.start||'',key=owner+':'+(week||round().start)+':'+active;
+ loadedIdentity=owner;
+ if(!force&&inflight?.key===key)return inflight.promise;
+ // Resource TTL is checked even when changing internal tabs or revisiting a week.
+ const request=++sequence;loading();data=null;
+ const summaryUrl='/api/team-victories/competition',victoryUrl='/api/team-victories';
+ const resourceKey=url=>owner+':'+round().start+':'+url;
+ const promise=(async()=>{
+  const [r,v,c,h]=await Promise.allSettled([
+   !week?readResource('/api/rankings/xp?period=week',p,{force}):Promise.resolve(null),
+   p&&(!week||active==='cabinet')?readResource(victoryUrl,p,{force}):Promise.resolve(cachedResource(resourceKey(victoryUrl))),
+   readResource(summaryUrl,p,{force:force&&(!week||active==='medals')}),
+   week?readResource(summaryUrl+'?week='+encodeURIComponent(week)+'&includeSummary=false',p,{force}):Promise.resolve(null)
+  ]);
+  if(request!==sequence||owner!==identity(profile())||week!==(selectedWeek?.start||''))return;
+  const summary=c.status==='fulfilled'&&c.value?.enabled?c.value:null;
+  const history=h.status==='fulfilled'&&h.value?.enabled?h.value:null;
+  data={competition:summary,profile:p,
+   rankings:week?(history&&Array.isArray(history.teams)?{teams:history.teams}:null):r.status==='fulfilled'&&Array.isArray(r.value?.teams)?r.value:null,
+   victories:v.status==='fulfilled'?v.value:null};
+  if(summary?.weeks)availableWeeks=summary.weeks;
+  render();
+ })().finally(()=>{if(inflight?.request===request)inflight=null;});
+ inflight={key,request,promise};return promise;
+}
 function render(){if(!data)return;updateCountdown();const {profile:p,rankings:r,victories:v}=data,team=v?.enabled?v.team:null,mine=r?.teams.find(t=>t.isMine),gold=num(team?.totalGold),privateTeam=team?.competitionEligible===false;
 $('#cabinetTab').textContent=team?'Vitrína týmu':'Trofeje';
 $('.rank-list').innerHTML=r?(r.teams.length?r.teams.map(t=>`<li class="${t.isMine?'mine':''}"><span class="pos">${num(t.rank)===1?'<img src="/rewards/team-victories/weekly-gold.svg" alt="1. místo">':fmt(t.rank)+'.'}</span><div><strong>${esc(t.name)}${t.isMine?'<span class="mine-label">váš tým</span>':''}</strong>${Number.isFinite(t.memberCount)?`<small>${fmt(t.memberCount)} členů</small>`:''}</div><span class="xp">${fmt(t.xp)} <small>XP</small></span></li>`).join(''):'<li>Zatím nejsou žádné týmové výsledky.</li>'):`<li><div>Pořadí se nepodařilo načíst.<br>${retry}</div></li>`;
@@ -58,9 +100,9 @@ function mountRankingNavigation(){window.PropletRankings?.mountViewNavigation($(
 mountRankingNavigation();
 
 document.addEventListener('proplet:screen-changed',e=>{if(e.detail.screen==='weekly'){document.querySelector('.bottom-nav [data-nav="leaderboard"]')?.classList.add('active');mountRankingNavigation();updateCountdown();load();}else if($('#detail').open)$('#detail').close();});
-function accountChanged(){sequence++;data=null;loadedAt=0;inflight=null;if($('#detail').open)$('#detail').close();loading();if(currentScreen==='weekly')load(true);}
+function accountChanged(){sequence++;clearResources();selectedWeek=null;availableWeeks=[];data=null;loadedIdentity=identity(profile());inflight=null;if($('#detail').open)$('#detail').close();loading();if(currentScreen==='weekly')load(true);}
 document.addEventListener('proplet:account-changed',accountChanged);
-document.addEventListener('proplet:profile-refreshed',()=>{if(loadedKey&&loadedKey!==identity(profile())+':'+(selectedWeek?.start||round().start))accountChanged();});
+document.addEventListener('proplet:profile-refreshed',()=>{if(loadedIdentity&&loadedIdentity!==identity(profile()))accountChanged();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentScreen==='weekly'){updateCountdown();load();}});
 window.PropletWeeklyCompetition={open:openWeekly};
 document.addEventListener('proplet:ready',()=>{if(new URLSearchParams(location.search).get('open')==='weekly')openWeekly();},{once:true});
