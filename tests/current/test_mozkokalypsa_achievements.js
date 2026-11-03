@@ -19,11 +19,19 @@ const sw=fs.readFileSync('public/sw.js','utf8');for(const a of list)assert(sw.in
 console.log('PASS: seven boundaries, retroactive stats, separate difficulty, unique IDs, transparent illustration integrity and offline precache');
 
 const game={mode:'free',puzzle:{difficulty:'mozkokalypsa'}},stats=n=>({freeCompleted:{mozkokalypsa:n}});
-const batch=ctx.completionAchievements(stats(75),stats(76),game);assert.equal(batch.filter(a=>a.group==='mozkokalypsa').length,6);
+const batch=ctx.completionAchievements(stats(75),stats(76),game,[],true);assert.equal(batch.filter(a=>a.group==='mozkokalypsa').length,6);
 const seen=Array.from(batch,a=>a.id);assert.equal(ctx.completionAchievements(stats(76),stats(77),game,seen).filter(a=>a.group==='mozkokalypsa').length,0);
 assert.deepEqual(Array.from(ctx.completionAchievements(stats(99),stats(100),game,seen).filter(a=>a.group==='mozkokalypsa'),a=>a.id),['mozkokalypsa-100']);
 for(const mode of ['daily','playtest'])assert.equal(ctx.completionAchievements(stats(75),stats(76),{...game,mode}).filter(a=>a.group==='mozkokalypsa').length,0);
-assert.equal(ctx.completionAchievements(stats(100),stats(100),game).filter(a=>a.group==='mozkokalypsa').length,7,'replay celebrates existing full completion');
+assert.equal(ctx.completionAchievements(stats(100),stats(100),game,[],true).filter(a=>a.group==='mozkokalypsa').length,7,'replay celebrates existing full completion');
+const won=completedAt=>({mode:'free',difficulty:'mozkokalypsa',completedAt});
+assert(ctx.pendingMozkokalypsaRollout({a:won('2026-10-03T12:00:00Z')}));
+assert(!ctx.pendingMozkokalypsaRollout({a:won('2026-10-03T12:00:00Z'),b:won('2026-11-03T18:42:00Z')}));
+assert(!ctx.pendingMozkokalypsaRollout({a:won(null)}));
+const freshAwards=(before,after)=>Array.from(ctx.completionAchievements(stats(before),stats(after),game),a=>a.id);
+assert.deepEqual(freshAwards(100,101),[],'board 101 must not repeat badges after a device change');
+assert.deepEqual(freshAwards(99,100),['mozkokalypsa-100']);
+assert.deepEqual(freshAwards(0,1),['mozkokalypsa-1']);
 console.log('PASS: all retroactive badges together on next Mozkokalypsa, once per saved player state, then only future milestones');
 
 vm.runInContext(fs.readFileSync('public/achievement-stories.js','utf8'),ctx);const stories=ctx.window.PropletAchievementStories;
