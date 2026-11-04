@@ -25,6 +25,8 @@ Okno 24 h začíná časem přiřazení včetně a končí přesně za 24 hodin 
 | Pomoc | Použití standardní nápovědy na přímo spojené první skutečné desce v okně. Použití tréninkové nápovědy v A vykazovat odděleně. |
 | Chyby a načítání | Identity s hlášenou klientskou chybou a zvlášť s potvrzeným selháním načtení první skutečné desky v okně. Samotná absence startu může znamenat i odchod. Nedostupnost sběru se označí jako neznámá. |
 
+Archiv a všech šest obtížností Volné hry (včetně veřejné Mozkokalypsy) používají režim free. Denní Extra používá daily_special. Měsíční soutěž odvozuje skóre ze skutečných Denních her, proto její pořadí a připsání bodů nesmí přidat další dokončení. Víkendová Tajenka má signály tajenka_started a tajenka_completed. Klient ukládá dokončení před odesláním signálu, včetně hry hosta. Do readoutu vstoupí jen signál přijatý se skutečnou first-party identitou v produkci bez testovacího příznaku. Původní pozvánkový režim playtest Mozkokalypsa III skončil podle serverové uzávěry 30. 9. 2026 a v listopadovém náboru není způsobilou hrou.
+
 Čas do otevření popsat jen diagnosticky. Událost startu ani synchronizace výsledku sama o sobě nedokládá skutečné dokončení. Propojení první desky vyžaduje souhlas flow, ID pokusu a ID desky.
 
 ## Ranní report a bezpečnost

@@ -32,13 +32,13 @@ def verify_entry_readout(connection):
         cursor.execute("set local proplet.entry_report_as_of='2026-11-16 12:00Z'")
         cursor.execute(query)
         live = {r['variant']: r for r in cursor.fetchall()}
-        assert live['A']['assigned'] == 2 and live['B']['assigned'] == 2, live
+        assert live['A']['assigned'] == 2 and live['B']['assigned'] == 3, live
         assert all(r['completed_24h'] is None and r['pending_24h'] == r['assigned'] for r in live.values()), live
         cursor.execute("set local proplet.entry_report_as_of='2026-12-02 08:00Z'")
         cursor.execute(query)
         a, b = cursor.fetchall()
         assert a['assigned'] == 2 and a['completed_24h'] == 0, a
-        assert (b['completed_24h'], b['first_completed'], b['continued'], b['returned_d1']) == (1, 1, 1, 2), b
+        assert (b['completed_24h'], b['first_completed'], b['continued'], b['returned_d1']) == (2, 1, 1, 2), b
         assert not a['investigate'] and not b['investigate'], (a, b)
 
 sys.path.insert(0, str(ROOT))
