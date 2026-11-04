@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.20-entry1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.21-retry-resume1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -1065,18 +1065,33 @@ function renderNewContentBanner(selector='#newContentBanner'){
  root.classList.remove('hidden');root.querySelector(compact?'.play-news-strip':'.primary-btn').onclick=()=>{trackProductEvent('content_drop_cta_clicked');startLatestContent()};
 }
 
-let homeLayoutRecovery=null,homeLayoutRecoveryAttempted=false;
+let homeLayoutRecovery=null,homeLayoutRecoveryAttempts=0,homeLayoutRecoveryRetryAt=0;
 function renderFreeResumeCard(){
+ // An available module also refreshes Today's resume after progress changes.
  if(typeof window.PropletHomeLayout?.renderResumeCard==='function'){window.PropletHomeLayout.renderResumeCard();return;}
- if(homeLayoutRecoveryAttempted)return;
- homeLayoutRecoveryAttempted=true;
+ // Compact Play owns its exact-board resume in the difficulty tile. It has
+ // no legacy card to recover, even when the optional HomeLayout failed.
+ if(document.getElementById('screen-free')?.classList.contains('play-compact')){
+  document.getElementById('freeResumeCard')?.remove();return;
+ }
+ if(!Object.values(getState().inProgress||{}).some(item=>item?.mode==='free'))return;
+ if(homeLayoutRecovery||homeLayoutRecoveryAttempts>=2||Date.now()<homeLayoutRecoveryRetryAt)return;
+ homeLayoutRecoveryAttempts++;
  homeLayoutRecovery=new Promise((resolve,reject)=>{
-  const script=document.createElement('script');let settled=false;
-  const finish=()=>{if(settled)return;settled=true;clearTimeout(timer);script.remove();typeof window.PropletHomeLayout?.renderResumeCard==='function'?resolve():reject(new Error('home-layout-contract'));};
-  const timer=setTimeout(finish,10000);
-  script.src='/home-layout.js?v=play-one-screen1';script.onload=finish;script.onerror=finish;
-  try{document.head.append(script)}catch{finish()}
- }).then(()=>window.PropletHomeLayout.renderResumeCard()).catch(error=>{reportClientError('home_layout_contract','HomeLayout resume card unavailable',error);});
+  // Join the shell's in-flight script instead of starting a duplicate fetch.
+  const existing=document.querySelector('script[data-proplet-home-layout]');
+  const shared=existing&&existing.dataset.loaded!=='1'&&existing.dataset.loadFailed!=='1';
+  const script=shared?existing:document.createElement('script');let settled=false,timer;
+  const cleanup=()=>{clearTimeout(timer);script.removeEventListener('load',loaded);script.removeEventListener('error',failed);if(!shared)script.remove();};
+  const finish=reason=>{if(settled)return;settled=true;if(reason==='timeout')script.dataset.loadFailed='1';cleanup();typeof window.PropletHomeLayout?.renderResumeCard==='function'?resolve():reject(new Error(reason));};
+  const loaded=()=>{script.dataset.loaded='1';finish('missing_export');},failed=()=>{script.dataset.loadFailed='1';finish('load_error');};
+  script.addEventListener('load',loaded,{once:true});script.addEventListener('error',failed,{once:true});
+  timer=setTimeout(()=>finish('timeout'),10000);
+  if(!shared){script.src='/home-layout.js?v=resume-recovery1';try{document.head.append(script)}catch{finish('append_error')}}
+ }).then(()=>window.PropletHomeLayout.renderResumeCard()).catch(error=>{
+  homeLayoutRecoveryRetryAt=Date.now()+30000;
+  reportClientError('home_layout_contract',`HomeLayout module unavailable: ${error.message}`,error);
+ }).finally(()=>{homeLayoutRecovery=null;});
 }
 function lastPlayedDifficulty(){try{const diff=localStorage.getItem('proplet:played-levels:difficulty');if(DIFF[diff])return diff}catch{}return 'easy';}
 function renderFree(){

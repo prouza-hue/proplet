@@ -40,6 +40,21 @@ async function hintClose(page){await page.evaluate(()=>{document.querySelector('
   assert.equal(await page.locator('#freeResumeCard').count(),0,'compact Play does not recreate the retired separate card');
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'viewport must not overflow');
   assert.deepEqual(await page.evaluate(()=>({profile:localStorage.getItem('proplet-v2-profile'),state:JSON.stringify(getState())})),saved);
+  // A missing optional legacy card module must not block the approved tile.
+  await page.route('**/home-layout.js*',r=>r.abort());
+  await page.evaluate(()=>{window.__savedHomeLayoutForTest=window.PropletHomeLayout;window.PropletHomeLayout={renderResumeCard:1};renderFree();});
+  assert.match(await resumeTile.textContent(),/Pokračovat/);
+  assert.equal(await page.locator('#freeResumeCard').count(),0);
+  await resumeTile.click();
+  await page.waitForFunction(()=>currentGame?.puzzle?.id==='g4-e-009');
+  assert.equal(await page.evaluate(()=>currentGame?.puzzle?.id),'g4-e-009','missing HomeLayout still resumes the exact board');
+  assert.equal(await page.evaluate(()=>currentGame.hints),2,'resume preserves existing hint use');
+  assert.equal(await page.evaluate(()=>currentGame.moves),3,'resume preserves existing moves');
+  if(process.env.RESUME_EVIDENCE_DIR){
+   fs.mkdirSync(process.env.RESUME_EVIDENCE_DIR,{recursive:true});
+   await page.screenshot({path:path.join(process.env.RESUME_EVIDENCE_DIR,`resume-${viewport.width}.png`)});
+  }
+  await page.evaluate(()=>{window.PropletHomeLayout=window.__savedHomeLayoutForTest;delete window.__savedHomeLayoutForTest;nav('daily');});
   for(const outcome of ['invalid','cancelled','empty','correct']){
    await page.evaluate(async outcome=>{
     document.querySelectorAll('.modal').forEach(el=>el.classList.add('hidden'));
@@ -94,6 +109,13 @@ async function hintClose(page){await page.evaluate(()=>{document.querySelector('
  }
  for(const viewport of [{width:1280,height:900},{width:390,height:844},{width:673,height:841}]){
   console.log('CHECK actual 4.09.9 worker upgrade '+viewport.width);await control({reset:true,release:'baseline'});
+  // Cache immutable git-show fixture bytes before timed browser navigation.
+  // The browser still installs and upgrades the real historical worker.
+  if(viewport.width===1280){
+   const shell=await fetch(base+'/sw.js').then(r=>r.text());
+   const urls=[...new Set([...shell.matchAll(/'([^']+)'/g)].map(m=>m[1]).filter(s=>s.startsWith('/')))];
+   await Promise.all(urls.map(url=>fetch(base+url).then(r=>r.arrayBuffer())));
+  }
   const ctx=await context(browser,{...viewport,sw:true}),{page,errors}=await load(ctx);await page.waitForFunction(()=>navigator.serviceWorker.controller);
   const old=await page.evaluate(()=>APP_PREVIEW_RELEASE);assert.equal(old,'proplet-v4.09.9-mama1');
   await page.evaluate(()=>{const s=getState();s.completed['free:g4-e-001']={puzzleId:'g4-e-001',mode:'free',difficulty:'easy',elapsedMs:30000,points:15,completedAt:'2026-09-15T09:00:00Z'};s.inProgress['free:g4-e-009']={puzzleId:'g4-e-009',mode:'free',difficulty:'easy',found:[],hints:2,moves:3,elapsedMs:2500};saveState(s)});
