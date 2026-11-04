@@ -35,21 +35,31 @@ class SessionCommand(BaseModel):
     progress: Progress = Field(default_factory=Progress)
 
 
+def playable_answer_indices(mode, answers):
+    return [i for i, answer in enumerate(answers) if mode != 'tajenka' or len(answer['word']) >= 4]
+
+
 def canonical_progress(command, puzzle):
     result = command.progress.model_dump()
     found = []
     seen = set()
     answers = puzzle.get('answers') or []
+    playable = playable_answer_indices(command.mode, answers)
     for word in command.progress.found:
-        if word.answerIndex >= len(answers) or word.answerIndex in seen:
+        index = word.answerIndex
+        # Persist original board indices so pre-update sessions still merge by index.
+        # Cached clients send those indices directly, new clients index playable words.
+        if index < len(playable) and answers[playable[index]].get('path') == word.path:
+            index = playable[index]
+        if index not in playable or index in seen:
             raise HTTPException(400, 'Neplatný rozehraný postup')
-        answer = answers[word.answerIndex]
+        answer = answers[index]
         if answer.get('path') != word.path:
             raise HTTPException(400, 'Neplatná cesta slova')
-        seen.add(word.answerIndex)
-        found.append({'answerIndex': word.answerIndex, 'word': answer['word'],
+        seen.add(index)
+        found.append({'answerIndex': index, 'word': answer['word'],
                       'path': answer['path'], 'colorIndex': len(found)})
-    if command.action == 'finish' and len(found) != len(answers):
+    if command.action == 'finish' and len(found) != len(playable):
         raise HTTPException(400, 'Deska ještě není dokončená')
     result['found'] = found
     result['moves'] = max(result['moves'], len(found) + result['wrongAttempts'])

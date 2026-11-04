@@ -114,4 +114,35 @@ with (
         raise AssertionError("future Tajenka must remain rejected")
 
 
+week_eighteen = server.tajenka_puzzle_for_week(18)
+assert [a["word"] for a in week_eighteen["answers"]] == ["KDO", "CHVÍLI", "STÁL", "STOJÍ", "OPODÁL"]
+with (
+    patch.object(server, "TAJENKA_RELEASE_ENABLED", True),
+    patch.object(server, "current_prague_date", return_value=date(2026, 11, 4)),
+):
+    result = payload_for(week_eighteen)
+    result.moves = 4
+    server.validate_result_sanity(result)
+
+# Both client versions must persist the same indices so the database can merge
+# a pre-update pause with a finish on the new client without duplicating a word.
+for index_offset in (0, 1):
+    command = server.play_sessions.SessionCommand(
+        action="finish", mode="tajenka", difficulty="medium", puzzle_id=week_eighteen["id"],
+        challenge_key=result.challenge_key, attempt_id="week-18-resume",
+        owner_id="00000000-0000-4000-8000-000000000099", sequence=2,
+        progress={"found": [{"answerIndex": index + index_offset, "path": answer["path"]}
+                            for index, answer in enumerate(week_eighteen["answers"][1:])]},
+    )
+    saved = server.play_sessions.canonical_progress(command, week_eighteen)
+    assert [word["answerIndex"] for word in saved["found"]] == [1, 2, 3, 4]
+    assert saved["moves"] == 4
+    command.progress.found.pop()
+    try:
+        server.play_sessions.canonical_progress(command, week_eighteen)
+    except HTTPException as error:
+        assert error.detail == "Deska ještě není dokončená"
+    else:
+        raise AssertionError("Missing a playable word must still block completion")
+
 print("PASS: released Tajenka result validates, awards 200 XP, and syncs to the account")

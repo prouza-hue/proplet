@@ -25,6 +25,10 @@ function create(deps){
      return null;
    });
  }
+ function restoreProgress(g,progress){
+   if(g.mode!=='tajenka'||!progress||!deps.tajenkaFound)return progress||{};
+   return {...progress,found:deps.tajenkaFound(g.puzzle,{...progress,puzzleId:g.puzzle.id})};
+ }
  async function prepare(puzzle,mode,dailyDate,restored){
    if(!['daily','daily_special','free','tajenka'].includes(mode))return {restored};
    // A first offline launch may have no cached server policy at all. Keep the
@@ -39,7 +43,8 @@ function create(deps){
      const row=await deps.api('/api/play-session',{method:'POST',body:JSON.stringify(command(g,'open',progress)),authProfile:profile});
      const practice=mode==='daily_special'&&puzzle?.meta?.dailySpecialBinding?.rewardEligible===false;
      if(row.finished&&(practice||deps.completed?.(puzzle,mode,dailyDate)||await deps.completedAttempt?.(puzzle,mode,dailyDate,row.attempt_id,profile)))return {restored:null,fairPlay:false,replay:true};
-     return {restored:{...restored,...row.progress,puzzleId:puzzle.id,mode,dailyDate,attemptId:row.attempt_id,serverTimingAnchored:true,disconnected:false,timingUnverified:!!restored?.timingUnverified||row.verified===false},fairPlay:true};
+     const serverProgress=restoreProgress(g,row.progress);
+     return {restored:{...restored,...serverProgress,puzzleId:puzzle.id,mode,dailyDate,attemptId:row.attempt_id,serverTimingAnchored:true,disconnected:false,timingUnverified:!!restored?.timingUnverified||row.verified===false},fairPlay:true};
    }catch(error){
      if(error.status===409||error.status===422)throw error;
      return {restored:{...restored,disconnected:true,timingUnverified:!!restored?.timingUnverified||!restored?.serverTimingAnchored,attemptId:g.attemptId},fairPlay:true};
@@ -52,7 +57,7 @@ function create(deps){
    const profile=deps.profile();
    const row=await send(g,'open');
    if(row){
-     const progress=row.progress||{},found=new Map();
+     const progress=restoreProgress(g,row.progress),found=new Map();
      for(const word of [...(g.found||[]),...(progress.found||[])])found.set(word.answerIndex,word);
      g.found=[...found.values()].map((word,index)=>({...word,colorIndex:index}));
      g.used=new Map();for(const word of g.found)for(const cell of word.path)g.used.set(cell,word.colorIndex);

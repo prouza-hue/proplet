@@ -1396,7 +1396,7 @@ def validate_result_sanity(payload: ResultCreate) -> None:
     if not puzzle:
         raise HTTPException(400, "Neznámá úloha")
     answers = puzzle.get("answers") or []
-    answer_count = len(answers)
+    answer_count = len(play_sessions.playable_answer_indices(payload.mode, answers))
     active_cells = len(puzzle.get("mask") or [])
     if payload.mode == "starter" and payload.puzzle_id == "starter-v1" and payload.difficulty == "easy":
         # Released board-v2 (4 answers/25 cells) and board-v3-short (3/9)
