@@ -15,21 +15,21 @@ c.currentGame.mode='free';events.length=0;c.trackStarterInput('correct');assert.
 c.currentGame.mode='starter';c.currentGame.starterTrace=trace();c.trackStarterInput('private word');assert.equal(events.length,0);
 console.log('PASS finite first terminal input outcome once per run, immutable provenance and independent canonical funnel');
 async function recovery(){
- for(const mode of ['valid','recover','error','timeout','missing_export','shared','compact','empty']){
+ for(const mode of ['valid','compact-valid','recover','error','timeout','missing_export','shared','compact','empty']){
   let calls=0,timer,clock=0;const scripts=[],reports=[];
   function script(){const s=new EventTarget();s.dataset={};s.remove=()=>{};return s;}
   const existing=mode==='shared'?script():null;
   const state={inProgress:mode==='empty'?{}:{'free:fixture':{mode:'free',puzzleId:'fixture'}},completed:{}};
   const before=JSON.stringify(state);
-  const screen={classList:{contains:name=>mode==='compact'&&name==='play-compact'}};
-  const x={window:{PropletHomeLayout:mode==='valid'?{renderResumeCard(){calls++}}:{renderResumeCard:1}},
+  const screen={classList:{contains:name=>mode.startsWith('compact')&&name==='play-compact'}};
+  const x={window:{PropletHomeLayout:['valid','compact-valid'].includes(mode)?{renderResumeCard(){calls++}}:{renderResumeCard:1}},
    document:{createElement:script,getElementById:id=>id==='screen-free'?screen:null,querySelector:()=>existing,head:{append:s=>scripts.push(s)}},
    Date:{now:()=>clock},getState:()=>state,
    setTimeout:fn=>{timer=fn;return 1},clearTimeout(){},reportClientError:(...args)=>reports.push(args)};
   vm.createContext(x);vm.runInContext(app.slice(app.indexOf('let homeLayoutRecovery='),app.indexOf('function renderFree(){')),x);
   x.renderFreeResumeCard();x.renderFreeResumeCard();
   if(mode==='compact'||mode==='empty'){assert.equal(scripts.length,0);assert.equal(reports.length,0);assert.equal(calls,0);continue;}
-  if(mode==='valid'){assert.equal(calls,2);assert.equal(scripts.length,0);continue;}
+  if(mode==='valid'||mode==='compact-valid'){assert.equal(calls,2,'available module refreshes Today even when Play is compact');assert.equal(scripts.length,0);continue;}
   assert.equal(scripts.length,mode==='shared'?0:1,'join shell load or share one recovery');
   const loadedScript=existing||scripts[0];
   if(mode==='recover'||mode==='shared'){

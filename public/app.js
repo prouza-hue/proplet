@@ -1067,13 +1067,14 @@ function renderNewContentBanner(selector='#newContentBanner'){
 
 let homeLayoutRecovery=null,homeLayoutRecoveryAttempts=0,homeLayoutRecoveryRetryAt=0;
 function renderFreeResumeCard(){
+ // An available module also refreshes Today's resume after progress changes.
+ if(typeof window.PropletHomeLayout?.renderResumeCard==='function'){window.PropletHomeLayout.renderResumeCard();return;}
  // Compact Play owns its exact-board resume in the difficulty tile. It has
  // no legacy card to recover, even when the optional HomeLayout failed.
  if(document.getElementById('screen-free')?.classList.contains('play-compact')){
   document.getElementById('freeResumeCard')?.remove();return;
  }
  if(!Object.values(getState().inProgress||{}).some(item=>item?.mode==='free'))return;
- if(typeof window.PropletHomeLayout?.renderResumeCard==='function'){window.PropletHomeLayout.renderResumeCard();return;}
  if(homeLayoutRecovery||homeLayoutRecoveryAttempts>=2||Date.now()<homeLayoutRecoveryRetryAt)return;
  homeLayoutRecoveryAttempts++;
  homeLayoutRecovery=new Promise((resolve,reject)=>{
