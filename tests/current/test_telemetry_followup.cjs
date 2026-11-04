@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const app=fs.readFileSync('public/app.js','utf8');
-const ready=()=>Object.fromEntries(['analyticsVersion','trainingPuzzle','captureFirstGame','isFirstGame','recordStarted','recordCompleted','afterStart','eventHeaders'].map(k=>[k,()=>{}]));
+const ready=()=>Object.fromEntries(['analyticsVersion','trainingPuzzle','captureFirstGame','isFirstGame','recordStarted','recordCompleted','afterStart','eventHeaders','prepareEntry'].map(k=>[k,()=>{}]));
 const recovery=app.slice(app.indexOf('let firstStepsRuntimeRequest='),app.indexOf('function createStarterTrace('));
 async function verifyRecovery(){
  const scripts=[],toasts=[],errors=[],original={attemptId:'preserve-me'};

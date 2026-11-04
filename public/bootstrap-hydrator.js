@@ -102,7 +102,7 @@
         const requestedScreen=typeof currentScreen==='undefined'?null:currentScreen;
         const needsFull=!puzzle?.meta?.archiveExperience&&(mode==='free'||mode==='rescue')&&typeof puzzleDB!=='undefined'&&puzzleDB?.bootstrapSchema===1;
         if(!needsFull)return canonicalStartGame(puzzle,mode,dailyDate,options);
-        ensureFullDatabase().then(full=>{
+        return ensureFullDatabase().then(full=>{
           if(request!==pendingStart)return;
           if(requestedScreen!==null&&currentScreen!==requestedScreen)return;
           if(typeof getProfile==='function'){
@@ -111,10 +111,11 @@
           }
           const resolved=canonicalPuzzle(full,puzzle,mode);
           if(!playablePuzzle(resolved))throw new Error('canonical-puzzle-missing');
-          canonicalStartGame(resolved,mode,dailyDate,options);
+          return canonicalStartGame(resolved,mode,dailyDate,options);
         }).catch(error=>{
           if(request!==pendingStart)return;
           console.warn('bootstrap hydration failed before game start',error);
+          if(options.firstSteps)return false;
           try{typeof showToast==='function'&&showToast('Herní banka se ještě načítá. Zkus to prosím znovu.')}catch{}
         });
       };

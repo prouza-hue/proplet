@@ -184,7 +184,8 @@
     "referral_landing_validated",
     "starter_v1_presentation_checked",
     "starter_v1_idle",
-    "starter_v1_input_outcome"
+    "starter_v1_input_outcome",
+    "entry_board_load_failed"
   ],
   "starter_presentation_context": {
     "events": ["starter_v1_presentation_checked", "starter_v1_idle"],

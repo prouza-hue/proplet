@@ -1872,6 +1872,7 @@ def config():
     p = load_puzzles()
     return {
         **monthly_preview_capabilities(),
+        "entryExperimentEnabled": entry_experiment.enabled(VERCEL_ENV or "local"),
         "badges": BADGES,
         "points": {**POINTS, "starter": STARTER_XP},
         "dictionarySize": p["dictionarySize"],
@@ -5587,7 +5588,10 @@ team_victories.install(app, auth_player=auth_player, db_rpc=db_rpc,
                        enforce_rate_limit=enforce_rate_limit, db_select_bounded=db_select_bounded)
 
 # Lokální spuštění přes uvicorn: Vercel obslouží public/ sám z CDN.
-from backend import first_board
+from backend import first_board, entry_experiment
+entry_experiment.install(app, telemetry_actor=telemetry_actor, db_rpc=db_rpc,
+                         enforce_rate_limit=enforce_rate_limit, environment=VERCEL_ENV,
+                         app_version=APP_VERSION)
 first_board.install(app, telemetry_actor=telemetry_actor, db_rpc=db_rpc,
                     enforce_rate_limit=enforce_rate_limit, environment=VERCEL_ENV,
                     app_version=APP_VERSION)

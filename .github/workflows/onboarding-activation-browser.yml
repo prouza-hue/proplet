@@ -7,6 +7,7 @@ on:
       - 'public/**'
       - 'tools/test_onboarding_activation_browser.cjs'
       - 'tools/test_first_steps_browser.cjs'
+      - 'tools/test_first_board_challenger_browser.cjs'
       - 'tools/test_starter_presentation_browser.cjs'
       - 'tools/test_profile_statistics_browser.cjs'
       - 'tools/test_module_contracts_browser.cjs'

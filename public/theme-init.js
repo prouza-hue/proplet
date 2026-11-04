@@ -141,7 +141,7 @@
     window.__PROPLET_COLD_BOOTSTRAP_PREFETCH=coldBootstrapFetch;
 
     const hydrator=document.createElement('script');
-    hydrator.src='/bootstrap-hydrator.js?v=dailygen6-20261008';
+    hydrator.src='/bootstrap-hydrator.js?v=entry1';
     hydrator.async=false;
     hydrator.dataset.propletBootstrapHydrator='1';
     document.head.appendChild(hydrator);
@@ -241,7 +241,7 @@
 
   const loadExtras=async()=>{
     loadScript('/challenge-cta-v3333.js?v=result-sticker1','propletChallengeCtaV3333');
-    await loadScript('/runtime-meta.js?v=41019palette1','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=41020entry1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=play-one-screen1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');

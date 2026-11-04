@@ -190,6 +190,7 @@ EMBEDDED_EVENT_NAMES = (
     "word_discovery_claim_rejected",
     *REFERRAL_EVENT_NAMES,
     *STARTER_DIAGNOSTIC_EVENT_NAMES,
+    "entry_board_load_failed",
 )
 
 
