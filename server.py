@@ -437,6 +437,7 @@ def enforce_rate_limit(
     limit: int,
     window_seconds: int,
     discriminator: Optional[str] = None,
+    result_attempt_id: Optional[str] = None,
 ) -> None:
     actor_hash = _rate_actor_hash(request, discriminator)
     context = request_guard_context.get()
@@ -463,11 +464,32 @@ def enforce_rate_limit(
             context["fair_play_policy"] = row["fairPlay"]
     if not bool(row.get("allowed")):
         request_id = getattr(request.state, "request_id", None)
+        retry_seconds = max(60, window_seconds)
+        metadata = {"rate_scope_actor": actor_hash}
+        if scope == "result_submit":
+            # The quota uses fixed buckets, not a rolling hour after rejection.
+            try:
+                reset = datetime.fromisoformat(str(row.get("reset_at", "")).replace("Z", "+00:00"))
+                remaining = (reset - datetime.now(timezone.utc)).total_seconds()
+                if reset.tzinfo is not None and -window_seconds <= remaining <= window_seconds:
+                    retry_seconds = max(1, math.ceil(remaining))
+            except (ValueError, TypeError, OverflowError):
+                pass  # Preserve the conservative wait if the guard has no usable reset.
+            metadata["retry_after_seconds"] = retry_seconds
+            try:
+                metadata["reporting_actor_key"] = "p:" + str(uuid.UUID(str(discriminator)))
+            except (ValueError, TypeError, AttributeError):
+                pass
+            try:
+                metadata["reported_attempt_id"] = str(uuid.UUID(str(result_attempt_id)))
+                metadata["attempt_link"] = "reported"
+            except (ValueError, TypeError, AttributeError):
+                pass  # A client-supplied ID is never an ownership assertion.
         try:
-            record_operational_event("rate_limit", request_id=request_id, route=request.url.path, actor_kind="network", code=scope, metadata={"rate_scope_actor":actor_hash})
+            record_operational_event("rate_limit", request_id=request_id, route=request.url.path, actor_kind="network", code=scope, metadata=metadata)
         except Exception:
             pass
-        raise HTTPException(429, "Příliš mnoho pokusů. Chvíli počkej a zkus to znovu.", headers={"Retry-After": str(max(60, window_seconds))})
+        raise HTTPException(429, "Příliš mnoho pokusů. Chvíli počkej a zkus to znovu.", headers={"Retry-After": str(retry_seconds)})
 
 
 def norm_family(code: str) -> str:
@@ -3677,7 +3699,7 @@ def result(payload: ResultCreate, request: Request, authorization: Optional[str]
             return atomic_result_public_response(player["id"], replay_receipt, include_stats=request.headers.get("X-Proplet-Result-Receipt") != "1")
     # Replaying an already committed result does not consume the player's write budget.
     # Players sharing a school/home network no longer share this smaller limit.
-    enforce_rate_limit(request, "result_submit", limit=120, window_seconds=3600, discriminator=player["id"])
+    enforce_rate_limit(request, "result_submit", limit=120, window_seconds=3600, discriminator=player["id"], result_attempt_id=payload.attempt_id)
     if not puzzle_exists(payload.puzzle_id, payload.mode, payload.difficulty):
         raise HTTPException(400, "Neznámá úloha")
     validate_result_sanity(payload)

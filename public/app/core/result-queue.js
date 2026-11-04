@@ -122,7 +122,13 @@
               if (!firstError) firstError = error?.message || 'Synchronizace selhala';
               if (!error?.status || Number(error.status) === 429 || Number(error.status) >= 500 || Number(error.status) === 401) {
                 const failures = Math.min(7, (Number(retry.failures) || 0) + 1);
-                const delay = Math.max(Number(error.retryAfterMs) || 0, Math.min(3600000, 60000 * 2 ** (failures - 1)));
+                const serverDelay = Number(error.retryAfterMs);
+                const validServerDelay = Number.isFinite(serverDelay) && serverDelay > 0;
+                const backoff = Math.min(3600000, 60000 * 2 ** (failures - 1));
+                // A quota reset may be seconds away; do not stretch it to the
+                // generic network-error backoff. Missing headers keep backoff.
+                const delay = Number(error.status) === 429 && validServerDelay
+                  ? serverDelay : Math.max(validServerDelay ? serverDelay : 0, backoff);
                 retry = {failures, until:now() + delay, status:Number(error.status) || 0}; writeRetry(retry);
                 break;
               }
