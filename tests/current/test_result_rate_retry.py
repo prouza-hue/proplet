@@ -86,4 +86,3 @@ call = next(n for n in ast.walk(handler) if isinstance(n, ast.Call) and
 assert any(k.arg == "result_attempt_id" and ast.unparse(k.value) == "payload.attempt_id"
            for k in call.keywords)
 print("PASS fixed-bucket Retry-After, 120/121 boundary, safe reported linkage and unchanged other scopes")
-

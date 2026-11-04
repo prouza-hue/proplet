@@ -13,4 +13,3 @@ Regression coverage:
 - Loopback browser on desktop, phone and Fold: malformed/blocked HomeLayout still resumes g4-e-009 with saved hints and moves; existing current-module recovery and real historical 4.09.9 worker upgrade remain in the suite.
 
 Candidate release 4.10.21 / proplet-v4.10.21-retry-resume1. No migration is required. No production games, registrations, writes or error probes are part of validation. Subsequent organic verification must associate a real rate-limit request with its reported attempt and confirm later receipt; a module warning by itself must not be presented as a lost game.
-
