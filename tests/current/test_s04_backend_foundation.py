@@ -34,7 +34,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (path, methods, name)
         for path, methods, name in reviewed
-        if path and path not in {"/api/release-news", "/api/release-news/claim", "/api/qa/monthly-control", "/api/competition/monthly", "/api/cron/monthly-competition", "/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/competition", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+        if path and path not in {"/api/release-news", "/api/release-news/claim", "/api/qa/monthly-control", "/api/competition/monthly", "/api/cron/monthly-competition", "/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/competition", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/entry-experiment/assignment', '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -214,6 +214,7 @@ for model in ("SessionCommand", "Progress", "FoundWord"):
 # Additive allocator has its own isolated HTTP contract in test_first_board_catchup.
 assert set(openapi_contract["paths"]["/api/first-board/assignment"]) == {"post"}
 openapi_contract["paths"].pop("/api/first-board/assignment")
+assert set(openapi_contract["paths"].pop("/api/entry-experiment/assignment")) == {"post"}
 openapi_contract["components"]["schemas"].pop("AssignmentRequest")
 
 # Diagnostic provenance adds only optional fields; the actual route/model boundary
@@ -496,6 +497,7 @@ with (
     # The explicit live-player preview capability is additive and defaults closed.
     # Keep every pre-existing response field under the historical digest below.
     assert config_fixture.pop('livePlayerPreview') is False
+    assert config_fixture.pop('entryExperimentEnabled') is False
     # Admin environment discovery is an additive public boolean; it never
     # exposes the backing database or changes the previous config fields.
     assert config_fixture.pop('adminPreview') is False

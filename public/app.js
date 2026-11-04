@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.19-palette1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.20-entry1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -31,7 +31,10 @@ function acceptMonthlyPreviewClock(config){
 }
 function monthlyPreviewNow(){return new Date(Date.now()+(monthlyPreviewClockOffsetMs??0))}
 function resultCompletedAt(){return monthlyPreviewNow().toISOString()}
+let entryExperimentEnabled=false,entryExperimentTest=false;
 function acceptRuntimeCapabilities(config){
+ entryExperimentEnabled=config?.entryExperimentEnabled===true;
+ entryExperimentTest=['local','preview'].includes(config?.environment);
  acceptMonthlyPreviewClock(config);
  runtimeCapabilitiesChecked=true;
  livePlayerPreviewEnabled=config?.environment==='preview'&&config?.livePlayerPreview===true;
@@ -1123,7 +1126,7 @@ async function sendAttemptCheckpoint(eventType){
 // Diagnostic phases are additive; legacy funnel events keep their meaning.
 let starterBootTrace=null;
 let firstStepsRuntimeRequest=null;
-function firstStepsRuntimeReady(){return ['analyticsVersion','trainingPuzzle','captureFirstGame','isFirstGame','recordStarted','recordCompleted','afterStart','eventHeaders'].every(key=>typeof window.PropletFirstSteps?.[key]==='function')}
+function firstStepsRuntimeReady(){return ['analyticsVersion','trainingPuzzle','captureFirstGame','isFirstGame','recordStarted','recordCompleted','afterStart','eventHeaders','prepareEntry'].every(key=>typeof window.PropletFirstSteps?.[key]==='function')}
 async function ensureFirstStepsRuntime(){
  if(firstStepsRuntimeReady())return;
  if(firstStepsRuntimeRequest)return firstStepsRuntimeRequest;
@@ -1131,7 +1134,7 @@ async function ensureFirstStepsRuntime(){
   const script=document.createElement('script');let settled=false;
   const finish=()=>{if(settled)return;settled=true;clearTimeout(timer);script.remove();firstStepsRuntimeReady()?resolve():reject(new Error('first-steps-contract'))};
   const timer=setTimeout(finish,10000);
-  script.src='/app/engagement/first-steps.js?v=firstgame-recovery2';script.onload=finish;script.onerror=finish;
+  script.src='/app/engagement/first-steps.js?v=entry1';script.onload=finish;script.onerror=finish;
   try{document.head.append(script)}catch{finish()}
  });
  try{await firstStepsRuntimeRequest}finally{firstStepsRuntimeRequest=null}
@@ -1759,7 +1762,7 @@ function analyticsHeaders(eventType,properties){
  const experimentKey=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentKey||'')?properties.experimentKey:null,experimentVariant=/^[a-z0-9_-]{1,64}$/.test(properties?.experimentVariant||'')?properties.experimentVariant:null,experimentBucket=Number.isInteger(properties?.experimentBucket)&&properties.experimentBucket>=0&&properties.experimentBucket<100?properties.experimentBucket:null;
  const experimentHeaders=experimentKey&&experimentVariant&&experimentBucket!==null?{'X-Proplet-Experiment':experimentKey,'X-Proplet-Experiment-Variant':experimentVariant,'X-Proplet-Experiment-Bucket':String(experimentBucket)}:{};
  const marketingGate=eventType?.startsWith('marketing_')&&['eligible','unknown_parameter','auth_url','nonproduction','non_game_path'].includes(properties?.marketingGate)?properties.marketingGate:null;
- return {...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...referralHeaders,...gameHeaders,...starterHeaders,...experimentHeaders,...(marketingGate?{'X-Proplet-Marketing-Gate':marketingGate}:{}),...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':provenance?.clientRelease||APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':provenance?.onboardingVersion||window.PropletFirstSteps?.analyticsVersion()||'board-v2',...(eventType?.startsWith('first_steps_v1_')||eventType?.startsWith('first_board_experiment_')||eventType==='account_created'?window.PropletFirstSteps?.eventHeaders(properties):{}),...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
+ return {...(typeof window!=='undefined'?window.PropletFirstSteps?.entryHeaders?.():{}),...(eventType&&typeof window!=='undefined'&&window.PropletMarketing?window.PropletAcquisition?.headers():{}),...referralHeaders,...gameHeaders,...starterHeaders,...experimentHeaders,...(marketingGate?{'X-Proplet-Marketing-Gate':marketingGate}:{}),...(eventType?{'X-Proplet-Auth-At-Event':getProfile()?.token?'account':'anonymous'}:{}),...(eventType==='starter_hint_used'&&Number.isInteger(properties?.level)?{'X-Proplet-Hint-Level':String(properties.level)}:{}),'X-Proplet-Client-Release':provenance?.clientRelease||APP_PREVIEW_RELEASE,'X-Proplet-Analytics':'2','X-Proplet-Onboarding':provenance?.onboardingVersion||window.PropletFirstSteps?.analyticsVersion()||'board-v2',...(eventType?.startsWith('first_steps_v1_')||eventType?.startsWith('first_board_experiment_')||eventType==='account_created'?window.PropletFirstSteps?.eventHeaders(properties):{}),...(new URLSearchParams(location.search).get('tutorial')==='1'?{'X-Proplet-Test':'1'}:{})};
 }
 function productAnalytics(){
  if(productAnalyticsController)return productAnalyticsController;
@@ -2946,12 +2949,17 @@ async function boot(){
  if(previewRuntime())await loadRuntimeCapabilities();
  try{await ensureFirstStepsRuntime()}catch{reportClientError('first_steps_module_unavailable','first-steps-contract')}
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();globalThis.PropletArchiveExperience?.configure();
- if(freshStarterVisit()){starterBootTrace=createStarterTrace();trackStarterPhase(starterBootTrace,'requested')}
- try{puzzleDB=await loadPuzzleDatabaseWithRecovery();trackStarterPhase(starterBootTrace,'data_ready')}catch{trackStarterPhase(starterBootTrace,'failed','data');try{reportClientError('puzzle_boot_failed','both-attempts-failed')}catch{}showPuzzleBootError();return}
+ const forcedTutorial=new URLSearchParams(location.search).get('tutorial')==='1';
+ if(freshStarterVisit()&&!forcedTutorial)await loadRuntimeCapabilities();
+ try{
+  if(!forcedTutorial)await window.PropletFirstSteps.prepareEntry(entryExperimentEnabled,entryExperimentTest);
+ }catch{reportClientError('entry_assignment_failed','entry-contract');showPuzzleBootError();return}
+ if(freshStarterVisit()&&!window.PropletFirstSteps?.directEntryPending()){starterBootTrace=createStarterTrace();trackStarterPhase(starterBootTrace,'requested')}
+ try{puzzleDB=await loadPuzzleDatabaseWithRecovery();trackStarterPhase(starterBootTrace,'data_ready')}catch{window.PropletFirstSteps?.recordEntryLoadFailure?.();trackStarterPhase(starterBootTrace,'failed','data');try{reportClientError('puzzle_boot_failed','both-attempts-failed')}catch{}showPuzzleBootError();return}
  await Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]);
  await loadTajenkaFixture();
  await freeOrder().configure();freeOrderLastRefreshAt=Date.now();
- document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();await globalThis.PropletArchiveExperience?.install();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>{const installPreview=openInstallPreview();if(!installPreview&&!(!livePlayerPreview()&&window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&new URLSearchParams(location.search).get('releasePreview')==='1'))openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1');document.dispatchEvent(new CustomEvent('proplet:ready'));if(!installPreview)openSpecialInvitation().catch(()=>{})},80);
+ document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();await globalThis.PropletArchiveExperience?.install();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>{const installPreview=openInstallPreview();const directEntry=!installPreview&&!forcedTutorial&&window.PropletFirstSteps?.openDirectEntry();if(!directEntry&&!installPreview&&!(!livePlayerPreview()&&window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&new URLSearchParams(location.search).get('releasePreview')==='1'))openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1');document.dispatchEvent(new CustomEvent('proplet:ready'));if(!installPreview&&!directEntry)openSpecialInvitation().catch(()=>{})},80);
  const refreshDailyAfterResume=()=>Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]).then(()=>{if(currentScreen!=='game')renderDaily()}).catch(()=>{if(currentScreen==='daily')renderDaily()});
  window.addEventListener('online',refreshDailyAfterResume);window.addEventListener('focus',refreshDailyAfterResume);window.addEventListener('pageshow',refreshDailyAfterResume);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshDailyAfterResume()});

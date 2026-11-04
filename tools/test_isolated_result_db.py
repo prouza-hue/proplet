@@ -22,6 +22,39 @@ from psycopg import sql
 from psycopg.types.json import Jsonb
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def verify_entry_readout(connection):
+    query = (ROOT / 'docs/audits/ENTRY-EXPERIMENT-READOUT.sql').read_text(encoding='utf-8-sig')
+    fixture = (ROOT / 'supabase/tests/new_player_entry_readout.sql').read_text(encoding='utf-8-sig')
+    with connection.transaction(force_rollback=True), connection.cursor(row_factory=dict_row) as cursor:
+        cursor.execute(fixture)
+        cursor.execute("set local proplet.entry_report_as_of='2026-11-16 12:00Z'")
+        cursor.execute(query)
+        live = {r['variant']: r for r in cursor.fetchall()}
+        assert live['A']['assigned'] == 2 and live['B']['assigned'] == 3, live
+        assert all(r['completed_24h'] is None and r['pending_24h'] == r['assigned'] for r in live.values()), live
+        cursor.execute("set local proplet.entry_report_as_of='2026-12-02 08:00Z'")
+        cursor.execute(query)
+        a, b = cursor.fetchall()
+        assert a['assigned'] == 2 and a['completed_24h'] == 0, a
+        assert (b['completed_24h'], b['first_completed'], b['continued'], b['returned_d1']) == (2, 1, 1, 2), b
+        assert not a['investigate'] and not b['investigate'], (a, b)
+        expected_freeze = datetime(2026, 12, 2, 8, tzinfo=timezone.utc)
+        assert a['freeze'] == expected_freeze and b['cutoff'] == expected_freeze, (a, b)
+        # The stored activation, including its time of day, owns the schedule.
+        cursor.execute("update proplet_experiment_internal.entry_control "
+                       "set starts_at='2026-11-14 10:37Z',ends_at='2026-11-28 10:37Z' where singleton")
+        cursor.execute(query)
+        shifted = cursor.fetchall()
+        assert all(r['freeze'] == datetime(2026, 11, 30, 8, tzinfo=timezone.utc) for r in shifted), shifted
+        assert shifted[0]['assigned'] == 2 and shifted[1]['completed_24h'] == 2, shifted
+        cursor.execute("update proplet_experiment_internal.entry_control "
+                       "set enabled=false,starts_at=null,ends_at=null where singleton")
+        cursor.execute(query)
+        assert cursor.fetchall() == [], 'An experiment without an activation has no report cohort.'
+
+
 sys.path.insert(0, str(ROOT))
 from backend.contracts import ResultCreate
 from backend.results import result_identity, build_command
@@ -93,6 +126,10 @@ def main():
             c.execute(path.read_text(encoding='utf8'))
             report['schemaFiles'].append({'path': path.relative_to(ROOT).as_posix(),
                                          'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+        c.execute((ROOT/'supabase/tests/new_player_entry.sql').read_text(encoding='utf8'))
+        report['checks'].append('entry experiment: immutable assignment, both branches, history, claim and grants')
+        verify_entry_readout(c)
+        report['checks'].append('entry experiment readout: silent identities, test exclusion, explicit attempt link, 24h/D1 bounds')
         c.execute((ROOT/'supabase/tests/account_integrity_counts.sql').read_text(encoding='utf8'))
         report['checks'].append('admin integrity: exact 20001 results, bounded IDs, no fanout, service-role only, invoker, rollback')
         c.execute((ROOT/'supabase/tests/account_created.sql').read_text(encoding='utf8'))
@@ -103,6 +140,17 @@ def main():
         for index, player in enumerate(players):
             c.execute('insert into public.players(id,name,family_code,token_hash) values(%s,%s,%s,%s)',
                       (player, 'Synthetic '+str(index), 'SOLO_TEST', 'synthetic-token-'+str(index)))
+
+    # Concurrent tabs may generate different flow UUIDs before either receives its response.
+    concurrent_identity = hashlib.sha256(secrets.token_bytes(32)).hexdigest()
+    def allocate_entry(_):
+        with connect() as conn:
+            return conn.execute("select public.proplet_entry_assign_v1('local',true,%s,null,gen_random_uuid(),'qa','qa','qa',true)",
+                                (concurrent_identity,)).fetchone()[0]
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        entries = list(executor.map(allocate_entry, range(8)))
+    assert entries[0]['variant'] in ('A', 'B') and all(x == entries[0] for x in entries)
+    report['checks'].append('entry experiment: concurrent tabs share one server assignment and canonical flow')
 
     def command(attempt, elapsed=42000, completed='2026-09-15T10:00:00+00:00', player=players[0]):
         payload = ResultCreate(puzzle_id='phase2-synthetic-board', challenge_key='free:phase2-synthetic-board',

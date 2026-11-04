@@ -33,7 +33,7 @@ if implemented:
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     # Keep all historical names unchanged; the reviewed referral extension is additive.
     from backend.analytics import REFERRAL_EVENT_NAMES, STARTER_DIAGNOSTIC_EVENT_NAMES
-    assert registry["events"] == FIXTURE["events"] + list(REFERRAL_EVENT_NAMES) + list(STARTER_DIAGNOSTIC_EVENT_NAMES)
+    assert registry["events"] == FIXTURE["events"] + list(REFERRAL_EVENT_NAMES) + list(STARTER_DIAGNOSTIC_EVENT_NAMES) + ["entry_board_load_failed"]
     assert STARTER_DIAGNOSTIC_EVENT_NAMES == ('starter_v1_presentation_checked', 'starter_v1_idle', 'starter_v1_input_outcome')
     assert registry["request_fields"] == ["event_type"]
     assert registry["pii_policy"]["custom_properties_sent"] is False
@@ -70,7 +70,7 @@ from backend import analytics as product_analytics
 
 events = product_analytics.load_registry()["events"]
 assert len(FIXTURE["events"]) == 157
-assert len(events) == 157 + len(product_analytics.REFERRAL_EVENT_NAMES) + len(product_analytics.STARTER_DIAGNOSTIC_EVENT_NAMES)
+assert len(events) == 157 + len(product_analytics.REFERRAL_EVENT_NAMES) + len(product_analytics.STARTER_DIAGNOSTIC_EVENT_NAMES) + 1
 assert len(events) == len(set(events))
 inserted = []
 

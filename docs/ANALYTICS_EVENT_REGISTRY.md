@@ -160,3 +160,7 @@ See docs/audits/TELEMETRY-FOLLOWUP-20261019.md and TELEMETRY-FOLLOWUP-VERIFY.sql
 for exact first-game row counts, attempt links, duplicate diagnostics and separate
 new/old/unknown producer error reporting. Never replace client_release with
 reporter_release or server_version. Raw stacks and URL parameters remain excluded.
+
+## New player entry, November 2026
+
+`new-player-entry-v1` uses the immutable private enrollment ledger. Its atomic server receipt is `entry_experiment_assigned`. The independent first-board assignment and attempt events retain their existing key and meaning. `entry_board_load_failed` records an observed loading failure for an assigned flow. A direct entrant never emits a starter event. See [preregistration](audits/ENTRY-EXPERIMENT.md) and the [read-only report](audits/ENTRY-EXPERIMENT-READOUT.sql).
