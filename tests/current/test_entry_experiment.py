@@ -1,5 +1,4 @@
 """HTTP boundary: no client-selected branch, production QA excluded, retry after close."""
-from datetime import timedelta
 from unittest.mock import Mock, patch
 from uuid import uuid4
 
@@ -26,18 +25,14 @@ def check_http_contract():
     client = TestClient(app)
     url = "/api/entry-experiment/assignment"
     body = {"first_steps_run_id": str(uuid4()), "variant": "B", "p_enroll": True}
-    with patch.dict("os.environ", {"PROPLET_ENTRY_EXPERIMENT_ENABLED": "1"}), patch.object(entry, "datetime") as clock:
-        for instant, active in [
-            (entry.START - timedelta(microseconds=1), False), (entry.START, True),
-            (entry.END - timedelta(microseconds=1), True), (entry.END, False)
-        ]:
-            clock.now.return_value = instant
-            assert client.post(url, json=body).json() == {"variant": None}
-            rpc_name, args = rpc.call_args.args
-            assert rpc_name == "proplet_entry_assign_v1"
-            assert args["p_enroll"] is active and args["p_is_test"] is False
-            assert args["p_anonymous_id"] == "a" * 64 and "variant" not in args
-        clock.now.return_value = entry.START
+    with patch.dict("os.environ", {"PROPLET_ENTRY_EXPERIMENT_ENABLED": "1"}):
+        assert all(entry.enabled(env) for env in ("local", "preview", "production"))
+        assert not entry.enabled("unknown")
+        assert client.post(url, json=body).json() == {"variant": None}
+        rpc_name, args = rpc.call_args.args
+        assert rpc_name == "proplet_entry_assign_v1"
+        assert args["p_enroll"] is True and args["p_is_test"] is False
+        assert args["p_anonymous_id"] == "a" * 64 and "variant" not in args
         rpc.reset_mock()
         assert client.post(url, json=body, headers={"X-Proplet-Test": "1"}).json() == {"variant": None}
         rpc.assert_not_called()

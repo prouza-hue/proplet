@@ -1,21 +1,14 @@
 """Server gate for the preregistered new-player entry experiment."""
 import os
-from datetime import datetime, timezone
 
 from fastapi import Header, HTTPException, Request
 from backend import measurement
 from backend.first_board import AssignmentRequest
 
-START = datetime(2026, 11, 15, 23, tzinfo=timezone.utc)
-END = datetime(2026, 11, 29, 23, tzinfo=timezone.utc)
-
-
 def enabled(environment):
     if os.getenv("PROPLET_ENTRY_EXPERIMENT_ENABLED") != "1":
         return False
-    return environment in ("local", "preview") or (
-        environment == "production" and START <= datetime.now(timezone.utc) < END
-    )
+    return environment in ("local", "preview", "production")
 
 
 def install(app, *, telemetry_actor, db_rpc, enforce_rate_limit, environment, app_version):

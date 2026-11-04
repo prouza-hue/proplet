@@ -40,6 +40,20 @@ def verify_entry_readout(connection):
         assert a['assigned'] == 2 and a['completed_24h'] == 0, a
         assert (b['completed_24h'], b['first_completed'], b['continued'], b['returned_d1']) == (2, 1, 1, 2), b
         assert not a['investigate'] and not b['investigate'], (a, b)
+        expected_freeze = datetime(2026, 12, 2, 8, tzinfo=timezone.utc)
+        assert a['freeze'] == expected_freeze and b['cutoff'] == expected_freeze, (a, b)
+        # The stored activation, including its time of day, owns the schedule.
+        cursor.execute("update proplet_experiment_internal.entry_control "
+                       "set starts_at='2026-11-14 10:37Z',ends_at='2026-11-28 10:37Z' where singleton")
+        cursor.execute(query)
+        shifted = cursor.fetchall()
+        assert all(r['freeze'] == datetime(2026, 11, 30, 8, tzinfo=timezone.utc) for r in shifted), shifted
+        assert shifted[0]['assigned'] == 2 and shifted[1]['completed_24h'] == 2, shifted
+        cursor.execute("update proplet_experiment_internal.entry_control "
+                       "set enabled=false,starts_at=null,ends_at=null where singleton")
+        cursor.execute(query)
+        assert cursor.fetchall() == [], 'An experiment without an activation has no report cohort.'
+
 
 sys.path.insert(0, str(ROOT))
 from backend.contracts import ResultCreate

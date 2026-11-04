@@ -1,10 +1,16 @@
 -- Read only. Default cutoff is the current statement time, capped at the final freeze.
 -- Use SET proplet.entry_report_as_of='...Z' in the same session for reproducible test or replay bounds.
-WITH params AS (
-  SELECT least(coalesce(nullif(current_setting('proplet.entry_report_as_of',true),'')::timestamptz,statement_timestamp()), timestamptz '2026-12-02 08:00Z') AS cutoff,
-         timestamptz '2026-11-15 23:00Z' AS opens,
-         timestamptz '2026-11-29 23:00Z' AS closes,
-         timestamptz '2026-12-02 08:00Z' AS freeze
+WITH schedule AS (
+  SELECT starts_at AS opens, ends_at AS closes,
+         (((ends_at AT TIME ZONE 'Europe/Prague')::date + 2) + time '09:00')
+             AT TIME ZONE 'Europe/Prague' AS freeze
+  FROM proplet_experiment_internal.entry_control
+  WHERE singleton AND starts_at IS NOT NULL AND ends_at IS NOT NULL
+), params AS (
+  SELECT least(coalesce(nullif(current_setting('proplet.entry_report_as_of',true),'')::timestamptz,
+                       statement_timestamp()), schedule.freeze) AS cutoff,
+         opens, closes, schedule.freeze
+  FROM schedule
 ), assignments AS MATERIALIZED (
   SELECT a.*, e.player_id, e.id IS NULL AS missing_receipt,
          ((a.assigned_at AT TIME ZONE 'Europe/Prague')::date + 1)::timestamp
@@ -81,7 +87,7 @@ WITH params AS (
       AND (e.anonymous_id=a.anonymous_id OR e.player_id=a.player_id OR e.context->>'first_steps_run_id'=a.first_steps_run_id::text)
   ) evt ON true
 )
-SELECT v.variant,p.cutoff, count(m.assigned_at) AS assigned,
+SELECT v.variant,p.cutoff,p.opens,p.closes,p.freeze, count(m.assigned_at) AS assigned,
  count(*) FILTER (WHERE (m.assigned_at AT TIME ZONE 'Europe/Prague')::date=
     (p.cutoff AT TIME ZONE 'Europe/Prague')::date-1) AS assigned_yesterday,
  count(*) FILTER (WHERE m.assigned_at+interval '24 hours'>p.cutoff) AS pending_24h,
@@ -99,4 +105,4 @@ SELECT v.variant,p.cutoff, count(m.assigned_at) AS assigned,
  CASE WHEN p.cutoff=p.freeze THEN count(*) FILTER (WHERE m.created_account) END AS created_accounts,
  CASE WHEN p.cutoff=p.freeze THEN count(*) FILTER (WHERE m.helped) END AS used_hint
 FROM (VALUES ('A'),('B')) v(variant) CROSS JOIN params p LEFT JOIN metrics m ON m.variant=v.variant
-GROUP BY v.variant,p.cutoff,p.freeze ORDER BY v.variant;
+GROUP BY v.variant,p.cutoff,p.opens,p.closes,p.freeze ORDER BY v.variant;

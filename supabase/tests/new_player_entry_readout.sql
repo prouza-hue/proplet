@@ -1,4 +1,7 @@
 -- This fixture runs inside a transaction in the isolated PostgreSQL gate.
+-- Its historical sample has a fixed schedule independent of the production activation.
+UPDATE proplet_experiment_internal.entry_control
+SET starts_at='2026-11-15 23:00Z',ends_at='2026-11-29 23:00Z',enabled=false WHERE singleton;
 INSERT INTO proplet_experiment_internal.entry_assignments
     (environment,is_test,anonymous_id,first_steps_run_id,variant,assigned_at,event_id)
 SELECT env,test,repeat(hex,64),('ad000000-0000-4000-8000-00000000000'||n)::uuid,

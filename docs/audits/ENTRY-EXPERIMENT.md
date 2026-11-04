@@ -1,10 +1,12 @@
 # Dvoutýdenní experiment se vstupem nových hráčů
 
-Preregistrace z 4. listopadu 2026, klíč `new-player-entry-v1`. Tento plán čeká na samostatné rozhodnutí o spuštění. Hypotéza je, že vynechání tréninku zvýší pravděpodobnost dokončení alespoň jedné skutečné hry do 24 hodin.
+Preregistrace z 4. listopadu 2026, klíč `new-player-entry-v1`. Uživatel následně schválil produkční nasazení a okamžité spuštění po dokončení kontrol. Hypotéza je, že vynechání tréninku zvýší pravděpodobnost dokončení alespoň jedné skutečné hry do 24 hodin.
 
 ## Nábor a zásah
 
-Pevný začátek je 16. 11. 2026 v 00.00 Europe/Prague včetně, konec 30. 11. v 00.00 bez tohoto okamžiku. V UTC jde o 15. 11. ve 23.00 až 29. 11. ve 23.00. Poslední den pro návraty D1 končí 1. 12. v 00.00 pražského času. Zvolené finální zmrazení dat je 2. 12. 2026 v 09.00 Praha (08.00 UTC), aby doběhl i opožděný sběr. Výsledky archivovat k tomuto času. Pokud není připravený celý experiment před začátkem, nespouštět zkrácený nábor. Náhradní termín vyžaduje novou dohodu před náborem.
+Začátek náboru je přesný serverový okamžik jednorázové aktivace uložený v entry_control.starts_at, včetně tohoto okamžiku. Konec entry_control.ends_at je přesně o 14 celých dní později, bez koncového okamžiku. Operátor při aktivaci uloží a zveřejní oba konkrétní časy v Europe/Prague i UTC spolu s nasazeným SHA. Databázový interval vznikne atomicky před prvním způsobilým přiřazením. Dřívější navržený termín od 16. listopadu nahrazuje uživatelem schválený okamžitý start.
+
+Posledním hráčům doběhne jejich 24hodinové okno a celý následující pražský kalendářní den. Finální zmrazení dat nastane v 09.00 Europe/Prague dva kalendářní dny po pražském datu konce náboru. Tento odstup zahrnuje i rezervu pro opožděný sběr. Čtecí dotaz odvozuje nábor i zmrazení výhradně z uloženého intervalu a přikládá je ke každému výstupu. Před aktivací vrací prázdný výsledek. Nábor se bez nové dohody neprodlužuje a uložené časy se po aktivaci nepřepisují.
 
 A absolvuje současný trénink PES, LES, ČAJ a pak první Volnou hru. Dokončení tréninku nese stávajících 10 XP podle běžných pravidel. B otevře rovnou tutéž g4-e-009. Vynecháním tréninku hráč v B jeho 10 XP nezíská. Rozdíl odměny je součástí měřeného zásahu. Ovládání, pomoc, odměna za skutečnou desku a okamžik nabídky účtu po jejím dokončení jsou společné.
 
@@ -51,19 +53,27 @@ Výsledek read-only SQL archivovat jako CSV s hlavičkou (psql --csv). Příkaz 
 
 Dne 4. 11. 2026 obsluhovala hrajproplet.cz revize main `c402d3bfb07d4808ae1f2b23d891b838967e8800`, verze 4.10.19. Nasazené first-steps používají trainingWin → startFirst → POST /api/first-board/assignment. Čtecí kontrola definice RPC na produkčním PostgreSQL potvrdila policy `challenger_rollout_20261007` a desku `g4-e-009`. Před spuštěním znovu ověřit alias, SHA, banku i RPC.
 
-1. Po schválení připravit databázovou migraci verzovanou v tomto PR a následně nasadit odpovídající klient i server. Migrace zakládá zavřenou databázovou bránu. Před spuštěním musí projít izolované testy obou větví, načtení reportu i kontrola jeho přístupu k ledgeru.
-2. Připravit produkční release s `PROPLET_ENTRY_EXPERIMENT_ENABLED=1`. Před začátkem okna po samostatném souhlasu obsluhy otevřít databázovou bránu níže. Přesný okamžik provedení, SHA, identitu operátora a stav brány zaznamenat. Po zmeškání začátku tuto operaci neprovádět.
+1. V rámci schváleného nasazení připravit databázovou migraci verzovanou v tomto PR a následně nasadit odpovídající klient i server. Migrace zakládá zavřenou databázovou bránu. Před spuštěním musí projít izolované testy obou větví, načtení reportu i kontrola jeho přístupu k ledgeru.
+2. Připravit produkční release s PROPLET_ENTRY_EXPERIMENT_ENABLED=1. Po ověření nasazeného klienta, serveru, databáze a reportu spustit jednorázový aktivační příkaz níže. Vrácené konkrétní časy začátku a konce, termín zmrazení, SHA, identitu operátora a stav brány zaznamenat. Pokud příkaz nevrátí právě jeden řádek, nezačínat nové okno a zjistit uložený stav.
 3. Pro okamžité ukončení nových přiřazení uzavřít bránu druhým příkazem. Původní ledger a report zachovat. V dalším běžném nasazení odebrat proměnnou prostředí. Vypnutí ani uzavření kalendářního okna nepřepíše uložený postup.
 
 Každý příkaz je samostatná operace obsluhy na správném prostředí. První patří výhradně ke schválenému spuštění.
 
 ```sql
-UPDATE proplet_experiment_internal.entry_control SET enabled=true WHERE singleton RETURNING enabled;
+WITH activation AS MATERIALIZED (SELECT clock_timestamp() AS starts_at)
+UPDATE proplet_experiment_internal.entry_control AS c
+SET starts_at=a.starts_at, ends_at=a.starts_at+interval '14 days', enabled=true
+FROM activation AS a
+WHERE c.singleton AND c.starts_at IS NULL AND c.ends_at IS NULL
+RETURNING c.enabled, c.starts_at, c.ends_at,
+          c.starts_at AT TIME ZONE 'Europe/Prague' AS starts_prague,
+          c.ends_at AT TIME ZONE 'Europe/Prague' AS ends_prague,
+          ((c.ends_at AT TIME ZONE 'Europe/Prague')::date+2)+time '09:00' AS freeze_prague;
 ```
 
 Okamžité bezpečnostní zastavení a kontrola výsledného stavu:
 
 ```sql
 UPDATE proplet_experiment_internal.entry_control SET enabled=false WHERE singleton RETURNING enabled;
-SELECT enabled FROM proplet_experiment_internal.entry_control WHERE singleton;
+SELECT enabled, starts_at, ends_at FROM proplet_experiment_internal.entry_control WHERE singleton;
 ```

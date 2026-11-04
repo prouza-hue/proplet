@@ -68,4 +68,56 @@ begin
     end if;
 end;
 $$;
+reset role;
+-- Production gating against the real database clock, entirely inside this
+-- disposable database transaction. The operator controls the window.
+do $$
+declare
+    stamp timestamptz := clock_timestamp();
+    identity text := repeat('1',64);
+    first_assign jsonb;
+begin
+    begin
+        update proplet_experiment_internal.entry_control set enabled=true where singleton;
+        raise exception 'Enabled an experiment without a time window';
+    exception when check_violation then null;
+    end;
+    begin
+        update proplet_experiment_internal.entry_control set starts_at=stamp,ends_at=stamp+interval '15 days' where singleton;
+        raise exception 'Allowed a non-fourteen-day window';
+    exception when check_violation then null;
+    end;
+    update proplet_experiment_internal.entry_control
+    set enabled=true, starts_at=stamp+interval '1 hour', ends_at=stamp+interval '14 days 1 hour' where singleton;
+    if public.proplet_entry_assign_v1('production',false,identity,null,gen_random_uuid(),'qa','qa','qa',true)->>'variant' is not null then
+        raise exception 'Enrollment before database start';
+    end if;
+    update proplet_experiment_internal.entry_control
+    set starts_at=stamp-interval '15 days', ends_at=stamp-interval '1 day' where singleton;
+    if public.proplet_entry_assign_v1('production',false,identity,null,gen_random_uuid(),'qa','qa','qa',true)->>'variant' is not null then
+        raise exception 'Enrollment after database end';
+    end if;
+    update proplet_experiment_internal.entry_control
+    set starts_at=stamp-interval '1 hour', ends_at=stamp+interval '13 days 23 hours' where singleton;
+    first_assign := public.proplet_entry_assign_v1('production',false,identity,null,gen_random_uuid(),'qa','qa','qa',true);
+    if first_assign->>'variant' is null then raise exception 'Active database window did not enroll'; end if;
+    insert into public.product_events(id,anonymous_id,event_type,app_version,environment,is_test,created_at)
+    values(gen_random_uuid(),repeat('2',64),'app_open','qa','production',false,stamp-interval '2 hours');
+    if public.proplet_entry_assign_v1('production',false,repeat('2',64),null,gen_random_uuid(),'qa','qa','qa',true)->>'variant' is not null then
+        raise exception 'Identity predating the database start entered test';
+    end if;
+    update proplet_experiment_internal.entry_control set enabled=false where singleton;
+    if public.proplet_entry_assign_v1('production',false,repeat('3',64),null,gen_random_uuid(),'qa','qa','qa',true)->>'variant' is not null then
+        raise exception 'Kill switch admitted a new identity';
+    end if;
+    if public.proplet_entry_assign_v1('production',false,identity,null,gen_random_uuid(),'qa','qa','qa',true) <> first_assign then
+        raise exception 'Kill switch changed an existing assignment';
+    end if;
+    update proplet_experiment_internal.entry_control
+    set enabled=true, starts_at=stamp-interval '15 days', ends_at=stamp-interval '1 day' where singleton;
+    if public.proplet_entry_assign_v1('production',false,identity,null,gen_random_uuid(),'qa','qa','qa',true) <> first_assign then
+        raise exception 'Closed window changed an existing assignment';
+    end if;
+end;
+$$;
 rollback;
