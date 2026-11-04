@@ -65,7 +65,9 @@ UPDATE proplet_experiment_internal.entry_control AS c
 SET starts_at=a.starts_at, ends_at=a.starts_at+interval '14 days', enabled=true
 FROM activation AS a
 WHERE c.singleton AND c.starts_at IS NULL AND c.ends_at IS NULL
-RETURNING c.enabled, c.starts_at, c.ends_at,
+RETURNING c.enabled,
+          c.starts_at AT TIME ZONE 'UTC' AS starts_utc,
+          c.ends_at AT TIME ZONE 'UTC' AS ends_utc,
           c.starts_at AT TIME ZONE 'Europe/Prague' AS starts_prague,
           c.ends_at AT TIME ZONE 'Europe/Prague' AS ends_prague,
           ((c.ends_at AT TIME ZONE 'Europe/Prague')::date+2)+time '09:00' AS freeze_prague;
