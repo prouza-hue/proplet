@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import sys
 from datetime import date
 from pathlib import Path
@@ -146,3 +147,60 @@ for index_offset in (0, 1):
         raise AssertionError("Missing a playable word must still block completion")
 
 print("PASS: released Tajenka result validates, awards 200 XP, and syncs to the account")
+
+
+with (
+    patch.object(server, "TAJENKA_RELEASE_ENABLED", True),
+    patch.object(server, "VERCEL_ENV", "production"),
+    patch.object(server, "current_prague_date", return_value=date(2027, 4, 1)),
+    patch.object(server, "enforce_rate_limit"),
+    patch.object(server, "auth_player", return_value={"id": "account-a"}),
+    patch.object(server, "TAJENKA_RECOVERY_ACTORS", set()) as cohort,
+    patch.object(server, "db_select") as select,
+):
+    key = f"tajenka:{week_eighteen['id']}"
+    assert server.tajenka_week_for(date(2027, 4, 1)) is None
+    assert server.puzzle_exists(week_eighteen["id"], "tajenka", "medium")
+    assert not server.puzzle_exists(week_two["id"], "tajenka", "medium")
+    server.validate_result_sanity(result)
+    shared = server.shared_puzzle(Mock(), "tajenka", week_eighteen["id"], None)
+    assert week_eighteen["id"].encode() in shared.body
+    found = [{"answerIndex": i, "word": a["word"], "path": a["path"]}
+             for i, a in enumerate(week_eighteen["answers"]) if len(a["word"]) >= 4]
+    case = {"created_at": "2026-11-04T12:00:00+00:00", "progress": {"found": found}}
+    rows = [case]
+    results = []
+    anon = "synthetic-installation-uuid"
+    guest = "a:" + server.anonymous_hash(anon)
+
+    def read_owned(table, *, columns, **filters):
+        if table == "results":
+            assert filters == {"player_id": "account-a", "challenge_key": key}
+            return results
+        assert table == "play_sessions" and columns == "created_at,progress"
+        assert filters == {"actor_key": owner, "challenge_key": key, "puzzle_id": week_eighteen["id"],
+                           "mode": "tajenka", "finished": False}
+        return rows
+
+    select.side_effect = read_owned
+    assert server.tajenka_recovery(Mock(), False, "Bearer test", anon) == {"eligible": False, "completed": False}
+    select.assert_not_called()
+    for owner, token in ((guest, None), ("p:account-a", "Bearer test")):
+        cohort.add(hashlib.sha256(owner.encode()).hexdigest())
+        assert server.tajenka_recovery(Mock(), False, token, anon) == {"eligible": True, "completed": False}
+    rows = []
+    assert not server.tajenka_recovery(Mock(), False, token, anon)["eligible"]
+    rows = [case]
+    case["progress"]["found"] = found[:3]
+    assert not server.tajenka_recovery(Mock(), False, token, anon)["eligible"]
+    case["progress"]["found"] = found
+    case["created_at"] = "2026-11-04T12:37:22.701+00:00"
+    assert not server.tajenka_recovery(Mock(), False, token, anon)["eligible"]
+    case["created_at"] = "2026-11-04T12:00:00+00:00"
+    results = [{"id": "rewarded"}]
+    assert server.tajenka_recovery(Mock(), False, token, anon) == {"eligible": False, "completed": True}
+    rows = []  # An old local save can outlive the server session.
+    cohort.clear()
+    assert server.tajenka_recovery(Mock(), True, token, anon) == {"eligible": False, "completed": True}
+
+print("PASS: recovery is owner scoped, excludes already rewarded games and keeps week 18 redeemable after the season")

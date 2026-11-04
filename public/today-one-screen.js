@@ -18,6 +18,7 @@
   root.append(make('h1','os-sr','Dnes'));
   const main=make('div','os-main');featureSlot=make('div','os-feature-slot');weekSlot=make('div','os-week-slot');
   main.append(featureSlot,weekSlot);grid=make('div','os-grid');grid.setAttribute('aria-label','Další hry');notices=make('div','os-notices');
+  const recovery=q('#tajenkaRecoveryNotice');if(recovery)root.append(recovery);
   root.append(main,grid,notices);screen.append(root);return true;
  }
  function reward(e){return text(e?.querySelector('.studio-xp,.tajenka-entry-reward'));}

@@ -9,10 +9,10 @@
   <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
   <script src="/referral-transport.js?v=profile-entry1"></script>
-<script src="/runtime-meta.js?v=41022tajenka1" data-proplet-runtime-meta="1" data-loaded="1"></script>
+<script src="/runtime-meta.js?v=41023tajenkareturn1" data-proplet-runtime-meta="1" data-loaded="1"></script>
   <script src="/app/client-diagnostics.js?v=actor-context1" id="propletClientDiagnostics"></script>
   <script src="/analytics-init.js?v=telemetry1"></script>
-  <script src="/theme-init.js?v=41022tajenka1"></script>
+  <script src="/theme-init.js?v=41023tajenkareturn1"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Najdi slova. Propleť celou plochu. Česká slovní hra s novou výzvou každý den." />
@@ -97,6 +97,11 @@
     </header>
 
     <section id="screen-daily" class="screen active">
+      <section id="tajenkaRecoveryNotice" class="card hidden" aria-labelledby="tajenkaRecoveryTitle">
+        <h2 id="tajenkaRecoveryTitle">Tajenka je opravená</h2>
+        <p>Mrzí nás, že tě slovo KDO zastavilo. Všechna čtyři slova už máš. Otevři Tajenku a vyzvedni si svých 200 XP.</p>
+        <button type="button" id="tajenkaRecoveryBtn" class="primary-btn">Vyzvednout 200 XP</button>
+      </section>
       <header id="studioTodayHeading"><h1>Dnes</h1><time id="studioTodayDate"></time></header>
       <div class="daily-hero card">
         <div class="hero-decor" aria-hidden="true"><span>Ř</span><span>A</span><span>P</span></div>
@@ -803,7 +808,7 @@
   <script src="/app/archive/solution-contract.js"></script>
   <script src="/app/archive/experience.js?v=play-one-screen1"></script>
   <script src="/release-news.js?v=expansion600news1"></script>
-  <script src="/app.js?v=41022tajenka1"></script>
+  <script src="/app.js?v=41023tajenkareturn1"></script>
   <script src="/app/weekly/competition.js?v=resource1"></script>
   <script src="/app/monthly/competition.js?v=competition-ui1"></script>
 
@@ -816,7 +821,7 @@
   <script src="/app/mozkokalypsa-launch.js?v=archive-release1"></script>
 <script src="/referrals.js?v=ui-refinement2"></script>
   <script src="/studio-shell.js?v=1"></script>
-  <script src="/today-one-screen.js?v=play-one-screen1"></script>
+  <script src="/today-one-screen.js?v=tajenka-return1"></script>
 
   <script src="/ui-playtest-preview.js?v=1"></script>
 <script src="/visual-playtest.js?v=1"></script>

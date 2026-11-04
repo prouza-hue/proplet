@@ -53,3 +53,30 @@ assert.match(progress.innerHTML,/>4\/4</);
 assert(!slots.innerHTML.includes('pending'));
 assert.equal(slots.innerHTML.replace(/<[^>]+>/g,''),quote.tajenka.displayText);
 console.log('PASS: Kdo and již are visible on entry. The four saved paths complete the original quote.');
+
+// A private local save is evidence only if the four canonical paths were already
+// present when the fix went live. Never invite a finished or partial player.
+(async()=>{
+ let state={},account=null,hidden=true,started=0,status={eligible:false,completed:false};
+ const notice={classList:{add(){hidden=true},remove(){hidden=false}}},button={};
+ const context={...gameContext,tajenkaPuzzle:puzzle,TAJENKA_RELEASE_ENABLED:true,
+  getProfile:()=>account,playerScope:()=>account?.id||'guest',tajenkaState:()=>state,
+  tajenkaCompletion:()=>state.completed,api:async()=>status,
+  $:s=>s==='#tajenkaRecoveryNotice'?notice:button,
+  startGame:async(board,mode,date,options)=>{assert.equal(board.id,quote.id);assert.equal(options.kdoRecovery,true);started++}};
+ vm.createContext(context);
+ const begin=app.indexOf('const KDO_PUZZLE_ID='),end=app.indexOf('function hideClaimedKdoNotice()',begin);
+ vm.runInContext(app.slice(begin,end),context);
+ const old={puzzleId:quote.id,savedAt:1793795842700,found:oldFound};
+ state.inProgress=old;await context.refreshKdoNotice();assert.equal(hidden,false);
+ await button.onclick();assert.equal(started,1);
+ for(const row of [{...old,found:oldFound.slice(1)},{...old,savedAt:1793795842702},
+  {...old,found:oldFound.map(f=>({...f,path:[0]}))}]){
+  state.inProgress=row;await context.refreshKdoNotice();assert.equal(hidden,true);
+ }
+ account={id:'member',token:'fixture'};state={};status={eligible:true,completed:false};
+ await context.refreshKdoNotice();assert.equal(hidden,false);
+ status={eligible:false,completed:true};await button.onclick();assert.equal(hidden,true);assert.equal(started,1);
+ state={inProgress:old};await context.refreshKdoNotice();assert.equal(hidden,true);
+ console.log('PASS: KDO apology checks the original four paths and excludes partial, newer and already rewarded games.');
+})().catch(err=>{console.error(err);process.exitCode=1});

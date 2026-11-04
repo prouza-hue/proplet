@@ -124,6 +124,20 @@ POINTS = {"daily": 100, "easy": 15, "medium": 25, "hard": 50, "hardcore": 100, "
 MOZKOMOR_UNLOCK_BASE_LEVELS = 0
 STARTER_XP = 10
 TAJENKA_REWARD_XP = 200
+TAJENKA_RECOVERY_ID = "tajenka-v2-week-18"
+TAJENKA_SHORT_WORD_FIX_AT = datetime.fromisoformat("2026-11-04T12:37:22.701+00:00")
+# SHA-256 of server-owned actor keys with all four paths before the fix.
+TAJENKA_RECOVERY_ACTORS = frozenset({
+    "5c1fefd7c65ec852c24d90f8b7f7ad19f8c880da6cad8220033f64bef86a4696",
+    "6b549b6d13fe2141d588cd5cf9520d2dd3691c5ca9a42969a9b3896a969e14c1",
+    "94a03988e87c7cd26cbb58ed969f6fb851b7d5e0100c584701d6878ea98c7a9c",
+    "9dacb32b4ab437376188931badb2d0f1f7ff36bed99d99079ef86527b8c960ad",
+    "a9b6d70687c4924b6c669deed1f90a1a68c490e9f15ac513c2467fae81b0452f",
+    "b12ae4c64e3f6e1d0db8c9d40082d0964ee34695678389b51cc28a3a0d196388",
+    "e30d2e2c479423fd5987bc273c4ab589bfa3afaacaf4c6dbb93504c003284f58",
+    "ecd2596235dc52dc7bd7b6910ad7f2bff60b4bb6e4a0e5bcc122ef937d678507",
+    "eddbe256fb28b5163b522bbced19efd7d8cb4cb7fed6ed3ede5dfb7ea373a450",
+})
 FAIR_PLAY_HEARTBEAT_MS = 25_000
 FAIR_PLAY_LEASE_MS = 45_000
 PLAYER_COLUMNS = "id,name,family_code,token_hash,created_at,password_hash,avatar,support_mode,team_joined_at,public_rankings,email,email_verified_at,auth_user_id,google_avatar_url,use_google_avatar,printshop_welcome_seen_at"
@@ -1317,16 +1331,19 @@ def is_daily_generation_upgrade(old: dict, payload: ResultCreate) -> bool:
     )
 
 
+def released_tajenka(puzzle_id: str, today: date) -> Optional[dict]:
+    latest = tajenka_week_for(today) or 0
+    # Keep this one published board redeemable after the finite season ends.
+    if puzzle_id == TAJENKA_RECOVERY_ID and today >= TAJENKA_SHORT_WORD_FIX_AT.date():
+        latest = max(latest, 18)
+    return next((p for p in load_tajenka_bank().get("puzzles", [])
+                 if p.get("id") == puzzle_id and 1 <= int(p.get("week") or 0) <= latest), None)
+
+
 def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
-    data = load_puzzles()
     if mode == "tajenka":
-        current_week = tajenka_week_for(current_prague_date())
-        return TAJENKA_RELEASE_ENABLED and current_week is not None and any(
-            p.get("id") == puzzle_id and p.get("difficulty") == difficulty
-            and int((p.get("meta") or {}).get("rewardXp") or 0) == TAJENKA_REWARD_XP
-            and 1 <= int(p.get("week") or 0) <= current_week
-            for p in load_tajenka_bank().get("puzzles", [])
-        )
+        return resolved_puzzle(puzzle_id, mode, difficulty) is not None
+    data = load_puzzles()
     if mode == "starter":
         starter = data.get("starter") or {}
         return starter.get("id") == puzzle_id and starter.get("difficulty") == difficulty
@@ -1349,22 +1366,12 @@ def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
 
 
 def resolved_puzzle(puzzle_id: str, mode: str, difficulty: str) -> Optional[dict]:
-    data = load_puzzles()
     if mode == "tajenka":
-        current_week = tajenka_week_for(current_prague_date())
-        if not TAJENKA_RELEASE_ENABLED or current_week is None:
-            return None
-        return next(
-            (
-                puzzle
-                for puzzle in load_tajenka_bank().get("puzzles", [])
-                if puzzle.get("id") == puzzle_id
-                and puzzle.get("difficulty") == difficulty
-                and int((puzzle.get("meta") or {}).get("rewardXp") or 0) == TAJENKA_REWARD_XP
-                and 1 <= int(puzzle.get("week") or 0) <= current_week
-            ),
-            None,
-        )
+        puzzle = released_tajenka(puzzle_id, current_prague_date()) if TAJENKA_RELEASE_ENABLED else None
+        if puzzle and puzzle.get("difficulty") == difficulty and (puzzle.get("meta") or {}).get("rewardXp") == TAJENKA_REWARD_XP:
+            return puzzle
+        return None
+    data = load_puzzles()
     if mode == "starter":
         p = data.get("starter") or {}
         return p if p.get("id") == puzzle_id and p.get("difficulty") == difficulty else None
@@ -1456,10 +1463,7 @@ def shared_puzzle(
         if puzzle is None and "dated_daily_shared_body" in globals():
             puzzle = dated_daily_shared_body(puzzle_id)
     elif kind == "tajenka" and (TAJENKA_RELEASE_ENABLED or VERCEL_ENV == "preview"):
-        slot = tajenka_week_for(today)
-        latest = slot or 0
-        puzzle = next((p for p in load_tajenka_bank().get("puzzles", [])
-                       if p.get("id") == puzzle_id and 1 <= int(p.get("week") or 0) <= latest), None)
+        puzzle = released_tajenka(puzzle_id, today)
     if not puzzle or (puzzle.get("meta") or {}).get("archiveSummaryOnly"):
         raise HTTPException(404, "Tahle sdílená úloha už není dostupná")
     return JSONResponse(content={"puzzle": puzzle}, headers={"Cache-Control": "private, no-store"})
@@ -2758,6 +2762,40 @@ def play_session_config():
     return {"enabled": policy.get("enabled") is True, "dailyFrom": policy.get("daily_from"),
             "isolatedPreview": isolated_fair_play_preview(),
             "heartbeatMs": FAIR_PLAY_HEARTBEAT_MS, "leaseMs": FAIR_PLAY_LEASE_MS}
+
+
+@app.get("/api/tajenka/recovery")
+def tajenka_recovery(request: Request, check_completion: bool = False, authorization: Optional[str] = Header(default=None),
+                     x_proplet_anon_id: Optional[str] = Header(default=None, alias="X-Proplet-Anon-ID")):
+    no_recovery = {"eligible": False, "completed": False}
+    if not TAJENKA_RELEASE_ENABLED or (VERCEL_ENV == "preview" and not (isolated_fair_play_preview() or LIVE_PLAYER_PREVIEW)):
+        return no_recovery
+    enforce_rate_limit(request, "tajenka_recovery", limit=180, window_seconds=3600)
+    actor = telemetry_actor(authorization, x_proplet_anon_id)
+    puzzle = released_tajenka(TAJENKA_RECOVERY_ID, current_prague_date())
+    if not puzzle:
+        return no_recovery
+    key = domain_content.challenge_key("tajenka", TAJENKA_RECOVERY_ID)
+    player_id = actor.get("player_id")
+    if check_completion and player_id and db_select("results", columns="id", player_id=player_id, challenge_key=key):
+        return {"eligible": False, "completed": True}
+    fingerprint = hashlib.sha256(actor["actor_key"].encode("utf-8")).hexdigest()
+    if fingerprint not in TAJENKA_RECOVERY_ACTORS:
+        return no_recovery
+    rows = db_select("play_sessions", columns="created_at,progress", actor_key=actor["actor_key"],
+                     challenge_key=key, puzzle_id=TAJENKA_RECOVERY_ID, mode="tajenka", finished=False)
+    if not rows or datetime.fromisoformat(rows[0]["created_at"]) >= TAJENKA_SHORT_WORD_FIX_AT:
+        return no_recovery
+    answers = puzzle["answers"]
+    expected = {(i, a["word"], tuple(a["path"])) for i, a in enumerate(answers) if len(a["word"]) >= 4}
+    found = (rows[0].get("progress") or {}).get("found") or []
+    if len(found) != len(expected) or {
+        (word.get("answerIndex"), word.get("word"), tuple(word.get("path") or [])) for word in found
+    } != expected:
+        return no_recovery
+    if not check_completion and player_id and db_select("results", columns="id", player_id=player_id, challenge_key=key):
+        return {"eligible": False, "completed": True}
+    return {"eligible": True, "completed": False}
 
 
 @app.post("/api/play-session")

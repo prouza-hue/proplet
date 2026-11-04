@@ -34,7 +34,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (path, methods, name)
         for path, methods, name in reviewed
-        if path and path not in {"/api/release-news", "/api/release-news/claim", "/api/qa/monthly-control", "/api/competition/monthly", "/api/cron/monthly-competition", "/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/competition", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/entry-experiment/assignment', '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
+        if path and path not in {"/api/tajenka/recovery", "/api/release-news", "/api/release-news/claim", "/api/qa/monthly-control", "/api/competition/monthly", "/api/cron/monthly-competition", "/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/competition", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/entry-experiment/assignment', '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     )
     return hashlib.sha256(
         json.dumps(routes, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -99,6 +99,14 @@ for path in pilot_paths:
 for monthly_path in ("/api/competition/monthly", "/api/cron/monthly-competition"):
     assert set(openapi_contract["paths"][monthly_path]) == {"get"}
     openapi_contract["paths"].pop(monthly_path)
+# Only the owner's recovery status is exposed, with no write operation or body.
+recovery_path = "/api/tajenka/recovery"
+assert [(route.methods, route.name) for route in server.app.routes if route.path == recovery_path] == [({"GET"}, "tajenka_recovery")]
+recovery = openapi_contract["paths"].pop(recovery_path)
+assert set(recovery) == {"get"} and "requestBody" not in recovery["get"]
+params = {(p["name"], p["in"]): p for p in recovery["get"]["parameters"]}
+assert set(params) == {("check_completion", "query"), ("authorization", "header"), ("X-Proplet-Anon-ID", "header")}
+assert params[("check_completion", "query")]["schema"]["default"] is False
 # Weekly history and offline publication add read-only routes; preserve the original API digest.
 # Weekly guest/auth, privacy, date validation and completeness: test_competition_history.py.
 for offline_path in ("/api/result-receipt", "/api/team-victories/competition", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline"):
