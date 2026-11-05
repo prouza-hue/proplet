@@ -239,8 +239,8 @@ html.tiskarna-ui body #patronTodayLink.patron-today-link:not([hidden]){display:g
 #patronDialog .patron-offer-scroll{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:24px 24px 8px}
 #patronDialog .patron-offer-footer{flex:none;padding:10px 24px max(18px,env(safe-area-inset-bottom));background:var(--td-paper,#fffcf5)}
 #patronDialog[data-patron-step=offer] .patron-close{z-index:2;border-radius:50%;background:var(--td-paper,#fffcf5)}
-#patronDialog[data-patron-step=offer] .patron-intro{grid-template-columns:68px minmax(0,1fr);gap:12px;margin:0 28px 12px 0}
-#patronDialog[data-patron-step=offer] .patron-art{width:68px;height:72px}
+#patronDialog[data-patron-step=offer] .patron-intro{grid-template-columns:96px minmax(0,1fr);gap:12px;margin:0 28px 12px 0}
+#patronDialog[data-patron-step=offer] .patron-art{width:96px;height:100px}
 #patronDialog[data-patron-step=offer] h2{font-size:28px;line-height:1.12}
 #patronDialog .patron-offer-copy{gap:7px;margin:0}
 #patronDialog .patron-offer-copy p{font-size:15px;line-height:1.4;text-align:left;text-wrap:pretty}
@@ -266,16 +266,26 @@ html.tiskarna-ui body #patronTodayLink.patron-today-link:not([hidden]){display:g
 @media(max-width:540px){
  #patronDialog .patron-offer-scroll{padding:22px 18px 6px}
  #patronDialog .patron-offer-footer{padding-inline:18px}
- #patronDialog[data-patron-step=offer] .patron-intro{grid-template-columns:54px minmax(0,1fr);gap:10px}
- #patronDialog[data-patron-step=offer] .patron-art{width:54px;height:60px}
+ #patronDialog[data-patron-step=offer] .patron-intro{grid-template-columns:78px minmax(0,1fr);gap:10px}
+ #patronDialog[data-patron-step=offer] .patron-art{width:78px;height:82px}
  #patronDialog[data-patron-step=offer] h2{font-size:25px}
 }
 @media(max-width:359px){
  #patronDialog .patron-offer-scroll{padding-inline:14px}
  #patronDialog .patron-offer-footer{padding-inline:14px}
- #patronDialog[data-patron-step=offer] .patron-intro{grid-template-columns:44px minmax(0,1fr);gap:8px;margin-right:24px}
- #patronDialog[data-patron-step=offer] .patron-art{width:44px;height:52px}
+ #patronDialog[data-patron-step=offer] .patron-intro{grid-template-columns:64px minmax(0,1fr);gap:8px;margin-right:24px}
+ #patronDialog[data-patron-step=offer] .patron-art{width:64px;height:70px}
  #patronDialog[data-patron-step=offer] h2{font-size:22px}
  #patronDialog .patron-amounts .patron-amount>span{font-size:13px}
  #patronDialog .patron-perk-details>summary{font-size:12px;gap:5px}
 }
+
+/* A compact, personal preview uses the same avatar and badge as the player's identity. */
+#patronDialog .patron-perk-details>summary{gap:10px;padding:4px 0;min-height:52px}
+#patronDialog .patron-offer-avatar{display:block;flex:0 0 44px}
+#patronDialog .patron-offer-avatar :is(.patron-avatar-demo,.patron-avatar-native,.organic-avatar){width:44px!important;height:44px!important}
+#patronDialog .patron-offer-avatar .patron-avatar-native{font-size:28px}
+#patronDialog .patron-offer-identity{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;flex:1}
+#patronDialog .patron-offer-identity>strong{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 15px/1.3 Outfit,sans-serif;color:var(--td-ink)}
+#patronDialog .patron-offer-identity .patron-label-static{font-size:12px;line-height:1.3;gap:4px}
+#patronDialog .patron-offer-identity .patron-label-static svg{flex:none}
