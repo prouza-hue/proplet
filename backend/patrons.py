@@ -76,8 +76,13 @@ class IntentBody(Body):
         elif self.firstPaymentDate is not None:raise ValueError('Jednorázová podpora nemá datum trvalého příkazu')
         return self
 class PreferenceBody(Body):
-    publicBadge: StrictBool
-    offersDisabled: StrictBool
+    publicBadge: Optional[StrictBool]=None
+    offersDisabled: Optional[StrictBool]=None
+    @model_validator(mode='after')
+    def require_preference(self):
+        if self.publicBadge is None and self.offersDisabled is None:
+            raise ValueError('Vyber nastavení podpory')
+        return self
 class DismissBody(Body):
     receiptId: UUID
     action: Literal['declined','ignored','opened']
@@ -112,12 +117,16 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
     def state(pid):return run('proplet_patron_state_v1',{'p_player':pid,'p_claim':False})
 
     @app.get('/api/patrons')
-    def status(request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
+    def status(request:Request,response:Response,authorization:Optional[str]=Header(default=None),visibility:bool=False):
         headers(response)
         if not enabled():return {'enabled':False}
         if not authorization:return {'enabled':True,'authenticated':False,'patron':False,'publicBadge':False,'offersDisabled':True,'canOffer':False,'thanksPending':False,'contributions':[]}
         p=auth_player(authorization);enforce_rate_limit(request,'patron_status',limit=120,window_seconds=3600)
-        return {'enabled':True,'authenticated':True,'nickname':p.get('name') or 'Hráč',**state(p['id'])}
+        value=state(p['id'])
+        if visibility and value.get('patron') is True:
+            choice=run('proplet_patron_thanks_visibility_v1',{'p_player':p['id'],'p_claim':False})
+            value={**value,'thanksPending':choice['thanksPending']}
+        return {'enabled':True,'authenticated':True,'nickname':p.get('name') or 'Hráč',**value}
 
     @app.post('/api/patrons/intents')
     def create_intent(body:IntentBody,request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
@@ -137,8 +146,10 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
         return run('proplet_patron_preferences_v1',{'p_player':p['id'],'p_public':body.publicBadge,'p_disabled':body.offersDisabled})
 
     @app.post('/api/patrons/thanks/claim')
-    def claim_thanks(response:Response,authorization:Optional[str]=Header(default=None)):
+    def claim_thanks(response:Response,authorization:Optional[str]=Header(default=None),visibility:bool=False):
         headers(response);p=account(authorization)
+        if visibility:
+            return run('proplet_patron_thanks_visibility_v1',{'p_player':p['id'],'p_claim':True})
         return run('proplet_patron_thanks_claim_v1',{'p_player':p['id']})
 
     @app.post('/api/patrons/offers/claim')

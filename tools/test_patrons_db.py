@@ -30,6 +30,7 @@ def main():
    c.execute((ROOT/'supabase/migrations/20261031134258_patron_support.sql').read_text())
    c.execute((ROOT/'supabase/migrations/20261101022415_patron_manual_badge.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261101103408_patron_recurring_badge.sql').read_text(encoding='utf8'))
+   c.execute((ROOT/'supabase/migrations/20261105083317_patron_thanks_visibility.sql').read_text(encoding='utf8'))
   ids=[str(uuid4()) for _ in range(4)];player,other,balanced,admin=ids
   for index,pid in enumerate(ids):c.execute('insert into public.players(id,name,family_code,token_hash,support_mode,public_rankings) values(%s,%s,%s,%s,%s,true)',(pid,'Patron SQL '+str(index),'patron-test',secrets.token_hex(32),'younger' if pid==balanced else 'none'))
   # Use the existing schema's required admin columns, if present.
@@ -173,6 +174,9 @@ def main():
   assert sum(r['displayGranted'] for r in thanks)==1
   assert not rpc('proplet_patron_thanks_claim_v1',player)['displayGranted']
   assert not rpc('proplet_patron_state_v1',player,False)['thanksPending']
+  # The legacy CTA already ran, and this player has an explicit private preference.
+  assert not rpc('proplet_patron_thanks_visibility_v1',player,False)['thanksPending']
+  assert not rpc('proplet_patron_thanks_visibility_v1',player,True)['displayGranted']
 
   assert confirm(first['id'],first['reference'],'test-tx')['alreadyConfirmed'] is True
   assert confirm(first['id'],first['reference'],'another-tx')['ok'] is False
@@ -216,6 +220,22 @@ def main():
   assert all(set(r)=={'id','amountCzk','frequency','confirmedAt'} and r['frequency']=='monthly' and r['amountCzk']==199 for r in monthly_state['contributions'])
   assert len(rpc('proplet_patron_state_v1',player,False)['contributions'])==1
 
+  # A new paid supporter sees a preselected checkbox, but reads and concurrent
+  # claims leave the public leaderboard untouched until a preference is saved.
+  def claim_visibility(_):
+   with psycopg.connect(**opts) as conn:
+    conn.execute('set role service_role')
+    return rpc('proplet_patron_thanks_visibility_v1',other,True,connection=conn)
+  pending=rpc('proplet_patron_thanks_visibility_v1',other,False)
+  assert pending['thanksPending'] and pending['defaultPublicBadge'] and not pending['displayGranted']
+  with ThreadPoolExecutor(max_workers=2) as pool:visibility_claims=list(pool.map(claim_visibility,range(2)))
+  assert sum(r['displayGranted'] for r in visibility_claims)==1
+  assert next(r for r in visibility_claims if r['displayGranted'])['defaultPublicBadge']
+  assert not rpc('proplet_patron_thanks_claim_v1',other)['displayGranted']
+  assert not rpc('proplet_patron_thanks_visibility_v1',other,False)['thanksPending']
+  assert not rpc('proplet_patron_state_v1',other,False)['publicBadge']
+  assert rpc('proplet_patron_public_ids_v1',[other])['players']==[]
+
   assert c.execute('select count(*) from proplet_private.patron_entitlements where player_id=%s',(other,)).fetchone()[0]==1
   assert c.execute('select count(*) from proplet_private.patron_audit where intent_id=%s',(monthly['id'],)).fetchone()[0]==2
   ledger=rpc('proplet_patron_admin_list_v1',7,100,monthly['reference'])['items'][0]
@@ -242,9 +262,10 @@ def main():
   c.execute('reset role')
   for role in ('anon','authenticated'):
    c.execute(sql.SQL('set role {}').format(sql.Identifier(role)))
-   try:rpc('proplet_patron_state_v1',player,False)
-   except psycopg.errors.InsufficientPrivilege:pass
-   else:raise AssertionError('Client role can invoke private patron RPC')
+   for name in ('proplet_patron_state_v1','proplet_patron_thanks_visibility_v1'):
+    try:rpc(name,player,False)
+    except psycopg.errors.InsufficientPrivilege:pass
+    else:raise AssertionError(f'Client role can invoke {name}')
    c.execute('reset role')
   http_acceptance(opts,new_player(),new_player(),admin)
   from tools.test_patron_manual_badge_db import run_manual_badge_acceptance
@@ -296,7 +317,7 @@ def http_acceptance(opts,owner,other,admin):
  assert client.post('/api/patrons/intents',json=body,headers=h).json()==created
  assert client.post('/api/patrons/intents',json={**body,'amountCzk':199},headers=h).status_code==409
  assert client.get(path,headers=oh).status_code==404
- with psycopg.connect(**opts) as db:db.execute("update public.players set name='HTTP renamed' where id=%s",(owner,))
+ with psycopg.connect(**opts) as db:db.execute("update public.players set name='HTTP renamed',public_rankings=true where id=%s",(owner,))
  assert client.get(path,headers=h).json()==created
  assert not client.get('/api/patrons',headers=h).json()['patron']
  assert client.get('/api/admin/patrons',headers=h).status_code==403
@@ -319,13 +340,32 @@ def http_acceptance(opts,owner,other,admin):
  assert client.post('/api/patrons/thanks/claim',headers=h).json()['displayGranted']
  assert not client.post('/api/patrons/thanks/claim',headers=h).json()['displayGranted']
  assert not client.get('/api/patrons',headers=h).json()['thanksPending']
- assert client.post('/api/patrons/preferences',json={'publicBadge':True,'offersDisabled':True},headers=h).json()['publicBadge']
+ # Old PWA clients cannot consume the replay. Accounts with private rankings
+ # do not qualify for a replay even if they have never set a badge preference.
+ status_path='/api/patrons?visibility=true'
+ claim_path='/api/patrons/thanks/claim?visibility=true'
+ with psycopg.connect(**opts) as db:db.execute('update public.players set public_rankings=false where id=%s',(owner,))
+ assert not client.get(status_path,headers=h).json()['thanksPending']
+ assert not client.post(claim_path,headers=h).json()['displayGranted']
+ with psycopg.connect(**opts) as db:db.execute('update public.players set public_rankings=true where id=%s',(owner,))
+ assert client.get(status_path,headers=h).json()['thanksPending']
+ assert not client.post('/api/patrons/thanks/claim',headers=h).json()['displayGranted']
+ assert not client.get(status_path,headers=oh).json()['thanksPending']
+ replay=client.post(claim_path,headers=h).json()
+ assert replay['displayGranted'] and replay['defaultPublicBadge']
+ assert not client.get(status_path,headers=h).json()['publicBadge']
+ assert not client.post(claim_path,headers=h).json()['displayGranted']
+ assert not client.get(status_path,headers=h).json()['thanksPending']
+ preferences_path='/api/patrons/preferences'
+ assert not client.post(preferences_path,json={'publicBadge':False,'offersDisabled':True},headers=h).json()['publicBadge']
+ saved=client.post(preferences_path,json={'publicBadge':True},headers=h).json()
+ assert saved['publicBadge'] and saved['offersDisabled']
  rows=client.get('/api/admin/patrons?reference='+intent['reference'],headers=ah).json()['items']
  assert rows[0]['id']==intent['id'] and rows[0]['paymentCount']==1
  enabled[0]=False;before=len(rpc_calls)
  assert client.get('/api/patrons',headers=h).json()=={'enabled':False}
  assert client.post('/api/patrons/intents',json=body,headers=h).status_code==503
  assert len(rpc_calls)==before
- print('PASS native patron HTTP + real SQL: authenticated immutable QR decoded, owner/rename binding, admin authority, exact matching, idempotence, duplicate bank ID denial, private history, account thanks, opt-in and default-OFF without database calls')
+ print('PASS native patron HTTP + real SQL: authenticated immutable QR decoded, owner/rename binding, admin authority, exact matching, idempotence, duplicate bank ID denial, private history, one-time legacy thanks replay, badge-only save and feature flag')
 
 if __name__=='__main__':main()

@@ -3,6 +3,7 @@
  'use strict';
  const request=(path,options={})=>api(path,options);
  let stateGeneration=0,accountEpoch=0,resultReady=false,started=false,qrDownloadUrl=null;
+ let welcomePublic=false,welcomeSaving=false;
  function clearQrDownload(){if(qrDownloadUrl){URL.revokeObjectURL(qrDownloadUrl);qrDownloadUrl=null;}}
  async function saveQr(svg){
   const image=new Image();image.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(svg)));await image.decode();
@@ -20,8 +21,8 @@
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const money=n=>new Intl.NumberFormat('cs-CZ').format(n)+' Kč';
  const paidDate=value=>{const d=new Date(value);return Number.isNaN(d.getTime())?'Datum není dostupné':new Intl.DateTimeFormat('cs-CZ',{timeZone:'Europe/Prague',dateStyle:'medium'}).format(d);};
- async function refresh(){const epoch=accountEpoch,generation=++stateGeneration;try{const value=await request('/api/patrons');if(epoch!==accountEpoch||generation!==stateGeneration)return;Object.assign(model,{enabled:value.enabled===true,authenticated:value.authenticated===true,paid:value.patron===true,badgeType:value.patron===true?(value.badgeType==='recurring'?'recurring':'supporter'):null,recurringStatus:value.patron===true&&value.recurringStatus&&typeof value.recurringStatus==='object'?value.recurringStatus:null,thanksPending:value.thanksPending===true,contributions:Array.isArray(value.contributions)?value.contributions:[],public:value.publicBadge===true,offersDisabled:value.offersDisabled===true,canOffer:value.canOffer===true});decorate();if($('#patronDialog')?.open&&model.step==='thanks')render();window.PropletAnnouncements?.kick();}catch{if(epoch===accountEpoch){model.canOffer=false;model.error='Podporu se teď nepodařilo načíst. Hra funguje dál.';}}}
- async function preference(next){try{await request('/api/patrons/preferences',{method:'POST',body:JSON.stringify({publicBadge:model.public,offersDisabled:model.offersDisabled,...next})});await refresh();}catch{model.error='Změnu se nepodařilo uložit. Zkus to prosím znovu.';render();}}
+ async function refresh(){const epoch=accountEpoch,generation=++stateGeneration;try{const value=await request('/api/patrons?visibility=true');if(epoch!==accountEpoch||generation!==stateGeneration)return;Object.assign(model,{enabled:value.enabled===true,authenticated:value.authenticated===true,paid:value.patron===true,badgeType:value.patron===true?(value.badgeType==='recurring'?'recurring':'supporter'):null,recurringStatus:value.patron===true&&value.recurringStatus&&typeof value.recurringStatus==='object'?value.recurringStatus:null,thanksPending:value.thanksPending===true,contributions:Array.isArray(value.contributions)?value.contributions:[],public:value.publicBadge===true,offersDisabled:value.offersDisabled===true,canOffer:value.canOffer===true});decorate();if($('#patronDialog')?.open&&model.step==='thanks')render();window.PropletAnnouncements?.kick();}catch{if(epoch===accountEpoch){model.canOffer=false;model.error='Podporu se teď nepodařilo načíst. Hra funguje dál.';}}}
+ async function preference(next){try{await request('/api/patrons/preferences',{method:'POST',body:JSON.stringify(next)});await refresh();}catch{model.error='Změnu se nepodařilo uložit. Zkus to prosím znovu.';render();}}
  async function createIntent(){if(model.pending)return;if(!model.authenticated){close();if(typeof openProfileModal==='function')openProfileModal('login');return;}const epoch=accountEpoch;if(model.requestAmount!==[model.amount,model.frequency,model.frequency==='monthly'?model.firstPaymentDate:''].join(':')||!model.requestId){model.requestId=crypto.randomUUID();model.requestAmount=[model.amount,model.frequency,model.frequency==='monthly'?model.firstPaymentDate:''].join(':');}model.pending=true;model.error='';render();try{const value=await request('/api/patrons/intents',{method:'POST',body:JSON.stringify({requestId:model.requestId,amountCzk:model.amount,frequency:model.frequency,...(model.frequency==='monthly'?{firstPaymentDate:model.firstPaymentDate}:{})})});if(epoch!==accountEpoch||!model.enabled)return;model.intent=value.intent;model.payment=value.payment;model.step='qr';model.canOffer=false;}catch(error){console.error('Patron QR preparation failed',error);if(epoch===accountEpoch)model.error='QR se nepodařilo připravit. Zkus to znovu — nevznikne tím druhá platba.';}finally{if(epoch===accountEpoch){model.pending=false;render();$('#patronTitle')?.focus({preventScroll:true});}}}
 
  const art='<img class="patron-art" src="/assets/support/patron-letterpress-v1.webp" alt="" width="144" height="144">';
@@ -72,7 +73,8 @@
    content='<div class="patron-welcome-art">'+art+'</div><h2 id="patronTitle" tabindex="-1">Díky, že držíš<br>Proplet ve hře.</h2>'+
     '<p class="patron-welcome-copy">Moc si tvé podpory vážím.<br>— Pavel</p>'+
     '<div class="patron-welcome-badge'+badgeClass(model.badgeType)+'">'+heart+'<span>Odznak podporovatele je tvůj</span></div>'+
-    '<button class="primary-btn patron-primary" data-close>Zpátky do hry</button>';
+    `<label class="patron-visibility"><input type="checkbox" id="patronWelcomePublic" ${welcomePublic?'checked':''}><span>Ukazovat můj odznak v žebříčcích<small>Kdykoli to můžeš změnit v nastavení. Částku nezveřejňujeme.</small></span></label>`+
+    '<button class="primary-btn patron-primary" data-confirm-visibility>Zpátky do hry</button>';
   }else if(model.step==='thanks'){
    content=heading('Díky, že držíš Proplet ve hře.','Tvoje podpora dává další práci na Propletu smysl. Moc si jí vážím. — Pavel')+
     '<div class="patron-own-badge'+badgeClass(model.badgeType)+'">'+avatarDemo(profile()?.avatar,model.badgeType)+'<div><strong>'+esc(profile()?.name||'Podporovatel')+'</strong><span class="patron-label-static'+badgeClass(model.badgeType)+'">'+heart+badgeName(model.badgeType)+'</span></div></div>'+ownStatus()+
@@ -95,6 +97,22 @@
    form.addEventListener('submit',e=>{e.preventDefault();if(!Number.isInteger(model.amount)||model.amount<1||model.amount>100000){$('#patronCustom').reportValidity();return}void createIntent();});
   }
   dialog.querySelector('[data-contribute-again]')?.addEventListener('click',()=>{model.requestId=null;model.requestAmount=null;model.intent=null;model.payment=null;model.step='offer';render();$('#patronTitle')?.focus({preventScroll:true});});
+  dialog.querySelector('[data-confirm-visibility]')?.addEventListener('click',async e=>{
+   if(welcomeSaving)return;
+   const epoch=accountEpoch,button=e.currentTarget,input=$('#patronWelcomePublic');
+   welcomePublic=input.checked;welcomeSaving=true;
+   button.disabled=input.disabled=true;
+   try{
+    await request('/api/patrons/preferences',{method:'POST',body:JSON.stringify({publicBadge:welcomePublic})});
+    if(epoch!==accountEpoch)return;
+    if(dialog.open&&model.step==='welcome')close();
+    await refresh();
+   }catch{
+    if(epoch===accountEpoch&&dialog.open&&model.step==='welcome'){
+     model.error='Změnu se nepodařilo uložit. Zkus to prosím znovu.';render();
+    }
+   }finally{welcomeSaving=false;}
+  });
   $('#patronPublic')?.addEventListener('change',e=>{void preference({publicBadge:e.target.checked})});
   dialog.querySelector('[data-save]')?.addEventListener('click',async e=>{const button=e.currentTarget;button.disabled=true;try{await saveQr(model.payment.qrSvg);$('#patronCopyStatus').textContent='QR je připravené ke stažení jako PNG.';}catch{$('#patronCopyStatus').textContent='QR se nepodařilo uložit. Zkus to znovu nebo zkopíruj údaje.';}finally{button.disabled=false;}});
   dialog.querySelector('[data-copy]')?.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(model.payment.spd);$('#patronCopyStatus').textContent='Zkopírovány přesné platební údaje z QR (SPAYD).';}catch{$('#patronCopyStatus').textContent='Kopírování není dostupné. Údaje jsou uvedené nad QR.';}});
@@ -153,7 +171,7 @@
  }
  let raf=0;const schedule=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;decorate()})};
  function boot(){if(started)return;started=true;ensure();if(typeof registerGameCompletionHook==='function')registerGameCompletionHook({id:'patron-result',priority:200,after:({game})=>{if(game?.finished&&['daily','daily_special','free','tajenka'].includes(game.mode)&&!game.postStarterWarmup&&!game.puzzle?.meta?.archiveExperience)resultCompleted();}});void refresh();new MutationObserver(schedule).observe(document.querySelector('.app-shell'),{childList:true,subtree:true});new MutationObserver(schedule).observe($('#winModal'),{childList:true,subtree:true});
-  window.PropletAnnouncements?.register({id:'patron-thanks-v1',repeatable:true,priority:-10,eligible:()=>model.enabled&&model.authenticated&&model.paid&&model.thanksPending,show:async({isCurrent})=>{if(!isCurrent()||document.querySelector('#rankSpotlight:not(.hidden)'))return false;const epoch=accountEpoch;const status=await request('/api/patrons/thanks/claim',{method:'POST'});if(epoch!==accountEpoch||!model.enabled||!status.displayGranted)return false;const current=isCurrent();model.thanksPending=false;if(!current)return false;open('welcome');return true;},close});
+  window.PropletAnnouncements?.register({id:'patron-thanks-v1',repeatable:true,priority:-10,eligible:()=>model.enabled&&model.authenticated&&model.paid&&model.thanksPending,show:async({isCurrent})=>{if(!isCurrent()||document.querySelector('#rankSpotlight:not(.hidden)'))return false;const epoch=accountEpoch;const status=await request('/api/patrons/thanks/claim?visibility=true',{method:'POST'});if(epoch!==accountEpoch||!model.enabled||!status.displayGranted)return false;const current=isCurrent();model.thanksPending=false;if(!current)return false;welcomePublic=status.defaultPublicBadge===true;open('welcome');return true;},close});
   window.PropletAnnouncements?.register({id:'patron-support-v1',repeatable:true,priority:-20,eligible:()=>resultReady&&model.enabled&&model.authenticated&&model.canOffer&&!model.paid&&!model.offersDisabled,show:async({isCurrent})=>{if(!isCurrent()||document.querySelector('#rankSpotlight:not(.hidden)'))return false;const epoch=accountEpoch;const status=await request('/api/patrons/offers/claim',{method:'POST'});if(epoch!==accountEpoch||!status.displayGranted)return false;const current=isCurrent();model.canOffer=false;resultReady=false;model.receiptId=status.receiptId;if(!current)return false;offer();return true;},close:()=>$('#patronOffer')?.remove()});
  }
  function offer(){if(!model.enabled||$('#patronOffer'))return;const card=document.createElement('aside');card.id='patronOffer';card.className='patron-offer';card.innerHTML='<span class="patron-entry-seal">'+heart+'</span><div><strong>Baví tě Proplet?</strong><p>Můžeš přispět na jeho další příběh.</p></div><button class="primary-btn" data-support>Podpořit</button><button class="text-btn" data-dismiss>Teď ne</button>';document.querySelector('.app-footer')?.before(card);card.querySelector('[data-support]').onclick=()=>{if(model.receiptId)void request('/api/patrons/offers/dismiss',{method:'POST',body:JSON.stringify({receiptId:model.receiptId,action:'opened'})}).catch(()=>{});card.remove();open('offer');};card.querySelector('[data-dismiss]').onclick=()=>{if(model.receiptId)void request('/api/patrons/offers/dismiss',{method:'POST',body:JSON.stringify({receiptId:model.receiptId,action:'declined'})}).catch(()=>{});model.receiptId=null;card.remove();};}
