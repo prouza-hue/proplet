@@ -232,3 +232,50 @@ html[data-theme=dark] .patron-settings-preview.patron-recurring{color:#ffb0a0!im
 html.tiskarna-ui body #patronTodayLink.patron-today-link:not([hidden]){display:grid!important;grid-template-columns:54px minmax(0,1fr) 22px;align-items:center;gap:12px;box-sizing:border-box;width:min(480px,100%);min-height:54px;margin:10px auto 3px!important;padding:9px 13px!important;border:1px solid color-mix(in srgb,var(--patron-cream-edge) 40%,var(--td-line))!important;border-radius:11px;background:linear-gradient(115deg,color-mix(in srgb,var(--td-paper) 88%,var(--patron-cream)),var(--td-paper))!important;color:var(--td-ink)!important;text-align:left;text-decoration:none!important;box-shadow:0 2px 0 color-mix(in srgb,var(--td-line) 65%,transparent),inset 0 1px 0 #ffffff30!important;cursor:pointer}
 .patron-support-stamps{display:flex;align-items:center;padding-left:2px}.patron-support-stamps>i{display:grid;place-items:center;box-sizing:border-box;flex:none;width:28px;height:29px;border:1px solid color-mix(in srgb,var(--patron-blue) 65%,var(--td-line));border-radius:6px 5px 6px 4px;background:var(--patron-blue);color:var(--td-paper);transform:rotate(-9deg);box-shadow:0 1px 2px #0002}.patron-support-stamps>i+ i{margin-left:-3px;transform:translateY(1px) rotate(8deg)}.patron-support-stamps>i.patron-support-recurring{background:var(--patron-cream);color:var(--patron-stamp);border-color:var(--patron-cream-edge);box-shadow:0 1px 2px #0002,inset 0 0 0 1px #fff7}.patron-support-stamps svg{width:17px;height:17px}.patron-support-title{font:600 19px/1.2 Fraunces,Georgia,serif;letter-spacing:-.02em}.patron-support-arrow{display:flex;align-items:center;justify-content:center;width:22px;height:22px;color:var(--patron-blue);font-family:Outfit,sans-serif}#patronTodayLink:active{transform:translateY(1px)}
 @media(max-width:359px){html.tiskarna-ui body #patronTodayLink.patron-today-link:not([hidden]){grid-template-columns:50px minmax(0,1fr) 20px;gap:9px;padding-inline:11px!important}.patron-support-title{font-size:18px}.patron-support-stamps>i{width:26px;height:28px}.patron-support-arrow{width:20px;height:20px}}
+
+/* One scrolling body keeps the payment action visible without covering content. */
+#patronDialog[data-patron-step=offer]{position:fixed;top:calc(var(--patron-viewport-top,0px) + var(--patron-viewport-height,100dvh) / 2);bottom:auto;margin:0 auto;transform:translateY(-50%);padding:0;overflow:hidden;width:min(520px,calc(100% - 24px));max-height:calc(min(100dvh,var(--patron-viewport-height,100dvh)) - 24px)}
+#patronDialog[data-patron-step=offer] #patronForm{display:flex;flex-direction:column;max-height:calc(min(100dvh,var(--patron-viewport-height,100dvh)) - 26px);min-height:0;margin:0}
+#patronDialog .patron-offer-scroll{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:24px 24px 8px}
+#patronDialog .patron-offer-footer{flex:none;padding:10px 24px max(18px,env(safe-area-inset-bottom));background:var(--td-paper,#fffcf5)}
+#patronDialog[data-patron-step=offer] .patron-close{z-index:2;border-radius:50%;background:var(--td-paper,#fffcf5)}
+#patronDialog[data-patron-step=offer] .patron-intro{grid-template-columns:68px minmax(0,1fr);gap:12px;margin:0 28px 12px 0}
+#patronDialog[data-patron-step=offer] .patron-art{width:68px;height:72px}
+#patronDialog[data-patron-step=offer] h2{font-size:28px;line-height:1.12}
+#patronDialog .patron-offer-copy{gap:7px;margin:0}
+#patronDialog .patron-offer-copy p{font-size:15px;line-height:1.4}
+#patronDialog .patron-message-toggle{display:flex;align-items:center;gap:7px;min-height:44px;padding:4px 0;border:0;background:none;color:var(--patron-blue);font:500 14px/1.3 Outfit,sans-serif;cursor:pointer}
+#patronForm .patron-frequency{margin-bottom:12px!important}
+#patronForm legend{margin-bottom:7px;font-size:14px}
+#patronDialog .patron-amounts .patron-amount>span{min-height:50px;font-size:15px;padding:6px 2px!important}
+#patronDialog .patron-start{justify-content:flex-start;gap:5px;margin:5px 0 0;min-height:44px;font-size:14px}
+#patronDialog .patron-date-control{position:relative;display:inline-flex;align-items:center;gap:5px;min-height:44px;cursor:pointer}
+#patronDialog .patron-date-control input{position:absolute;inset:0;width:100%;height:100%;max-width:none;opacity:0;cursor:pointer;padding:0}
+#patronDialog .patron-date-control input::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:auto;height:auto;cursor:pointer}
+#patronDialog .patron-date-control:focus-within{outline:3px solid var(--td-blue,#315da8);outline-offset:2px;border-radius:4px}
+#patronDialog .patron-date-change{color:var(--patron-blue);text-decoration:underline;text-underline-offset:3px}
+#patronDialog .patron-perk-details{margin:0;padding:0}
+#patronDialog .patron-perk-details>summary{gap:7px;font-size:13px;min-height:44px}
+#patronDialog .patron-perk-details>summary>span:nth-child(2){min-width:0}
+#patronDialog .patron-perk-details>summary>span:last-child{flex:none}
+#patronDialog .patron-perk-details p{padding-bottom:8px}
+#patronDialog .patron-frequency-note{margin:0;font-size:12px;line-height:1.35}
+#patronDialog .patron-offer-footer .patron-payment-note{margin-top:8px;line-height:1.35}
+#patronDialog .patron-recurring-warning{display:block;position:static;height:auto;min-height:0;overflow:visible;text-align:left}
+#patronDialog .patron-recurring-warning>*{position:static;grid-area:auto;float:none;transform:none;height:auto;max-height:none;white-space:normal;overflow-wrap:break-word}
+@media(max-width:540px){
+ #patronDialog .patron-offer-scroll{padding:22px 18px 6px}
+ #patronDialog .patron-offer-footer{padding-inline:18px}
+ #patronDialog[data-patron-step=offer] .patron-intro{grid-template-columns:54px minmax(0,1fr);gap:10px}
+ #patronDialog[data-patron-step=offer] .patron-art{width:54px;height:60px}
+ #patronDialog[data-patron-step=offer] h2{font-size:25px}
+}
+@media(max-width:359px){
+ #patronDialog .patron-offer-scroll{padding-inline:14px}
+ #patronDialog .patron-offer-footer{padding-inline:14px}
+ #patronDialog[data-patron-step=offer] .patron-intro{grid-template-columns:44px minmax(0,1fr);gap:8px;margin-right:24px}
+ #patronDialog[data-patron-step=offer] .patron-art{width:44px;height:52px}
+ #patronDialog[data-patron-step=offer] h2{font-size:22px}
+ #patronDialog .patron-amounts .patron-amount>span{font-size:13px}
+ #patronDialog .patron-perk-details>summary{font-size:12px;gap:5px}
+}

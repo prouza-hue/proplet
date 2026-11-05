@@ -3,7 +3,7 @@
  'use strict';
  const request=(path,options={})=>api(path,options);
  let stateGeneration=0,accountEpoch=0,started=false,qrDownloadUrl=null;
- let welcomePublic=false,welcomeSaving=false;
+ let welcomePublic=false,welcomeSaving=false,messageExpanded=false;
  function clearQrDownload(){if(qrDownloadUrl){URL.revokeObjectURL(qrDownloadUrl);qrDownloadUrl=null;}}
  async function saveQr(svg){
   const image=new Image();image.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(svg)));await image.decode();
@@ -43,29 +43,39 @@
  function ensure(){
   if($('#patronDialog'))return;
   const el=document.createElement('dialog');el.id='patronDialog';el.setAttribute('aria-labelledby','patronTitle');document.body.append(el);
+  const fitViewport=()=>{el.style.setProperty('--patron-viewport-height',(window.visualViewport?.height||window.innerHeight)+'px');el.style.setProperty('--patron-viewport-top',(window.visualViewport?.offsetTop||0)+'px');};
+  fitViewport();window.addEventListener('resize',fitViewport);
+  window.visualViewport?.addEventListener('resize',fitViewport);window.visualViewport?.addEventListener('scroll',fitViewport);
   el.addEventListener('click',e=>{if(e.target===el)close()});el.addEventListener('cancel',e=>{e.preventDefault();close()});
 
  }
  function close(){clearQrDownload();const el=$('#patronDialog');if(el?.open)el.close();model.returnFocus?.isConnected&&model.returnFocus.focus({preventScroll:true});}
- function open(step='offer',from=document.activeElement){if(!model.enabled)return;$('#patronOffer')?.remove();if(step==='offer'&&model.paid){model.requestId=null;model.requestAmount=null;model.intent=null;model.payment=null;}ensure();model.error='';model.returnFocus=from;model.step=step;render();if(!$('#patronDialog').open)$('#patronDialog').showModal();$('#patronTitle')?.focus({preventScroll:true});}
+ function open(step='offer',from=document.activeElement){if(!model.enabled)return;$('#patronOffer')?.remove();if(step==='offer'&&model.paid){model.requestId=null;model.requestAmount=null;model.intent=null;model.payment=null;}if(step==='offer'){messageExpanded=false;if(!model.requestId&&!model.intent&&!model.pending){model.frequency='monthly';model.selected=recommendedAmount;model.amount=Number(recommendedAmount);model.firstPaymentDate=today();}}ensure();model.error='';model.returnFocus=from;model.step=step;render();if(!$('#patronDialog').open)$('#patronDialog').showModal();$('#patronTitle')?.focus({preventScroll:true});}
  const recurringWarning=()=>'<aside class="patron-recurring-warning" role="note"><strong>Zkontroluj měsíční opakování</strong><p>Některé banky načtou QR jen jako jednorázovou platbu. Pokud se opakování nenastaví, založ ve své bance trvalý příkaz <b>každý měsíc</b>. Zachovej stejný účet, částku a variabilní symbol.</p><details class="patron-bank-help"><summary>Jak je to u mé banky?</summary><p><b>KB:</b> banka uvádí založení trvalého příkazu z QR. Před potvrzením ověř měsíční opakování. <a href="https://www.kb.cz/cs/o-bance/spokojenost-klientu" target="_blank" rel="noopener noreferrer">Informace KB</a></p><p><b>Raiffeisenbank:</b> banka tuto možnost uvádí, při našem vyzkoušení na Androidu se ale opakování nepředvyplnilo. Počítej i s ručním nastavením. <a href="https://www.rb.cz/osobni/ucty/sluzby-k-uctum/mobilni-bankovnictvi" target="_blank" rel="noopener noreferrer">Informace Raiffeisenbank</a></p><p><b>Partners:</b> při vyzkoušení na Androidu se načetla jednorázová platba. Měsíční opakování nastav ručně.</p><p>U ostatních aplikací nemáme automatické nastavení ověřené. Podpora se může lišit podle verze aplikace. Aktualizováno 1. 11. 2026.</p><p>Pokud už první platba odešla, nastav trvalý příkaz až od dalšího měsíce, ať neposíláš příspěvek dvakrát.</p></details></aside>';
  function heading(title,copy){return `<header class="patron-intro">${art}<div><h2 id="patronTitle" tabindex="-1">${title}</h2>${copy?`<p>${copy}</p>`:''}</div></header>`;}
  function render(){
   const dialog=$('#patronDialog');if(!dialog)return;clearQrDownload();let content='';
   if(model.step==='offer'){
-   content=heading('Pomoz Propletu zůstat ve hře. ❤️')+
-    `<div class="patron-offer-copy">
+   content='<form id="patronForm"><div class="patron-offer-scroll">'+heading('Pomoz Propletu zůstat ve hře.')+
+    (messageExpanded?`<div class="patron-offer-copy" id="patronMessage">
       <p>Proplet je zdarma a moc bych si přál, aby to tak zůstalo.</p>
       <p>Jenže ani hra zdarma se neobejde bez nákladů. Za její provoz a nástroje, které používám při vývoji, platím přes 2 000 Kč měsíčně. Zatím jde většina z mojí kapsy.</p>
       <p>Pokud tě Proplet baví, budu rád, když mi pomůžeš udržet ho v chodu a dál ho vylepšovat. Třeba i malým měsíčním příspěvkem. Každá podpora se počítá.</p>
       <p>Díky, že hraješ. A pokud se rozhodneš přispět, díky o to víc!</p>
       <p>— Pavel</p>
-    </div>`+
-    '<form id="patronForm"><fieldset class="patron-frequency"><legend class="os-sr">Četnost podpory</legend><div>'+[['monthly','Měsíčně'],['once','Jednorázově']].map(([v,label])=>`<label><input type="radio" name="frequency" value="${v}" ${model.frequency===v?'checked':''}><span>${label}</span></label>`).join('')+'</div></fieldset><fieldset><legend>Výše příspěvku</legend><div class="patron-amounts">'+['79',recommendedAmount,'199','custom'].map(v=>`<label class="patron-amount"><input type="radio" name="amount" value="${v}" ${model.selected===v?'checked':''}><span>${v==='custom'?'Jiná částka':money(Number(v))}${v===recommendedAmount?'<small>Doporučeno</small>':''}</span></label>`).join('')+'</div></fieldset>'+
+    </div>`:`<div class="patron-offer-copy" id="patronMessage">
+      <p>Proplet je zdarma a rád bych, aby to tak zůstalo. Jeho provoz a vývoj mě ale stojí přes 2 000 Kč měsíčně, které zatím platím převážně sám.</p>
+      <p>Pokud tě Proplet baví, budu rád, když mi s tím pomůžeš. Díky!</p>
+      <p>— Pavel</p>
+    </div>`)+
+    `<button type="button" class="patron-message-toggle" aria-expanded="${messageExpanded}" aria-controls="patronMessage">${messageExpanded?'Zkrátit vzkaz':'Pár slov ode mě'} <span aria-hidden="true">${messageExpanded?'⌃':'⌄'}</span></button>`+
+    '<fieldset class="patron-frequency"><legend class="os-sr">Četnost podpory</legend><div>'+[['monthly','Měsíčně'],['once','Jednorázově']].map(([v,label])=>`<label><input type="radio" name="frequency" value="${v}" ${model.frequency===v?'checked':''}><span>${label}</span></label>`).join('')+'</div></fieldset><fieldset><legend>Výše příspěvku</legend><div class="patron-amounts">'+['79',recommendedAmount,'199','custom'].map(v=>`<label class="patron-amount"><input type="radio" name="amount" value="${v}" ${model.selected===v?'checked':''}><span>${v==='custom'?'Jiná částka':money(Number(v))}${v===recommendedAmount?'<small>Doporučeno</small>':''}</span></label>`).join('')+'</div></fieldset>'+
     `<label class="patron-custom" ${model.selected==='custom'?'':'hidden'}>Částka v Kč<input name="custom" id="patronCustom" inputmode="numeric" type="number" min="1" max="100000" step="1" value="${model.selected==='custom'?model.amount:recommendedAmount}"></label>`+
-    (model.frequency==='monthly'?`<label class="patron-start">První platba<input name="firstPaymentDate" type="date" min="${today()}" value="${model.firstPaymentDate}" required></label>`+recurringWarning():'')+
-    '<div class="patron-keepsake patron-perk"><div class="patron-mini-person">'+avatarDemo(profile()?.avatar,model.frequency==='monthly'?'recurring':'supporter')+'<span class="patron-label-static'+badgeClass(model.frequency==='monthly'?'recurring':'supporter')+'">'+badgeName(model.frequency==='monthly'?'recurring':'supporter')+'</span></div><div><strong>Tvoje značka podpory</strong><p>'+(model.frequency==='monthly'?'Červené srdíčko získáš po první potvrzené měsíční platbě. Další platby ho obnovují. Při ukončení podpory ti zůstane modrá značka. Zobrazení u jména je dobrovolné, částka se nezveřejňuje.':'Modrá značka jako trvalé poděkování po potvrzení příspěvku. Dobrovolně u jména, bez zveřejnění částky.')+'</p></div></div>'+
-    `<button class="primary-btn patron-primary" type="submit" ${model.pending?'disabled':''}>${model.pending?'Připravuji QR…':model.authenticated?(model.frequency==='monthly'?'Měsíčně ':'Jednorázově ')+money(model.amount)+' · QR':'Přihlásit se a připravit QR'} <span aria-hidden="true">→</span></button><p class="patron-payment-note">${model.authenticated?'Zobrazení QR není platba. Převod zadáš ve své bance.':'Přihlášení bezpečně propojí příspěvek s tvým účtem.'}</p></form>`;
+    (model.frequency==='monthly'?`<label class="patron-start">První platba: <span class="patron-date-control"><span data-date-label>${model.firstPaymentDate===today()?'dnes':esc(paidDate(model.firstPaymentDate+'T12:00:00Z'))}</span> · <span class="patron-date-change">Změnit</span><input aria-label="Datum první měsíční platby" name="firstPaymentDate" type="date" min="${today()}" value="${model.firstPaymentDate}" required></span></label>`:'')+
+    '<details class="patron-perk-details"><summary><span class="patron-settings-preview'+badgeClass(model.frequency==='monthly'?'recurring':'supporter')+'"><i aria-hidden="true">'+heart+'</i></span><span>Získáš značku podporovatele Propletu.</span><span aria-hidden="true">⌄</span></summary><p>'+(model.frequency==='monthly'?'Červené srdíčko získáš po první potvrzené měsíční platbě. Další platby ho obnovují. Při ukončení podpory ti zůstane modrá značka.':'Modrá značka ti zůstane jako trvalé poděkování po potvrzení příspěvku.')+' Zobrazení u jména je dobrovolné a můžeš ho kdykoli změnit v nastavení. Částka se nezveřejňuje.</p></details>'+
+    (model.frequency==='monthly'?'<p class="patron-frequency-note">Měsíční opakování nastavíš ve své bance. QR ho nemusí předvyplnit.</p>':'')+
+    '</div><div class="patron-offer-footer">'+
+    `<button class="primary-btn patron-primary" type="submit" ${model.pending?'disabled':''}>${model.pending?'Připravuji QR…':model.authenticated?(model.frequency==='monthly'?'Měsíčně ':'Jednorázově ')+money(model.amount)+' · QR':'Přihlásit se a připravit QR'} <span aria-hidden="true">→</span></button><p class="patron-payment-note">${model.authenticated?'Zobrazení QR není platba. Převod zadáš ve své bance.':'Přihlášení bezpečně propojí příspěvek s tvým účtem.'}</p></div></form>`;
   }else if(model.step==='qr'){
    const intent=model.intent,payment=model.payment;if(!intent||!payment){model.step='offer';render();return;}
    const image='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(payment.qrSvg)));
@@ -94,12 +104,16 @@
     '<button class="primary-btn patron-primary" data-support>Podpořit Proplet <span aria-hidden="true">→</span></button><button class="text-btn patron-dismiss" data-close>Zpátky do hry</button>';
   }
   dialog.setAttribute('data-patron-step',model.step);
-  dialog.innerHTML='<button class="patron-close" aria-label="Zavřít podporu">×</button>'+content+(model.error?'<p class="patron-error" role="alert">'+esc(model.error)+'</p>':'');
+  const error=model.error?'<p class="patron-error" role="alert">'+esc(model.error)+'</p>':'';
+  if(model.step==='offer')content=content.replace('</div></form>',error+'</div></form>');
+  dialog.innerHTML='<button class="patron-close" aria-label="Zavřít podporu">×</button>'+content+(model.step==='offer'?'':error);
   const personAvatar=dialog.querySelector('.patron-person-avatar');if(model.step==='other'&&personAvatar&&model.personAvatarNodes?.length)personAvatar.append(...model.personAvatarNodes.map(node=>node.cloneNode(true)));
   dialog.querySelector('.patron-close').onclick=close;dialog.querySelectorAll('[data-close]').forEach(b=>b.onclick=close);
   dialog.querySelector('[data-back]')?.addEventListener('click',()=>{model.step='offer';render();$('#patronTitle')?.focus({preventScroll:true})});dialog.querySelector('[data-support]')?.addEventListener('click',()=>open('offer',model.returnFocus));
+  dialog.querySelector('.patron-message-toggle')?.addEventListener('click',()=>{messageExpanded=!messageExpanded;render();dialog.querySelector('.patron-message-toggle')?.focus({preventScroll:true});});
   const form=$('#patronForm');if(form){
-   form.addEventListener('change',e=>{if(e.target.name==='frequency'){model.frequency=e.target.value;render();document.querySelector('#patronForm input[name=frequency]:checked')?.focus();return;}if(e.target.name==='firstPaymentDate'){model.firstPaymentDate=e.target.value;return;}if(e.target.name==='amount'){model.selected=e.target.value;if(model.selected!=='custom')model.amount=Number(model.selected);render();if(model.selected==='custom')$('#patronCustom').focus();else document.querySelector('#patronForm input[name=amount]:checked')?.focus()}});
+   if(model.pending)form.querySelectorAll('input').forEach(input=>{input.disabled=true;});
+   form.addEventListener('change',e=>{if(e.target.name==='frequency'){model.frequency=e.target.value;render();document.querySelector('#patronForm input[name=frequency]:checked')?.focus();return;}if(e.target.name==='firstPaymentDate'){model.firstPaymentDate=e.target.value;const label=form.querySelector('[data-date-label]');if(label)label.textContent=e.target.value===today()?'dnes':e.target.value?paidDate(e.target.value+'T12:00:00Z'):'Vyber datum';return;}if(e.target.name==='amount'){model.selected=e.target.value;if(model.selected!=='custom')model.amount=Number(model.selected);render();if(model.selected==='custom')$('#patronCustom').focus();else document.querySelector('#patronForm input[name=amount]:checked')?.focus()}});
    $('#patronCustom').addEventListener('input',e=>{const n=Number(e.target.value);model.amount=n;form.querySelector('button[type=submit]').textContent=Number.isInteger(n)&&n>0?(model.frequency==='monthly'?'Měsíčně ':'Jednorázově ')+money(n)+' · QR →':'Zadej částku';});
    form.addEventListener('submit',e=>{e.preventDefault();if(!Number.isInteger(model.amount)||model.amount<1||model.amount>100000){$('#patronCustom').reportValidity();return}void createIntent();});
   }
