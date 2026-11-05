@@ -751,6 +751,19 @@
       ]
     },
     {
+      "id": "20261105-patron-thanks-visibility",
+      "order": 650,
+      "version": "2026.11.05",
+      "path": "supabase/migrations/20261105083317_patron_thanks_visibility.sql",
+      "type": "migration",
+      "status": "prepared-preserves-public-badge-preferences",
+      "sha256": "bbe4c0359346270dc2c46b6e18a920614f591188f7f246300fac0569921f09f5",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_patron_preferences_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

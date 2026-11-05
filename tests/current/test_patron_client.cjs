@@ -1,11 +1,23 @@
 // Exercise native patron UI gates, durable claim coordination and kill switch.
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 const nodes=new Map(),events=new Map(),entries=new Map();let mounted=0,calls=[],removed=[];
-function element(){return {attrs:{},setAttribute(k,v){this.attrs[k]=v},addEventListener(){},append(){},remove(){removed.push(this.id);nodes.delete('#'+this.id)},querySelector(){return {onclick:null,addEventListener(){}}},querySelectorAll:()=>[],classList:{contains:()=>false,remove(){}},innerHTML:'',textContent:'',showModal(){this.open=true},close(){this.open=false},focus(){}};}
+const welcomeButton={addEventListener(_event,fn){this.confirm=fn}};
+function element(){return {attrs:{},setAttribute(k,v){this.attrs[k]=v},addEventListener(){},append(){},remove(){removed.push(this.id);nodes.delete('#'+this.id)},querySelector(s){return s==='[data-confirm-visibility]'&&this.innerHTML.includes('data-confirm-visibility')?welcomeButton:{onclick:null,addEventListener(){}}},querySelectorAll:()=>[],classList:{contains:()=>false,remove(){}},innerHTML:'',textContent:'',showModal(){this.open=true},close(){this.open=false},focus(){}};}
 const footer={before(node){if(node.id==='patronOffer')mounted++;nodes.set('#'+node.id,node)}};
 const document={createElement:element,body:{append(node){nodes.set('#'+node.id,node)}},querySelector(s){if(s==='.app-footer')return footer;return nodes.get(s)||null},querySelectorAll(s){return s.startsWith('#patronProfileEntry')?s.split(',').flatMap(key=>nodes.get(key)?[nodes.get(key)]:[]):[]},addEventListener(name,fn){events.set(name,fn)}};
 const status={enabled:true,authenticated:true,patron:false,publicBadge:false,offersDisabled:false,canOffer:true};
-const request=async path=>{calls.push(path);return path.endsWith('/claim')?{displayGranted:true,receiptId:'receipt'}:status};
+const visibilityWrites=[];
+const request=async (path,options)=>{
+ calls.push(path);
+ if(path==='/api/patrons/thanks/claim?visibility=true'){
+  status.thanksPending=false;return {displayGranted:true,defaultPublicBadge:true};
+ }
+ if(path==='/api/patrons/preferences'){
+  const choice=JSON.parse(options.body);visibilityWrites.push(choice);
+  status.publicBadge=choice.publicBadge;return status;
+ }
+ return path.endsWith('/claim')?{displayGranted:true,receiptId:'receipt'}:status;
+};
 const window={PropletAnnouncements:{register(e){entries.set(e.id,e)},kick(){}},addEventListener(){}};
 const context={window,document,api:request,Intl,crypto:require('node:crypto').webcrypto,MutationObserver:class{observe(){}},requestAnimationFrame(){},getProfile:()=>({id:'a',token:'token',supportMode:'younger'}),currentScreen:'daily'};
 vm.runInNewContext(fs.readFileSync('public/app/patrons.js','utf8'),context);
@@ -26,7 +38,7 @@ async function avatarInfoLifecycle(){
  const header=new Node();header.id='profileChipAvatar';const settings=new Node();settings.id='settingsHelpCard';map.set('#screen-profile #settingsHelpCard',settings);
  const doc={activeElement:null,visibilityState:'visible',createElement:tag=>new Node(tag),body:{append:n=>map.set('#'+n.id,n)},querySelector:s=>map.get(s)||map.get('#patronDialog')?.controls.get(s)||null,querySelectorAll:s=>s==='#profileChipAvatar,.profile-avatar-big'?[header]:s==='.patron-avatar-marked'?[header,...rows.map(r=>r.avatar)].filter(a=>a.classList.contains('patron-avatar-marked')):s==='.ranking-row,.result-player-row'?rows:s==='.patron-supported'?rows.filter(r=>r.classList.contains('patron-supported')):s==='.result-player-avatar.patron-avatar-info'?rows.map(r=>r.avatar).filter(a=>a.classList.contains('patron-avatar-info')):s.startsWith('#patronProfileEntry')?s.split(',').flatMap(key=>map.get(key)?[map.get(key)]:[]):[],addEventListener:(k,f)=>listeners.set(k,f)};
  const server={enabled:true,authenticated:true,patron:false,publicBadge:false,canOffer:false,offersDisabled:true};const win={addEventListener:(k,f)=>windowListeners.set(k,f),PropletAnnouncements:{register(){},kick(){}}};
- const ctx={setTimeout,clearTimeout,Date,window:win,document:doc,api:async(path)=>{requests.push(path);if(path==='/api/patrons'&&deferNextStatus){const pending=deferNextStatus;deferNextStatus=null;return pending;}return server},Intl,crypto:require('node:crypto').webcrypto,MutationObserver:class{observe(){}},requestAnimationFrame:()=>1,getProfile:()=>({id:'me',token:'fixture',name:'Pavel',avatar:'🦊'}),currentScreen:'daily'};
+ const ctx={setTimeout,clearTimeout,Date,window:win,document:doc,api:async(path)=>{requests.push(path);if(path==='/api/patrons?visibility=true'&&deferNextStatus){const pending=deferNextStatus;deferNextStatus=null;return pending;}return server},Intl,crypto:require('node:crypto').webcrypto,MutationObserver:class{observe(){}},requestAnimationFrame:()=>1,getProfile:()=>({id:'me',token:'fixture',name:'Pavel',avatar:'🦊'}),currentScreen:'daily'};
  vm.runInNewContext(fs.readFileSync('public/app/patrons.js','utf8'),ctx);listeners.get('proplet:ready')();await win.PropletPatrons.refresh();
  const button=supported.avatar;assert.equal(button.querySelector('.patron-avatar-card')?.getAttribute('aria-hidden'),'true');assert.equal(plain.avatar.querySelector('.patron-avatar-card'),null,'private other player is never marked');assert.equal(header.querySelector('.patron-avatar-card'),null);assert.equal(button.tagName,'BUTTON');assert.equal(button.children[0],hydrated,'avatar hydration is preserved');assert.equal(plain.avatar.tagName,'SPAN');assert.equal(own.avatar.tagName,'SPAN','private/non-patron own avatar stays static');assert.equal(button.getAttribute('aria-haspopup'),'dialog');assert(button.getAttribute('aria-label').includes('Pavel <autor>'));
  const before=requests.length;button.onclick({stopPropagation(){}});const dialog=map.get('#patronDialog');assert.equal(dialog.open,true);assert.equal(dialog.getAttribute('data-patron-step'),'other');assert(dialog.innerHTML.includes('Pavel &lt;autor&gt;'));assert(dialog.innerHTML.includes('Podporuje provoz a další rozvoj Propletu. Podpoř Proplet a získej vlastní značku podporovatele.'));assert(dialog.innerHTML.includes('Podpořit Proplet'));assert(!dialog.innerHTML.includes('patron-art'),'person information stays compact');assert.equal(dialog.querySelector('.patron-person-avatar').children[0].getAttribute('src'),hydrated.getAttribute('src'),'modal forwards the clicked rendered avatar, not viewer or emoji fallback');assert.equal(dialog.querySelector('.patron-person-avatar').children.length,1,'detail clones only the identity, without duplicating the card');assert.equal(requests.length,before,'public information does not create any payment or server write');
@@ -62,7 +74,7 @@ async function avatarInfoLifecycle(){
  Object.assign(server,{publicBadge:false});await win.PropletPatrons.refresh();assert.equal(own.avatar.tagName,'SPAN','hiding the public badge removes the button');assert.equal(own.avatar.querySelector('.patron-avatar-card'),null,'private own result remains private');assert(header.querySelector('.patron-avatar-card'),'own header retains personal entitlement without exposing it to others');assert.equal(header.children.length,1,'header adds only the decorative card, never a text label');assert(map.get('#patronBadgePreference').innerHTML.includes('Pravidelný podporovatel'),'private owner can still preview regular badge in settings');assert(!map.get('#patronBadgePreference').innerHTML.includes('checked'),'settings public checkbox reflects actual privacy');
  let resolveOld;deferNextStatus=new Promise(resolve=>{resolveOld=resolve});const oldResponse=win.PropletPatrons.refresh();
  Object.assign(server,{patron:false,publicBadge:false,badgeType:null,recurringStatus:null});listeners.get('proplet:account-changed')();assert.equal(header.querySelector('.patron-avatar-card'),null,'account switch clears previous own entitlement immediately');assert.equal(win.PropletPatrons.model.badgeType,null);assert.equal(win.PropletPatrons.model.recurringStatus,null);assert(!map.has('#patronBadgePreference'),'account switch clears previous privacy preview immediately');await win.PropletPatrons.refresh();
- resolveOld({enabled:true,authenticated:true,patron:true,publicBadge:true,badgeType:'recurring',recurringStatus:{state:'current'}});await oldResponse;assert.equal(win.PropletPatrons.model.badgeType,null,'late status response from previous account cannot reinstate regular badge');assert.equal(header.querySelector('.patron-avatar-card'),null,'non-patron account cannot inherit the previous mark');Object.assign(server,{enabled:false});const writes=requests.length;await win.PropletPatrons.refresh();assert.equal(supported.avatar.tagName,'SPAN');assert.equal(supported.avatar.children[0],hydrated);assert.equal(dialog.open,false);assert.deepEqual(requests.slice(writes),['/api/patrons']);
+ resolveOld({enabled:true,authenticated:true,patron:true,publicBadge:true,badgeType:'recurring',recurringStatus:{state:'current'}});await oldResponse;assert.equal(win.PropletPatrons.model.badgeType,null,'late status response from previous account cannot reinstate regular badge');assert.equal(header.querySelector('.patron-avatar-card'),null,'non-patron account cannot inherit the previous mark');Object.assign(server,{enabled:false});const writes=requests.length;await win.PropletPatrons.refresh();assert.equal(supported.avatar.tagName,'SPAN');assert.equal(supported.avatar.children[0],hydrated);assert.equal(dialog.open,false);assert.deepEqual(requests.slice(writes),['/api/patrons?visibility=true']);
 }
 (async()=>{
  events.get('proplet:ready')();await window.PropletPatrons.refresh();
@@ -70,7 +82,7 @@ async function avatarInfoLifecycle(){
  const signedInStatus={...status};Object.assign(status,{authenticated:false,canOffer:false,offersDisabled:true});
  const guestRead=calls.length;await window.PropletPatrons.refresh();const guestLink=nodes.get('#patronTodayLink');
  assert(guestLink,'enabled guest has the native manual Today support link');assert.equal(guestLink.attrs['aria-label'],'Podpořit Proplet');assert(guestLink.innerHTML.includes('>Podpořit Proplet</span>'));assert.equal(guestLink.hidden,false);
- assert.equal(entry.eligible(),false,'guest page never creates an automatic support offer');assert.deepEqual(calls.slice(guestRead),['/api/patrons'],'guest decoration only reads status');
+ assert.equal(entry.eligible(),false,'guest page never creates an automatic support offer');assert.deepEqual(calls.slice(guestRead),['/api/patrons?visibility=true'],'guest decoration only reads status');
  Object.assign(status,signedInStatus);await window.PropletPatrons.refresh();
  assert.equal(entry.eligible(),false,'initial page open never asks');
  window.PropletPatrons.resultCompleted();await Promise.resolve();assert.equal(entry.eligible(),true,'server policy determines eligibility across age preferences');
@@ -82,9 +94,15 @@ async function avatarInfoLifecycle(){
  assert.equal(nodes.get('#patronDialog').open,true);assert.equal(thanks.eligible(),false);
  assert.equal(nodes.get('#patronDialog').attrs['data-patron-step'],'welcome','automatic first confirmation opens the celebration');
  assert.doesNotMatch(nodes.get('#patronDialog').innerHTML,/Tvoje potvrzené příspěvky|Přispět znovu|patronPublic/,'celebration has no payment management');
- window.PropletPatrons.close();window.PropletPatrons.open('thanks');
+ assert.match(nodes.get('#patronDialog').innerHTML,/id="patronWelcomePublic" checked/);
+ assert.deepEqual(visibilityWrites,[],'opening the prompt never publishes the badge');
+ nodes.set('#patronWelcomePublic',{checked:false});
+ await welcomeButton.confirm({currentTarget:welcomeButton});
+ assert.deepEqual(visibilityWrites,[{publicBadge:false}],'confirming an unchecked box saves the opt-out');
+ assert.equal(nodes.get('#patronDialog').open,false);
+ window.PropletPatrons.open('thanks');
  assert.match(nodes.get('#patronDialog').innerHTML,/Tvoje potvrzené příspěvky/);assert.match(nodes.get('#patronDialog').innerHTML,/Přispět znovu/,'manual support management remains available');
- assert.equal(calls.filter(p=>p==='/api/patrons/thanks/claim').length,1);
+ assert.equal(calls.filter(p=>p==='/api/patrons/thanks/claim?visibility=true').length,1);
  window.PropletPatrons.model.requestId='prior-confirmed-intent';window.PropletPatrons.open('offer');assert.equal(window.PropletPatrons.model.requestId,null,'manual support from an existing patron starts a new contribution');
  // Live disable must remove previously rendered support and bank details with no write.
  for(const id of ['patronProfileEntry','patronTodayLink','patronOfferPreference']){const node=element();node.id=id;nodes.set('#'+id,node);}
@@ -92,7 +110,7 @@ async function avatarInfoLifecycle(){
  status.enabled=false;const before=calls.length;await window.PropletPatrons.refresh();
  assert.equal(nodes.get('#patronDialog').open,false);assert.equal(window.PropletPatrons.model.intent,null);assert.equal(window.PropletPatrons.model.payment,null);
  for(const id of ['patronProfileEntry','patronTodayLink','patronOfferPreference','patronOffer'])assert.ok(removed.includes(id));
- assert.deepEqual(calls.slice(before),['/api/patrons'],'kill switch does not dismiss/claim/write');
+ assert.deepEqual(calls.slice(before),['/api/patrons?visibility=true'],'kill switch does not dismiss/claim/write');
  assert.equal(entry.eligible(),false);assert.equal(thanks.eligible(),false);window.PropletPatrons.offer();assert.equal(mounted,1);
  await avatarInfoLifecycle();
  console.log('PASS patron client: server gates; first/renewed/grace/expired/reinstated badges; pending QR and history never grant; private/public details and settings; stale account response; live OFF');
