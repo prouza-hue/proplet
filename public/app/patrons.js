@@ -20,7 +20,7 @@
  const recommendedAmount='129';
  const model={frequency:'monthly',firstPaymentDate:today(),amount:Number(recommendedAmount),paid:false,badgeType:null,recurringStatus:null,thanksPending:false,contributions:[],public:false,offersDisabled:false,enabled:false,authenticated:false,canOffer:false,step:'offer',returnFocus:null,selected:recommendedAmount,intent:null,payment:null,pending:false,error:''};
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const money=n=>new Intl.NumberFormat('cs-CZ').format(n)+' Kč';
+ const money=n=>new Intl.NumberFormat('cs-CZ').format(n)+' Kč';
  const paidDate=value=>{const d=new Date(value);return Number.isNaN(d.getTime())?'Datum není dostupné':new Intl.DateTimeFormat('cs-CZ',{timeZone:'Europe/Prague',dateStyle:'medium'}).format(d);};
  async function refresh(){const epoch=accountEpoch,generation=++stateGeneration;try{const value=await request('/api/patrons?visibility=true');if(epoch!==accountEpoch||generation!==stateGeneration)return;Object.assign(model,{enabled:value.enabled===true,authenticated:value.authenticated===true,paid:value.patron===true,badgeType:value.patron===true?(value.badgeType==='recurring'?'recurring':'supporter'):null,recurringStatus:value.patron===true&&value.recurringStatus&&typeof value.recurringStatus==='object'?value.recurringStatus:null,thanksPending:value.thanksPending===true,contributions:Array.isArray(value.contributions)?value.contributions:[],public:value.publicBadge===true,offersDisabled:value.offersDisabled===true,canOffer:value.canOffer===true});decorate();if($('#patronDialog')?.open&&model.step==='thanks')render();window.PropletAnnouncements?.kick();}catch{if(epoch===accountEpoch){model.canOffer=false;model.error='Podporu se teď nepodařilo načíst. Hra funguje dál.';}}}
  async function preference(next){try{await request('/api/patrons/preferences',{method:'POST',body:JSON.stringify(next)});await refresh();}catch{model.error='Změnu se nepodařilo uložit. Zkus to prosím znovu.';render();}}
@@ -58,15 +58,15 @@
   if(model.step==='offer'){
    content='<form id="patronForm"><div class="patron-offer-scroll">'+heading('Pomoz Propletu zůstat ve hře.')+
     (messageExpanded?`<div class="patron-offer-copy" id="patronMessage">
-      <p>Proplet je zdarma a moc bych si přál, aby to tak zůstalo.</p>
-      <p>Jenže ani hra zdarma se neobejde bez nákladů. Za její provoz a nástroje, které používám při vývoji, platím přes 2 000 Kč měsíčně. Zatím jde většina z mojí kapsy.</p>
-      <p>Pokud tě Proplet baví, budu rád, když mi pomůžeš udržet ho v chodu a dál ho vylepšovat. Třeba i malým měsíčním příspěvkem. Každá podpora se počítá.</p>
-      <p>Díky, že hraješ. A pokud se rozhodneš přispět, díky o to víc!</p>
-      <p>— Pavel</p>
+      <p>Proplet je zdarma a moc bych si přál, aby to tak zůstalo.</p>
+      <p>Jenže ani hra zdarma se neobejde bez nákladů. Za její provoz a nástroje, které používám při vývoji, platím přes 2 000 Kč měsíčně. Zatím jde většina z mojí kapsy.</p>
+      <p>Pokud tě Proplet baví, budu rád, když mi pomůžeš udržet ho v chodu a dál ho vylepšovat. Třeba i malým měsíčním příspěvkem. Každá podpora se počítá.</p>
+      <p>Díky, že hraješ. A pokud se rozhodneš přispět, díky o to víc!</p>
+      <p>— Pavel</p>
     </div>`:`<div class="patron-offer-copy" id="patronMessage">
-      <p>Proplet je zdarma a rád bych, aby to tak zůstalo. Jeho provoz a vývoj mě ale stojí přes 2 000 Kč měsíčně, které zatím platím převážně sám.</p>
-      <p>Pokud tě Proplet baví, budu rád, když mi s tím pomůžeš. Díky!</p>
-      <p>— Pavel</p>
+      <p>Proplet je zdarma a rád bych, aby to tak zůstalo. Jeho provoz a vývoj mě ale stojí přes 2 000 Kč měsíčně, které zatím platím převážně sám.</p>
+      <p>Pokud tě Proplet baví, budu rád, když mi s tím pomůžeš. Díky!</p>
+      <p>— Pavel</p>
     </div>`)+
     `<button type="button" class="patron-message-toggle" aria-expanded="${messageExpanded}" aria-controls="patronMessage">${messageExpanded?'Zkrátit vzkaz':'Pár slov ode mě'} <span aria-hidden="true">${messageExpanded?'⌃':'⌄'}</span></button>`+
     '<fieldset class="patron-frequency"><legend class="os-sr">Četnost podpory</legend><div>'+[['monthly','Měsíčně'],['once','Jednorázově']].map(([v,label])=>`<label><input type="radio" name="frequency" value="${v}" ${model.frequency===v?'checked':''}><span>${label}</span></label>`).join('')+'</div></fieldset><fieldset><legend>Výše příspěvku</legend><div class="patron-amounts">'+['79',recommendedAmount,'199','custom'].map(v=>`<label class="patron-amount"><input type="radio" name="amount" value="${v}" ${model.selected===v?'checked':''}><span>${v==='custom'?'Jiná částka':money(Number(v))}${v===recommendedAmount?'<small>Doporučeno</small>':''}</span></label>`).join('')+'</div></fieldset>'+

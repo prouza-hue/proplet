@@ -243,7 +243,7 @@ html.tiskarna-ui body #patronTodayLink.patron-today-link:not([hidden]){display:g
 #patronDialog[data-patron-step=offer] .patron-art{width:68px;height:72px}
 #patronDialog[data-patron-step=offer] h2{font-size:28px;line-height:1.12}
 #patronDialog .patron-offer-copy{gap:7px;margin:0}
-#patronDialog .patron-offer-copy p{font-size:15px;line-height:1.4}
+#patronDialog .patron-offer-copy p{font-size:15px;line-height:1.4;text-align:left;text-wrap:pretty}
 #patronDialog .patron-message-toggle{display:flex;align-items:center;gap:7px;min-height:44px;padding:4px 0;border:0;background:none;color:var(--patron-blue);font:500 14px/1.3 Outfit,sans-serif;cursor:pointer}
 #patronForm .patron-frequency{margin-bottom:12px!important}
 #patronForm legend{margin-bottom:7px;font-size:14px}
