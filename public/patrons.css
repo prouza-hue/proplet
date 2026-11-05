@@ -152,8 +152,6 @@ html.tiskarna-ui body #screen-leaderboard :is(.ranking-rank-chip,.ranking-player
 .patron-frequency span{display:flex;align-items:center;justify-content:center;min-height:44px;font:600 15px/1.25 Outfit,sans-serif;border-radius:9px;text-align:center;padding:8px;box-sizing:border-box}
 .patron-frequency input:checked+span{background:var(--td-paper);color:var(--patron-blue);box-shadow:0 1px 4px #0002}
 .patron-frequency input:focus-visible+span{outline:3px solid var(--td-blue);outline-offset:2px}
-.patron-start{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 0;font-size:14px}
-.patron-start input{max-width:170px;min-width:0;font:inherit;padding:8px;border:1px solid var(--td-line);border-radius:8px;background:var(--td-paper);color:var(--td-ink)}
 #patronDialog .patron-frequency-note{font-size:12px;margin:6px 0 0}
 #patronDialog .patron-perk{margin:18px 0 22px;padding:0;background:none;grid-template-columns:68px minmax(0,1fr);gap:14px}
 #patronDialog .patron-perk p{font-size:13px;margin-top:4px}
@@ -248,12 +246,6 @@ html.tiskarna-ui body #patronTodayLink.patron-today-link:not([hidden]){display:g
 #patronForm .patron-frequency{margin-bottom:12px!important}
 #patronForm legend{margin-bottom:7px;font-size:14px}
 #patronDialog .patron-amounts .patron-amount>span{min-height:50px;font-size:15px;padding:6px 2px!important}
-#patronDialog .patron-start{justify-content:flex-start;gap:5px;margin:5px 0 0;min-height:44px;font-size:14px}
-#patronDialog .patron-date-control{position:relative;display:inline-flex;align-items:center;gap:5px;min-height:44px;cursor:pointer}
-#patronDialog .patron-date-control input{position:absolute;inset:0;width:100%;height:100%;max-width:none;opacity:0;cursor:pointer;padding:0}
-#patronDialog .patron-date-control input::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:auto;height:auto;cursor:pointer}
-#patronDialog .patron-date-control:focus-within{outline:3px solid var(--td-blue,#315da8);outline-offset:2px;border-radius:4px}
-#patronDialog .patron-date-change{color:var(--patron-blue);text-decoration:underline;text-underline-offset:3px}
 #patronDialog .patron-perk-details{margin:0;padding:0}
 #patronDialog .patron-perk-details>summary{gap:7px;font-size:13px;min-height:44px}
 #patronDialog .patron-perk-details>summary>span:nth-child(2){min-width:0}
