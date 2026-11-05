@@ -764,6 +764,20 @@
       ]
     },
     {
+      "id": "20261105-patron-offer-visibility",
+      "order": 660,
+      "version": "2026.11.05",
+      "path": "supabase/migrations/20261105224723_patron_offer_visibility.sql",
+      "type": "migration",
+      "status": "prepared-visibility-confirmation",
+      "sha256": "c2c3313d2522603523617377142cadfbdd834cdba9abddd6bb782da14d93878f",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_patron_state_v1",
+        "public.proplet_patron_offer_dismiss_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",
