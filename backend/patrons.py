@@ -86,6 +86,8 @@ class PreferenceBody(Body):
 class DismissBody(Body):
     receiptId: UUID
     action: Literal['declined','ignored','opened']
+class OfferDisplayBody(Body):
+    receiptId: Optional[UUID]=None
 class ConfirmBody(Body):
     intentId: UUID
     reference: str=Field(pattern=r'^[1-9][0-9]{0,9}$')
@@ -156,6 +158,11 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
     def claim(request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
         headers(response);p=account(authorization);enforce_rate_limit(request,'patron_offer',limit=30,window_seconds=3600)
         return run('proplet_patron_state_v1',{'p_player':p['id'],'p_claim':True})
+
+    @app.post('/api/patrons/offers/display')
+    def display_offer(body:OfferDisplayBody,request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
+        headers(response);p=account(authorization);enforce_rate_limit(request,'patron_offer',limit=30,window_seconds=3600)
+        return run('proplet_patron_offer_v2',{'p_player':p['id'],'p_receipt':str(body.receiptId) if body.receiptId else None})
 
     @app.post('/api/patrons/offers/dismiss')
     def dismiss(body:DismissBody,response:Response,authorization:Optional[str]=Header(default=None)):

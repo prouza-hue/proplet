@@ -31,6 +31,7 @@ def main():
    c.execute((ROOT/'supabase/migrations/20261101022415_patron_manual_badge.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261101103408_patron_recurring_badge.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261105083317_patron_thanks_visibility.sql').read_text(encoding='utf8'))
+   c.execute((ROOT/'supabase/migrations/20261105224723_patron_offer_visibility.sql').read_text(encoding='utf8'))
   ids=[str(uuid4()) for _ in range(4)];player,other,balanced,admin=ids
   for index,pid in enumerate(ids):c.execute('insert into public.players(id,name,family_code,token_hash,support_mode,public_rankings) values(%s,%s,%s,%s,%s,true)',(pid,'Patron SQL '+str(index),'patron-test',secrets.token_hex(32),'younger' if pid==balanced else 'none'))
   # Use the existing schema's required admin columns, if present.
@@ -52,7 +53,12 @@ def main():
   c.execute("update proplet_private.patron_first_seen set first_seen_at=now()-interval '49 hours'")
   assert rpc('proplet_patron_state_v1',player,False)['canOffer'] is True
   assert rpc('proplet_patron_state_v1',balanced,False)['canOffer'] is True
-  assert rpc('proplet_patron_state_v1',balanced,True)['displayGranted'] is True
+  assert not rpc('proplet_patron_state_v1',balanced,True)['displayGranted']
+  # Legacy receipts with a recorded click count, while passive departures do not.
+  c.execute("""insert into proplet_private.patron_offer_receipts(player_id,shown_at,outcome)
+               values(%s,now()-interval '5 days','opened'),(%s,now(),'ignored')""",(balanced,balanced))
+  legacy=rpc('proplet_patron_state_v1',balanced,False)
+  assert legacy['offerCount90d']==1 and legacy['offerWaitReason']=='cooldown'
 
   def new_player():
    pid=str(uuid4())
@@ -65,10 +71,10 @@ def main():
    c.execute("insert into public.results(id,player_id,puzzle_id,challenge_key,mode,difficulty,best_elapsed_ms,best_moves,points,completed_at) values(%s,%s,%s,%s,%s,'easy',10000,5,15,now()) on conflict do nothing",(str(uuid4()),pid,'patron-post-'+str(index),mode+':patron-post-'+str(index),mode))
   news_player=new_player();news(news_player)
   for j in range(2):post_news_board(news_player,j)
-  waiting=rpc('proplet_patron_state_v1',news_player,True)
+  waiting=rpc('proplet_patron_offer_v2',news_player,None)
   assert not waiting['displayGranted'] and waiting['offerWaitReason']=='release_wait' and waiting['postAnchorBoards']==2
   c.execute("update public.release_news_receipts set claimed_at=now()-interval '47 hours 59 minutes' where player_id=%s",(news_player,))
-  assert not rpc('proplet_patron_state_v1',news_player,True)['displayGranted']
+  assert not rpc('proplet_patron_offer_v2',news_player,None)['displayGranted']
   c.execute("update public.release_news_receipts set claimed_at=now()-interval '48 hours' where player_id=%s",(news_player,))
   assert rpc('proplet_patron_state_v1',news_player,False)['canOffer']
   # Five historic boards and elapsed time cannot replace two new boards.
@@ -89,8 +95,11 @@ def main():
   assert state['postAnchorBoards']==1 and not state['canOffer']
   post_news_board(late,1)
   assert rpc('proplet_patron_state_v1',late,False)['canOffer']
+  late_reservation=rpc('proplet_patron_offer_v2',late,None)['receiptId']
+  assert late_reservation
   assert rpc('proplet_patron_preferences_v1',late,False,True)['offerWaitReason']=='disabled'
-  assert not rpc('proplet_patron_state_v1',late,True)['displayGranted']
+  assert not rpc('proplet_patron_offer_v2',late,late_reservation)['displayGranted']
+  assert not rpc('proplet_patron_offer_v2',late,None)['displayGranted']
   assert rpc('proplet_patron_preferences_v1',late,False,False)['canOffer']
   # No-history accounts never become eligible merely by waiting.
   empty=str(uuid4());c.execute("insert into public.players(id,name,family_code,token_hash) values(%s,'Empty','patron-test',%s)",(empty,secrets.token_hex(32)))
@@ -111,7 +120,7 @@ def main():
   def race_claim():
    with psycopg.connect(**opts) as conn:
     conn.execute('set role service_role')
-    return rpc('proplet_patron_state_v1',race,True,connection=conn)
+    return rpc('proplet_patron_offer_v2',race,None,connection=conn)
   with ThreadPoolExecutor(max_workers=2) as pool:
    news_future=pool.submit(insert_news);assert inserted.wait(5)
    offer_future=pool.submit(race_claim)
@@ -125,31 +134,64 @@ def main():
   assert not race_state['displayGranted'] and race_state['offerAnchorSource']=='release_news'
   assert race_state['offerWaitReason']=='release_wait'
 
+  # Only one device may reserve. The reservation does not create a receipt or
+  # affect eligibility after expiry, and its id cannot confirm a later lease.
+  def claim(_):
+   with psycopg.connect(**opts) as conn:
+    conn.execute('set role service_role')
+    return rpc('proplet_patron_offer_v2',player,None,connection=conn)
+  with ThreadPoolExecutor(max_workers=2) as pool:claims=list(pool.map(claim,range(2)))
+  assert sum(r['displayGranted'] for r in claims)==1
+  stale=next(r['receiptId'] for r in claims if r['displayGranted'])
+  assert c.execute('select count(*) from proplet_private.patron_offer_receipts where player_id=%s',(player,)).fetchone()[0]==0
+  assert rpc('proplet_patron_state_v1',player,False)['canOffer']
+  c.execute("update proplet_private.patron_first_seen set offer_reserved_until=now()-interval '1 second' where player_id=%s",(player,))
+  assert not rpc('proplet_patron_offer_v2',player,stale)['displayGranted']
+  receipt=claim(0)['receiptId']
+  assert receipt and receipt!=stale
+  assert not rpc('proplet_patron_offer_v2',other,receipt)['displayGranted']
+  assert rpc('proplet_patron_offer_dismiss_v1',player,receipt,'declined')['code']=='not_found'
+  assert rpc('proplet_patron_offer_v2',player,receipt)['offerCount90d']==1
+  assert rpc('proplet_patron_offer_v2',player,receipt)['offerCount90d']==1
+  rpc('proplet_patron_offer_dismiss_v1',player,receipt,'ignored')
+  assert c.execute('select outcome from proplet_private.patron_offer_receipts where id=%s',(receipt,)).fetchone()[0]=='shown'
+  rpc('proplet_patron_offer_dismiss_v1',player,receipt,'declined')
+  assert c.execute('select outcome from proplet_private.patron_offer_receipts where id=%s',(receipt,)).fetchone()[0]=='declined'
+  c.execute("update proplet_private.patron_offer_receipts set shown_at=now()-interval '13 days' where id=%s",(receipt,))
+  assert claim(0)['offerWaitReason']=='cooldown'
+  c.execute("update proplet_private.patron_offer_receipts set shown_at=now()-interval '14 days' where id=%s",(receipt,))
+  second_receipt=claim(0)['receiptId']
+  assert rpc('proplet_patron_offer_v2',player,second_receipt)['offerCount90d']==2
+  rpc('proplet_patron_offer_dismiss_v1',player,second_receipt,'opened')
+  assert c.execute('select outcome from proplet_private.patron_offer_receipts where id=%s',(second_receipt,)).fetchone()[0]=='opened'
+  c.execute("update proplet_private.patron_offer_receipts set shown_at=shown_at-interval '29 days' where player_id=%s",(player,))
+  assert claim(0)['offerWaitReason']=='cooldown'
+  c.execute("update proplet_private.patron_offer_receipts set shown_at=shown_at-interval '1 day' where player_id=%s",(player,))
+  third_receipt=claim(0)['receiptId']
+  assert rpc('proplet_patron_offer_v2',player,third_receipt)['offerCount90d']==3
+  c.execute("update proplet_private.patron_offer_receipts set shown_at=shown_at-interval '31 days' where player_id=%s",(player,))
+  assert claim(0)['offerWaitReason']=='offer_limit'
+  c.execute("update proplet_private.patron_offer_receipts set shown_at=now()-interval '91 days' where id=%s",(receipt,))
+  available=rpc('proplet_patron_state_v1',player,False)
+  assert available['canOffer'] and available['offerCount90d']==2
+
+  # Creating a QR suppresses even a previously reserved offer, without
+  # preventing manual contributions or changing existing payment instructions.
+  pending_reservation=claim(0)['receiptId']
   c.execute('set role service_role')
   request=str(uuid4());first=rpc('proplet_patron_intent_v1',player,request,99)['intent']
   assert first['status']=='qr_created' and first['reference'].isdigit()
-  assert rpc('proplet_patron_state_v1',player,False)['patron'] is False
+  pending=rpc('proplet_patron_offer_v2',player,pending_reservation)
+  assert not pending['patron'] and not pending['displayGranted'] and pending['offerWaitReason']=='payment_pending'
+  assert claim(0)['offerWaitReason']=='payment_pending'
   assert rpc('proplet_patron_intent_v1',player,request,99)['intent']==first
   assert rpc('proplet_patron_intent_v1',player,request,199)['code']=='idempotency_conflict'
   assert rpc('proplet_patron_intent_read_v1',other,first['id'])['code']=='not_found'
   assert rpc('proplet_patron_preferences_v1',player,True,False)['code']=='not_confirmed'
+  assert rpc('proplet_patron_preferences_v1',player,False,True)['offerWaitReason']=='disabled'
+  assert rpc('proplet_patron_preferences_v1',player,False,False)['offerWaitReason']=='payment_pending'
   c.execute('reset role');c.execute("update public.players set name='Změněné jméno' where id=%s",(player,))
   assert rpc('proplet_patron_intent_v1',player,request,99)['intent']['nicknameSnapshot']==first['nicknameSnapshot']
-  # Atomic offer claims on the same account across independent device connections.
-  def claim(_):
-   with psycopg.connect(**opts) as conn:
-    conn.execute('set role service_role')
-    return rpc('proplet_patron_state_v1',player,True,connection=conn)
-  with ThreadPoolExecutor(max_workers=2) as pool:claims=list(pool.map(claim,range(2)))
-  assert sum(r['displayGranted'] for r in claims)==1
-  c.execute("update proplet_private.patron_offer_receipts set shown_at=now()-interval '31 days' where player_id=%s",(player,))
-  assert rpc('proplet_patron_state_v1',player,True)['displayGranted'] is True
-  c.execute("update proplet_private.patron_offer_receipts set shown_at=shown_at-interval '31 days' where player_id=%s",(player,))
-  assert rpc('proplet_patron_state_v1',player,True)['displayGranted'] is False
-  c.execute("update proplet_private.patron_offer_receipts set shown_at=shown_at-interval '91 days' where player_id=%s",(player,))
-  assert rpc('proplet_patron_state_v1',player,False)['canOffer'] is True
-  assert rpc('proplet_patron_preferences_v1',player,False,True)['canOffer'] is False
-  assert rpc('proplet_patron_preferences_v1',player,False,False)['canOffer'] is True
   try:rpc('proplet_patron_confirm_v1',other,first['id'],first['reference'],'forbidden',99,'CZK','5531840001/5500')
   except psycopg.errors.InsufficientPrivilege:pass
   else:raise AssertionError('Non-admin confirmed a contribution')
@@ -161,6 +203,7 @@ def main():
   assert confirm(first['id'],first['reference'],'test-tx')['alreadyConfirmed'] is False
   thank_state=rpc('proplet_patron_state_v1',player,False)
   assert thank_state['thanksPending'] and not thank_state['publicBadge']
+  assert rpc('proplet_patron_offer_v2',player,None)['offerWaitReason']=='patron'
   assert len(thank_state['contributions'])==1
   assert set(thank_state['contributions'][0])=={'id','amountCzk','frequency','confirmedAt'}
   assert thank_state['contributions'][0]['amountCzk']==99
@@ -262,17 +305,17 @@ def main():
   c.execute('reset role')
   for role in ('anon','authenticated'):
    c.execute(sql.SQL('set role {}').format(sql.Identifier(role)))
-   for name in ('proplet_patron_state_v1','proplet_patron_thanks_visibility_v1'):
-    try:rpc(name,player,False)
+   for function_name,arg in (('proplet_patron_state_v1',False),('proplet_patron_thanks_visibility_v1',False),('proplet_patron_offer_v2',None)):
+    try:rpc(function_name,player,arg)
     except psycopg.errors.InsufficientPrivilege:pass
-    else:raise AssertionError(f'Client role can invoke {name}')
+    else:raise AssertionError(f'Client role can invoke {function_name}')
    c.execute('reset role')
   http_acceptance(opts,new_player(),new_player(),admin)
   from tools.test_patron_manual_badge_db import run_manual_badge_acceptance
   run_manual_badge_acceptance(opts)
   from tools.test_patron_recurring_db import run_recurring_acceptance
   run_recurring_acceptance(opts)
- print('PASS patron SQL: migration, ownership, immutable once/monthly/date, Prague calendar, repeated monthly receipts, concurrent receipt retry, permanent entitlement, account-wide exactly-once thanks claim, private bounded personal payment history, monthly audit/ledger, rename, atomic claims/news receipt race, balanced preset eligibility, durable first-visit 48h fallback, news priority + 48h + two distinct ordinary boards, late receipt reset, 3-day/5-board eligibility, 30/90-day limits, opt-out, exact receipt, duplicate bank transaction, private default and ACL; database='+name)
+ print('PASS patron SQL: visibility, account-wide lease and retry, 14/30/90-day scheduling, legacy evidence, news and newcomer gates, opt-out, pending QR, patron suppression, payment ownership/ledger, monthly dates, thanks, badge privacy and ACL; database='+name)
 
 def http_acceptance(opts,owner,other,admin):
  """Real native HTTP handlers over the disposable SQL schema, no mocked RPC."""
@@ -299,6 +342,15 @@ def http_acceptance(opts,owner,other,admin):
    return db.execute(sql.SQL('select public.{}({})').format(sql.Identifier(name),fields),list(args.values())).fetchone()[0]
  patrons.install(app,auth_player=auth,require_admin=require_admin,db_rpc=call,enforce_rate_limit=lambda *a,**k:None,enabled=lambda:enabled[0])
  client=TestClient(app);h={'Authorization':'Bearer sql-owner'};oh={'Authorization':'Bearer sql-other'};ah={'Authorization':'Bearer sql-admin'}
+ display='/api/patrons/offers/display'
+ assert client.post(display,json={}).status_code==401
+ assert not client.get('/api/patrons',headers=h).json()['canOffer']
+ with psycopg.connect(**opts) as db:
+  db.execute("update proplet_private.patron_first_seen set first_seen_at=now()-interval '49 hours' where player_id=%s",(owner,))
+ reservation=client.post(display,json={},headers=h).json()
+ assert reservation['displayGranted'] and reservation['offerCount90d']==0
+ impression=client.post(display,json={'receiptId':reservation['receiptId']},headers=h).json()
+ assert impression['displayGranted'] and impression['offerCount90d']==1
  body={'requestId':str(uuid4()),'amountCzk':99}
  assert client.post('/api/patrons/intents',json=body).status_code==401
  assert client.post('/api/patrons/intents',json={**body,'playerId':other},headers=h).status_code==422
@@ -366,6 +418,6 @@ def http_acceptance(opts,owner,other,admin):
  assert client.get('/api/patrons',headers=h).json()=={'enabled':False}
  assert client.post('/api/patrons/intents',json=body,headers=h).status_code==503
  assert len(rpc_calls)==before
- print('PASS native patron HTTP + real SQL: authenticated immutable QR decoded, owner/rename binding, admin authority, exact matching, idempotence, duplicate bank ID denial, private history, one-time legacy thanks replay, badge-only save and feature flag')
+ print('PASS native patron HTTP + real SQL: visible offer confirmation, authenticated immutable QR decoded, owner/rename binding, admin authority, exact matching, idempotence, duplicate bank ID denial, private history, one-time legacy thanks replay, badge-only save and feature flag')
 
 if __name__=='__main__':main()

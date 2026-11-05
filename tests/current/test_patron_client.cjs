@@ -1,10 +1,12 @@
 // Exercise native patron UI gates, durable claim coordination and kill switch.
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 const nodes=new Map(),events=new Map(),entries=new Map();let mounted=0,calls=[],removed=[];
+const offerRequests=[];let anchorTop=90,cardBottom=240,afterPaint;
 const welcomeButton={addEventListener(_event,fn){this.confirm=fn}};
-function element(){return {attrs:{},setAttribute(k,v){this.attrs[k]=v},addEventListener(){},append(){},remove(){removed.push(this.id);nodes.delete('#'+this.id)},querySelector(s){return s==='[data-confirm-visibility]'&&this.innerHTML.includes('data-confirm-visibility')?welcomeButton:{onclick:null,addEventListener(){}}},querySelectorAll:()=>[],classList:{contains:()=>false,remove(){}},innerHTML:'',textContent:'',showModal(){this.open=true},close(){this.open=false},focus(){}};}
-const footer={before(node){if(node.id==='patronOffer')mounted++;nodes.set('#'+node.id,node)}};
-const document={createElement:element,body:{append(node){nodes.set('#'+node.id,node)}},querySelector(s){if(s==='.app-footer')return footer;return nodes.get(s)||null},querySelectorAll(s){return s.startsWith('#patronProfileEntry')?s.split(',').flatMap(key=>nodes.get(key)?[nodes.get(key)]:[]):[]},addEventListener(name,fn){events.set(name,fn)}};
+function element(){const controls=new Map();return {attrs:{},isConnected:true,setAttribute(k,v){this.attrs[k]=v},addEventListener(){},append(){},remove(){this.isConnected=false;removed.push(this.id);nodes.delete('#'+this.id)},getBoundingClientRect(){return {left:8,right:312,top:90,bottom:cardBottom,width:304,height:150}},contains(node){return node===this},querySelector(s){if(s==='[data-confirm-visibility]'&&this.innerHTML.includes('data-confirm-visibility'))return welcomeButton;if(!controls.has(s))controls.set(s,{onclick:null,addEventListener(){}});return controls.get(s)},querySelectorAll:()=>[],classList:{contains:()=>false,remove(){}},innerHTML:'',textContent:'',showModal(){this.open=true},close(){this.open=false},focus(){}};}
+const anchor={getBoundingClientRect:()=>({top:anchorTop,width:304}),before(node){mounted++;nodes.set('#'+node.id,node)}};
+const footer={before(node){nodes.set('#'+node.id,node)}};
+const document={createElement:element,elementFromPoint:()=>nodes.get('#patronOffer'),body:{append(node){nodes.set('#'+node.id,node)}},querySelector(s){if(s==='.app-footer')return footer;if(s==='#oneScreenToday .os-main')return anchor;return nodes.get(s)||null},querySelectorAll(s){return s.startsWith('#patronProfileEntry')?s.split(',').flatMap(key=>nodes.get(key)?[nodes.get(key)]:[]):[]},addEventListener(name,fn){events.set(name,fn)}};
 const status={enabled:true,authenticated:true,patron:false,publicBadge:false,offersDisabled:false,canOffer:true};
 const visibilityWrites=[];
 const request=async (path,options)=>{
@@ -16,10 +18,14 @@ const request=async (path,options)=>{
   const choice=JSON.parse(options.body);visibilityWrites.push(choice);
   status.publicBadge=choice.publicBadge;return status;
  }
- return path.endsWith('/claim')?{displayGranted:true,receiptId:'receipt'}:status;
+ if(path.startsWith('/api/patrons/offers/')){
+  offerRequests.push(JSON.parse(options.body));
+  return {displayGranted:true,receiptId:'receipt'};
+ }
+ return status;
 };
-const window={PropletAnnouncements:{register(e){entries.set(e.id,e)},kick(){}},addEventListener(){}};
-const context={window,document,api:request,Intl,crypto:require('node:crypto').webcrypto,MutationObserver:class{observe(){}},requestAnimationFrame(){},getProfile:()=>({id:'a',token:'token',supportMode:'younger'}),currentScreen:'daily'};
+const window={innerWidth:320,innerHeight:570,PropletAnnouncements:{register(e){entries.set(e.id,e)},kick(){}},addEventListener(){}};
+const context={window,document,setTimeout,clearTimeout,api:request,Intl,crypto:require('node:crypto').webcrypto,MutationObserver:class{observe(){}},requestAnimationFrame(fn){queueMicrotask(()=>{afterPaint?.();fn()})},getProfile:()=>({id:'a',token:'token',supportMode:'younger'}),currentScreen:'daily'};
 vm.runInNewContext(fs.readFileSync('public/app/patrons.js','utf8'),context);
 async function avatarInfoLifecycle(){
  const map=new Map(),listeners=new Map(),windowListeners=new Map(),rows=[],requests=[];let focus=null,deferNextStatus=null;
@@ -84,10 +90,26 @@ async function avatarInfoLifecycle(){
  assert(guestLink,'enabled guest has the native manual Today support link');assert.equal(guestLink.attrs['aria-label'],'Podpořit Proplet');assert(guestLink.innerHTML.includes('>Podpořit Proplet</span>'));assert.equal(guestLink.hidden,false);
  assert.equal(entry.eligible(),false,'guest page never creates an automatic support offer');assert.deepEqual(calls.slice(guestRead),['/api/patrons?visibility=true'],'guest decoration only reads status');
  Object.assign(status,signedInStatus);await window.PropletPatrons.refresh();
- assert.equal(entry.eligible(),false,'initial page open never asks');
- window.PropletPatrons.resultCompleted();await Promise.resolve();assert.equal(entry.eligible(),true,'server policy determines eligibility across age preferences');
- assert.equal(await entry.show({isCurrent:()=>entry.eligible()}),true,'server claim must not invalidate its own display ticket');
- assert.equal(mounted,1);assert.equal(entry.eligible(),false);assert.equal(calls.filter(p=>p.endsWith('/claim')).length,1);
+ const show=()=>entry.show({isCurrent:()=>entry.eligible()});
+ anchorTop=550;
+ assert.equal(await show(),false,'offscreen slot does not even reserve a receipt');assert.deepEqual(offerRequests,[]);
+ anchorTop=90;context.currentScreen='game';
+ assert.equal(await show(),false,'playing does not trigger automatic support');assert.deepEqual(offerRequests,[]);
+ context.currentScreen='daily';afterPaint=()=>{document.hidden=true;};
+ assert.equal(await show(),false,'backgrounding before paint does not confirm the reservation');
+ assert.equal(nodes.has('#patronOffer'),false);assert.deepEqual(offerRequests,[{}]);
+ document.hidden=false;afterPaint=null;
+ assert.equal(await show(),true,'returning to Today can show an eligible card');
+ assert.equal(mounted,2);assert.equal(entry.eligible(),false);assert.deepEqual(offerRequests,[{},{},{receiptId:'receipt'}]);
+ context.currentScreen='free';events.get('proplet:screen-changed')();
+ assert.equal(nodes.has('#patronOffer'),false);assert.equal(offerRequests.length,3,'navigation away is not a dismissal');
+ context.currentScreen='daily';await window.PropletPatrons.refresh();assert.equal(await show(),true);
+ await nodes.get('#patronOffer').querySelector('[data-dismiss]').onclick();
+ assert.deepEqual(offerRequests.at(-1),{receiptId:'receipt',action:'declined'});
+ await window.PropletPatrons.refresh();assert.equal(await show(),true);
+ await nodes.get('#patronOffer').querySelector('[data-support]').onclick();
+ assert.deepEqual(offerRequests.at(-1),{receiptId:'receipt',action:'opened'});
+ assert.equal(nodes.get('#patronDialog').attrs['data-patron-step'],'offer');window.PropletPatrons.close();
  Object.assign(status,{patron:true,thanksPending:true,canOffer:false,contributions:[{id:'payment',amountCzk:99,frequency:'monthly',confirmedAt:'2026-10-31T12:00:00Z'}]});
  await window.PropletPatrons.refresh();assert.equal(thanks.eligible(),true);assert.equal(entry.eligible(),false);
  assert.equal(await thanks.show({isCurrent:()=>thanks.eligible()}),true);
@@ -105,13 +127,13 @@ async function avatarInfoLifecycle(){
  assert.equal(calls.filter(p=>p==='/api/patrons/thanks/claim?visibility=true').length,1);
  window.PropletPatrons.model.requestId='prior-confirmed-intent';window.PropletPatrons.open('offer');assert.equal(window.PropletPatrons.model.requestId,null,'manual support from an existing patron starts a new contribution');
  // Live disable must remove previously rendered support and bank details with no write.
- for(const id of ['patronProfileEntry','patronTodayLink','patronOfferPreference']){const node=element();node.id=id;nodes.set('#'+id,node);}
+ for(const id of ['patronProfileEntry','patronTodayLink','patronOfferPreference','patronOffer']){const node=element();node.id=id;nodes.set('#'+id,node);}
  window.PropletPatrons.model.intent={id:'bound'};window.PropletPatrons.model.payment={spd:'bound'};
  status.enabled=false;const before=calls.length;await window.PropletPatrons.refresh();
  assert.equal(nodes.get('#patronDialog').open,false);assert.equal(window.PropletPatrons.model.intent,null);assert.equal(window.PropletPatrons.model.payment,null);
  for(const id of ['patronProfileEntry','patronTodayLink','patronOfferPreference','patronOffer'])assert.ok(removed.includes(id));
  assert.deepEqual(calls.slice(before),['/api/patrons?visibility=true'],'kill switch does not dismiss/claim/write');
- assert.equal(entry.eligible(),false);assert.equal(thanks.eligible(),false);window.PropletPatrons.offer();assert.equal(mounted,1);
+ assert.equal(entry.eligible(),false);assert.equal(thanks.eligible(),false);assert.equal(await show(),false);
  await avatarInfoLifecycle();
  console.log('PASS patron client: server gates; first/renewed/grace/expired/reinstated badges; pending QR and history never grant; private/public details and settings; stale account response; live OFF');
 })().catch(e=>{console.error(e);process.exit(1)});

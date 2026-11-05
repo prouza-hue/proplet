@@ -50,6 +50,17 @@ class PatronHttpTests(unittest.TestCase):
   self.assertEqual(response.status_code,200)
   self.assertEqual(self.calls[-1],('proplet_patron_thanks_claim_v1',{'p_player':'player-a'}))
   self.assertEqual(response.headers['cache-control'],'no-store')
+ def test_offer_confirmation_uses_authenticated_account_and_reserved_uuid(self):
+  path='/api/patrons/offers/display';headers={'Authorization':'Bearer player-a'};receipt=str(uuid4())
+  self.assertEqual(self.client.post(path,json={}).status_code,401)
+  self.assertEqual(self.client.post(path,json={'playerId':'victim'},headers=headers).status_code,422)
+  self.assertEqual(self.client.post(path,json={'receiptId':'bad'},headers=headers).status_code,422)
+  self.assertEqual(self.calls,[])
+  self.assertEqual(self.client.post(path,json={},headers=headers).status_code,200)
+  response=self.client.post(path,json={'receiptId':receipt},headers=headers)
+  self.assertEqual(response.status_code,200)
+  self.assertEqual(response.headers['cache-control'],'no-store')
+  self.assertEqual(self.calls,[('proplet_patron_offer_v2',{'p_player':'player-a','p_receipt':value}) for value in (None,receipt)])
  def test_idempotent_intent_is_not_payment_and_is_owned(self):
   body={'requestId':str(uuid4()),'amountCzk':99};headers={'Authorization':'Bearer player-a'}
   first=self.client.post('/api/patrons/intents',json=body,headers=headers).json()

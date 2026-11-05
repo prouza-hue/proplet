@@ -1,5 +1,5 @@
 """Validate the additive patron surface before hashing the historical API."""
-PATHS={'/api/patrons':{'get'},'/api/patrons/intents':{'post'},'/api/patrons/intents/{intent_id}':{'get'},'/api/patrons/preferences':{'post'},'/api/patrons/offers/claim':{'post'},'/api/patrons/thanks/claim':{'post'},'/api/patrons/offers/dismiss':{'post'},'/api/admin/patrons':{'get'},'/api/admin/patrons/confirm':{'post'}}
+PATHS={'/api/patrons':{'get'},'/api/patrons/intents':{'post'},'/api/patrons/intents/{intent_id}':{'get'},'/api/patrons/preferences':{'post'},'/api/patrons/offers/claim':{'post'},'/api/patrons/offers/display':{'post'},'/api/patrons/thanks/claim':{'post'},'/api/patrons/offers/dismiss':{'post'},'/api/admin/patrons':{'get'},'/api/admin/patrons/confirm':{'post'}}
 def normalize_patron_routes(routes):
  rows=list(routes)
  assert {(p,m.lower()) for p,methods,_ in rows if p in PATHS for m in methods}=={(p,m) for p,methods in PATHS.items() for m in methods}
