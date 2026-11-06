@@ -27,17 +27,19 @@
     if(!hero||!main||!date||!meta)return;
     const title=main.querySelector('#dailyHeroTitle');
     const titleRow=title?.closest('.daily-title-choice-row')||title;
-    if(title&&!title.dataset.dailySpecialTitle)title.textContent='Denní výzva';
+    // Moving the labels into an unattached row removes them from the hero.
+    if(!titleRow||titleRow.parentElement!==main)return;
+    if(!title.dataset.dailySpecialTitle)title.textContent='Denní výzva';
     let line=main.querySelector('.daily-title-meta');
     if(!line){
       line=document.createElement('div');
       line.className='daily-title-meta';
-      titleRow?.insertAdjacentElement('afterend',line);
+      titleRow.insertAdjacentElement('afterend',line);
       date.classList.remove('date-pill','light-pill');
       date.classList.add('daily-inline-date');
       line.append(date,meta);
     }
-    if(titleRow&&line.parentElement!==main)titleRow.insertAdjacentElement('afterend',line);
+    if(line.parentElement!==main)titleRow.insertAdjacentElement('afterend',line);
   }
 
   function dailyProgressExists(date,daily){

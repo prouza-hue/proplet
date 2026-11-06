@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.29-patron-now1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.30-daily-guard1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -1090,7 +1090,7 @@ function renderFreeResumeCard(){
   const loaded=()=>{script.dataset.loaded='1';finish('missing_export');},failed=()=>{script.dataset.loadFailed='1';finish('load_error');};
   script.addEventListener('load',loaded,{once:true});script.addEventListener('error',failed,{once:true});
   timer=setTimeout(()=>finish('timeout'),10000);
-  if(!shared){script.src='/home-layout.js?v=resume-recovery1';try{document.head.append(script)}catch{finish('append_error')}}
+  if(!shared){script.src='/home-layout.js?v=daily-guard1';try{document.head.append(script)}catch{finish('append_error')}}
  }).then(()=>window.PropletHomeLayout.renderResumeCard()).catch(error=>{
   homeLayoutRecoveryRetryAt=Date.now()+30000;
   reportClientError('home_layout_contract',`HomeLayout module unavailable: ${error.message}`,error);

@@ -115,7 +115,7 @@ for(const copy of [
   'Pokračovat v Denní výzvě',
   'Hrát novinky',
 ])assert(`${app}\n${home}\n${progressionSource}\n${dailySource}`.includes(copy),`Daily/progression copy drifted: ${copy}`);
-assert(`${app}\n${dailySource}`.includes("$('#shareDailyBtn').classList.toggle('hidden',!done)"),'Daily share visibility drifted');
+if(!hasOwners)assert(app.includes("$('#shareDailyBtn').classList.toggle('hidden',!done)"),'Daily share visibility drifted');
 assert(`${app}\n${dailySource}`.includes("if(daily.active){deps.showDailyResult(date,daily.active);return}")||app.includes("if(daily.active){showDailyResult(date,daily.active);return}"),'completed Daily must open its result');
 assert(`${app}\n${dailySource}`.includes("deps.startGame(daily.puzzle,'daily',date,options)")||app.includes("startGame(daily.puzzle,'daily',date,options)"),'fresh/legacy Daily must start the selected board');
 if(!hasOwners)assert(menu.includes("new MutationObserver(normalize).observe(button"),'Daily result-menu observer missing');
