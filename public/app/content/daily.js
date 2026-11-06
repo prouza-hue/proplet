@@ -14,23 +14,24 @@
 
     function renderDaily(){
       const date=deps.pragueDateISO();let daily;
+      const dateLabel=$('#dailyDate'),meta=$('#dailyMeta'),action=$('#playDailyBtn');
+      const share=$('#shareDailyBtn'),sync=$('#dailySyncStatus');
       try{daily=deps.dailyResultState(date)}catch{
-        $('#dailyDate').textContent=deps.formatDateCZ(date);
-        $('#dailyMeta').textContent='Dnešní výzvu se zatím nepodařilo načíst.';
-        $('#playDailyBtn').textContent='Zkusit načíst dnešní výzvu';
-        $('#shareDailyBtn').classList.add('hidden');$('#dailySyncStatus').classList.add('hidden');
+        if(dateLabel)dateLabel.textContent=deps.formatDateCZ(date);
+        if(meta)meta.textContent='Dnešní výzvu se zatím nepodařilo načíst.';
+        if(action)action.textContent='Zkusit načíst dnešní výzvu';
+        share?.classList.add('hidden');sync?.classList.add('hidden');
         deps.renderDailyWeekRhythm(date);deps.renderLevelCard(deps.effectiveStats());deps.renderRescueCard();deps.renderQuickPlay();deps.renderTajenkaEntry();deps.afterRender?.();
         return {date,daily:null};
       }
       const p=daily.puzzle,stats=deps.effectiveStats(),done=daily.active,upgrade=daily.legacy;
-      $('#dailyDate').textContent=deps.formatDateCZ(date);
-      $('#dailyMeta').textContent=`${deps.DIFF[p.difficulty].label} · ${deps.countCz(p.meta.cells,'políčko','políčka','políček')} · ${deps.countCz(p.answers.length,'slovo','slova','slov')}`;
+      if(dateLabel)dateLabel.textContent=deps.formatDateCZ(date);
+      if(meta)meta.textContent=`${deps.DIFF[p.difficulty].label} · ${deps.countCz(p.meta.cells,'políčko','políčka','políček')} · ${deps.countCz(p.answers.length,'slovo','slova','slov')}`;
       deps.renderDailyWeekRhythm(date);
-      $('#playDailyBtn').textContent=done?'Zobrazit dnešní výsledek':upgrade?'Zahrát novou dnešní výzvu':'Hrát dnešní výzvu';
-      $('#shareDailyBtn').classList.toggle('hidden',!done);
+      if(action)action.textContent=done?'Zobrazit dnešní výsledek':upgrade?'Zahrát novou dnešní výzvu':'Hrát dnešní výzvu';
+      share?.classList.toggle('hidden',!done);
       deps.renderLevelCard(stats);
-      const sync=$('#dailySyncStatus');
-      if(!done&&!upgrade){sync.classList.add('hidden')}else{
+      if(!done&&!upgrade){sync?.classList.add('hidden')}else if(sync){
         sync.classList.remove('hidden');
         const profile=deps.getProfile(),queued=deps.getQueue().some(r=>r.challengeKey===`daily:${date}`),syncState=deps.getSyncState();
         if(upgrade)sync.textContent='✨ Dnešní výzva má novou desku. Zahraj ji pro dnešní i týdenní pořadí; dalších 100 XP se nepřidá.';

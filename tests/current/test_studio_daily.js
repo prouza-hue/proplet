@@ -82,4 +82,17 @@ assert.equal(nodes.get('#studioExtraCard').hidden,true);
 base.active=null;failBase=true;nodes.get('#playDailyBtn').textContent='Zkusit načíst dnešní výzvu';ui.render();
 assert.equal(nodes.get('#playDailyBtn').textContent,'Zkusit načíst dnešní výzvu','loading error retains canonical retry');
 assert.equal(nodes.get('#studioDailyResult').hidden,true);
+// A partial hero can keep its controls while its metadata nodes are absent.
+failBase=false;
+nodes.delete('#dailyMeta');
+ui.render();
+assert.equal(ui.getState().selected,'base');
+special={descriptor:{dailyDate:date,challengeKey:'special',rewardEligible:true},puzzle:{difficulty:'hardcore'}};
+// renderBase is exercised with the main control in place.
+ui.select('special');
+assert.match(nodes.get('#playDailyBtn').innerHTML,/Hrát Mozkožrouta/);
+nodes.delete('#playDailyBtn');
+ui.render();
+ui.start();
+assert.equal(routes.pop(),'special');
 console.log('PASS Studio Today: automatic hierarchy, explicit choice, date/account reset, canonical routes, real summary and sync errors');

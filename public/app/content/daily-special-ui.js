@@ -189,13 +189,14 @@
       hero.dataset.studioState=base?.active?(available&&!special.active?'done':'complete'):'before';
       title.textContent=selected==='special'?'Extra výzva':'Denní výzva';
       const art=$('#studioDailyArt');if(art)art.src=selected==='special'?icon(special.puzzle.difficulty):'/rewards/printshop/symbol-daily.svg';
+      const meta=$('#dailyMeta'),action=$('#playDailyBtn');
       if(selected==='base'&&base?.puzzle){
-        $('#dailyMeta').innerHTML='<span>'+escape(deps.DIFF?.[base.puzzle.difficulty]?.label||'')+'</span>'+(base.legacy?'':base.active?'<span>✓ Hotovo</span>':'<span class="studio-xp">+100 XP</span>');
-        if(base.active&&!explicitSelection&&(!available||special.active)&&deps.openFree){
-          $('#playDailyBtn').textContent='Vybrat volnou hru';
+        if(meta)meta.innerHTML='<span>'+escape(deps.DIFF?.[base.puzzle.difficulty]?.label||'')+'</span>'+(base.legacy?'':base.active?'<span>✓ Hotovo</span>':'<span class="studio-xp">+100 XP</span>');
+        if(action&&base.active&&!explicitSelection&&(!available||special.active)&&deps.openFree){
+          action.textContent='Vybrat volnou hru';
         }
       }
-      $('#playDailyBtn')?.classList.remove('daily-special-action');
+      action?.classList.remove('daily-special-action');
       if(button){
         button.removeAttribute('aria-pressed');
         button.setAttribute('aria-label','Zpět na základní Denní výzvu');
@@ -206,8 +207,8 @@
       scheduleIntro();
       if(selected!=='special')return {selected};
       const puzzle=special.puzzle,descriptor=special.descriptor,key=descriptor.officialChallengeKey||descriptor.challengeKey;
-      $('#dailyMeta').innerHTML='<span>'+escape(deps.DIFF?.[puzzle.difficulty]?.label||'Extra')+'</span>'+(descriptor.rewardEligible===false?'<span>Trénink</span>':special.active?'<span>✓ Hotovo</span>':'<span class="studio-xp">+200 XP</span>');
-      const action=$('#playDailyBtn'),done=!!special.active,progress=!!special.progress;
+      if(meta)meta.innerHTML='<span>'+escape(deps.DIFF?.[puzzle.difficulty]?.label||'Extra')+'</span>'+(descriptor.rewardEligible===false?'<span>Trénink</span>':special.active?'<span>✓ Hotovo</span>':'<span class="studio-xp">+200 XP</span>');
+      const done=!!special.active,progress=!!special.progress;
       if(action){
         action.classList.add('daily-special-action');
         const verb=done?'Zobrazit výsledek speciálu':progress?'Pokračovat ve speciálu':'Hrát '+(puzzle.difficulty==='hardcore'?'Mozkožrouta':puzzle.difficulty==='mozkomor'?'Mozkomora':'Mozkokalypsu');
