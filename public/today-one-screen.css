@@ -186,3 +186,36 @@ html[data-theme=dark] .os-completion-row .os-arrow{color:var(--td-blue)}
 .os-feature:not(.os-complete):not(.os-special)>.os-art{grid-column:2;grid-row:1;justify-self:center}
 .os-feature:not(.os-complete):not(.os-special)>.os-arrow{position:static;grid-column:2;grid-row:2;justify-self:center;display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 14px;box-sizing:border-box;border-radius:8px;background:#315da8;color:#fff8e9;font:650 15px/1.2 Outfit,sans-serif;box-shadow:0 2px 0 #203f74;white-space:nowrap}
 @media(min-width:900px){.os-feature:not(.os-complete):not(.os-special){--os-cta-bottom:14px}.os-feature:not(.os-complete):not(.os-special)>.os-arrow{font-size:16px;padding-inline:18px}}
+
+@media(max-width:899px){
+ html.tiskarna-ui body.today-one-screen.one-screen-ready:has(#screen-daily.active){
+  --today-block-gap:10px;
+  /* The hard shadows extend past the cards' layout boxes. */
+  --today-card-depth:3px;
+  --today-support-depth:2px;
+ }
+ html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday{row-gap:var(--today-block-gap)}
+ #oneScreenToday .os-grid{row-gap:calc(var(--today-block-gap) + var(--today-card-depth))}
+ html.tiskarna-ui body.today-one-screen.one-screen-ready:has(#screen-daily.active) #patronTodayLink.patron-today-link:not([hidden]){
+  margin:calc(var(--today-block-gap) + var(--today-card-depth)) auto 0!important;
+ }
+ html.tiskarna-ui body.today-one-screen.one-screen-ready:not(.playing):has(#screen-daily.active) .app-footer{
+  margin-top:calc(var(--today-block-gap) + var(--today-card-depth))!important;
+ }
+ html.tiskarna-ui body.today-one-screen.one-screen-ready:not(.playing):has(#screen-daily.active) #patronTodayLink:not([hidden])+.app-footer{
+  margin-top:calc(var(--today-block-gap) + var(--today-support-depth))!important;
+ }
+}
+@media(max-width:599px){
+ #oneScreenToday .os-main{row-gap:calc(var(--today-block-gap) + var(--today-card-depth))}
+ #oneScreenToday .os-week{padding-block:0}
+ #oneScreenToday .os-week-slot:empty{display:none}
+ html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday:has(.os-week-slot:empty){
+  row-gap:calc(var(--today-block-gap) + var(--today-card-depth));
+ }
+}
+@media(min-width:600px) and (max-width:899px){
+ html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday{
+  row-gap:calc(var(--today-block-gap) + var(--today-card-depth));
+ }
+}
