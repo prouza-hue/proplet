@@ -40,6 +40,25 @@ def verify_entry_readout(connection):
         assert a['assigned'] == 2 and a['completed_24h'] == 0, a
         assert (b['completed_24h'], b['first_completed'], b['continued'], b['returned_d1']) == (2, 1, 1, 2), b
         assert not a['investigate'] and not b['investigate'], (a, b)
+        assert a['policy_metrics']['hash50_v1']['assigned'] == 1, a
+        assert b['policy_metrics']['hash50_v1']['assigned'] == 2, b
+        assert a['policy_metrics']['alternating_v1']['assigned'] == 1, a
+        assert b['policy_metrics']['alternating_v1']['assigned'] == 1, b
+        assert b['policy_metrics']['hash50_v1']['completed_24h'] == 1, b
+        assert b['policy_metrics']['alternating_v1']['completed_24h'] == 1, b
+        assert a['policy_metrics']['alternating_v1']['first_ordinal'] == 1, a
+        assert b['policy_metrics']['alternating_v1']['last_ordinal'] == 2, b
+        assert a['policy_metrics']['alternating_v1']['switched_at'] is not None, a
+        assert a['policy_metrics']['hash50_v1']['switched_at'] is None, a
+        cursor.execute("set local proplet.entry_report_as_of='2026-11-17 12:00Z'")
+        cursor.execute(query)
+        daily = cursor.fetchall()
+        assert len(daily) == 2 and [r['assigned_yesterday'] for r in daily] == [2, 3], daily
+        assert daily[1]['policy_metrics']['hash50_v1']['assigned_yesterday'] == 2, daily
+        assert daily[1]['policy_metrics']['alternating_v1']['assigned_yesterday'] == 1, daily
+        assert all(r['completed_24h'] is None for r in daily), daily
+        cursor.execute("set local proplet.entry_report_as_of='2026-12-02 08:00Z'")
+
         expected_freeze = datetime(2026, 12, 2, 8, tzinfo=timezone.utc)
         assert a['freeze'] == expected_freeze and b['cutoff'] == expected_freeze, (a, b)
         # The stored activation, including its time of day, owns the schedule.
@@ -123,7 +142,36 @@ def main():
             if path.name.endswith('_account_created_authoritative.sql'):
                 c.execute("insert into players(id,name,family_code,token_hash) values ('20000000-0000-4000-8000-000000000001','Historical fixture','SOLO_HISTORY','historical-fixture')")
                 c.execute("insert into product_events(id,anonymous_id,event_type,app_version) values ('20000000-0000-4000-8000-000000000002','historical-guest','account_created','legacy')")
+            if path.name.endswith('_entry_alternating_allocation.sql'):
+                # Uneven historical B assignments must neither be relabeled nor
+                # influence the new phase's first A or its independent counter.
+                for index in range(3):
+                    identity = hashlib.sha256(f'entry-before-switch-{index}'.encode()).hexdigest()
+                    while hashlib.sha256(('new-player-entry-v1:' + identity).encode()).digest()[0] < 128:
+                        identity = hashlib.sha256(identity.encode()).hexdigest()
+                    assignment = c.execute(
+                        "select public.proplet_entry_assign_v1('local',true,%s,null,gen_random_uuid(),'qa','qa','qa',true)",
+                        (identity,)).fetchone()[0]
+                    assert assignment['variant'] == 'B'
+                previous_assignments = c.execute(
+                    'select event_id,to_jsonb(a) from proplet_experiment_internal.entry_assignments a order by event_id').fetchall()
+                previous_control = c.execute(
+                    'select enabled,starts_at,ends_at from proplet_experiment_internal.entry_control').fetchall()
             c.execute(path.read_text(encoding='utf8'))
+            if path.name.endswith('_entry_alternating_allocation.sql'):
+                for event_id, original in previous_assignments:
+                    migrated = c.execute(
+                        'select to_jsonb(a) from proplet_experiment_internal.entry_assignments a where event_id=%s',
+                        (event_id,)).fetchone()[0]
+                    assert migrated.pop('allocation_policy') == 'hash50_v1'
+                    assert migrated.pop('allocation_ordinal') is None
+                    assert migrated.pop('allocation_switched_at') is None
+                    assert migrated == original, 'Migration changed a historical assignment'
+                assert c.execute(
+                    'select enabled,starts_at,ends_at from proplet_experiment_internal.entry_control').fetchall() == previous_control
+                assert c.execute(
+                    'select max(last_ordinal) from proplet_experiment_internal.entry_allocation_state').fetchone()[0] == 0
+                report['checks'].append('entry migration preserves historical B assignments and exact recruitment window; new sequence starts at zero')
             report['schemaFiles'].append({'path': path.relative_to(ROOT).as_posix(),
                                          'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
         c.execute((ROOT/'supabase/tests/new_player_entry.sql').read_text(encoding='utf8'))
@@ -141,16 +189,8 @@ def main():
             c.execute('insert into public.players(id,name,family_code,token_hash) values(%s,%s,%s,%s)',
                       (player, 'Synthetic '+str(index), 'SOLO_TEST', 'synthetic-token-'+str(index)))
 
-    # Concurrent tabs may generate different flow UUIDs before either receives its response.
-    concurrent_identity = hashlib.sha256(secrets.token_bytes(32)).hexdigest()
-    def allocate_entry(_):
-        with connect() as conn:
-            return conn.execute("select public.proplet_entry_assign_v1('local',true,%s,null,gen_random_uuid(),'qa','qa','qa',true)",
-                                (concurrent_identity,)).fetchone()[0]
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        entries = list(executor.map(allocate_entry, range(8)))
-    assert entries[0]['variant'] in ('A', 'B') and all(x == entries[0] for x in entries)
-    report['checks'].append('entry experiment: concurrent tabs share one server assignment and canonical flow')
+    from tools.test_entry_allocation_db import verify_entry_allocation
+    report['checks'].extend(verify_entry_allocation(connect))
 
     def command(attempt, elapsed=42000, completed='2026-09-15T10:00:00+00:00', player=players[0]):
         payload = ResultCreate(puzzle_id='phase2-synthetic-board', challenge_key='free:phase2-synthetic-board',

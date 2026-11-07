@@ -2,6 +2,14 @@
 begin;
 insert into public.players(id,name,family_code,token_hash)
 values('ed555555-0000-4000-8000-000000000001','Entry QA','SOLO_ENTRY','entry-claim-fixture');
+-- Model rows persisted before the migration without consuming the new counter.
+alter table proplet_experiment_internal.entry_assignments disable trigger proplet_entry_allocate_v1;
+insert into proplet_experiment_internal.entry_assignments
+    (environment,is_test,anonymous_id,first_steps_run_id,variant,assigned_at)
+select 'local',true,encode(sha256(convert_to('entry-legacy-fixture-'||arm,'UTF8')),'hex'),
+    gen_random_uuid(),arm,clock_timestamp()-interval '1 day'
+from (values ('A'),('B')) as legacy(arm);
+alter table proplet_experiment_internal.entry_assignments enable trigger proplet_entry_allocate_v1;
 set local role service_role;
 do $$
 declare
@@ -12,7 +20,23 @@ declare
     first_assign jsonb;
     result jsonb;
     seen text[] := '{}';
+    before_ordinal bigint;
+    legacy record;
 begin
+    select last_ordinal into before_ordinal from proplet_experiment_internal.entry_allocation_state
+    where environment='local' and is_test;
+    for legacy in select * from proplet_experiment_internal.entry_assignments
+        where environment='local' and is_test and anonymous_id in (
+            encode(sha256(convert_to('entry-legacy-fixture-A','UTF8')),'hex'),
+            encode(sha256(convert_to('entry-legacy-fixture-B','UTF8')),'hex'))
+    loop
+        result := public.proplet_entry_assign_v1('local',true,legacy.anonymous_id,null,gen_random_uuid(),'qa','qa','qa',true);
+        if result->>'variant'<>legacy.variant or result->>'firstStepsRunId'<>legacy.first_steps_run_id::text
+           or result->>'allocationPolicy'<>'hash50_v1' or result->>'allocationOrdinal' is not null
+           or result->>'allocationSwitchedAt' is not null then
+            raise exception 'Historical hash assignment changed or was relabelled';
+        end if;
+    end loop;
     for i in 1..16 loop
         flow := gen_random_uuid();
         identity := encode(sha256(convert_to('entry-sql-fixture-'||i,'UTF8')),'hex');
@@ -20,6 +44,11 @@ begin
         arm := first_assign->>'variant';
         if arm is null or arm not in ('A','B') or first_assign->>'boardId' <> 'g4-e-009' then
             raise exception 'New identity did not receive the pinned real board';
+        end if;
+        if first_assign->>'allocationPolicy'<>'alternating_v1'
+           or (first_assign->>'allocationOrdinal')::bigint<>before_ordinal+i
+           or arm<>(case when (before_ordinal+i)%2=1 then 'A' else 'B' end) then
+            raise exception 'New assignments did not alternate exactly once per identity';
         end if;
         seen := array_append(seen,arm);
         result := public.proplet_entry_assign_v1('local',true,identity,null,gen_random_uuid(),'qa','qa','qa',true);
@@ -29,7 +58,7 @@ begin
             raise exception 'Missing/duplicated assignment receipt';
         end if;
     end loop;
-    if not (seen @> array['A','B']) then raise exception 'Both hash branches expected'; end if;
+    if not (seen @> array['A','B']) then raise exception 'Both alternating branches expected'; end if;
     if public.proplet_entry_assign_v1('local',true,identity,null,gen_random_uuid(),'qa','qa','qa',false) <> first_assign
        or public.proplet_entry_assign_v1('local',true,repeat('e',64),null,gen_random_uuid(),'qa','qa','qa',false)->>'variant' is not null then
         raise exception 'Disabled gate lost an existing assignment or created a new one';
@@ -65,6 +94,14 @@ begin
     if has_function_privilege('anon','public.proplet_entry_assign_v1(text,boolean,text,uuid,uuid,text,text,text,boolean)','execute')
        or has_table_privilege('authenticated','proplet_experiment_internal.entry_assignments','insert') then
         raise exception 'Client can forge an assignment';
+    end if;
+    if has_function_privilege('anon','public.proplet_entry_allocate_v1()','execute')
+       or has_table_privilege('authenticated','proplet_experiment_internal.entry_allocation_state','update') then
+        raise exception 'Public client can mutate the alternating counter';
+    end if;
+    if (select last_ordinal from proplet_experiment_internal.entry_allocation_state
+        where environment='local' and is_test)<>before_ordinal+16 then
+        raise exception 'Retry, claim, or an ineligible identity consumed an ordinal';
     end if;
 end;
 $$;
