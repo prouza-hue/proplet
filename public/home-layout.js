@@ -87,6 +87,10 @@
       const difficulty=item.difficulty,q=freeProgress(difficulty);
       if(q.resume)return {difficulty,q};
     }
+    for(const difficulty of Object.keys(DIFF)){
+      const q=freeProgress(difficulty);
+      if(q.resume)return {difficulty,q};
+    }
     return null;
   }
 

@@ -75,9 +75,14 @@ function create(d){
   const r=record(diff);r.mode=mode;queue(diff,r);changed();
   if(d.profile()?.token)await sync();
  }
+ function resume(diff){
+  if(!enabled||loadedIdentity!==identity(d.profile()))return null;
+  return d.bank(diff).find(p=>p.id===resumeIds[diff]&&!d.completed(diff).includes(p.id))||null;
+ }
  function next(diff,fallback){
+  const remote=resume(diff);if(remote)return remote;
   if(!enabled||!E.SUPPORTED.includes(diff))return fallback;
-  const r=record(diff);const remote=loadedIdentity===identity(d.profile())&&d.bank(diff).find(p=>p.id===resumeIds[diff]&&!d.completed(diff).includes(p.id));if(remote)return remote;
+  const r=record(diff);
   if(r.mode!=='varied')return fallback;
   if(d.shared){
    const bank=E.canonicalBank(d.bank(diff),diff),byId=new Map(bank.map(p=>[p.id,p])),done=new Set(d.completed(diff));
@@ -105,7 +110,7 @@ function create(d){
   if(d.hasHistory(p.id)||Object.keys(all).length)return;
   for(const diff of E.SUPPORTED)queue(diff,{...empty(),mode:'varied',newcomer:['easy','medium'].includes(diff)},{importGuest:true});
  }
- return {configure,sync,change,next,record,adopt,newAccount,supports:diff=>(d.shared?.variedDifficulties||E.SUPPORTED).includes(diff),enabled:()=>enabled,
+ return {configure,sync,change,next,resume,record,adopt,newAccount,supports:diff=>(d.shared?.variedDifficulties||E.SUPPORTED).includes(diff),enabled:()=>enabled,
   ready:()=>!d.profile()?.token||loadedIdentity===identity(d.profile())};
 }
 return {create};
