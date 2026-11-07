@@ -33,4 +33,22 @@ with patch.object(server.DB_HTTP_CLIENT,'request',side_effect=AssertionError('ex
    assert rpc.call_args.args[1]['p_player']=='owner','actor must come from authentication'
    body['ids']=['future'];assert client.post('/api/free-order',json=body).status_code==400
    body['difficulty']='mozkomor';assert client.post('/api/free-order',json=body).status_code==422
-print('PASS order API: identity, published IDs, tombstones, unsupported difficulty, feature off, preview database gates')
+  # Resume discovery is independent of which difficulties support varied ordering.
+  # Both large-board modes must return their exact newest unfinished server board.
+  sessions=[];puzzles={}
+  for difficulty in server.FREE_DIFFICULTIES:
+   for suffix,seen in [('new','2026-11-07T12:00:00Z'),('old','2026-11-06T12:00:00Z')]:
+    puzzle_id=f'{difficulty}-{suffix}'
+    sessions.append({'puzzle_id':puzzle_id,'last_seen':seen})
+    puzzles[puzzle_id]={'difficulty':difficulty}
+  sessions.append({'puzzle_id':'missing-board','last_seen':'2026-11-08T12:00:00Z'})
+  def select_resume(table,**filters):
+   assert filters.get('player_id')=='owner','resume lookup must remain account-scoped'
+   if table=='player_free_order':return []
+   assert table=='play_sessions' and filters=={'player_id':'owner','mode':'free','finished':False}
+   return sessions
+  with patch.object(server,'auth_player',return_value={'id':'owner'}),patch.object(server,'db_select',side_effect=select_resume),patch.object(server,'free_puzzle_info',side_effect=lambda puzzle_id:puzzles.get(puzzle_id)):
+   result=client.get('/api/free-order');assert result.status_code==200,result.text
+   assert result.json()['resumeIds']=={difficulty:f'{difficulty}-new' for difficulty in server.FREE_DIFFICULTIES},result.json()
+   assert result.json()['records']=={},'resume discovery must not create ordering preferences'
+print('PASS order API: identity, published IDs, tombstones, unsupported ordering difficulty, all-difficulty exact resume, feature off, preview database gates')
