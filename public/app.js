@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.30-daily-guard1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.31-pwa-exit1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -917,12 +917,12 @@ function nav(screen,{replace=false,fromPop=false}={}){
 function initNavigation(){
  const initial=ROUTE_SCREENS.has(history.state?.screen)&&history.state?.proplet?history.state.screen:'daily';
  history.replaceState({proplet:true,screen:initial},'',location.href);applyScreen(initial);
- window.addEventListener('popstate',async e=>{
+ async function handleBack(e){
   const modal=openTransientModal();
   if(modal){
-   if(modal.id==='archiveExperienceModal'){globalThis.PropletArchiveExperience.closeModal();history.pushState({proplet:true,screen:currentScreen},'',location.href);return}
-   if(modal.id==='onboardingModal'&&onboardingMandatory){history.pushState({proplet:true,screen:currentScreen},'',location.href);return}
-   if(modal.id==='winModal'&&await maybeOfferFirstWinReturnNudge('menu')){}
+   if(modal.id==='archiveExperienceModal')globalThis.PropletArchiveExperience.closeModal();
+   else if(modal.id==='onboardingModal'&&onboardingMandatory){}
+   else if(modal.id==='winModal'&&await maybeOfferFirstWinReturnNudge('menu')){}
    else if(modal.id==='winModal'&&shouldOfferAccountNudge())maybeOfferAccountNudge('menu');
    else if(modal.id==='winModal'&&await maybeOfferPushNudge('menu')){}
    else if(modal.id==='winModal'&&maybeOfferInstallNudge('menu','daily')){}
@@ -939,10 +939,62 @@ function initNavigation(){
    else if(modal.id==='tajenkaRulesModal')closeTajenkaRules();
    else if(modal.id==='helperOfferModal')dismissHelperOffer();
    else modal.classList.add('hidden');
-   history.pushState({proplet:true,screen:currentScreen},'',location.href);return
+   if(e)history.pushState({proplet:true,screen:currentScreen},'',location.href);
+   return
   }
+  if(!e)return;
   const screen=e.state?.proplet&&ROUTE_SCREENS.has(e.state.screen)?e.state.screen:'daily';nav(screen,{fromPop:true});
+ }
+ window.addEventListener('popstate',handleBack);
+ if(typeof window.CloseWatcher==='function'&&isStandaloneApp()&&/Android/i.test(navigator.userAgent)){
+  const dialog=$('#pwaExitDialog');
+  if(dialog)bindPwaExit(dialog,handleBack);
+ }
+}
+function bindPwaExit(dialog,dismissModal){
+ let watcher=null;
+ let exitConfirmed=false;
+ function syncWatcher(){
+  if(currentScreen!=='daily'||document.visibilityState==='hidden'||exitConfirmed||document.querySelector('dialog[open]')){
+   watcher?.destroy();
+   watcher=null;
+   return;
+  }
+  if(watcher)return;
+  watcher=new window.CloseWatcher();
+  watcher.addEventListener('close',async ()=>{
+   watcher=null;
+   if(openTransientModal()){
+    await dismissModal();
+    syncWatcher();
+   }else if(!document.querySelector('dialog[open]')){
+    dialog.showModal();
+   }
+  });
+ }
+ dialog.querySelector('form').addEventListener('submit',event=>{
+  if(event.submitter?.value!=='exit')return;
+  event.preventDefault();
+  exitConfirmed=true;
+  dialog.close();
+  window.close();
+  setTimeout(()=>{
+   if(exitConfirmed&&document.visibilityState==='visible')showToast('Proplet můžete opustit systémovým tlačítkem Domů.');
+  },400);
  });
+ function resumeWatcher(){
+  exitConfirmed=false;
+  if(dialog.open&&(currentScreen!=='daily'||document.visibilityState==='hidden'))dialog.close();
+  syncWatcher();
+ }
+ document.addEventListener('proplet:screen-changed',resumeWatcher);
+ document.addEventListener('visibilitychange',resumeWatcher);
+ document.addEventListener('pointerdown',()=>{
+  if(exitConfirmed)resumeWatcher();
+ });
+ // Native dialogs handle the system close signal themselves.
+ new MutationObserver(syncWatcher).observe(document.body,{subtree:true,attributes:true,attributeFilter:['open']});
+ syncWatcher();
 }
 function transientModals(){return ['archiveExperienceModal','tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','validWordFailsafeModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement','dailyExtraIntro'].map(id=>document.getElementById(id)).filter(Boolean)}
 function openTransientModal(){return document.querySelector('#achievementDetail[open]')||document.querySelector('#contentReleaseModal[open]')||transientModals().find(el=>!el.classList.contains('hidden'))||null}
