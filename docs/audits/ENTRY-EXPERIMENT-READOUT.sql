@@ -31,6 +31,16 @@ WITH schedule AS (
       OR allocation_switched_at IS NULL OR assigned_at < allocation_switched_at
       OR allocation_switched_at IS DISTINCT FROM min(allocation_switched_at) OVER () AS invalid_allocation
   FROM assignments WHERE allocation_policy='alternating_v1'
+  UNION ALL
+  SELECT a.event_id,
+    a.allocation_ordinal IS DISTINCT FROM row_number() OVER (ORDER BY a.allocation_ordinal,a.event_id)
+      OR a.variant IS DISTINCT FROM c.target_variant
+      OR a.allocation_switched_at IS DISTINCT FROM c.activated_at
+      OR a.assigned_at < c.activated_at OR c.quota IS NULL
+      OR a.allocation_ordinal > c.quota OR a.allocation_ordinal > c.allocated AS invalid_allocation
+  FROM assignments a LEFT JOIN proplet_experiment_internal.entry_catchup_state c
+    ON c.environment=a.environment AND c.is_test=a.is_test
+  WHERE a.allocation_policy='catchup_v1'
 ), owners AS (
   SELECT player_id FROM assignments WHERE player_id IS NOT NULL GROUP BY player_id HAVING count(*)>1
 ), metrics AS (
@@ -115,11 +125,15 @@ SELECT v.variant,pol.policy,p.cutoff,p.opens,p.closes,p.freeze, count(m.assigned
  CASE WHEN p.cutoff=p.freeze THEN count(*) FILTER (WHERE m.created_account) END AS created_accounts,
  CASE WHEN p.cutoff=p.freeze THEN count(*) FILTER (WHERE m.helped) END AS used_hint,
  min(m.allocation_ordinal) AS first_ordinal, max(m.allocation_ordinal) AS last_ordinal,
- min(m.allocation_switched_at) AS switched_at, max(m.allocation_switched_at) AS last_switched_at
+ min(m.allocation_switched_at) AS switched_at, max(m.allocation_switched_at) AS last_switched_at,
+ cs.activated_at,cs.snapshot_a,cs.snapshot_b,cs.target_variant,cs.quota,cs.allocated
 FROM (VALUES ('A'),('B')) v(variant)
-CROSS JOIN (VALUES ('hash50_v1'),('alternating_v1')) pol(policy)
+CROSS JOIN (VALUES ('hash50_v1'),('alternating_v1'),('catchup_v1')) pol(policy)
 CROSS JOIN params p LEFT JOIN metrics m ON m.variant=v.variant AND m.allocation_policy=pol.policy
-GROUP BY v.variant,pol.policy,p.cutoff,p.opens,p.closes,p.freeze
+LEFT JOIN proplet_experiment_internal.entry_catchup_state cs
+  ON pol.policy='catchup_v1' AND cs.environment='production' AND NOT cs.is_test
+GROUP BY v.variant,pol.policy,p.cutoff,p.opens,p.closes,p.freeze,
+         cs.activated_at,cs.snapshot_a,cs.snapshot_b,cs.target_variant,cs.quota,cs.allocated
 )
 -- Keep exactly two total rows for the existing morning report; the nested cohorts
 -- preserve the allocation policy for analysis without treating alternation as random.

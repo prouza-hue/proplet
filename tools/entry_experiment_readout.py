@@ -81,7 +81,8 @@ def readout(rows, intact):
         policies[variant] = json.loads(raw) if isinstance(raw, str) else raw
         if not isinstance(policies[variant], dict):
             raise ValueError('Chybí rozpad přiřazení podle politiky.')
-    if any(set(policies[v]) != {'hash50_v1', 'alternating_v1'} for v in ('A', 'B')):
+    supported = ({'hash50_v1', 'alternating_v1'}, {'hash50_v1', 'alternating_v1', 'catchup_v1'})
+    if set(policies['A']) != set(policies['B']) or set(policies['A']) not in supported:
         raise ValueError('Neznámá nebo neúplná politika přiřazování.')
     for variant, row in rows.items():
         if sum(int(cohort['assigned']) for cohort in policies[variant].values()) != int(row['assigned']):
@@ -89,11 +90,21 @@ def readout(rows, intact):
     print(f"Celkem přiřazeno A {rows['A']['assigned']}, B {rows['B']['assigned']}.")
     print('Původní náhodné přiřazování hash50_v1')
     random_cohort_readout({v: policies[v]['hash50_v1'] for v in ('A', 'B')}, intact)
-    a, b = (policies[v]['alternating_v1'] for v in ('A', 'B'))
-    print(f"Střídání alternating_v1. Přiřazeno A {a['assigned']}, B {b['assigned']}.")
+    for policy in ('alternating_v1', 'catchup_v1'):
+        if policy in policies['A']:
+            descriptive_cohort_readout(policies['A'][policy], policies['B'][policy], policy, intact)
+
+
+def descriptive_cohort_readout(a, b, policy, intact):
+    label = 'Střídání' if policy == 'alternating_v1' else 'Dorovnání'
+    print(f"{label} {policy}. Přiřazeno A {a['assigned']}, B {b['assigned']}.")
     if any(r['completed_24h'] in ('', None) for r in (a, b)):
         return
     na, nb = int(a['assigned']), int(b['assigned'])
+    if policy == 'catchup_v1':
+        print(f"Dokončilo A {a['completed_24h']}/{na}, B {b['completed_24h']}/{nb}.")
+        print('Dorovnávací fáze se vykazuje popisně, s ohledem na čas a zdroj příchodů.')
+        return
     if na and nb:
         xa, xb = int(a['completed_24h']), int(b['completed_24h'])
         print(f'Dokončilo A {xa}/{na}, B {xb}/{nb}. Popisný rozdíl B-A {(xb / nb - xa / na) * 100:+.2f} p. b.')
