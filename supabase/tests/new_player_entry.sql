@@ -58,6 +58,13 @@ begin
             raise exception 'Missing/duplicated assignment receipt';
         end if;
     end loop;
+    -- An INSERT error occurs after the allocator trigger has incremented the
+    -- counter. The failing subtransaction must restore that increment.
+    begin
+        perform public.proplet_entry_assign_v1('local',true,repeat('0',64),null,flow,'qa','qa','qa',true);
+        raise exception 'Duplicate flow was accepted';
+    exception when unique_violation then null;
+    end;
     if not (seen @> array['A','B']) then raise exception 'Both alternating branches expected'; end if;
     if public.proplet_entry_assign_v1('local',true,identity,null,gen_random_uuid(),'qa','qa','qa',false) <> first_assign
        or public.proplet_entry_assign_v1('local',true,repeat('e',64),null,gen_random_uuid(),'qa','qa','qa',false)->>'variant' is not null then
@@ -154,6 +161,19 @@ begin
     set enabled=true, starts_at=stamp-interval '15 days', ends_at=stamp-interval '1 day' where singleton;
     if public.proplet_entry_assign_v1('production',false,identity,null,gen_random_uuid(),'qa','qa','qa',true) <> first_assign then
         raise exception 'Closed window changed an existing assignment';
+    end if;
+    -- A stale function body may reach INSERT after its earlier clock check.
+    -- The trigger must reject this without consuming the next ordinal.
+    begin
+        insert into proplet_experiment_internal.entry_assignments
+            (environment,is_test,anonymous_id,first_steps_run_id,variant)
+        values('production',false,repeat('4',64),gen_random_uuid(),'A');
+        raise exception 'Stale INSERT bypassed the closed window';
+    exception when invalid_parameter_value then null;
+    end;
+    if (select last_ordinal from proplet_experiment_internal.entry_allocation_state
+        where environment='production' and not is_test)<>(first_assign->>'allocationOrdinal')::bigint then
+        raise exception 'Rejected stale INSERT consumed an ordinal';
     end if;
 end;
 $$;
