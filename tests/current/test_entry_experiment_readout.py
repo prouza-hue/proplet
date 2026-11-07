@@ -54,6 +54,25 @@ class ReadoutPolicyTests(unittest.TestCase):
         self.assertNotIn('95% interval', text)
         self.assertNotIn('Výsledek podporuje větev', text)
 
+    def test_catchup_is_descriptive_and_preserves_hash_inference(self):
+        rows = split_rows(cohort(20, 4), cohort(11, 3), cohort(1, 0), cohort(1, 1))
+        rows['A']['policy_metrics']['catchup_v1'] = cohort(0, 0)
+        rows['B']['policy_metrics']['catchup_v1'] = cohort(10, 7)
+        rows['B']['assigned'] += 10
+        with patch.object(report, 'binomial_p', wraps=report.binomial_p) as binomial:
+            text = output(rows)
+        binomial.assert_called_once_with(20, 11)
+        catchup = text.split('Dorovnání catchup_v1.')[1]
+        self.assertIn('Dokončilo A 0/0, B 7/10.', catchup)
+        self.assertNotIn('95% interval', catchup)
+        self.assertNotIn('Výsledek podporuje větev', catchup)
+
+    def test_catchup_must_exist_in_both_row_breakdowns(self):
+        rows = split_rows(cohort(1), cohort(1), cohort(1), cohort(1))
+        rows['A']['policy_metrics']['catchup_v1'] = cohort(0)
+        with self.assertRaises(ValueError):
+            output(rows)
+
     def test_no_interim_outcomes(self):
         text = output(split_rows(cohort(20), cohort(11), cohort(4), cohort(4)))
         self.assertNotIn('Dokončilo', text)

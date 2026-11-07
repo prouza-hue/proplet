@@ -32,13 +32,13 @@ def verify_entry_readout(connection):
         cursor.execute("set local proplet.entry_report_as_of='2026-11-16 12:00Z'")
         cursor.execute(query)
         live = {r['variant']: r for r in cursor.fetchall()}
-        assert live['A']['assigned'] == 2 and live['B']['assigned'] == 3, live
+        assert live['A']['assigned'] == 2 and live['B']['assigned'] == 4, live
         assert all(r['completed_24h'] is None and r['pending_24h'] == r['assigned'] for r in live.values()), live
         cursor.execute("set local proplet.entry_report_as_of='2026-12-02 08:00Z'")
         cursor.execute(query)
         a, b = cursor.fetchall()
         assert a['assigned'] == 2 and a['completed_24h'] == 0, a
-        assert (b['completed_24h'], b['first_completed'], b['continued'], b['returned_d1']) == (2, 1, 1, 2), b
+        assert (b['completed_24h'], b['first_completed'], b['continued'], b['returned_d1']) == (3, 1, 1, 2), b
         assert not a['investigate'] and not b['investigate'], (a, b)
         assert a['policy_metrics']['hash50_v1']['assigned'] == 1, a
         assert b['policy_metrics']['hash50_v1']['assigned'] == 2, b
@@ -46,6 +46,12 @@ def verify_entry_readout(connection):
         assert b['policy_metrics']['alternating_v1']['assigned'] == 1, b
         assert b['policy_metrics']['hash50_v1']['completed_24h'] == 1, b
         assert b['policy_metrics']['alternating_v1']['completed_24h'] == 1, b
+        assert a['policy_metrics']['catchup_v1']['assigned'] == 0, a
+        catchup = b['policy_metrics']['catchup_v1']
+        assert catchup['assigned'] == 1 and catchup['completed_24h'] == 1, catchup
+        assert (catchup['quota'], catchup['allocated'], catchup['snapshot_a'], catchup['snapshot_b']) == (1, 1, 2, 1), catchup
+        assert catchup['target_variant'] == 'B' and catchup['first_ordinal'] == 1, catchup
+
         assert a['policy_metrics']['alternating_v1']['first_ordinal'] == 1, a
         assert b['policy_metrics']['alternating_v1']['last_ordinal'] == 2, b
         assert a['policy_metrics']['alternating_v1']['switched_at'] is not None, a
@@ -53,9 +59,11 @@ def verify_entry_readout(connection):
         cursor.execute("set local proplet.entry_report_as_of='2026-11-17 12:00Z'")
         cursor.execute(query)
         daily = cursor.fetchall()
-        assert len(daily) == 2 and [r['assigned_yesterday'] for r in daily] == [2, 3], daily
+        assert len(daily) == 2 and [r['assigned_yesterday'] for r in daily] == [2, 4], daily
         assert daily[1]['policy_metrics']['hash50_v1']['assigned_yesterday'] == 2, daily
         assert daily[1]['policy_metrics']['alternating_v1']['assigned_yesterday'] == 1, daily
+        assert daily[1]['policy_metrics']['catchup_v1']['assigned_yesterday'] == 1, daily
+
         assert all(r['completed_24h'] is None for r in daily), daily
         cursor.execute("set local proplet.entry_report_as_of='2026-12-02 08:00Z'")
 
@@ -67,7 +75,7 @@ def verify_entry_readout(connection):
         cursor.execute(query)
         shifted = cursor.fetchall()
         assert all(r['freeze'] == datetime(2026, 11, 30, 8, tzinfo=timezone.utc) for r in shifted), shifted
-        assert shifted[0]['assigned'] == 2 and shifted[1]['completed_24h'] == 2, shifted
+        assert shifted[0]['assigned'] == 2 and shifted[1]['completed_24h'] == 3, shifted
         cursor.execute("update proplet_experiment_internal.entry_control "
                        "set enabled=false,starts_at=null,ends_at=null where singleton")
         cursor.execute(query)
@@ -176,6 +184,8 @@ def main():
                                          'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
         c.execute((ROOT/'supabase/tests/new_player_entry.sql').read_text(encoding='utf8'))
         report['checks'].append('entry experiment: immutable assignment, both branches, history, claim and grants')
+        c.execute((ROOT/'supabase/tests/entry_fixed_catchup.sql').read_text(encoding='utf8'))
+        report['checks'].append('entry catchup: fixed activation quota, completion, retry, rollback and immutable windows')
         verify_entry_readout(c)
         report['checks'].append('entry experiment readout: silent identities, test exclusion, explicit attempt link, 24h/D1 bounds')
         c.execute((ROOT/'supabase/tests/account_integrity_counts.sql').read_text(encoding='utf8'))
@@ -191,6 +201,8 @@ def main():
 
     from tools.test_entry_allocation_db import verify_entry_allocation
     report['checks'].extend(verify_entry_allocation(connect))
+    from tools.test_entry_catchup_db import verify_entry_catchup
+    report['checks'].extend(verify_entry_catchup(connect))
 
     def command(attempt, elapsed=42000, completed='2026-09-15T10:00:00+00:00', player=players[0]):
         payload = ResultCreate(puzzle_id='phase2-synthetic-board', challenge_key='free:phase2-synthetic-board',

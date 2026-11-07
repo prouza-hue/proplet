@@ -2,13 +2,31 @@
 
 Preregistrace z 4. listopadu 2026 s dodatkem ze 7. listopadu 2026, klíč `new-player-entry-v1`. Uživatel následně schválil produkční nasazení a okamžité spuštění po dokončení kontrol. Hypotéza je, že vynechání tréninku zvýší pravděpodobnost dokončení alespoň jedné skutečné hry do 24 hodin.
 
-## Změna přiřazování připravená 7. listopadu
+## Střídání nasazené 7. listopadu
 
-Tento PR zavádí uživatelem vyžádané střídání nových způsobilých identit A, B, A, B, počínaje A. Čtecí kontrola ze 7. 11. 2026 v 18.30.36 UTC potvrdila produkční revizi 4f8d3d3edc44e1cb0369fc45051ecbca62ac718b, verzi 4.10.32, aktivní nábor a dosavadní součet A 20 / B 11. Nábor začal 4. 11. 2026 v 00.25.06,242652 UTC (01.25.06,242652 Europe/Prague). Čas pozorování není čas přechodu politiky, ten při případném budoucím nasazení zapíše migrace. Přechod se týká až nových přiřazení po nasazení migrace. Dosavadní přiřazení a jejich postup zůstávají ve fázi hash50_v1. První přiřazení nové fáze alternating_v1 má pořadové číslo 1 a větev A bez ohledu na historické počty.
+PR #257 zavedl uživatelem vyžádané střídání nových způsobilých identit A, B, A, B, počínaje A. Čtecí kontrola ze 7. 11. 2026 v 18.30.36 UTC potvrdila produkční revizi 4f8d3d3edc44e1cb0369fc45051ecbca62ac718b, verzi 4.10.32, aktivní nábor a dosavadní součet A 20 / B 11. Nábor začal 4. 11. 2026 v 00.25.06,242652 UTC (01.25.06,242652 Europe/Prague). Střídání bylo následně nasazeno 7. 11. 2026 v 19.40.22,130966 Europe/Prague na SHA 7612c10. Přechod se týká až nových přiřazení po nasazení migrace. Dosavadní přiřazení a jejich postup zůstávají ve fázi hash50_v1. První přiřazení nové fáze alternating_v1 má pořadové číslo 1 a větev A bez ohledu na historické počty.
 
 Pořadí rezervuje server atomicky ve stejné transakci jako přiřazení. Opakované požadavky stejné identity vracejí původní větev a nové pořadí nespotřebují. Produkce, preview a testovací průchody mají oddělená pořadí. Každý řádek ledgeru uchovává allocation_policy, allocation_ordinal a allocation_switched_at. Historický hash má poslední dvě hodnoty prázdné. Přepnutí není restart náboru.
 
-Konec náboru zůstává 18. 11. 2026 v 01.25.06,242652 Europe/Prague (00.25.06,242652 UTC). Závěrečný odečet zůstává 20. 11. 2026 v 09.00 Europe/Prague (08.00 UTC). Tento dodatek je připravený v PR a nedokládá produkční nasazení změny.
+Konec náboru zůstává 18. 11. 2026 v 01.25.06,242652 Europe/Prague (00.25.06,242652 UTC). Závěrečný odečet zůstává 20. 11. 2026 v 09.00 Europe/Prague (08.00 UTC). Tento oddíl zaznamenává už nasazenou střídavou fázi. Aktuální změna přidává dorovnání.
+
+## Jednorázové dorovnání schválené 7. listopadu
+
+Uživatel schválil dorovnání počtu nově přiřazených hráčů a následné pokračování ve střídání. Ověřený stav před přípravou byl A 21 / B 11, přičemž první nový hráč střídavé fáze již dostal A. Rozhodující snapshot A/B se však znovu pořídí atomicky v okamžiku aktivace dorovnání. Pevná kvóta odpovídá tehdejšímu rozdílu, takže při potvrzeném poměru 21/11 dostane následujících deset způsobilých nových identit B.
+
+Samostatná politika catchup_v1 má vlastní pořadí, čas aktivace, snapshot a pevnou kvótu. Autoritativní entry_catchup_state uchovává activated_at, snapshot_a, snapshot_b, target_variant, quota a allocated odděleně pro každé prostředí. Tyto údaje jsou i v policy_metrics.catchup_v1. Po jejím vyčerpání se obnoví uložené střídavé pořadí. Dosavadní střídavý ordinal 1 znamená, že následující střídavý hráč má ordinal 2 a větev B. Opakovaný požadavek stejné identity kvótu nespotřebuje a rollback vrací rezervaci. Dorovnávají se přiřazení, dokončení zůstává měřeným výsledkem chování hráčů.
+
+Ranní report stále vrací přesně dva souhrnné řádky A/B, včetně společného assigned_yesterday. Třetí položka policy_metrics.catchup_v1 zachovává oddělený jmenovatel a výsledky dorovnávací fáze. Catchup i střídání se vyhodnocují popisně, bez automatického vítěze a bez slučování s hashovou randomizační inferencí. U dorovnání je běžná jednostranná kohorta, proto se na ni nepoužívá SRM ani požadavek stejně velkých A/B uvnitř fáze. Archivní reporty se dvěma politikami jsou dál podporované.
+
+Po ověření nasazeného schématu a kódu schválené dorovnání aktivuje operátor jedním příkazem. Migrace sama dorovnávací kvótu neaktivuje.
+
+```sql
+SELECT proplet_experiment_internal.activate_entry_catchup_v1('production',false);
+```
+
+Vrácený activated_at, snapshot_a, snapshot_b, target_variant, quota a allocated uložit společně s produkčním SHA a předat rannímu reportu. Opakované zavolání vrací už uložený stav a nevytváří další kvótu. Při aktuálním rozdílu nula se uloží nulová kvóta. Bezpečnostní zastavení používá stávající entry_control.enabled=false a zachová uložený snapshot, kvótu i pořadí.
+
+Konec náboru 18. 11. 2026 v 01.25.06,242652 Europe/Prague i závěrečný odečet 20. 11. v 09.00 zůstávají stejné. Zaznamenat skutečný čas aktivace dorovnání, snapshot, kvótu a nasazené SHA. Tato příprava dokumentu sama nedokládá dokončené produkční nasazení.
 
 ## Nábor a zásah
 
@@ -45,7 +63,7 @@ Ranní manažerský report Proplet (ID automatizace `rann-mana-ersk-report-propl
 
 Před povolením náboru ověřit v odkazované metodice existující vazbu na preregistraci a soubor `docs/audits/ENTRY-EXPERIMENT-READOUT.sql` na přesně nasazeném commitu. Zkontrolovat načtení metodiky ranní automatizací a její první read-only výpočet. Pokud napojení chybí, ponechat nábor vypnutý. Neměnit čas, příjemce ani stručný formát reportu.
 
-Každé ráno interně archivovat datum, čas odečtu, release, počet včerejších a celkových přiřazení A/B, otevřená okna, kontroly přiřazování a chyby. Čtecí SQL zachovává přesně dva souhrnné řádky A/B a původní assigned_yesterday přes obě politiky. Sloupec policy_metrics obsahuje samostatné metriky hash50_v1 a alternating_v1, včetně času přepnutí a mezí pořadových čísel. Ranní součty se dál čtou z horní úrovně, nikoli součtem souhrnu a vnořených dat. Vynechání tréninku v B není propad. Před finálním odečtem nepublikovat průběžná srovnání úspěšnosti. Do manažerského shrnutí patří odchylka vyžadující zásah. Produkční ověření je jen čtecí.
+Každé ráno interně archivovat datum, čas odečtu, release, počet včerejších a celkových přiřazení A/B, otevřená okna, kontroly přiřazování a chyby. Čtecí SQL zachovává přesně dva souhrnné řádky A/B a původní assigned_yesterday přes obě politiky. Sloupec policy_metrics obsahuje samostatné metriky hash50_v1, alternating_v1 a catchup_v1, včetně času přepnutí a mezí pořadových čísel. Ranní součty se dál čtou z horní úrovně, nikoli součtem souhrnu a vnořených dat. Vynechání tréninku v B není propad. Před finálním odečtem nepublikovat průběžná srovnání úspěšnosti. Do manažerského shrnutí patří odchylka vyžadující zásah. Produkční ověření je jen čtecí.
 
 Nábor hned vypnout při prokázaném přeřazení, přepsání rozehrané hry, odlišné první desce, nefunkční pomoci či předčasné nabídce účtu, ztrátě postupu při přihlášení nebo při zařazení testovacích dat jako hráčů. Vypnout také při nejméně pěti identitách s potvrzeným selháním načtení a podílu alespoň 10 % v jedné větvi mezi alespoň 30 identitami přiřazenými v poslední hodině. V původní hashové kohortě při N ≥ 100 kontrolovat přesným oboustranným binomickým testem poměr 1:1. Pro střídání kontrolovat souvislé pořadí od jedničky, lichá čísla ve větvi A, sudá ve větvi B a serverový čas přepnutí. Běžný test poměru náhodného vzorku se na střídání nepoužije. Při p < 0,001 pozastavit nábor a prověřit implementaci. Alarm vyšetřit hned, nečekat na ranní report. Zapsat přesný čas zastavení, důvod a rozsah škody. Dosavadní přiřazení zachovat. Bez dohody nábor znovu neotevírat a neprodlužovat.
 
@@ -90,8 +108,8 @@ UPDATE proplet_experiment_internal.entry_control SET enabled=false WHERE singlet
 SELECT enabled, starts_at, ends_at FROM proplet_experiment_internal.entry_control WHERE singleton;
 ```
 
-## Předání změny politiky
+## Předání dorovnávací fáze
 
-Před případným nasazením tohoto PR ověřit aktuální produkční SHA, uložený starts_at/ends_at a kontrolu ranního reportu. Migrace musí zachovat existující interval, přidat politiku a oddělené pořadí a zapsat čas přechodu. Zaznamenat nasazené SHA, čas přechodu v UTC i Europe/Prague a první pořadové číslo nové fáze. Výsledky před přechodem neoznačovat zpětně jako střídavé.
+Před schváleným nasazením dorovnání ověřit aktuální produkční SHA, uložený starts_at/ends_at a kontrolu ranního reportu. Migrace zachová existující interval a střídavé pořadí. Následná explicitní aktivace zapíše čas, snapshot a pevnou kvótu dorovnání. Zaznamenat nasazené SHA, čas přechodu v UTC i Europe/Prague a první pořadové číslo dorovnávací fáze. Výsledky před přechodem ponechat v původních kohortách.
 
 Při bezpečnostním zastavení použít stávající enabled=false. Obnovení se řídí novým schválením a pokračuje v uloženém pořadí. Přechod ani bezpečnostní vypnutí nezakládá další čtrnáctidenní okno. Ověření připraveného PR probíhá na lokálních syntetických datech.
