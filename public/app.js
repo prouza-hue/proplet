@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.32-today-spacing1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.33-all-resume1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -1076,7 +1076,7 @@ function freeOrder(){
   notice:showToast,changed:()=>{if(puzzleDB){renderFree();renderQuickPlay()}}
  });return freeOrderController;
 }
-function freeProgress(diff){const q=progression().freeProgress(diff);q.nextUnsolved=freeOrder().next(diff,q.nextUnsolved);return q}
+function freeProgress(diff){const q=progression().freeProgress(diff);q.resume=freeOrder().resume(diff)||q.resume;q.nextUnsolved=freeOrder().next(diff,q.nextUnsolved);return q}
 async function changeFreeOrder(diff,mode){
  saveGameProgress();try{await freeOrder().change(diff,mode)}catch(e){showToast('Volbu se nepodařilo synchronizovat: '+e.message)}
 }
@@ -1142,7 +1142,7 @@ function renderFreeResumeCard(){
   const loaded=()=>{script.dataset.loaded='1';finish('missing_export');},failed=()=>{script.dataset.loadFailed='1';finish('load_error');};
   script.addEventListener('load',loaded,{once:true});script.addEventListener('error',failed,{once:true});
   timer=setTimeout(()=>finish('timeout'),10000);
-  if(!shared){script.src='/home-layout.js?v=daily-guard1';try{document.head.append(script)}catch{finish('append_error')}}
+  if(!shared){script.src='/home-layout.js?v=all-resume1';try{document.head.append(script)}catch{finish('append_error')}}
  }).then(()=>window.PropletHomeLayout.renderResumeCard()).catch(error=>{
   homeLayoutRecoveryRetryAt=Date.now()+30000;
   reportClientError('home_layout_contract',`HomeLayout module unavailable: ${error.message}`,error);
@@ -3106,7 +3106,7 @@ async function boot(){
  const refreshDailyAfterResume=()=>Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]).then(()=>{if(currentScreen!=='game')renderDaily()}).catch(()=>{if(currentScreen==='daily')renderDaily()});
  window.addEventListener('online',refreshDailyAfterResume);window.addEventListener('focus',refreshDailyAfterResume);window.addEventListener('pageshow',refreshDailyAfterResume);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshDailyAfterResume()});
- const refreshFreeOrderAfterResume=()=>refreshFreeOrder({forceConfig:true});
+ const refreshFreeOrderAfterResume=()=>refreshFreeOrder({forceConfig:true,minAgeMs:0});
  window.addEventListener('online',()=>refreshFreeOrder({forceConfig:true,minAgeMs:0}));
  window.addEventListener('focus',refreshFreeOrderAfterResume);
  window.addEventListener('pageshow',refreshFreeOrderAfterResume);
