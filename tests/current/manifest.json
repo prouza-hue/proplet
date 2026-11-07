@@ -237,6 +237,10 @@
         "runner": "python"
       },
       {
+        "path": "tests/current/test_entry_experiment_readout.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_first_board_catchup.py",
         "runner": "python"
       },

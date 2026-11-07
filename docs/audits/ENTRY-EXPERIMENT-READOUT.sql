@@ -24,10 +24,20 @@ WITH schedule AS (
     AND e.context->>'first_steps_run_id'=a.first_steps_run_id::text
   WHERE a.environment='production' AND NOT a.is_test
     AND a.assigned_at>=p.opens AND a.assigned_at<least(p.closes,p.cutoff)
+), allocation_audit AS (
+  SELECT event_id,
+    allocation_ordinal IS DISTINCT FROM row_number() OVER (ORDER BY allocation_ordinal,event_id)
+      OR variant IS DISTINCT FROM CASE WHEN allocation_ordinal % 2 = 1 THEN 'A' ELSE 'B' END
+      OR allocation_switched_at IS NULL OR assigned_at < allocation_switched_at
+      OR allocation_switched_at IS DISTINCT FROM min(allocation_switched_at) OVER () AS invalid_allocation
+  FROM assignments WHERE allocation_policy='alternating_v1'
 ), owners AS (
   SELECT player_id FROM assignments WHERE player_id IS NOT NULL GROUP BY player_id HAVING count(*)>1
 ), metrics AS (
   SELECT a.*, p.cutoff, p.freeze,
+    coalesce((SELECT invalid_allocation FROM allocation_audit audit WHERE audit.event_id=a.event_id),false)
+      OR (a.allocation_policy='hash50_v1' AND
+          (a.allocation_ordinal IS NOT NULL OR a.allocation_switched_at IS NOT NULL)) AS invalid_allocation,
     EXISTS (SELECT FROM owners x WHERE x.player_id=a.player_id) AS shared_account,
     first_game.id AS first_attempt,
     first_game.completed_at AS first_completed,
@@ -86,13 +96,13 @@ WITH schedule AS (
       AND e.created_at<least(greatest(a.d1_end,a.assigned_at+interval '24 hours'),p.cutoff)
       AND (e.anonymous_id=a.anonymous_id OR e.player_id=a.player_id OR e.context->>'first_steps_run_id'=a.first_steps_run_id::text)
   ) evt ON true
-)
-SELECT v.variant,p.cutoff,p.opens,p.closes,p.freeze, count(m.assigned_at) AS assigned,
+), policy_cohorts AS (
+SELECT v.variant,pol.policy,p.cutoff,p.opens,p.closes,p.freeze, count(m.assigned_at) AS assigned,
  count(*) FILTER (WHERE (m.assigned_at AT TIME ZONE 'Europe/Prague')::date=
     (p.cutoff AT TIME ZONE 'Europe/Prague')::date-1) AS assigned_yesterday,
  count(*) FILTER (WHERE m.assigned_at+interval '24 hours'>p.cutoff) AS pending_24h,
  count(*) FILTER (WHERE m.d1_end>p.cutoff) AS pending_d1,
- count(*) FILTER (WHERE m.missing_receipt OR m.shared_account OR m.link_missing OR m.wrong_board) AS investigate,
+ count(*) FILTER (WHERE m.missing_receipt OR m.shared_account OR m.link_missing OR m.wrong_board OR m.invalid_allocation) AS investigate,
  count(*) FILTER (WHERE m.load_failed) AS load_failures,
  count(*) FILTER (WHERE m.client_error) AS reported_errors,
  count(*) FILTER (WHERE m.assigned_at>=p.cutoff-interval '1 hour') AS assigned_last_hour,
@@ -103,6 +113,33 @@ SELECT v.variant,p.cutoff,p.opens,p.closes,p.freeze, count(m.assigned_at) AS ass
  CASE WHEN p.cutoff=p.freeze THEN count(*) FILTER (WHERE m.continued OR m.tajenka_continued) END AS continued,
  CASE WHEN p.cutoff=p.freeze THEN count(*) FILTER (WHERE m.d1_visit OR m.d1_play) END AS returned_d1,
  CASE WHEN p.cutoff=p.freeze THEN count(*) FILTER (WHERE m.created_account) END AS created_accounts,
- CASE WHEN p.cutoff=p.freeze THEN count(*) FILTER (WHERE m.helped) END AS used_hint
-FROM (VALUES ('A'),('B')) v(variant) CROSS JOIN params p LEFT JOIN metrics m ON m.variant=v.variant
-GROUP BY v.variant,p.cutoff,p.opens,p.closes,p.freeze ORDER BY v.variant;
+ CASE WHEN p.cutoff=p.freeze THEN count(*) FILTER (WHERE m.helped) END AS used_hint,
+ min(m.allocation_ordinal) AS first_ordinal, max(m.allocation_ordinal) AS last_ordinal,
+ min(m.allocation_switched_at) AS switched_at, max(m.allocation_switched_at) AS last_switched_at
+FROM (VALUES ('A'),('B')) v(variant)
+CROSS JOIN (VALUES ('hash50_v1'),('alternating_v1')) pol(policy)
+CROSS JOIN params p LEFT JOIN metrics m ON m.variant=v.variant AND m.allocation_policy=pol.policy
+GROUP BY v.variant,pol.policy,p.cutoff,p.opens,p.closes,p.freeze
+)
+-- Keep exactly two total rows for the existing morning report; the nested cohorts
+-- preserve the allocation policy for analysis without treating alternation as random.
+SELECT variant,cutoff,opens,closes,c.freeze,
+ sum(assigned)::bigint AS assigned,
+ sum(assigned_yesterday)::bigint AS assigned_yesterday,
+ sum(pending_24h)::bigint AS pending_24h,
+ sum(pending_d1)::bigint AS pending_d1,
+ sum(investigate)::bigint AS investigate,
+ sum(load_failures)::bigint AS load_failures,
+ sum(reported_errors)::bigint AS reported_errors,
+ sum(assigned_last_hour)::bigint AS assigned_last_hour,
+ sum(load_failures_last_hour)::bigint AS load_failures_last_hour,
+ sum(completed_24h)::bigint AS completed_24h,
+ sum(first_started)::bigint AS first_started,
+ sum(first_completed)::bigint AS first_completed,
+ sum(continued)::bigint AS continued,
+ sum(returned_d1)::bigint AS returned_d1,
+ sum(created_accounts)::bigint AS created_accounts,
+ sum(used_hint)::bigint AS used_hint,
+ jsonb_object_agg(policy, to_jsonb(c)-'variant'-'policy'-'cutoff'-'opens'-'closes'-'freeze' ORDER BY policy) AS policy_metrics
+FROM policy_cohorts c
+GROUP BY variant,cutoff,opens,closes,c.freeze ORDER BY variant;

@@ -1,7 +1,13 @@
 -- This fixture runs inside a transaction in the isolated PostgreSQL gate.
 -- Its historical sample has a fixed schedule independent of the production activation.
+-- Remove earlier synthetic assignments only within this forced-rollback local fixture,
+-- so phase ordinals start at 1 independently of other acceptance scenarios.
+DELETE FROM proplet_experiment_internal.entry_assignments;
 UPDATE proplet_experiment_internal.entry_control
 SET starts_at='2026-11-15 23:00Z',ends_at='2026-11-29 23:00Z',enabled=false WHERE singleton;
+-- Reconstruct historical rows as the disposable DB owner. Live allocation is
+-- covered by the separate acceptance test; this transaction always rolls back.
+ALTER TABLE proplet_experiment_internal.entry_assignments DISABLE TRIGGER proplet_entry_allocate_v1;
 INSERT INTO proplet_experiment_internal.entry_assignments
     (environment,is_test,anonymous_id,first_steps_run_id,variant,assigned_at,event_id)
 SELECT env,test,repeat(hex,64),('ad000000-0000-4000-8000-00000000000'||n)::uuid,
@@ -9,6 +15,20 @@ SELECT env,test,repeat(hex,64),('ad000000-0000-4000-8000-00000000000'||n)::uuid,
 FROM (VALUES (1,'production',false,'a','A'),(2,'production',false,'b','B'),
              (3,'production',false,'c','B'),(4,'production',true,'d','A'),
              (5,'preview',true,'e','B'),(6,'production',false,'f','A'),(7,'production',false,'7','B')) AS f(n,env,test,hex,arm);
+
+-- Historical hash receipts intentionally have no allocation-policy event context.
+UPDATE proplet_experiment_internal.entry_assignments
+SET allocation_policy='hash50_v1',allocation_ordinal=NULL,allocation_switched_at=NULL
+WHERE first_steps_run_id::text LIKE 'ad000000-%';
+UPDATE proplet_experiment_internal.entry_assignments
+SET allocation_policy=CASE WHEN right(first_steps_run_id::text,1) IN ('6','7') THEN 'alternating_v1' ELSE 'hash50_v1' END,
+    allocation_ordinal=CASE right(first_steps_run_id::text,1) WHEN '6' THEN 1 WHEN '7' THEN 2 END,
+    allocation_switched_at=CASE WHEN right(first_steps_run_id::text,1) IN ('6','7')
+                               THEN timestamptz '2026-11-16 10:59Z' END,
+    variant=CASE WHEN right(first_steps_run_id::text,1) IN ('1','4','6') THEN 'A' ELSE 'B' END
+WHERE first_steps_run_id::text LIKE 'ad000000-%';
+
+ALTER TABLE proplet_experiment_internal.entry_assignments ENABLE TRIGGER proplet_entry_allocate_v1;
 
 INSERT INTO public.product_events(id,event_type,anonymous_id,environment,is_test,created_at,context)
 SELECT event_id,'entry_experiment_assigned',anonymous_id,environment,is_test,assigned_at,

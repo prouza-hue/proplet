@@ -1,6 +1,7 @@
 """Interpret aggregate CSV from ENTRY-EXPERIMENT-READOUT.sql without interim outcomes."""
 import argparse
 import csv
+import json
 import math
 from statistics import NormalDist
 
@@ -30,20 +31,14 @@ def wilson(x, n):
     return center - radius, center + radius
 
 
-def readout(rows, intact):
+def random_cohort_readout(rows, intact):
     a, b = rows['A'], rows['B']
     na, nb = (int(r['assigned']) for r in (a, b))
     p = binomial_p(na, nb)
     srm = na + nb >= 100 and p < 0.001
     print(f'Přiřazeno A {na}, B {nb}. Kontrola poměru p={p:.5g}.')
-    for name, row in rows.items():
-        failures, assigned = (int(row[k]) for k in ('load_failures_last_hour', 'assigned_last_hour'))
-        if assigned >= 30 and failures >= 5 and failures / assigned >= 0.1:
-            print(f'Zastavit nábor. Selhání načtení v poslední hodině ve větvi {name}.')
     if srm:
         print('Pozastavit nábor a prověřit přiřazování.')
-    if any(int(r['investigate']) for r in rows.values()):
-        print('Prověřit integritu přiřazení a vazeb pokusů.')
     if any(r['completed_24h'] in ('', None) for r in rows.values()):
         return
     if na and nb:
@@ -63,6 +58,49 @@ def readout(rows, intact):
             print('Výsledek podporuje větev ' + ('B.' if diff > 0 else 'A.'))
             return
     print('výsledek zatím není přesvědčivý')
+
+
+def technical_health(rows):
+    for name, row in rows.items():
+        failures, assigned = (int(row[k]) for k in ('load_failures_last_hour', 'assigned_last_hour'))
+        if assigned >= 30 and failures >= 5 and failures / assigned >= 0.1:
+            print(f'Zastavit nábor. Selhání načtení v poslední hodině ve větvi {name}.')
+    if any(int(row['investigate']) for row in rows.values()):
+        print('Prověřit integritu přiřazení a vazeb pokusů.')
+
+
+def readout(rows, intact):
+    technical_health(rows)
+    # Archived callers without policy metadata contain the original hash cohort.
+    if not any('policy_metrics' in row for row in rows.values()):
+        random_cohort_readout(rows, intact)
+        return
+    policies = {}
+    for variant, row in rows.items():
+        raw = row.get('policy_metrics')
+        policies[variant] = json.loads(raw) if isinstance(raw, str) else raw
+        if not isinstance(policies[variant], dict):
+            raise ValueError('Chybí rozpad přiřazení podle politiky.')
+    if any(set(policies[v]) != {'hash50_v1', 'alternating_v1'} for v in ('A', 'B')):
+        raise ValueError('Neznámá nebo neúplná politika přiřazování.')
+    for variant, row in rows.items():
+        if sum(int(cohort['assigned']) for cohort in policies[variant].values()) != int(row['assigned']):
+            raise ValueError('Součet kohort neodpovídá všem přiřazením.')
+    print(f"Celkem přiřazeno A {rows['A']['assigned']}, B {rows['B']['assigned']}.")
+    print('Původní náhodné přiřazování hash50_v1')
+    random_cohort_readout({v: policies[v]['hash50_v1'] for v in ('A', 'B')}, intact)
+    a, b = (policies[v]['alternating_v1'] for v in ('A', 'B'))
+    print(f"Střídání alternating_v1. Přiřazeno A {a['assigned']}, B {b['assigned']}.")
+    if any(r['completed_24h'] in ('', None) for r in (a, b)):
+        return
+    na, nb = int(a['assigned']), int(b['assigned'])
+    if na and nb:
+        xa, xb = int(a['completed_24h']), int(b['completed_24h'])
+        print(f'Dokončilo A {xa}/{na}, B {xb}/{nb}. Popisný rozdíl B-A {(xb / nb - xa / na) * 100:+.2f} p. b.')
+    if min(na, nb) < 100 or any(int(row['investigate']) for row in (a, b)) or not intact:
+        print('výsledek zatím není přesvědčivý')
+    else:
+        print('Popisné výsledky střídavé fáze vyžadují posouzení časového a akvizičního složení.')
 
 
 if __name__ == '__main__':
