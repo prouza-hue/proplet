@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.33-all-resume1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.34-native-back1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
@@ -946,16 +946,14 @@ function initNavigation(){
   const screen=e.state?.proplet&&ROUTE_SCREENS.has(e.state.screen)?e.state.screen:'daily';nav(screen,{fromPop:true});
  }
  window.addEventListener('popstate',handleBack);
- if(typeof window.CloseWatcher==='function'&&isStandaloneApp()&&/Android/i.test(navigator.userAgent)){
-  const dialog=$('#pwaExitDialog');
-  if(dialog)bindPwaExit(dialog,handleBack);
- }
+ if(typeof window.CloseWatcher==='function'&&isStandaloneApp()&&/Android/i.test(navigator.userAgent))bindPwaBack(handleBack);
 }
-function bindPwaExit(dialog,dismissModal){
+function bindPwaBack(dismissModal){
  let watcher=null;
- let exitConfirmed=false;
  function syncWatcher(){
-  if(currentScreen!=='daily'||document.visibilityState==='hidden'||exitConfirmed||document.querySelector('dialog[open]')){
+  // At the root, native Android Back must reach the host and leave the PWA.
+  // Only custom overlays need a watcher; native dialogs own their close signal.
+  if(currentScreen!=='daily'||document.visibilityState==='hidden'||document.querySelector('dialog[open]')||!openTransientModal()){
    watcher?.destroy();
    watcher=null;
    return;
@@ -964,36 +962,13 @@ function bindPwaExit(dialog,dismissModal){
   watcher=new window.CloseWatcher();
   watcher.addEventListener('close',async ()=>{
    watcher=null;
-   if(openTransientModal()){
-    await dismissModal();
-    syncWatcher();
-   }else if(!document.querySelector('dialog[open]')){
-    dialog.showModal();
-   }
+   await dismissModal();
+   syncWatcher();
   });
  }
- dialog.querySelector('form').addEventListener('submit',event=>{
-  if(event.submitter?.value!=='exit')return;
-  event.preventDefault();
-  exitConfirmed=true;
-  dialog.close();
-  window.close();
-  setTimeout(()=>{
-   if(exitConfirmed&&document.visibilityState==='visible')showToast('Proplet můžete opustit systémovým tlačítkem Domů.');
-  },400);
- });
- function resumeWatcher(){
-  exitConfirmed=false;
-  if(dialog.open&&(currentScreen!=='daily'||document.visibilityState==='hidden'))dialog.close();
-  syncWatcher();
- }
- document.addEventListener('proplet:screen-changed',resumeWatcher);
- document.addEventListener('visibilitychange',resumeWatcher);
- document.addEventListener('pointerdown',()=>{
-  if(exitConfirmed)resumeWatcher();
- });
- // Native dialogs handle the system close signal themselves.
- new MutationObserver(syncWatcher).observe(document.body,{subtree:true,attributes:true,attributeFilter:['open']});
+ document.addEventListener('proplet:screen-changed',syncWatcher);
+ document.addEventListener('visibilitychange',syncWatcher);
+ new MutationObserver(syncWatcher).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['open','class']});
  syncWatcher();
 }
 function transientModals(){return ['archiveExperienceModal','tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','validWordFailsafeModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement','dailyExtraIntro'].map(id=>document.getElementById(id)).filter(Boolean)}

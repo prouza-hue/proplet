@@ -12,6 +12,37 @@ async function navigation(modalId,owner){
   await handlers.popstate({state:{proplet:true,screen:'free'}});
   assert.equal(closed,owner,modalId+' must use its owner close handler');assert.equal(hidden,true);assert.equal(background.inert,false);assert.equal(body.style.overflow,'');assert.equal(pushed,1);
 }
+async function pwaBack(){
+  const handlers={},watchers=[];let mutation,observed,modal=null,nativeDialog=false,dismissed=0,mandatory=false;
+  class CloseWatcher{
+    constructor(){this.destroyed=false;watchers.push(this);}
+    addEventListener(event,fn){assert.equal(event,'close');this.close=fn;}
+    destroy(){this.destroyed=true;}
+  }
+  const context={window:{CloseWatcher,close(){assert.fail('web content must leave root exit to Android');}},
+    document:{body:{},visibilityState:'visible',querySelector:()=>nativeDialog?{}:null,addEventListener:(event,fn)=>handlers[event]=fn},
+    MutationObserver:class{constructor(fn){mutation=fn;}observe(target,options){observed=options;}},
+    currentScreen:'daily',openTransientModal:()=>modal};
+  vm.createContext(context);
+  vm.runInContext(extract('function bindPwaBack(', 'function transientModals(){'),context);
+  context.bindPwaBack(async()=>{dismissed++;if(!mandatory)modal=null;});
+  const live=()=>watchers.filter(w=>!w.destroyed);
+  assert.equal(live().length,0,'root without an overlay must leave native Back unhandled');
+  assert.ok(observed.attributeFilter.includes('class'),'custom modal visibility changes must resync Back');
+  assert.ok(observed.attributeFilter.includes('open'),'native dialog visibility changes must resync Back');
+  assert.equal(observed.childList,true,'dynamically added overlays must resync Back');
+  modal={id:'profileModal'};mutation();assert.equal(live().length,1);
+  let watcher=live()[0];watcher.destroyed=true;await watcher.close();
+  assert.equal(dismissed,1);assert.equal(live().length,0,'closing the last overlay must restore native exit');
+  modal={id:'onboardingModal'};mandatory=true;mutation();watcher=live()[0];watcher.destroyed=true;await watcher.close();
+  assert.equal(dismissed,2);assert.equal(live().length,1,'a mandatory overlay remaining open must keep Back protection');
+  nativeDialog=true;mutation();assert.equal(live().length,0,'native dialogs own their close signal');
+  nativeDialog=false;mutation();assert.equal(live().length,1);
+  context.currentScreen='game';handlers['proplet:screen-changed']();assert.equal(live().length,0,'game navigation must not be intercepted by root modal handling');
+  context.currentScreen='daily';handlers['proplet:screen-changed']();assert.equal(live().length,1);
+  context.document.visibilityState='hidden';handlers.visibilitychange();assert.equal(live().length,0);
+  modal=null;context.document.visibilityState='visible';handlers.visibilitychange();assert.equal(live().length,0,'returning to an unobstructed root must preserve native exit');
+}
 async function resume(){
   const target={id:'g6-refresh-hard-019',difficulty:'hard',meta:{level:319}},other={id:'g6-refresh-hard-001',difficulty:'hard',meta:{level:301}};
   const saved={completed:{},inProgress:{['free:'+target.id]:{puzzleId:target.id,mode:'free',difficulty:'hard',savedAt:200,elapsedMs:12345,found:[{word:'TEST',answerIndex:0}]},'free:missing':{puzzleId:'missing',mode:'free',difficulty:'hard',savedAt:300}}};
@@ -25,4 +56,4 @@ async function resume(){
   // A completed saved board must no longer override the next candidate.
   saved.completed['free:'+target.id]={puzzleId:target.id};assert.equal(context.resumableFreePuzzle('hard',[other,target]),null);
 }
-(async()=>{await navigation('mk100LaunchPreview','content');await navigation('freeRefreshAnnouncement','refresh');await resume();console.log('PASS: Android Back restores modal ownership; hard 319 resumes ahead of varied next board without altering progress.');})().catch(error=>{console.error(error);process.exitCode=1;});
+(async()=>{await navigation('mk100LaunchPreview','content');await navigation('freeRefreshAnnouncement','refresh');await pwaBack();await resume();console.log('PASS: root Android Back stays native; overlays retain close ownership; hard 319 resumes without altering progress.');})().catch(error=>{console.error(error);process.exitCode=1;});
