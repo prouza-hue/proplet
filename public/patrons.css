@@ -281,3 +281,27 @@ html.tiskarna-ui body #patronTodayLink.patron-today-link:not([hidden]){display:g
 #patronDialog .patron-offer-identity>strong{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 15px/1.3 Outfit,sans-serif;color:var(--td-ink)}
 #patronDialog .patron-offer-identity .patron-label-static{font-size:12px;line-height:1.3;gap:4px}
 #patronDialog .patron-offer-identity .patron-label-static svg{flex:none}
+
+/* Confirmed monthly support: no estimate is shown when the aggregate is unavailable. */
+.patron-funding{margin:3px 0 12px;min-width:0;color:var(--td-muted);font:400 12px/1.35 Outfit,sans-serif}
+.patron-funding>div{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:5px}
+.patron-funding strong{color:var(--td-ink);font-weight:600;white-space:nowrap}
+.patron-funding progress{display:block;box-sizing:border-box;width:100%;height:7px;border:0;border-radius:6px;overflow:hidden;background:var(--patron-tint);accent-color:var(--patron-blue)}
+.patron-funding progress::-webkit-progress-bar{background:var(--patron-tint);border-radius:6px}
+.patron-funding progress::-webkit-progress-value{background:var(--patron-blue);border-radius:6px}
+.patron-funding progress::-moz-progress-bar{background:var(--patron-blue);border-radius:6px}
+#patronOffer{display:block;box-sizing:border-box;min-width:0;margin:0 0 12px;padding:14px 16px}
+#patronOffer .patron-offer-heading{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+#patronOffer .patron-offer-heading>div{min-width:0}
+#patronOffer .patron-offer-heading strong{font:600 20px/1.2 Fraunces,Georgia,serif;color:var(--td-ink)}
+#patronOffer .patron-offer-heading p{font:400 13px/1.35 Outfit,sans-serif;margin:3px 0 0}
+#patronOffer .patron-entry-seal{width:34px;height:36px;flex:none}
+#patronOffer .patron-entry-seal svg{width:20px;height:20px}
+#patronOffer .patron-offer-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#patronOffer .patron-offer-actions>button{min-height:44px;font:500 13px/1.3 Outfit,sans-serif;cursor:pointer}
+#patronOffer .patron-offer-actions>[data-quick-support]{flex:1 0 100%;background:#315da8;color:#fff9ed;border:1px solid #244b89;border-radius:10px;padding:10px}
+html.tiskarna-ui body #patronOffer .patron-offer-actions>.text-btn{background:none;border:0;color:var(--patron-blue)!important;padding:4px 2px}
+html.tiskarna-ui body #patronOffer .patron-offer-actions>[data-dismiss]{margin-left:auto;color:var(--td-muted)!important}
+#patronOffer .patron-offer-note{font:400 11px/1.35 Outfit,sans-serif;color:var(--td-muted);margin:2px 0 0}
+
+.patron-funding-remaining{display:block;margin-top:4px;font:400 12px/1.3 Outfit,sans-serif;color:var(--td-muted)}

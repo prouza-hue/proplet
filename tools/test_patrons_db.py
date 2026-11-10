@@ -32,6 +32,7 @@ def main():
    c.execute((ROOT/'supabase/migrations/20261101103408_patron_recurring_badge.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261105083317_patron_thanks_visibility.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261105224723_patron_offer_visibility.sql').read_text(encoding='utf8'))
+   c.execute((ROOT/'supabase/migrations/20261110083909_patron_month_funding_and_pending_offer_window.sql').read_text(encoding='utf8'))
   ids=[str(uuid4()) for _ in range(4)];player,other,balanced,admin=ids
   for index,pid in enumerate(ids):c.execute('insert into public.players(id,name,family_code,token_hash,support_mode,public_rankings) values(%s,%s,%s,%s,%s,true)',(pid,'Patron SQL '+str(index),'patron-test',secrets.token_hex(32),'younger' if pid==balanced else 'none'))
   # Use the existing schema's required admin columns, if present.
@@ -53,6 +54,7 @@ def main():
   c.execute("update proplet_private.patron_first_seen set first_seen_at=now()-interval '49 hours'")
   assert rpc('proplet_patron_state_v1',player,False)['canOffer'] is True
   assert rpc('proplet_patron_state_v1',balanced,False)['canOffer'] is True
+  assert rpc('proplet_patron_state_v1',player,False)['monthFunding']['raisedCzk']==0, 'QR/manual entitlement is not confirmed money'
   assert not rpc('proplet_patron_state_v1',balanced,True)['displayGranted']
   # Legacy receipts with a recorded click count, while passive departures do not.
   c.execute("""insert into proplet_private.patron_offer_receipts(player_id,shown_at,outcome)
@@ -174,6 +176,28 @@ def main():
   c.execute("update proplet_private.patron_offer_receipts set shown_at=now()-interval '91 days' where id=%s",(receipt,))
   available=rpc('proplet_patron_state_v1',player,False)
   assert available['canOffer'] and available['offerCount90d']==2
+
+  # Unpaid QR instructions remain retrievable/idempotent after the reminder
+  # grace window. A newer attempt restarts only that finite seven-day window.
+  stale_player=new_player();rpc('proplet_patron_state_v1',stale_player,False)
+  c.execute("update proplet_private.patron_first_seen set first_seen_at=now()-interval '10 days' where player_id=%s",(stale_player,))
+  stale_request=str(uuid4());stale_intent=rpc('proplet_patron_intent_v1',stale_player,stale_request,129)['intent']
+  c.execute("update proplet_private.patron_intents set created_at=clock_timestamp()-interval '6 days 23 hours' where id=%s",(stale_intent['id'],))
+  assert rpc('proplet_patron_state_v1',stale_player,False)['offerWaitReason']=='payment_pending'
+  c.execute("update proplet_private.patron_intents set created_at=clock_timestamp()-interval '7 days 1 second' where id=%s",(stale_intent['id'],))
+  assert rpc('proplet_patron_state_v1',stale_player,False)['canOffer']
+  preserved=rpc('proplet_patron_intent_read_v1',stale_player,stale_intent['id'])['intent']
+  assert rpc('proplet_patron_intent_v1',stale_player,stale_request,129)['intent']==preserved
+  assert preserved['reference']==stale_intent['reference'] and preserved['amountCzk']==129
+  recent=rpc('proplet_patron_intent_v1',stale_player,str(uuid4()),79)['intent']
+  assert rpc('proplet_patron_state_v1',stale_player,False)['offerWaitReason']=='payment_pending'
+  c.execute("update proplet_private.patron_intents set created_at=clock_timestamp()-interval '8 days' where id=%s",(recent['id'],))
+  assert rpc('proplet_patron_state_v1',stale_player,False)['canOffer']
+  assert rpc('proplet_patron_preferences_v1',stale_player,False,True)['offerWaitReason']=='disabled'
+  rpc('proplet_patron_preferences_v1',stale_player,False,False)
+  # A late real transfer still confirms the original intent and suppresses offers.
+  late_paid=rpc('proplet_patron_confirm_v1',admin,stale_intent['id'],stale_intent['reference'],'late-stale-qr',129,'CZK','5531840001/5500')
+  assert late_paid['ok'] and rpc('proplet_patron_state_v1',stale_player,False)['offerWaitReason']=='patron'
 
   # Creating a QR suppresses even a previously reserved offer, without
   # preventing manual contributions or changing existing payment instructions.
@@ -312,10 +336,56 @@ def main():
    c.execute('reset role')
   http_acceptance(opts,new_player(),new_player(),admin)
   from tools.test_patron_manual_badge_db import run_manual_badge_acceptance
+  funding_before_manual=rpc('proplet_patron_state_v1',player,False)['monthFunding']
   run_manual_badge_acceptance(opts)
+  assert rpc('proplet_patron_state_v1',player,False)['monthFunding']==funding_before_manual
   from tools.test_patron_recurring_db import run_recurring_acceptance
   run_recurring_acceptance(opts)
+  month_funding_acceptance(c,rpc,new_player,admin)
  print('PASS patron SQL: visibility, account-wide lease and retry, 14/30/90-day scheduling, legacy evidence, news and newcomer gates, opt-out, pending QR, patron suppression, payment ownership/ledger, monthly dates, thanks, badge privacy and ACL; database='+name)
+
+def month_funding_acceptance(c,rpc,new_player,admin):
+ """Real ledger totals: bank-date authority, Prague boundaries, retries/privacy."""
+ from datetime import timedelta
+ pid=new_player()
+ current,month_start,month_end=c.execute("select (clock_timestamp() at time zone 'Europe/Prague')::date,date_trunc('month',clock_timestamp() at time zone 'Europe/Prague')::date,(date_trunc('month',clock_timestamp() at time zone 'Europe/Prague')+interval '1 month')::date").fetchone()
+ baseline=rpc('proplet_patron_state_v1',pid,False)['monthFunding']
+ assert set(baseline)=={'month','raisedCzk','goalCzk','remainingCzk'}
+ assert baseline['month']==month_start.strftime('%Y-%m') and baseline['goalCzk']==2000
+ original=baseline['raisedCzk']
+ def funding(delta):
+  value=rpc('proplet_patron_state_v1',pid,False)['monthFunding']
+  assert value=={'month':baseline['month'],'raisedCzk':original+delta,'goalCzk':2000,'remainingCzk':max(0,2000-original-delta)},value
+  return value
+ def intent(amount,frequency='once'):
+  return rpc('proplet_patron_intent_v1',pid,str(uuid4()),amount,frequency,current if frequency=='monthly' else None)['intent']
+ def confirm(i,tx,day=None):
+  args=[admin,i['id'],i['reference'],tx,i['amountCzk'],'CZK','5531840001/5500']
+  if day is not None:args.append(day)
+  return rpc('proplet_patron_confirm_v2' if day is not None else 'proplet_patron_confirm_v1',*args)
+ monthly=intent(129,'monthly');funding(0)
+ assert not confirm(monthly,'fund-current-1',current)['alreadyConfirmed'];funding(129)
+ assert confirm(monthly,'fund-current-1',current)['alreadyConfirmed'];funding(129)
+ assert not confirm(monthly,'fund-current-2',current)['alreadyConfirmed'];funding(258)
+ # paid_on wins even if administrators confirm in a different month.
+ c.execute("update proplet_private.patron_payments set confirmed_at=%s::date::timestamp at time zone 'Europe/Prague' where intent_id=%s",(month_start-timedelta(days=1),monthly['id']))
+ funding(258)
+ previous=intent(199);confirm(previous,'fund-prior-bank-date',month_start-timedelta(days=1));funding(258)
+ legacy=intent(79);confirm(legacy,'fund-legacy-no-bank-date')
+ c.execute("update proplet_private.patron_payments set confirmed_at=%s::date::timestamp at time zone 'Europe/Prague' where intent_id=%s",(month_start,legacy['id']))
+ funding(337)
+ # One microsecond before Prague midnight belongs to the previous month.
+ c.execute("update proplet_private.patron_payments set confirmed_at=(%s::date::timestamp at time zone 'Europe/Prague')-interval '1 microsecond' where intent_id=%s",(month_start,legacy['id']))
+ funding(258)
+ # The next month boundary is exclusive, and session time zone cannot change it.
+ c.execute("update proplet_private.patron_payments set confirmed_at=%s::date::timestamp at time zone 'Europe/Prague' where intent_id=%s",(month_end,legacy['id']))
+ for zone in ('Pacific/Kiritimati','Etc/GMT+12'):
+  c.execute(sql.SQL('set time zone {}').format(sql.Literal(zone)));funding(258)
+ c.execute('reset time zone')
+ large=intent(2000);confirm(large,'fund-over-goal',current)
+ assert funding(2258)['remainingCzk']==0
+ c.execute('set role service_role');funding(2258);c.execute('reset role')
+ print('PASS confirmed monthly funding: unpaid QR excluded, monthly ledger dedup, paid_on authority, legacy Prague boundaries, timezone independence, over-goal clamp, aggregate-only contract')
 
 def http_acceptance(opts,owner,other,admin):
  """Real native HTTP handlers over the disposable SQL schema, no mocked RPC."""
@@ -345,6 +415,10 @@ def http_acceptance(opts,owner,other,admin):
  display='/api/patrons/offers/display'
  assert client.post(display,json={}).status_code==401
  assert not client.get('/api/patrons',headers=h).json()['canOffer']
+ status=client.get('/api/patrons',headers=h)
+ assert set(status.json()['monthFunding'])=={'month','raisedCzk','goalCzk','remainingCzk'}
+ assert status.json()['monthFunding']['goalCzk']==2000 and status.json()['contributions']==[]
+ assert status.headers['cache-control']=='no-store'
  with psycopg.connect(**opts) as db:
   db.execute("update proplet_private.patron_first_seen set first_seen_at=now()-interval '49 hours' where player_id=%s",(owner,))
  reservation=client.post(display,json={},headers=h).json()
