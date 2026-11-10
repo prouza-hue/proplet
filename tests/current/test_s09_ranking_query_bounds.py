@@ -209,6 +209,19 @@ for index in range(481):  # 480 word pairs: a collision must occur.
 else:
     raise AssertionError("No adjective/animal collision exercised")
 
+# The specifically restored legacy alias is stable and stays behind privacy rules.
+with patch.object(server.hashlib, "sha256") as hashed:
+    hashed.return_value.digest.return_value = bytes.fromhex(
+        "ebef5c45594140410fa81a6e05fbffc7db9e44da27fe6232ed16f1296a10863a"
+    )
+    for scope in ("xp:today", "xp:all", "day:2026-11-11", "free:board"):
+        assert server._ranking_display_identity(private_player, None, scope) == {
+            "name": "Nenápadný rys", "avatar": "🐈", "anonymous": True,
+        }
+    assert server._ranking_display_identity({**private_player, "public_rankings": True}, None, "all") == {
+        "name": "Tajné jméno", "avatar": "😎", "anonymous": False,
+    }
+
 # Regular presentation follows the same public boolean/privacy boundary as the
 # permanent badge; knowing a private type alone cannot disclose support.
 assert server._ranking_display_identity(
