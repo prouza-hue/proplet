@@ -4624,16 +4624,15 @@ _RANKING_ANON_ANIMALS = [
 ]
 
 def _ranking_anonymous_identity(player_id: str, scope: str, used_names: set[str] | None = None) -> dict:
-    used_names = used_names if used_names is not None else set()
-    for nonce in range(512):
-        digest = hashlib.sha256(f"proplet-anon-v1:{scope}:{player_id}:{nonce}".encode()).digest()
-        adjective = _RANKING_ANON_ADJECTIVES[digest[0] % len(_RANKING_ANON_ADJECTIVES)]
-        animal, avatar = _RANKING_ANON_ANIMALS[digest[1] % len(_RANKING_ANON_ANIMALS)]
-        name = f"{adjective} {animal}"
-        if name not in used_names:
-            used_names.add(name)
-            return {"name": name, "avatar": avatar, "anonymous": True}
-    return {"name": "Anonymní propletač", "avatar": "🎭", "anonymous": True}
+    # Keep the call signature for ranking adapters, but never derive identity from
+    # scope or the other rows. The suffix distinguishes the finite animal aliases
+    # without exposing player IDs or requiring a persistent alias registry.
+    digest = hashlib.sha256(f"proplet-anon-v2:{player_id}".encode()).digest()
+    adjective = _RANKING_ANON_ADJECTIVES[digest[0] % len(_RANKING_ANON_ADJECTIVES)]
+    animal, avatar = _RANKING_ANON_ANIMALS[digest[1] % len(_RANKING_ANON_ANIMALS)]
+    # 48 independent hash bits make suffix collisions negligible, not impossible.
+    name = f"{adjective} {animal} · {digest[2:8].hex()}"
+    return {"name": name, "avatar": avatar, "anonymous": True}
 
 def _ranking_display_identity(player: dict | None, viewer_id: str | None, scope: str, used_names: set[str] | None = None) -> dict:
     player = player or {}
