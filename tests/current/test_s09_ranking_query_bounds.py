@@ -190,15 +190,16 @@ assert server._ranking_display_identity({**private_player, "public_rankings": No
 assert server._ranking_display_identity(private_player, "private", "all") == {
     "name": "Tajné jméno", "avatar": "😎", "anonymous": False,
 }
-# Force the same adjective/animal for two IDs, while exercising real SHA-256.
+# Finite word pairs can repeat: keep both stable instead of appending codes.
 by_base = {}
 for index in range(481):  # 480 word pairs: a collision must occur.
     pid = f"alias-fixture-{index}"
     identity = server._ranking_anonymous_identity(pid, "all")
-    base = identity["name"].split(" · ")[0]
+    base = identity["name"]
+    assert base in {f"{adj} {animal}" for adj in server._RANKING_ANON_ADJECTIVES for animal, _ in server._RANKING_ANON_ANIMALS}
     if base in by_base:
         other_pid, other = by_base[base]
-        assert identity["name"] != other["name"]
+        assert pid != other_pid and identity == other
         for order in ((pid, other_pid), (other_pid, pid)):
             used = set()
             actual = {p: server._ranking_anonymous_identity(p, "today", used) for p in order}
