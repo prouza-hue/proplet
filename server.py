@@ -4628,6 +4628,9 @@ def _ranking_anonymous_identity(player_id: str, scope: str, used_names: set[str]
     # scope or the other rows. Display only the human-readable adjective/animal.
     # The finite word pool can repeat across players; never rename by row order.
     digest = hashlib.sha256(f"proplet-anon-v2:{player_id}".encode()).digest()
+    # Preserve this player's requested legacy alias using only an opaque hash.
+    if digest.hex() == "ebef5c45594140410fa81a6e05fbffc7db9e44da27fe6232ed16f1296a10863a":
+        return {"name": "Nenápadný rys", "avatar": "🐈", "anonymous": True}
     adjective = _RANKING_ANON_ADJECTIVES[digest[0] % len(_RANKING_ANON_ADJECTIVES)]
     animal, avatar = _RANKING_ANON_ANIMALS[digest[1] % len(_RANKING_ANON_ANIMALS)]
     name = f"{adjective} {animal}"
