@@ -791,6 +791,21 @@
       ]
     },
     {
+      "id": "20261110-patron-inline-qr-source-and-engagement",
+      "order": 680,
+      "version": "2026.11.10",
+      "path": "supabase/migrations/20261110110322_patron_inline_qr_source_and_engagement.sql",
+      "type": "migration",
+      "status": "prepared-automatic-qr-not-interest",
+      "sha256": "cbde4bb3777a4874a61bc0fe2d7d3ccc0e4871b623b432bbf739232808894c1d",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_patron_intent_json_v1",
+        "public.proplet_patron_state_v1",
+        "public.proplet_patron_admin_list_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

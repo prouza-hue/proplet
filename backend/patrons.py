@@ -88,6 +88,11 @@ class DismissBody(Body):
     action: Literal['declined','ignored','opened']
 class OfferDisplayBody(Body):
     receiptId: Optional[UUID]=None
+class OfferQrBody(Body):
+    receiptId: UUID
+class OfferEngageBody(Body):
+    intentId: UUID
+    action: Literal['saved','copied']
 class ConfirmBody(Body):
     intentId: UUID
     reference: str=Field(pattern=r'^[1-9][0-9]{0,9}$')
@@ -163,6 +168,17 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
     def display_offer(body:OfferDisplayBody,request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
         headers(response);p=account(authorization);enforce_rate_limit(request,'patron_offer',limit=30,window_seconds=3600)
         return run('proplet_patron_offer_v2',{'p_player':p['id'],'p_receipt':str(body.receiptId) if body.receiptId else None})
+
+    @app.post('/api/patrons/offers/qr')
+    def offer_qr(body:OfferQrBody,request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
+        headers(response);p=account(authorization);enforce_rate_limit(request,'patron_offer_qr',limit=30,window_seconds=3600)
+        value=run('proplet_patron_offer_qr_v1',{'p_player':p['id'],'p_receipt':str(body.receiptId)})
+        return {**value,'payment':payment_data(value.get('intent'))}
+
+    @app.post('/api/patrons/offers/engage')
+    def offer_engage(body:OfferEngageBody,request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
+        headers(response);p=account(authorization);enforce_rate_limit(request,'patron_offer_engage',limit=60,window_seconds=3600)
+        return run('proplet_patron_offer_engage_v1',{'p_player':p['id'],'p_intent':str(body.intentId),'p_action':body.action})
 
     @app.post('/api/patrons/offers/dismiss')
     def dismiss(body:DismissBody,response:Response,authorization:Optional[str]=Header(default=None)):

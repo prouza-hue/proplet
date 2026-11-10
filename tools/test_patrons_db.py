@@ -33,6 +33,7 @@ def main():
    c.execute((ROOT/'supabase/migrations/20261105083317_patron_thanks_visibility.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261105224723_patron_offer_visibility.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261110083909_patron_month_funding_and_pending_offer_window.sql').read_text(encoding='utf8'))
+   c.execute((ROOT/'supabase/migrations/20261110110322_patron_inline_qr_source_and_engagement.sql').read_text(encoding='utf8'))
   ids=[str(uuid4()) for _ in range(4)];player,other,balanced,admin=ids
   for index,pid in enumerate(ids):c.execute('insert into public.players(id,name,family_code,token_hash,support_mode,public_rankings) values(%s,%s,%s,%s,%s,true)',(pid,'Patron SQL '+str(index),'patron-test',secrets.token_hex(32),'younger' if pid==balanced else 'none'))
   # Use the existing schema's required admin columns, if present.
@@ -342,6 +343,8 @@ def main():
   from tools.test_patron_recurring_db import run_recurring_acceptance
   run_recurring_acceptance(opts)
   month_funding_acceptance(c,rpc,new_player,admin)
+  from tools.test_patron_inline_qr_db import run_inline_qr_acceptance
+  run_inline_qr_acceptance(c,rpc,new_player,admin,opts)
  print('PASS patron SQL: visibility, account-wide lease and retry, 14/30/90-day scheduling, legacy evidence, news and newcomer gates, opt-out, pending QR, patron suppression, payment ownership/ledger, monthly dates, thanks, badge privacy and ACL; database='+name)
 
 def month_funding_acceptance(c,rpc,new_player,admin):
