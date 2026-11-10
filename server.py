@@ -4625,13 +4625,12 @@ _RANKING_ANON_ANIMALS = [
 
 def _ranking_anonymous_identity(player_id: str, scope: str, used_names: set[str] | None = None) -> dict:
     # Keep the call signature for ranking adapters, but never derive identity from
-    # scope or the other rows. The suffix distinguishes the finite animal aliases
-    # without exposing player IDs or requiring a persistent alias registry.
+    # scope or the other rows. Display only the human-readable adjective/animal.
+    # The finite word pool can repeat across players; never rename by row order.
     digest = hashlib.sha256(f"proplet-anon-v2:{player_id}".encode()).digest()
     adjective = _RANKING_ANON_ADJECTIVES[digest[0] % len(_RANKING_ANON_ADJECTIVES)]
     animal, avatar = _RANKING_ANON_ANIMALS[digest[1] % len(_RANKING_ANON_ANIMALS)]
-    # 48 independent hash bits make suffix collisions negligible, not impossible.
-    name = f"{adjective} {animal} · {digest[2:8].hex()}"
+    name = f"{adjective} {animal}"
     return {"name": name, "avatar": avatar, "anonymous": True}
 
 def _ranking_display_identity(player: dict | None, viewer_id: str | None, scope: str, used_names: set[str] | None = None) -> dict:
