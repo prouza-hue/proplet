@@ -28,6 +28,18 @@ class PatronHttpTests(unittest.TestCase):
    if name=='proplet_patron_intent_read_v1':return {'ok':False,'code':'not_found'}
    return {'ok':True,'patron':False,'publicBadge':False}
   self.rpc=Mock(side_effect=rpc);app=FastAPI();patrons.install(app,auth_player=auth,require_admin=admin,db_rpc=self.rpc,enforce_rate_limit=lambda *a,**k:None,enabled=lambda:self.enabled);self.client=TestClient(app)
+ def test_month_funding_is_additive_server_aggregate_with_no_guest_data(self):
+  funding={'month':'2026-11','raisedCzk':2230,'goalCzk':2000,'remainingCzk':0}
+  self.rpc.side_effect=lambda name,args:{'ok':True,'patron':False,'monthFunding':funding,'contributions':[]}
+  response=self.client.get('/api/patrons?visibility=true',headers={'Authorization':'Bearer player-a'})
+  self.assertEqual(response.status_code,200)
+  self.assertEqual(response.json()['monthFunding'],funding)
+  self.assertEqual(response.json()['contributions'],[])
+  self.rpc.assert_called_once_with('proplet_patron_state_v1',{'p_player':'player-a','p_claim':False})
+  self.assertEqual(response.headers['cache-control'],'no-store')
+  self.rpc.reset_mock()
+  self.assertNotIn('monthFunding',self.client.get('/api/patrons').json())
+  self.rpc.assert_not_called()
  def test_off_guest_and_untrusted_fields(self):
   self.enabled=False
   self.assertEqual(self.client.get('/api/patrons').json(),{'enabled':False})

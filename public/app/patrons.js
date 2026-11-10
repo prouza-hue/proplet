@@ -18,11 +18,17 @@
  const heart='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20S3 14.5 3 8.5C3 3 10 2.5 12 7c2-4.5 9-4 9 1.5C21 14.5 12 20 12 20Z" fill="currentColor"/></svg>';
  const today=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Prague'}).format(new Date());
  const recommendedAmount='129';
- const model={frequency:'monthly',amount:Number(recommendedAmount),paid:false,badgeType:null,recurringStatus:null,thanksPending:false,contributions:[],public:false,offersDisabled:false,enabled:false,authenticated:false,canOffer:false,step:'offer',returnFocus:null,selected:recommendedAmount,intent:null,payment:null,pending:false,error:''};
+ const model={frequency:'monthly',amount:Number(recommendedAmount),paid:false,badgeType:null,recurringStatus:null,thanksPending:false,contributions:[],monthFunding:null,public:false,offersDisabled:false,enabled:false,authenticated:false,canOffer:false,step:'offer',returnFocus:null,selected:recommendedAmount,intent:null,payment:null,pending:false,error:''};
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const money=n=>new Intl.NumberFormat('cs-CZ').format(n)+' Kč';
+ function fundingProgress(){
+  const value=model.monthFunding;
+  if(!value||value.month!==today().slice(0,7)||!Number.isSafeInteger(value.raisedCzk)||value.raisedCzk<0||!Number.isSafeInteger(value.goalCzk)||value.goalCzk<=0)return '';
+  const remaining=Math.max(0,value.goalCzk-value.raisedCzk);
+  return `<div class="patron-funding"><div><span>Podpora tento měsíc</span><strong>${esc(money(value.raisedCzk))} / ${esc(money(value.goalCzk))}</strong></div><progress max="${value.goalCzk}" value="${Math.min(value.raisedCzk,value.goalCzk)}" aria-label="Potvrzená podpora tento měsíc: ${esc(money(value.raisedCzk))} z cíle ${esc(money(value.goalCzk))}"></progress><span class="patron-funding-remaining">${remaining?'Zbývá '+esc(money(remaining)):'Základní provoz pokrytý'}</span></div>`;
+ }
  const paidDate=value=>{const d=new Date(value);return Number.isNaN(d.getTime())?'Datum není dostupné':new Intl.DateTimeFormat('cs-CZ',{timeZone:'Europe/Prague',dateStyle:'medium'}).format(d);};
- async function refresh(){const epoch=accountEpoch,generation=++stateGeneration;try{const value=await request('/api/patrons?visibility=true');if(epoch!==accountEpoch||generation!==stateGeneration)return;Object.assign(model,{enabled:value.enabled===true,authenticated:value.authenticated===true,paid:value.patron===true,badgeType:value.patron===true?(value.badgeType==='recurring'?'recurring':'supporter'):null,recurringStatus:value.patron===true&&value.recurringStatus&&typeof value.recurringStatus==='object'?value.recurringStatus:null,thanksPending:value.thanksPending===true,contributions:Array.isArray(value.contributions)?value.contributions:[],public:value.publicBadge===true,offersDisabled:value.offersDisabled===true,canOffer:value.canOffer===true});decorate();if($('#patronDialog')?.open&&model.step==='thanks')render();window.PropletAnnouncements?.kick();}catch{if(epoch===accountEpoch){model.canOffer=false;model.error='Podporu se teď nepodařilo načíst. Hra funguje dál.';}}}
+ async function refresh(){const epoch=accountEpoch,generation=++stateGeneration;try{const value=await request('/api/patrons?visibility=true');if(epoch!==accountEpoch||generation!==stateGeneration)return;Object.assign(model,{enabled:value.enabled===true,authenticated:value.authenticated===true,paid:value.patron===true,badgeType:value.patron===true?(value.badgeType==='recurring'?'recurring':'supporter'):null,recurringStatus:value.patron===true&&value.recurringStatus&&typeof value.recurringStatus==='object'?value.recurringStatus:null,thanksPending:value.thanksPending===true,contributions:Array.isArray(value.contributions)?value.contributions:[],public:value.publicBadge===true,offersDisabled:value.offersDisabled===true,canOffer:value.canOffer===true,monthFunding:value.monthFunding||null});decorate();if($('#patronDialog')?.open&&model.step==='thanks')render();window.PropletAnnouncements?.kick();}catch{if(epoch===accountEpoch){model.canOffer=false;model.error='Podporu se teď nepodařilo načíst. Hra funguje dál.';}}}
  async function preference(next){try{await request('/api/patrons/preferences',{method:'POST',body:JSON.stringify(next)});await refresh();}catch{model.error='Změnu se nepodařilo uložit. Zkus to prosím znovu.';render();}}
  async function createIntent(){if(model.pending)return;if(!model.authenticated){close();if(typeof openProfileModal==='function')openProfileModal('login');return;}const epoch=accountEpoch,firstPaymentDate=model.frequency==='monthly'?today():'';if(model.requestAmount!==[model.amount,model.frequency,firstPaymentDate].join(':')||!model.requestId){model.requestId=crypto.randomUUID();model.requestAmount=[model.amount,model.frequency,firstPaymentDate].join(':');}model.pending=true;model.error='';render();try{const value=await request('/api/patrons/intents',{method:'POST',body:JSON.stringify({requestId:model.requestId,amountCzk:model.amount,frequency:model.frequency,...(model.frequency==='monthly'?{firstPaymentDate}:{})})});if(epoch!==accountEpoch||!model.enabled)return;model.intent=value.intent;model.payment=value.payment;model.step='qr';model.canOffer=false;}catch(error){console.error('Patron QR preparation failed',error);if(epoch===accountEpoch)model.error='QR se nepodařilo připravit. Zkus to znovu — nevznikne tím druhá platba.';}finally{if(epoch===accountEpoch){model.pending=false;render();$('#patronTitle')?.focus({preventScroll:true});}}}
 
@@ -69,6 +75,7 @@
       <p>— Pavel</p>
     </div>`)+
     `<button type="button" class="patron-message-toggle" aria-expanded="${messageExpanded}" aria-controls="patronMessage">${messageExpanded?'Zkrátit vzkaz':'Pár slov ode mě'} <span aria-hidden="true">${messageExpanded?'⌃':'⌄'}</span></button>`+
+    fundingProgress()+
     '<fieldset class="patron-frequency"><legend class="os-sr">Četnost podpory</legend><div>'+[['monthly','Měsíčně'],['once','Jednorázově']].map(([v,label])=>`<label><input type="radio" name="frequency" value="${v}" ${model.frequency===v?'checked':''}><span>${label}</span></label>`).join('')+'</div></fieldset><fieldset><legend>Výše příspěvku</legend><div class="patron-amounts">'+['79',recommendedAmount,'199','custom'].map(v=>`<label class="patron-amount"><input type="radio" name="amount" value="${v}" ${model.selected===v?'checked':''}><span>${v==='custom'?'Jiná částka':money(Number(v))}${v===recommendedAmount?'<small>Doporučeno</small>':''}</span></label>`).join('')+'</div></fieldset>'+
     `<label class="patron-custom" ${model.selected==='custom'?'':'hidden'}>Částka v Kč<input name="custom" id="patronCustom" inputmode="numeric" type="number" min="1" max="100000" step="1" value="${model.selected==='custom'?model.amount:recommendedAmount}"></label>`+
     '<details class="patron-perk-details"><summary aria-label="Ukázka tvé značky podpory — podrobnosti"><span class="patron-offer-avatar">'+avatarDemo(profile()?.avatar,model.frequency==='monthly'?'recurring':'supporter')+'</span><span class="patron-offer-identity"><strong>'+esc(profile()?.name||'Ty')+'</strong><span class="patron-label-static'+badgeClass(model.frequency==='monthly'?'recurring':'supporter')+'">'+heart+badgeName(model.frequency==='monthly'?'recurring':'supporter')+'</span></span><span aria-hidden="true">⌄</span></summary><p>'+(model.frequency==='monthly'?'Červené srdíčko získáš po první potvrzené měsíční platbě. Další platby ho obnovují. Při ukončení podpory ti zůstane modrá značka.':'Modrá značka ti zůstane jako trvalé poděkování po potvrzení příspěvku.')+' Zobrazení u jména je dobrovolné a můžeš ho kdykoli změnit v nastavení. Částka se nezveřejňuje.</p></details>'+
@@ -164,7 +171,7 @@
    for(const avatar of document.querySelectorAll('.result-player-avatar.patron-avatar-info'))resultAvatarControl(avatar,false);
    return;
   }
-  if(!model.authenticated||model.paid||model.offersDisabled||model.intent)$('#patronOffer')?.remove();
+  if(!model.authenticated||model.paid||model.offersDisabled||model.pending)$('#patronOffer')?.remove();
   for(const avatar of document.querySelectorAll('#profileChipAvatar,.profile-avatar-big'))decorateAvatar(avatar,model.authenticated&&model.paid,model.badgeType);
   const card=$('#profileCard');if(card&&!$('#patronProfileEntry')){const entry=document.createElement('button');entry.type='button';entry.id='patronProfileEntry';entry.className='patron-profile-entry';card.after(entry);}
   const entry=$('#patronProfileEntry');if(entry){const html=`<span class="patron-entry-seal">${heart}</span><span><strong>${model.paid?'Díky, že jsi u toho.':'Baví tě Proplet?'}</strong><small>${model.paid?'Tvoje podpora a veřejná značka':'Podpoř jeho další příběh.'}</small></span><b aria-hidden="true">→</b>`;if(entry.innerHTML!==html)entry.innerHTML=html;}
@@ -193,12 +200,13 @@
  let raf=0;const schedule=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;decorate()})};
  function boot(){if(started)return;started=true;ensure();if(typeof registerGameCompletionHook==='function')registerGameCompletionHook({id:'patron-result',priority:200,after:({game})=>{if(game?.finished&&['daily','daily_special','free','tajenka'].includes(game.mode)&&!game.postStarterWarmup&&!game.puzzle?.meta?.archiveExperience)resultCompleted();}});void refresh();new MutationObserver(schedule).observe(document.querySelector('.app-shell'),{childList:true,subtree:true});new MutationObserver(schedule).observe($('#winModal'),{childList:true,subtree:true});
   window.PropletAnnouncements?.register({id:'patron-thanks-v1',repeatable:true,priority:-10,eligible:()=>model.enabled&&model.authenticated&&model.paid&&model.thanksPending,show:async({isCurrent})=>{if(!isCurrent()||document.querySelector('#rankSpotlight:not(.hidden)'))return false;const epoch=accountEpoch;const status=await request('/api/patrons/thanks/claim?visibility=true',{method:'POST'});if(epoch!==accountEpoch||!model.enabled||!status.displayGranted)return false;const current=isCurrent();model.thanksPending=false;if(!current)return false;welcomePublic=status.defaultPublicBadge===true;open('welcome');return true;},close});
-  window.PropletAnnouncements?.register({id:'patron-support-v1',repeatable:true,priority:-20,eligible:offerEligible,show:showOffer,close:()=>$('#patronOffer')?.remove()});
+  window.PropletAnnouncements?.register({id:'patron-support-v1',repeatable:true,nonModal:true,afterFirstSteps:true,priority:-20,eligible:offerEligible,show:showOffer,close:()=>$('#patronOffer')?.remove()});
  }
- const offerAnchor=()=>$('#oneScreenToday .os-main')||$('#screen-daily .daily-hero');
+ const offerScreen=()=>typeof currentScreen==='string'&&['daily','free'].includes(currentScreen);
+ const offerAnchor=()=>typeof currentScreen==='string'&&currentScreen==='free'?$('#difficultyCards'):$('#oneScreenToday .os-main')||$('#screen-daily .daily-hero');
  function offerEligible(){
-  if(typeof currentScreen==='undefined'||currentScreen!=='daily'||!model.enabled||!model.authenticated
-   ||!model.canOffer||model.paid||model.offersDisabled||model.intent||document.hidden
+  if(!offerScreen()||!model.enabled||!model.authenticated
+   ||!model.canOffer||model.paid||model.offersDisabled||model.pending||document.hidden
    ||$('#rankSpotlight:not(.hidden)'))return false;
   if($('#patronOffer'))return true;
   const anchor=offerAnchor()?.getBoundingClientRect();
@@ -229,22 +237,23 @@
   if(!isCurrent())return false;
   const card=document.createElement('aside');
   card.id='patronOffer';card.className='patron-offer';card.setAttribute('aria-label','Podpora Propletu');
-  card.innerHTML='<span class="patron-entry-seal" aria-hidden="true">'+heart+'</span><div><strong>Baví tě Proplet?</strong><p>Pomoz mu zůstat ve hře. ❤️</p></div><button type="button" class="primary-btn" data-support>Podpořit</button><button type="button" class="text-btn" data-dismiss>Teď ne</button>';
-  const support=card.querySelector('[data-support]'),dismiss=card.querySelector('[data-dismiss]');
-  support.disabled=dismiss.disabled=true;
+  card.innerHTML='<div class="patron-offer-heading"><span class="patron-entry-seal" aria-hidden="true">'+heart+'</span><div><strong>Baví tě Proplet?</strong><p>Pomoz mi ho udržet zdarma. — Pavel</p></div></div>'+fundingProgress()+'<div class="patron-offer-actions"><button type="button" class="primary-btn" data-quick-support>Měsíčně 129 Kč · QR →</button><button type="button" class="text-btn" data-support>Jiná podpora</button><button type="button" class="text-btn" data-dismiss>Teď ne</button></div><p class="patron-offer-note">QR není platba. Převod potvrdíš ve své bance.</p>';
+  const support=card.querySelector('[data-support]'),quick=card.querySelector('[data-quick-support]'),dismiss=card.querySelector('[data-dismiss]');
+  support.disabled=quick.disabled=dismiss.disabled=true;
   offerAnchor().before(card);
   if(!cardInView(card)||!await paintedInView(card,isCurrent)){card.remove();return false;}
   const confirmation=displayOffer({receiptId}).catch(()=>null);
-  async function respond(action){
+  async function respond(action,direct=false){
    card.remove();
-   if(action==='opened')open('offer');
+   if(action==='opened'){if(direct){model.frequency='monthly';model.amount=Number(recommendedAmount);model.selected=recommendedAmount;}open('offer');if(direct)void createIntent();}
    if((await confirmation)?.displayGranted&&epoch===accountEpoch){
     void request('/api/patrons/offers/dismiss',{method:'POST',body:JSON.stringify({receiptId,action})}).catch(()=>{});
    }
   }
+  quick.onclick=()=>respond('opened',true);
   support.onclick=()=>respond('opened');
   dismiss.onclick=()=>respond('declined');
-  support.disabled=dismiss.disabled=false;
+  support.disabled=quick.disabled=dismiss.disabled=false;
   const confirmed=await confirmation;
   if(epoch!==accountEpoch||!confirmed?.displayGranted){card.remove();return false;}
   model.canOffer=false;
@@ -252,14 +261,14 @@
  }
  document.addEventListener('click',e=>{const entry=e.target.closest?.('#patronProfileEntry');if(entry)open(model.paid?'thanks':'offer',entry);});
  document.addEventListener('proplet:ready',boot,{once:true});if(window.__PROPLET_CURRENT_UI_READY)boot();
- document.addEventListener('proplet:screen-changed',()=>{decorate();if(typeof currentScreen==='string'&&currentScreen!=='daily')$('#patronOffer')?.remove();});
- document.addEventListener('proplet:account-changed',()=>{accountEpoch++;close();model.pending=false;model.requestId=null;model.requestAmount=null;model.intent=null;model.payment=null;model.paid=false;model.badgeType=null;model.recurringStatus=null;model.personBadgeType=null;model.thanksPending=false;model.contributions=[];model.public=false;model.canOffer=false;model.enabled=false;model.authenticated=false;decorate();void refresh();});
+ document.addEventListener('proplet:screen-changed',()=>{decorate();const card=$('#patronOffer');if(card&&(!offerScreen()||!card.parentElement?.contains(offerAnchor())))card.remove();});
+ document.addEventListener('proplet:account-changed',()=>{accountEpoch++;close();model.pending=false;model.requestId=null;model.requestAmount=null;model.intent=null;model.payment=null;model.paid=false;model.badgeType=null;model.recurringStatus=null;model.personBadgeType=null;model.thanksPending=false;model.contributions=[];model.monthFunding=null;model.public=false;model.canOffer=false;model.enabled=false;model.authenticated=false;decorate();void refresh();});
  // Returning to a long-open tab revalidates time-limited thanks on the server.
  // Browsers often deliver pageshow, visibility and focus together; fetch once.
  let returnRefreshTimer=0,lastReturnRefresh=0;
  function refreshOnReturn(){if(!started||document.visibilityState==='hidden'||returnRefreshTimer||Date.now()-lastReturnRefresh<1000)return;returnRefreshTimer=setTimeout(()=>{returnRefreshTimer=0;if(document.visibilityState==='hidden')return;lastReturnRefresh=Date.now();void refresh();},80);}
  window.addEventListener('focus',refreshOnReturn);window.addEventListener('pageshow',refreshOnReturn);
- for(const event of ['scroll','resize'])window.addEventListener(event,()=>{if(offerEligible())window.PropletAnnouncements?.kick();},{passive:true});
+ for(const event of ['scroll','resize'])window.addEventListener(event,()=>{if(offerEligible())window.PropletAnnouncements?.kick();},{passive:true,capture:event==='scroll'});
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshOnReturn();});
  window.addEventListener('storage',()=>{void refresh();});
  document.addEventListener('proplet:patron-updated',()=>{void refresh();});

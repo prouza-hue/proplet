@@ -67,6 +67,26 @@ function setup({local=storage(),session=storage(),context=returning()}={}){
  assert.equal(await recurring.queue.kick(),true);assert.equal(await recurring.queue.kick(),false);
  assert.equal(recurring.local.getItem(receiptKey('support','a')),null);
  const later=setup({local:recurring.local});later.add('support',-20,{repeatable:true});assert.equal(await later.queue.kick(),true);
+ // An inline server-governed card must not starve behind a modal budget kept by
+ // a long-lived PWA tab. Ordinary announcements still cannot spend it twice.
+ const inline=setup();inline.session.setItem(SESSION_KEY,'1');let inlinePending=true;
+ inline.add('waiting-news',100);inline.add('support-inline',-20,{nonModal:true,repeatable:true,eligible:()=>inlinePending,show:({isCurrent})=>{assert(isCurrent());inlinePending=false;inline.state.events.push('support-inline');return true}});
+ assert.equal(await inline.queue.kick(),true);assert.deepEqual(inline.state.events,['support-inline']);assert.equal(await inline.queue.kick(),false);assert.equal(inline.local.getItem(receiptKey('support-inline','a')),null);
+ // A card is not a discovery dialog: a subsequently eligible modal keeps its
+ // one-per-session opportunity, and its priority remains authoritative.
+ const inlineFresh=setup();let cardPending=true,newsPending=false;
+ inlineFresh.add('news',100,{eligible:()=>newsPending});inlineFresh.add('support-inline',-20,{nonModal:true,repeatable:true,eligible:()=>cardPending,show:()=>{cardPending=false;return true}});
+ assert.equal(await inlineFresh.queue.kick(),true);assert.equal(inlineFresh.queue.sessionUsed(),false);newsPending=true;assert.equal(await inlineFresh.queue.kick(),true);assert.deepEqual(inlineFresh.state.events,['news']);assert.equal(inlineFresh.queue.sessionUsed(),true);
+ const inlinePriority=setup();inlinePriority.add('news',100);inlinePriority.add('support-inline',-20,{nonModal:true,repeatable:true});assert.equal(await inlinePriority.queue.kick(),true);assert.deepEqual(inlinePriority.state.events,['news'],'a non-modal opt-in never outranks available news');
+ for(const patch of [{hidden:true},{blocked:true},{screen:'game'},{quiet:true},{account:'',authenticated:false}]){
+  const safe=setup({context:{...returning(),...patch}});safe.session.setItem(SESSION_KEY,'1');safe.add('support-inline',-20,{nonModal:true,repeatable:true});assert.equal(await safe.queue.kick(),false,JSON.stringify(patch));assert.deepEqual(safe.state.events,[],'inline card preserves navigation, onboarding and interruption guards');
+ }
+ // A stale first-steps quiet marker can persist after login in an installed PWA.
+ // Only opted-in inline support with explicit completed first steps may bypass it.
+ const staleQuiet=setup({context:{...returning(),quiet:true,firstStepsPending:false}});staleQuiet.session.setItem(SESSION_KEY,'1');staleQuiet.add('news',100);staleQuiet.add('support-inline',-20,{nonModal:true,afterFirstSteps:true,repeatable:true});assert.equal(await staleQuiet.queue.kick(),true);assert.deepEqual(staleQuiet.state.events,['support-inline']);
+ for(const firstStepsPending of [true,undefined]){const onboarding=setup({context:{...returning(),quiet:true,firstStepsPending}});onboarding.add('support-inline',-20,{nonModal:true,afterFirstSteps:true,repeatable:true});assert.equal(await onboarding.queue.kick(),false,'pending or unknown first steps keeps quiet protection');}
+ const pendingWithoutQuiet=setup({context:{...returning(),quiet:false,firstStepsPending:true}});pendingWithoutQuiet.add('support-inline',-20,{nonModal:true,afterFirstSteps:true,repeatable:true});assert.equal(await pendingWithoutQuiet.queue.kick(),false,'explicit pending onboarding remains protected even without quiet marker');
+ const quietModal=setup({context:{...returning(),quiet:true,firstStepsPending:false}});quietModal.add('news',100,{afterFirstSteps:true});assert.equal(await quietModal.queue.kick(),false,'ordinary modal never bypasses first-steps quiet');
  // Denied persistent storage still has an in-memory session/receipt guard.
  const denied={getItem(){throw Error('denied')},setItem(){throw Error('denied')}};
  const fallback=setup({local:denied,session:denied});fallback.add('news',100);assert.equal(await fallback.queue.kick(),true);assert.equal(await fallback.queue.kick(),false);

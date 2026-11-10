@@ -1,4 +1,5 @@
-/* One automatic discovery dialog per tab session. User-opened dialogs do not use this queue. */
+/* One automatic discovery dialog per tab session. Server-capped non-modal cards
+   retain the same safety gates but do not consume the dialog budget. */
 (function(root,factory){
   'use strict';
   const api=factory();
@@ -38,11 +39,21 @@
       if(busy&&busy.account!==context.account){busy=null;}
       if(active&&active.account!==context.account){const previous=active;active=null;previous.entry.close?.();}
     }
-    const nextEntry=context=>[...entries.values()].sort((a,b)=>(b.priority||0)-(a.priority||0)).find(entry=>hasPending(entry.id,context));
+    // A returning player's PWA may retain the tutorial's quiet flag for days.
+    // Only an explicitly opted-in card can outlive it, after first steps ended;
+    // its eligible() still enforces the server's age/activity and reminder limits.
+    const entryAllowed=(entry,context)=>{
+      if(entry.nonModal===true&&entry.afterFirstSteps===true){
+        if(context.firstStepsPending===true)return false;
+        if(context.firstStepsPending===false)return automaticAllowed({...context,quiet:false});
+      }
+      return automaticAllowed(context);
+    };
+    const nextEntry=context=>[...entries.values()].sort((a,b)=>(b.priority||0)-(a.priority||0)).find(entry=>(entry.nonModal===true||!sessionUsed())&&entryAllowed(entry,context)&&hasPending(entry.id,context));
     async function kick(){
       const context=deps.context();cancelStale(context);
       if(busy){rerun=true;return false}
-      if(sessionUsed()||!automaticAllowed(context))return false;
+      if(!automaticAllowed({...context,quiet:false}))return false;
       const entry=nextEntry(context);
       if(!entry)return false;
       const ticket={account:context.account,entry};busy=ticket;
@@ -50,13 +61,13 @@
       // before opening. Navigation/account changes must never open a stale dialog.
       const isCurrent=()=>{
         const fresh=deps.context();
-        return busy===ticket&&fresh.account===ticket.account&&!sessionUsed()
-          &&automaticAllowed(fresh)&&nextEntry(fresh)?.id===entry.id;
+        return busy===ticket&&fresh.account===ticket.account&&(entry.nonModal===true||!sessionUsed())
+          &&entryAllowed(entry,fresh)&&nextEntry(fresh)?.id===entry.id;
       };
       try{
         const displayed=await entry.show({account:ticket.account,isCurrent});
         if(displayed!==true||busy!==ticket||deps.context().account!==ticket.account)return false;
-        consumed=true;write(deps.sessionStorage,SESSION_KEY);
+        if(entry.nonModal!==true){consumed=true;write(deps.sessionStorage,SESSION_KEY);}
         active=ticket;acknowledge(entry.id,ticket.account);deps.onShown?.(entry.id,ticket.account);
         return true;
       }catch(error){deps.onError?.(error);return false}
@@ -83,11 +94,11 @@
       let onboarded=false;try{onboarded=root.localStorage.getItem(typeof ONBOARD_KEY==='string'?ONBOARD_KEY:'proplet-v3-7-required-onboarding')==='done'}catch{}
       let completed=Number(profile?.stats?.totalCompleted)||0;
       // Do not parse the history on taps while playing or inside a modal.
-      if(account&&completed<5&&ready&&!queue.sessionUsed()&&!hidden&&!blocked&&['daily','free'].includes(screen)){
+      if(account&&completed<5&&ready&&!hidden&&!blocked&&['daily','free'].includes(screen)){
         try{completed=Math.max(completed,Object.values(getState()?.completed||{}).filter(row=>row&&['free','daily','daily_special','tajenka'].includes(row.mode)).length)}catch{}
       }
       return {ready,account,authenticated:!!account,completed,screen,hidden,blocked,onboarded,
-        quiet:!!root.PropletFirstSteps?.quiet(),
+        quiet:!!root.PropletFirstSteps?.quiet(),firstStepsPending:typeof root.PropletFirstSteps?.firstPending==='function'?!!root.PropletFirstSteps.firstPending():undefined,
         incoming:!!root.PropletReferrals?.pendingCode?.()||!!(root.PropletReferrals?.model?.incoming&&!root.PropletReferrals.model.paid)};
     }
     const queue=create({context,storage:storage('localStorage'),sessionStorage:storage('sessionStorage')});

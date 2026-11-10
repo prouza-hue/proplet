@@ -778,6 +778,19 @@
       ]
     },
     {
+      "id": "20261110-patron-month-funding-and-pending-offer-window",
+      "order": 670,
+      "version": "2026.11.10",
+      "path": "supabase/migrations/20261110083909_patron_month_funding_and_pending_offer_window.sql",
+      "type": "migration",
+      "status": "prepared-confirmed-month-funding-and-bounded-pending",
+      "sha256": "24681164d8baddae794c0bfc6fc97c241f64e4c97ca15b8d17f889f2671d0cc4",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_patron_state_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",
