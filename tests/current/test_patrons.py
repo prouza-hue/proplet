@@ -73,6 +73,37 @@ class PatronHttpTests(unittest.TestCase):
   self.assertEqual(response.status_code,200)
   self.assertEqual(response.headers['cache-control'],'no-store')
   self.assertEqual(self.calls,[('proplet_patron_offer_v2',{'p_player':'player-a','p_receipt':value}) for value in (None,receipt)])
+ def test_inline_qr_uses_only_authenticated_receipt_and_server_payment(self):
+  path='/api/patrons/offers/qr';h={'Authorization':'Bearer player-a'};receipt=str(uuid4())
+  self.assertEqual(self.client.post(path,json={'receiptId':receipt}).status_code,401)
+  for extra in ({'amountCzk':199},{'frequency':'monthly'},{'playerId':'player-b'},{'source':'manual'},{'requestId':str(uuid4())}):
+   self.assertEqual(self.client.post(path,json={'receiptId':receipt,**extra},headers=h).status_code,422)
+  self.assertEqual(self.calls,[])
+  self.rpc.side_effect=None
+  self.rpc.return_value={'ok':True,'intent':{'id':str(uuid4()),'reference':'1000000129','amountCzk':129,'frequency':'once','firstPaymentDate':None,'account':patrons.ACCOUNT,'currency':'CZK','message':'Ukázka podporuje Proplet','source':'automatic_offer','engagedAt':None}}
+  response=self.client.post(path,json={'receiptId':receipt},headers=h)
+  self.assertEqual(response.status_code,200)
+  self.rpc.assert_called_once_with('proplet_patron_offer_qr_v1',{'p_player':'player-a','p_receipt':receipt})
+  self.assertIn('*AM:129.00*CC:CZK*X-VS:1000000129*',response.json()['payment']['spd'])
+  self.assertNotIn('*FRQ:',response.json()['payment']['spd'])
+  self.assertEqual(response.headers['cache-control'],'no-store')
+  self.rpc.return_value={'ok':True,'intent':None}
+  self.assertEqual(self.client.post(path,json={'receiptId':receipt},headers=h).status_code,503)
+  self.enabled=False;self.rpc.reset_mock()
+  self.assertEqual(self.client.post(path,json={'receiptId':receipt},headers=h).status_code,503)
+  self.rpc.assert_not_called()
+ def test_inline_engagement_rejects_other_actions_and_uses_owner(self):
+  path='/api/patrons/offers/engage';h={'Authorization':'Bearer player-a'};intent=str(uuid4())
+  self.assertEqual(self.client.post(path,json={'intentId':intent,'action':'saved'}).status_code,401)
+  for action in ('shown','opened','failed','paid'):
+   self.assertEqual(self.client.post(path,json={'intentId':intent,'action':action},headers=h).status_code,422)
+  self.assertEqual(self.client.post(path,json={'intentId':intent,'action':'copied','playerId':'player-b'},headers=h).status_code,422)
+  self.assertEqual(self.calls,[])
+  for action in ('saved','copied'):
+   response=self.client.post(path,json={'intentId':intent,'action':action},headers=h)
+   self.assertEqual(response.status_code,200)
+   self.assertEqual(self.calls[-1],('proplet_patron_offer_engage_v1',{'p_player':'player-a','p_intent':intent,'p_action':action}))
+   self.assertEqual(response.headers['cache-control'],'no-store')
  def test_idempotent_intent_is_not_payment_and_is_owned(self):
   body={'requestId':str(uuid4()),'amountCzk':99};headers={'Authorization':'Bearer player-a'}
   first=self.client.post('/api/patrons/intents',json=body,headers=headers).json()

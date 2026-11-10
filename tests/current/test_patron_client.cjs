@@ -1,10 +1,10 @@
 // Exercise native patron UI gates, durable claim coordination and kill switch.
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 const nodes=new Map(),events=new Map(),entries=new Map();let mounted=0,calls=[],removed=[];
-const offerRequests=[];let anchorTop=90,cardBottom=240,afterPaint;
+const offerRequests=[],autoQrRequests=[];let anchorTop=90,cardBottom=240,afterPaint;
 const welcomeButton={addEventListener(_event,fn){this.confirm=fn}};
-function element(){const controls=new Map();return {style:{setProperty(){}},attrs:{},isConnected:true,setAttribute(k,v){this.attrs[k]=v},addEventListener(){},append(){},remove(){this.isConnected=false;removed.push(this.id);nodes.delete('#'+this.id)},getBoundingClientRect(){return {left:8,right:312,top:90,bottom:cardBottom,width:304,height:150}},contains(node){return node===this},querySelector(s){if(s==='[data-confirm-visibility]'&&this.innerHTML.includes('data-confirm-visibility'))return welcomeButton;if(!controls.has(s))controls.set(s,{onclick:null,addEventListener(){}});return controls.get(s)},querySelectorAll:()=>[],classList:{contains:()=>false,remove(){}},innerHTML:'',textContent:'',showModal(){this.open=true},close(){this.open=false},focus(){}};}
-const anchor={getBoundingClientRect:()=>({top:anchorTop,width:304}),before(node){mounted++;nodes.set('#'+node.id,node)}};
+function element(){const controls=new Map();return {style:{setProperty(){}},attrs:{},isConnected:true,setAttribute(k,v){this.attrs[k]=v},addEventListener(){},append(){},remove(){this.isConnected=false;removed.push(this.id);nodes.delete('#'+this.id)},getBoundingClientRect(){return {left:8,right:312,top:90,bottom:cardBottom,width:304,height:150}},contains(node){return node===this},querySelector(s){if(s==='[data-confirm-visibility]'&&this.innerHTML.includes('data-confirm-visibility'))return welcomeButton;if(!controls.has(s))controls.set(s,{onclick:null,addEventListener(){},replaceChildren(...children){this.children=children}});return controls.get(s)},querySelectorAll:()=>[],classList:{contains:()=>false,remove(){}},innerHTML:'',textContent:'',showModal(){this.open=true},close(){this.open=false},focus(){}};}
+const anchor={getBoundingClientRect:()=>({top:anchorTop,width:304}),before(node){mounted++;node.parentElement={contains:other=>other===anchor};nodes.set('#'+node.id,node)}};
 const footer={before(node){nodes.set('#'+node.id,node)}};
 const document={createElement:element,elementFromPoint:()=>nodes.get('#patronOffer'),body:{append(node){nodes.set('#'+node.id,node)}},querySelector(s){if(s==='.app-footer')return footer;if(s==='#oneScreenToday .os-main')return anchor;return nodes.get(s)||null},querySelectorAll(s){return s.startsWith('#patronProfileEntry')?s.split(',').flatMap(key=>nodes.get(key)?[nodes.get(key)]:[]):[]},addEventListener(name,fn){events.set(name,fn)}};
 const status={enabled:true,authenticated:true,patron:false,publicBadge:false,offersDisabled:false,canOffer:true};
@@ -18,6 +18,7 @@ const request=async (path,options)=>{
   const choice=JSON.parse(options.body);visibilityWrites.push(choice);
   status.publicBadge=choice.publicBadge;return status;
  }
+ if(path==='/api/patrons/offers/qr'){autoQrRequests.push(JSON.parse(options.body));return {intent:{id:'automatic',amountCzk:129,frequency:'once',source:'automatic_offer'},payment:{qrSvg:'<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"/>',spd:'TEST ONLY'}};}
  if(path.startsWith('/api/patrons/offers/')){
   offerRequests.push(JSON.parse(options.body));
   return {displayGranted:true,receiptId:'receipt'};
@@ -25,7 +26,7 @@ const request=async (path,options)=>{
  return status;
 };
 const window={innerWidth:320,innerHeight:570,PropletAnnouncements:{register(e){entries.set(e.id,e)},kick(){}},addEventListener(){}};
-const context={window,document,setTimeout,clearTimeout,api:request,Intl,crypto:require('node:crypto').webcrypto,MutationObserver:class{observe(){}},requestAnimationFrame(fn){queueMicrotask(()=>{afterPaint?.();fn()})},getProfile:()=>({id:'a',token:'token',supportMode:'younger'}),currentScreen:'daily'};
+const context={btoa:s=>Buffer.from(s,'binary').toString('base64'),window,document,setTimeout,clearTimeout,api:request,Intl,crypto:require('node:crypto').webcrypto,MutationObserver:class{observe(){}},requestAnimationFrame(fn){queueMicrotask(()=>{afterPaint?.();fn()})},getProfile:()=>({id:'a',token:'token',supportMode:'younger'}),currentScreen:'daily'};
 vm.runInNewContext(fs.readFileSync('public/app/patrons.js','utf8'),context);
 async function avatarInfoLifecycle(){
  const map=new Map(),listeners=new Map(),windowListeners=new Map(),rows=[],requests=[];let focus=null,deferNextStatus=null;
@@ -51,7 +52,7 @@ async function avatarInfoLifecycle(){
  await win.PropletPatrons.refresh();assert.equal(supported.avatar,button,'repeated decoration keeps the focused button');assert.equal(button.children[0],hydrated);assert.equal(button.children.filter(n=>n.classList.contains('patron-avatar-card')).length,1,'decoration is idempotent');dialog.querySelector('[data-support]').events.get('click')();assert.equal(dialog.getAttribute('data-patron-step'),'offer');assert(dialog.innerHTML.includes('patronForm'));assert.equal(requests.length,before+1,'CTA only opens the existing offer');win.PropletPatrons.close();assert.equal(focus,button,'closing the offer restores the original result avatar');
  Object.assign(server,{patron:true,publicBadge:true});await win.PropletPatrons.refresh();assert.equal(own.avatar.tagName,'BUTTON');own.avatar.onclick({stopPropagation(){}});assert.equal(win.PropletPatrons.model.personName,'Pavel','own result says the profile name, not Ty');assert(dialog.innerHTML.includes('>Pavel</h2>'));
  // A selected monthly offer and a monthly history entry cannot create a recurring entitlement.
- win.PropletPatrons.model.frequency='monthly';win.PropletPatrons.open('offer');
+ win.PropletPatrons.open('offer');assert.equal(win.PropletPatrons.model.frequency,'once','fresh manual offer defaults to one-off support');doc.querySelector('#patronForm').events.get('change')({target:{name:'frequency',value:'monthly'}});
  assert(dialog.innerHTML.includes('Červené srdíčko získáš po první potvrzené měsíční platbě.'));
  assert(dialog.innerHTML.includes('Měsíční opakování nastavíš ve své bance. QR ho nemusí předvyplnit.'));
  assert(!dialog.innerHTML.includes('patron-recurring-warning'),'full bank instructions belong to QR step; exercised by compact browser suite');
@@ -97,10 +98,10 @@ async function avatarInfoLifecycle(){
  assert.equal(await show(),false,'playing does not trigger automatic support');assert.deepEqual(offerRequests,[]);
  context.currentScreen='daily';afterPaint=()=>{document.hidden=true;};
  assert.equal(await show(),false,'backgrounding before paint does not confirm the reservation');
- assert.equal(nodes.has('#patronOffer'),false);assert.deepEqual(offerRequests,[{}]);
+ assert.equal(nodes.has('#patronOffer'),false);assert.deepEqual(offerRequests,[{}]);assert.deepEqual(autoQrRequests,[],'invisible reservation never prepares QR');
  document.hidden=false;afterPaint=null;
  assert.equal(await show(),true,'returning to Today can show an eligible card');
- assert.equal(mounted,2);assert.equal(entry.eligible(),false);assert.deepEqual(offerRequests,[{},{},{receiptId:'receipt'}]);
+ assert.equal(mounted,2);assert.deepEqual(autoQrRequests,[{receiptId:'receipt'}],'QR is prepared automatically only after visible confirmation');assert.equal(entry.eligible(),false);assert.deepEqual(offerRequests,[{},{},{receiptId:'receipt'}]);
  context.currentScreen='free';events.get('proplet:screen-changed')();
  assert.equal(nodes.has('#patronOffer'),false);assert.equal(offerRequests.length,3,'navigation away is not a dismissal');
  context.currentScreen='daily';await window.PropletPatrons.refresh();assert.equal(await show(),true);

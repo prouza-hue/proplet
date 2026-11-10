@@ -86,7 +86,7 @@ jobs:
       - name: Verify compact support dialog and payment preparation
         if: ${{ !cancelled() }}
         run: node tools/test_patron_compact_browser.cjs
-      - name: Verify automatic support delivery and confirmed progress
+      - name: Verify inline support QR, engagement and confirmed progress
         if: ${{ !cancelled() }}
         run: node tools/test_support_delivery_browser.cjs
       - name: Verify competition views, archive navigation and awards
@@ -100,6 +100,6 @@ jobs:
             artifacts/refinements-review/
             artifacts/ranking-navigation/
             artifacts/patron-compact/
-            artifacts/support-delivery/
+            artifacts/support-inline-qr/
             artifacts/competition-ui/
           retention-days: 7

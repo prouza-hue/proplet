@@ -5,20 +5,21 @@
  let stateGeneration=0,accountEpoch=0,started=false,qrDownloadUrl=null;
  let welcomePublic=false,welcomeSaving=false,messageExpanded=false;
  function clearQrDownload(){if(qrDownloadUrl){URL.revokeObjectURL(qrDownloadUrl);qrDownloadUrl=null;}}
- async function saveQr(svg){
+ async function saveQr(svg,maySave=()=>true){
   const image=new Image();image.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(svg)));await image.decode();
-  const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
-  const context=canvas.getContext('2d');context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(image,0,0);
+  const canvas=document.createElement('canvas');canvas.width=768;canvas.height=768;
+  const context=canvas.getContext('2d');context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(image,0,0,canvas.width,canvas.height);
   const png=await new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('PNG export failed')),'image/png'));
+  if(!maySave())return false;
   clearQrDownload();qrDownloadUrl=URL.createObjectURL(png);
-  const link=document.createElement('a');link.href=qrDownloadUrl;link.download='Proplet-QR-platba.png';document.body.append(link);link.click();link.remove();
+  const link=document.createElement('a');link.href=qrDownloadUrl;link.download='Proplet-QR-platba.png';document.body.append(link);link.click();link.remove();return true;
  }
  const profile=()=>typeof getProfile==='function'?getProfile():null;
  const $=s=>document.querySelector(s);
  const heart='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20S3 14.5 3 8.5C3 3 10 2.5 12 7c2-4.5 9-4 9 1.5C21 14.5 12 20 12 20Z" fill="currentColor"/></svg>';
  const today=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Prague'}).format(new Date());
  const recommendedAmount='129';
- const model={frequency:'monthly',amount:Number(recommendedAmount),paid:false,badgeType:null,recurringStatus:null,thanksPending:false,contributions:[],monthFunding:null,public:false,offersDisabled:false,enabled:false,authenticated:false,canOffer:false,step:'offer',returnFocus:null,selected:recommendedAmount,intent:null,payment:null,pending:false,error:''};
+ const model={frequency:'once',amount:Number(recommendedAmount),paid:false,badgeType:null,recurringStatus:null,thanksPending:false,contributions:[],monthFunding:null,public:false,offersDisabled:false,enabled:false,authenticated:false,canOffer:false,step:'offer',returnFocus:null,selected:recommendedAmount,intent:null,payment:null,pending:false,error:''};
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const money=n=>new Intl.NumberFormat('cs-CZ').format(n)+' Kč';
  function fundingProgress(){
@@ -56,7 +57,7 @@
 
  }
  function close(){clearQrDownload();const el=$('#patronDialog');if(el?.open)el.close();model.returnFocus?.isConnected&&model.returnFocus.focus({preventScroll:true});}
- function open(step='offer',from=document.activeElement){if(!model.enabled)return;$('#patronOffer')?.remove();if(step==='offer'&&model.paid){model.requestId=null;model.requestAmount=null;model.intent=null;model.payment=null;}if(step==='offer'){messageExpanded=false;if(!model.requestId&&!model.intent&&!model.pending){model.frequency='monthly';model.selected=recommendedAmount;model.amount=Number(recommendedAmount);}}ensure();model.error='';model.returnFocus=from;model.step=step;render();if(!$('#patronDialog').open)$('#patronDialog').showModal();$('#patronTitle')?.focus({preventScroll:true});}
+ function open(step='offer',from=document.activeElement){if(!model.enabled)return;$('#patronOffer')?.remove();if(step==='offer'&&model.paid){model.requestId=null;model.requestAmount=null;model.intent=null;model.payment=null;}if(step==='offer'){messageExpanded=false;if(!model.requestId&&!model.intent&&!model.pending){model.frequency='once';model.selected=recommendedAmount;model.amount=Number(recommendedAmount);}}ensure();model.error='';model.returnFocus=from;model.step=step;render();if(!$('#patronDialog').open)$('#patronDialog').showModal();$('#patronTitle')?.focus({preventScroll:true});}
  const recurringWarning=()=>'<aside class="patron-recurring-warning" role="note"><strong>Zkontroluj měsíční opakování</strong><p>Některé banky načtou QR jen jako jednorázovou platbu. Pokud se opakování nenastaví, založ ve své bance trvalý příkaz <b>každý měsíc</b>. Zachovej stejný účet, částku a variabilní symbol.</p><details class="patron-bank-help"><summary>Jak je to u mé banky?</summary><p><b>KB:</b> banka uvádí založení trvalého příkazu z QR. Před potvrzením ověř měsíční opakování. <a href="https://www.kb.cz/cs/o-bance/spokojenost-klientu" target="_blank" rel="noopener noreferrer">Informace KB</a></p><p><b>Raiffeisenbank:</b> banka tuto možnost uvádí, při našem vyzkoušení na Androidu se ale opakování nepředvyplnilo. Počítej i s ručním nastavením. <a href="https://www.rb.cz/osobni/ucty/sluzby-k-uctum/mobilni-bankovnictvi" target="_blank" rel="noopener noreferrer">Informace Raiffeisenbank</a></p><p><b>Partners:</b> při vyzkoušení na Androidu se načetla jednorázová platba. Měsíční opakování nastav ručně.</p><p>U ostatních aplikací nemáme automatické nastavení ověřené. Podpora se může lišit podle verze aplikace. Aktualizováno 1. 11. 2026.</p><p>Pokud už první platba odešla, nastav trvalý příkaz až od dalšího měsíce, ať neposíláš příspěvek dvakrát.</p></details></aside>';
  function heading(title,copy){return `<header class="patron-intro">${art}<div><h2 id="patronTitle" tabindex="-1">${title}</h2>${copy?`<p>${copy}</p>`:''}</div></header>`;}
  function render(){
@@ -76,7 +77,7 @@
     </div>`)+
     `<button type="button" class="patron-message-toggle" aria-expanded="${messageExpanded}" aria-controls="patronMessage">${messageExpanded?'Zkrátit vzkaz':'Pár slov ode mě'} <span aria-hidden="true">${messageExpanded?'⌃':'⌄'}</span></button>`+
     fundingProgress()+
-    '<fieldset class="patron-frequency"><legend class="os-sr">Četnost podpory</legend><div>'+[['monthly','Měsíčně'],['once','Jednorázově']].map(([v,label])=>`<label><input type="radio" name="frequency" value="${v}" ${model.frequency===v?'checked':''}><span>${label}</span></label>`).join('')+'</div></fieldset><fieldset><legend>Výše příspěvku</legend><div class="patron-amounts">'+['79',recommendedAmount,'199','custom'].map(v=>`<label class="patron-amount"><input type="radio" name="amount" value="${v}" ${model.selected===v?'checked':''}><span>${v==='custom'?'Jiná částka':money(Number(v))}${v===recommendedAmount?'<small>Doporučeno</small>':''}</span></label>`).join('')+'</div></fieldset>'+
+    '<fieldset class="patron-frequency"><legend class="os-sr">Četnost podpory</legend><div>'+[['once','Jednorázově'],['monthly','Měsíčně']].map(([v,label])=>`<label><input type="radio" name="frequency" value="${v}" ${model.frequency===v?'checked':''}><span>${label}</span></label>`).join('')+'</div></fieldset><fieldset><legend>Výše příspěvku</legend><div class="patron-amounts">'+['79',recommendedAmount,'199','custom'].map(v=>`<label class="patron-amount"><input type="radio" name="amount" value="${v}" ${model.selected===v?'checked':''}><span>${v==='custom'?'Jiná částka':money(Number(v))}${v===recommendedAmount?'<small>Doporučeno</small>':''}</span></label>`).join('')+'</div></fieldset>'+
     `<label class="patron-custom" ${model.selected==='custom'?'':'hidden'}>Částka v Kč<input name="custom" id="patronCustom" inputmode="numeric" type="number" min="1" max="100000" step="1" value="${model.selected==='custom'?model.amount:recommendedAmount}"></label>`+
     '<details class="patron-perk-details"><summary aria-label="Ukázka tvé značky podpory — podrobnosti"><span class="patron-offer-avatar">'+avatarDemo(profile()?.avatar,model.frequency==='monthly'?'recurring':'supporter')+'</span><span class="patron-offer-identity"><strong>'+esc(profile()?.name||'Ty')+'</strong><span class="patron-label-static'+badgeClass(model.frequency==='monthly'?'recurring':'supporter')+'">'+heart+badgeName(model.frequency==='monthly'?'recurring':'supporter')+'</span></span><span aria-hidden="true">⌄</span></summary><p>'+(model.frequency==='monthly'?'Červené srdíčko získáš po první potvrzené měsíční platbě. Další platby ho obnovují. Při ukončení podpory ti zůstane modrá značka.':'Modrá značka ti zůstane jako trvalé poděkování po potvrzení příspěvku.')+' Zobrazení u jména je dobrovolné a můžeš ho kdykoli změnit v nastavení. Částka se nezveřejňuje.</p></details>'+
     (model.frequency==='monthly'?'<p class="patron-frequency-note">Měsíční opakování nastavíš ve své bance. QR ho nemusí předvyplnit.</p>':'')+
@@ -237,26 +238,57 @@
   if(!isCurrent())return false;
   const card=document.createElement('aside');
   card.id='patronOffer';card.className='patron-offer';card.setAttribute('aria-label','Podpora Propletu');
-  card.innerHTML='<div class="patron-offer-heading"><span class="patron-entry-seal" aria-hidden="true">'+heart+'</span><div><strong>Baví tě Proplet?</strong><p>Pomoz mi ho udržet zdarma. — Pavel</p></div></div>'+fundingProgress()+'<div class="patron-offer-actions"><button type="button" class="primary-btn" data-quick-support>Měsíčně 129 Kč · QR →</button><button type="button" class="text-btn" data-support>Jiná podpora</button><button type="button" class="text-btn" data-dismiss>Teď ne</button></div><p class="patron-offer-note">QR není platba. Převod potvrdíš ve své bance.</p>';
-  const support=card.querySelector('[data-support]'),quick=card.querySelector('[data-quick-support]'),dismiss=card.querySelector('[data-dismiss]');
-  support.disabled=quick.disabled=dismiss.disabled=true;
+  card.innerHTML='<div class="patron-offer-heading"><span class="patron-entry-seal" aria-hidden="true">'+heart+'</span><div><strong>Baví tě Proplet?</strong><p>Pomoz mi ho udržet zdarma. — Pavel</p></div><button type="button" class="text-btn" data-dismiss aria-label="Teď ne — zavřít nabídku podpory">×</button></div>'+fundingProgress()+'<div class="patron-inline-payment"><div class="patron-inline-qr" data-inline-qr><span>Připravuji QR…</span></div><div class="patron-inline-copy"><strong>Jednorázově<br>129 Kč</strong><p>QR není platba.<br>Převod potvrdíš ve své bance.</p><button type="button" class="text-btn" data-inline-copy disabled>Kopírovat údaje</button><button type="button" class="text-btn" data-inline-retry hidden>Zkusit znovu</button></div></div><p class="patron-inline-status" role="status"></p><div class="patron-offer-actions"><button type="button" class="primary-btn" data-inline-save disabled>Uložit QR do telefonu</button><button type="button" class="text-btn" data-support>Jiná částka</button><button type="button" class="text-btn" data-monthly-support>Podporovat měsíčně</button></div>';
+  const support=card.querySelector('[data-support]'),monthly=card.querySelector('[data-monthly-support]'),dismiss=card.querySelector('[data-dismiss]'),save=card.querySelector('[data-inline-save]'),copy=card.querySelector('[data-inline-copy]'),retry=card.querySelector('[data-inline-retry]'),status=card.querySelector('.patron-inline-status'),qr=card.querySelector('[data-inline-qr]');
+  support.disabled=monthly.disabled=dismiss.disabled=true;
   offerAnchor().before(card);
   if(!cardInView(card)||!await paintedInView(card,isCurrent)){card.remove();return false;}
-  const confirmation=displayOffer({receiptId}).catch(()=>null);
-  async function respond(action,direct=false){
-   card.remove();
-   if(action==='opened'){if(direct){model.frequency='monthly';model.amount=Number(recommendedAmount);model.selected=recommendedAmount;}open('offer');if(direct)void createIntent();}
-   if((await confirmation)?.displayGranted&&epoch===accountEpoch){
-    void request('/api/patrons/offers/dismiss',{method:'POST',body:JSON.stringify({receiptId,action})}).catch(()=>{});
-   }
-  }
-  quick.onclick=()=>respond('opened',true);
-  support.onclick=()=>respond('opened');
-  dismiss.onclick=()=>respond('declined');
-  support.disabled=quick.disabled=dismiss.disabled=false;
-  const confirmed=await confirmation;
-  if(epoch!==accountEpoch||!confirmed?.displayGranted){card.remove();return false;}
+  const confirmed=await displayOffer({receiptId}).catch(()=>null);
+  if(epoch!==accountEpoch||!confirmed?.displayGranted||!card.isConnected){card.remove();return false;}
   model.canOffer=false;
+  const current=()=>epoch===accountEpoch&&model.enabled&&model.authenticated&&card.isConnected&&offerScreen()&&card.parentElement?.contains(offerAnchor());
+  let prepared=null,preparing=false,acting=false;
+  function reportAction(action){
+   if(!current())return;
+   void request('/api/patrons/offers/dismiss',{method:'POST',body:JSON.stringify({receiptId,action})}).catch(()=>{});
+  }
+  function customize(frequency){
+   if(!current())return;
+   reportAction('opened');card.remove();open('offer');model.frequency=frequency;model.amount=Number(recommendedAmount);model.selected=recommendedAmount;render();$('#patronTitle')?.focus({preventScroll:true});
+  }
+  async function prepare(){
+   if(!current()||preparing||prepared)return;
+   if(!cardInView(card)){qr.textContent='Načti QR pro podporu';retry.hidden=false;retry.textContent='Načíst QR';return;}
+   preparing=true;retry.hidden=true;status.textContent='';qr.textContent='Připravuji QR…';
+   try{
+    const value=await request('/api/patrons/offers/qr',{method:'POST',body:JSON.stringify({receiptId})});
+    if(!current())return;
+    if(!value.intent?.id||!value.payment?.qrSvg||!value.payment?.spd)throw Error('Missing automatic QR');
+    prepared=value;
+    const image=document.createElement('img');image.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(value.payment.qrSvg)));image.alt='QR pro jednorázovou podporu 129 Kč';image.width=image.height=144;qr.replaceChildren(image);
+    save.disabled=copy.disabled=false;
+   }catch{
+    if(current()){qr.textContent='QR se nepodařilo načíst.';retry.hidden=false;retry.textContent='Zkusit znovu';}
+   }finally{preparing=false;}
+  }
+  async function usePayment(action){
+   if(!current()||!prepared||acting)return;
+   acting=true;save.disabled=copy.disabled=true;status.textContent='';
+   try{
+    if(action==='saved')await saveQr(prepared.payment.qrSvg,current);else await navigator.clipboard.writeText(prepared.payment.spd);
+    if(!current())return;
+    status.textContent=action==='saved'?'QR je připravené ke stažení.':'Platební údaje jsou zkopírované.';
+    // Preparation is not interest. Only a successful explicit use is reported.
+    void request('/api/patrons/offers/engage',{method:'POST',body:JSON.stringify({intentId:prepared.intent.id,action})}).catch(()=>{});
+   }catch{
+    if(current())status.textContent=action==='saved'?'QR se nepodařilo uložit. Zkus to znovu.':'Kopírování není dostupné. Zkus uložit QR.';
+   }finally{acting=false;if(current())save.disabled=copy.disabled=false;}
+  }
+  support.onclick=()=>customize('once');monthly.onclick=()=>customize('monthly');
+  dismiss.onclick=()=>{reportAction('declined');card.remove();};
+  save.onclick=()=>void usePayment('saved');copy.onclick=()=>void usePayment('copied');retry.onclick=()=>void prepare();
+  support.disabled=monthly.disabled=dismiss.disabled=false;
+  void prepare();
   return true;
  }
  document.addEventListener('click',e=>{const entry=e.target.closest?.('#patronProfileEntry');if(entry)open(model.paid?'thanks':'offer',entry);});

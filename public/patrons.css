@@ -299,9 +299,31 @@ html.tiskarna-ui body #patronTodayLink.patron-today-link:not([hidden]){display:g
 #patronOffer .patron-entry-seal svg{width:20px;height:20px}
 #patronOffer .patron-offer-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #patronOffer .patron-offer-actions>button{min-height:44px;font:500 13px/1.3 Outfit,sans-serif;cursor:pointer}
-#patronOffer .patron-offer-actions>[data-quick-support]{flex:1 0 100%;background:#315da8;color:#fff9ed;border:1px solid #244b89;border-radius:10px;padding:10px}
+#patronOffer .patron-offer-actions>[data-inline-save]{flex:1 0 100%;background:#315da8;color:#fff9ed;border:1px solid #244b89;border-radius:10px;padding:10px}
 html.tiskarna-ui body #patronOffer .patron-offer-actions>.text-btn{background:none;border:0;color:var(--patron-blue)!important;padding:4px 2px}
 html.tiskarna-ui body #patronOffer .patron-offer-actions>[data-dismiss]{margin-left:auto;color:var(--td-muted)!important}
 #patronOffer .patron-offer-note{font:400 11px/1.35 Outfit,sans-serif;color:var(--td-muted);margin:2px 0 0}
 
 .patron-funding-remaining{display:block;margin-top:4px;font:400 12px/1.3 Outfit,sans-serif;color:var(--td-muted)}
+
+/* The automatic offer already contains a one-off QR; manual choices stay optional. */
+#patronOffer .patron-offer-heading>[data-dismiss]{flex:none;margin-left:auto;align-self:flex-start;width:36px;min-height:36px;padding:0;border:0;background:none;color:var(--td-muted)!important;font:400 25px/1 Outfit,sans-serif;cursor:pointer}
+#patronOffer .patron-inline-payment{display:grid;grid-template-columns:144px minmax(0,1fr);gap:12px;align-items:center}
+#patronOffer .patron-inline-qr{display:grid;place-items:center;width:144px;height:144px;background:#fff;color:#253142;text-align:center;font:400 13px/1.4 Outfit,sans-serif}
+#patronOffer .patron-inline-qr>img{display:block;width:100%;height:100%;object-fit:contain}
+#patronOffer .patron-inline-copy{min-width:0}
+#patronOffer .patron-inline-copy>strong{display:block;color:var(--td-ink);font:600 18px/1.2 Outfit,sans-serif}
+#patronOffer .patron-inline-copy>p{margin:7px 0 0;color:var(--td-muted);font:400 12px/1.35 Outfit,sans-serif}
+html.tiskarna-ui body #patronOffer .patron-inline-copy>.text-btn{min-height:44px;padding:4px 0;border:0;background:none;color:var(--patron-blue)!important;font:500 12px/1.3 Outfit,sans-serif;cursor:pointer;text-align:left}
+#patronOffer .patron-inline-copy>.text-btn[hidden]{display:none}
+#patronOffer .patron-inline-status{min-height:17px;margin:5px 0;color:var(--td-muted);font:400 12px/1.35 Outfit,sans-serif}
+#patronOffer .patron-offer-actions>[data-monthly-support]{margin-left:auto}
+@media(max-width:359px){
+ #patronOffer{padding:12px}
+ #patronOffer .patron-inline-payment{grid-template-columns:140px minmax(0,1fr);gap:10px}
+ #patronOffer .patron-inline-qr{width:140px;height:140px}
+ #patronOffer .patron-offer-heading{gap:8px}
+ #patronOffer .patron-offer-heading strong{font-size:18px}
+ #patronOffer .patron-offer-heading p{font-size:12px}
+ #patronOffer .patron-offer-actions>.text-btn{font-size:12px}
+}
