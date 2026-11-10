@@ -181,6 +181,33 @@ assert public_identity == {"name": "Veřejný", "avatar": "🐸", "anonymous": F
 assert private_identity["anonymous"] is True
 assert private_identity["name"] != "Tajné jméno" and private_identity["avatar"] != "😎"
 
+# One private identity survives scope/date, pagination, row order and visibility.
+private_player = {"id": "private", "name": "Tajné jméno", "avatar": "😎", "public_rankings": False}
+for scope in ("xp:today", "xp:all", "day:2026-11-10", "day:2026-11-11", "free:board"):
+    for used in (set(), {private_identity["name"]}, {"Other alias"}):
+        assert server._ranking_display_identity(private_player, None, scope, used) == private_identity
+assert server._ranking_display_identity({**private_player, "public_rankings": None}, None, "all") == private_identity
+assert server._ranking_display_identity(private_player, "private", "all") == {
+    "name": "Tajné jméno", "avatar": "😎", "anonymous": False,
+}
+# Force the same adjective/animal for two IDs, while exercising real SHA-256.
+by_base = {}
+for index in range(481):  # 480 word pairs: a collision must occur.
+    pid = f"alias-fixture-{index}"
+    identity = server._ranking_anonymous_identity(pid, "all")
+    base = identity["name"].split(" · ")[0]
+    if base in by_base:
+        other_pid, other = by_base[base]
+        assert identity["name"] != other["name"]
+        for order in ((pid, other_pid), (other_pid, pid)):
+            used = set()
+            actual = {p: server._ranking_anonymous_identity(p, "today", used) for p in order}
+            assert actual == {pid: identity, other_pid: other}
+        break
+    by_base[base] = (pid, identity)
+else:
+    raise AssertionError("No adjective/animal collision exercised")
+
 # Regular presentation follows the same public boolean/privacy boundary as the
 # permanent badge; knowing a private type alone cannot disclose support.
 assert server._ranking_display_identity(
