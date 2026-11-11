@@ -94,6 +94,7 @@ class OfferEngageBody(Body):
     intentId: UUID
     action: Literal['saved','copied']
 class ConfirmBody(Body):
+    allowHigherAmount: StrictBool=False
     intentId: UUID
     reference: str=Field(pattern=r'^[1-9][0-9]{0,9}$')
     bankTransactionId: str=Field(min_length=1,max_length=120,pattern=r'^[A-Za-z0-9_.:/-]+$')
@@ -123,6 +124,9 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
     def headers(response):response.headers['Cache-Control']='no-store'
     def state(pid):return run('proplet_patron_state_v1',{'p_player':pid,'p_claim':False})
 
+    from backend import patron_gifts
+    patron_gifts.install(app,auth_player=account,require_admin=require_admin,db_rpc=db_rpc,enforce_rate_limit=enforce_rate_limit)
+
     @app.get('/api/patrons')
     def status(request:Request,response:Response,authorization:Optional[str]=Header(default=None),visibility:bool=False):
         headers(response)
@@ -133,7 +137,7 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
         if visibility and value.get('patron') is True:
             choice=run('proplet_patron_thanks_visibility_v1',{'p_player':p['id'],'p_claim':False})
             value={**value,'thanksPending':choice['thanksPending']}
-        return {'enabled':True,'authenticated':True,'nickname':p.get('name') or 'Hráč',**value}
+        return {'enabled':True,'authenticated':True,'nickname':p.get('name') or 'Hráč',**value,**patron_gifts.state(p['id'],db_rpc)}
 
     @app.post('/api/patrons/intents')
     def create_intent(body:IntentBody,request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
@@ -194,7 +198,7 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
     def confirm(body:ConfirmBody,request:Request,response:Response,authorization:Optional[str]=Header(default=None)):
         headers(response);active();admin=require_admin(authorization,write=True)
         enforce_rate_limit(request,'patron_confirm',limit=60,window_seconds=3600)
-        return run('proplet_patron_confirm_v2',{'p_actor':admin['player']['id'],'p_intent':str(body.intentId),'p_reference':body.reference,'p_bank_tx':body.bankTransactionId,'p_amount':body.amountCzk,'p_currency':body.currency,'p_account':body.recipientAccount,'p_paid_on':body.paidOn})
+        return run('proplet_patron_confirm_v3',{'p_actor':admin['player']['id'],'p_intent':str(body.intentId),'p_reference':body.reference,'p_bank_tx':body.bankTransactionId,'p_amount':body.amountCzk,'p_currency':body.currency,'p_account':body.recipientAccount,'p_paid_on':body.paidOn,'p_allow_higher_amount':body.allowHigherAmount})
 
 
 def annotate_players(players,db_rpc):

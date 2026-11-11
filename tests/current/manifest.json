@@ -930,6 +930,10 @@
         "runner": "python"
       },
       {
+        "path": "tests/current/test_patron_gifts.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_patrons.py",
         "runner": "python"
       },

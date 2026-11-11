@@ -35,6 +35,8 @@ on:
       - 'tools/qa_refinements_review.cjs'
       - 'tools/test_rankings_navigation_browser.cjs'
       - 'tools/test_patron_compact_browser.cjs'
+      - 'tools/test_patron_receipt_browser.cjs'
+      - 'public/admin/**'
       - 'tools/test_support_delivery_browser.cjs'
       - 'tools/competition_ui_visual_qa.cjs'
       - 'tools/browser_fixture_server.cjs'
@@ -86,6 +88,9 @@ jobs:
       - name: Verify compact support dialog and payment preparation
         if: ${{ !cancelled() }}
         run: node tools/test_patron_compact_browser.cjs
+      - name: Verify higher bank receipt confirmation
+        if: ${{ !cancelled() }}
+        run: node tools/test_patron_receipt_browser.cjs
       - name: Verify inline support QR, engagement and confirmed progress
         if: ${{ !cancelled() }}
         run: node tools/test_support_delivery_browser.cjs
