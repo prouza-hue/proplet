@@ -9,8 +9,8 @@ const html=`<!doctype html><html lang="cs" class="tiskarna-ui"><head><meta chars
 document.documentElement.dataset.theme=new URLSearchParams(location.search).get('theme')||'light';
 var currentScreen='daily',getProfile=()=>({id:window.__account||'fixture-player',name:'Pavel',avatar:'🙂',useGoogleAvatar:window.__privatePhoto===true,token:'fixture'});
 window.__calls=[];window.__fail=false;window.__status={enabled:true,authenticated:true,patron:false,publicBadge:false,offersDisabled:false,canOffer:false};
-var api=async(path,options={})=>{const body=options.body?JSON.parse(options.body):null;__calls.push({path,body});if(path==='/api/patrons/intents'){if(__fail){__fail=false;throw Error('Synthetic offline failure')}if(window.__defer)await new Promise(resolve=>window.__resolve=resolve);return {intent:{...body,id:body.requestId,account:'TEST ONLY',reference:'9900000001',message:'Local test only'},payment:{spd:'SYNTHETIC-NONPAYABLE',qrSvg:'<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="white"/><text x="30" y="128" fill="black">TEST ONLY — NOT PAYABLE</text></svg>'}}}return structuredClone(__status)};
-window.PropletAnnouncements={register(){},kick(){}};
+var api=async(path,options={})=>{const body=options.body?JSON.parse(options.body):null;__calls.push({path,body});if(path==='/api/patrons/gift'){__status.personalGift={...__status.personalGift,pending:false,status:body.action==='answer'?'answered':body.action==='decline'?'declined':'pending',answer:body.answer||null};return {ok:true,gift:structuredClone(__status.personalGift)}}if(path==='/api/patrons/intents'){if(__fail){__fail=false;throw Error('Synthetic offline failure')}if(window.__defer)await new Promise(resolve=>window.__resolve=resolve);return {intent:{...body,id:body.requestId,account:'TEST ONLY',reference:'9900000001',message:'Local test only'},payment:{spd:'SYNTHETIC-NONPAYABLE',qrSvg:'<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="white"/><text x="30" y="128" fill="black">TEST ONLY — NOT PAYABLE</text></svg>'}}}return structuredClone(__status)};
+window.__announcements=new Map();window.PropletAnnouncements={register(entry){__announcements.set(entry.id,entry)},kick(){}};
 </script><script src="/organic-ui-v4023.js"></script><script src="/app/patrons.js"></script><script>document.dispatchEvent(new Event('proplet:ready'));document.querySelector('#origin').onclick=()=>PropletPatrons.open();</script></body></html>`;
 const types={'.js':'text/javascript','.css':'text/css','.woff2':'font/woff2','.webp':'image/webp','.svg':'image/svg+xml','.png':'image/png'};
 const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://localhost');if(req.method!=='GET'){res.writeHead(405);return res.end()}if(url.pathname==='/'){res.setHeader('content-type','text/html');return res.end(html)}const file=path.resolve(pub,'.'+url.pathname);if(!file.startsWith(pub+path.sep)||!fs.existsSync(file)){res.writeHead(404);return res.end()}res.setHeader('content-type',types[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file))});
@@ -35,6 +35,36 @@ await submit(page);assert.equal(await page.locator('.patron-recurring-warning').
 const bankHelp=page.locator('.patron-recurring-warning');assert((await bankHelp.innerText()).includes('Pokud už první platba odešla, nastav trvalý příkaz až od dalšího měsíce'));assert((await bankHelp.innerText()).includes('při našem vyzkoušení na Androidu se ale opakování nepředvyplnilo'));assert.equal(await bankHelp.locator('a[href="https://www.kb.cz/cs/o-bance/spokojenost-klientu"]').count(),1);assert.equal(await bankHelp.locator('a[href="https://www.rb.cz/osobni/ucty/sluzby-k-uctum/mobilni-bankovnictvi"]').count(),1);assert(await bankHelp.locator('a').evaluateAll(links=>links.every(a=>a.target==='_blank'&&a.rel.includes('noopener')&&a.rel.includes('noreferrer'))));
 const warning=await page.locator('.patron-recurring-warning').evaluate(w=>{const ps=[...w.querySelectorAll('p')].map(p=>p.getBoundingClientRect());return {display:getComputedStyle(w).display,overlap:ps.some((r,i)=>i&&r.top<ps[i-1].bottom-1),overflow:w.scrollWidth>w.clientWidth+1}});assert(!warning.overlap,'bank paragraphs overlap');assert(!warning.overflow,'bank help overflows');await page.screenshot({path:path.join(out,'qr-'+label+'-'+mode+'.png'),fullPage:true});
 results.push({width,height,label,mode,geometry,warning});await context.close();}
+// Personal gift: native form, private server-addressed copy, mobile/Fold readability and durable reply.
+for(const [width,height,label] of [[390,844,'mobile'],[690,829,'fold-wide']])for(const mode of ['light','dark']){
+ const giftContext=await browser.newContext({viewport:{width,height},serviceWorkers:'block',reducedMotion:'reduce'});
+ await giftContext.route('**/*',r=>new URL(r.request().url()).origin===base?r.continue():r.abort());
+ const giftPage=await giftContext.newPage();giftPage.on('pageerror',e=>errors.push(e.message));
+ await giftPage.goto(base+'/?theme='+mode);await giftPage.waitForFunction(()=>window.PropletPatrons?.model.enabled);
+ assert.equal(await giftPage.evaluate(()=>__announcements.get('patron-personal-gift-v1').eligible()),false,'ordinary player has no personal letter');
+ await giftPage.evaluate(async()=>{
+  __status.personalGift={id:'synthetic-personal-gift',pending:true,status:'pending',paragraphs:['Zdeňku, Vaše zpráva mě opravdu dojala.','Moc děkuju za tak štědrou podporu, ale hlavně za to, že jste mi napsal, co pro Vás Proplet znamená.','Rád bych Vám na oplátku nechal vytvořit osobní odznak do hry, který budete mít jen Vy.','Máte nějaké oblíbené zvíře, koníček nebo motiv, který by Vám udělal radost?']};
+  await PropletPatrons.refresh();await __announcements.get('patron-personal-gift-v1').show({isCurrent:()=>true});
+ });
+ await giftPage.locator('#patronGiftMotif').waitFor();await giftPage.evaluate(()=>document.fonts.ready);
+ assert.match(await giftPage.locator('.patron-gift-letter').innerText(),/Vaše zpráva.*dojala/s);
+ const giftGeometry=await giftPage.locator('#patronDialog').evaluate(d=>({width:d.clientWidth,scrollWidth:d.scrollWidth,rect:d.getBoundingClientRect().toJSON()}));
+ assert(giftGeometry.scrollWidth<=giftGeometry.width+1,'personal letter has no horizontal overflow');
+ assert(giftGeometry.rect.top>=0&&giftGeometry.rect.bottom<=height+1,'personal letter stays in the viewport with internal scroll');
+ await giftPage.screenshot({path:path.join(out,'personal-gift-'+label+'-'+mode+'.png')});
+ await giftPage.locator('#patronGiftForm button[type=submit]').click();
+ assert.equal(await giftPage.evaluate(()=>__calls.filter(c=>c.path==='/api/patrons/gift').length),0,'empty motif is not sent');
+ await giftPage.locator('#patronGiftMotif').fill('  Rys mezi horami  ');
+ await giftPage.locator('#patronGiftForm button[type=submit]').click();
+ await giftPage.waitForFunction(()=>PropletPatrons.model.step==='gift-sent');
+ assert.deepEqual(await giftPage.evaluate(()=>__calls.find(c=>c.path==='/api/patrons/gift').body),{action:'answer',answer:'Rys mezi horami'});
+ assert.equal(await giftPage.evaluate(()=>__status.personalGift.answer),'Rys mezi horami','mock persistence receives the trimmed motif');
+ await giftPage.getByRole('button',{name:'Zpátky do hry',exact:true}).click();
+ await giftPage.evaluate(async()=>{await PropletPatrons.refresh();document.dispatchEvent(new Event('proplet:account-changed'))});
+ await giftPage.waitForFunction(()=>PropletPatrons.model.enabled);
+ assert.equal(await giftPage.evaluate(()=>__announcements.get('patron-personal-gift-v1').eligible()),false,'saved answer does not reopen on account refresh');
+ results.push({label,mode,personalGift:giftGeometry,reply:'saved'});await giftContext.close();
+}
 // Request payload and lifecycle tests use the actual DOM and native amount validation.
 const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});await context.route('**/*',r=>new URL(r.request().url()).origin===base?r.continue():r.abort());const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.clock.setFixedTime(new Date('2026-11-06T22:59:00Z'));await page.goto(base);await page.waitForFunction(()=>window.PropletPatrons?.model.enabled);await open(page);
 await page.evaluate(()=>{__privatePhoto=true;const chip=document.createElement('span');chip.id='profileChipAvatar';chip.innerHTML='<img class="google-profile-avatar" alt="Private photo" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22/%3E">';document.querySelector('.app-shell').append(chip);PropletPatrons.open('offer',document.querySelector('#origin'))});await page.locator('.patron-offer-avatar .organic-avatar').waitFor();assert.equal(await page.locator('.patron-offer-avatar .organic-avatar').getAttribute('data-avatar-file'),'01-liska.svg','public preview uses selected game avatar even with a private Google profile photo');assert.equal(await page.locator('.patron-offer-avatar .google-profile-avatar').count(),0);const stamp=await page.locator('.patron-art').evaluate(img=>({naturalWidth:img.naturalWidth,width:img.getBoundingClientRect().width}));assert(stamp.naturalWidth>=stamp.width*3,'stamp has enough source pixels for high density mobile');

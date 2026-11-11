@@ -127,6 +127,16 @@ async function avatarInfoLifecycle(){
  assert.match(nodes.get('#patronDialog').innerHTML,/Tvoje potvrzené příspěvky/);assert.match(nodes.get('#patronDialog').innerHTML,/Přispět znovu/,'manual support management remains available');
  assert.equal(calls.filter(p=>p==='/api/patrons/thanks/claim?visibility=true').length,1);
  window.PropletPatrons.model.requestId='prior-confirmed-intent';window.PropletPatrons.open('offer');assert.equal(window.PropletPatrons.model.requestId,null,'manual support from an existing patron starts a new contribution');
+ // Personal letter is eligible only from the server-addressed state, once per session.
+ const gift=entries.get('patron-personal-gift-v1');assert.equal(gift.eligible(),false);
+ Object.assign(status,{personalGift:{pending:true,paragraphs:['Zdeňku, Vaše zpráva mě opravdu dojala.','Co by Vám udělalo radost?']}});
+ await window.PropletPatrons.refresh();assert.equal(gift.eligible(),true);
+ assert.equal(await gift.show({isCurrent:()=>false}),false);
+ assert.equal(await gift.show({isCurrent:()=>true}),true);
+ assert.match(nodes.get('#patronDialog').innerHTML,/Vaše zpráva/);
+ assert.match(nodes.get('#patronDialog').innerHTML,/Promyslím si to/);
+ assert.equal(gift.eligible(),false,'closing cannot immediately repeat the personal letter');
+ window.PropletPatrons.close();
  // Live disable must remove previously rendered support and bank details with no write.
  for(const id of ['patronProfileEntry','patronTodayLink','patronOfferPreference','patronOffer']){const node=element();node.id=id;nodes.set('#'+id,node);}
  window.PropletPatrons.model.intent={id:'bound'};window.PropletPatrons.model.payment={spd:'bound'};

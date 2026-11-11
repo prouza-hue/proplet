@@ -34,6 +34,8 @@ def main():
    c.execute((ROOT/'supabase/migrations/20261105224723_patron_offer_visibility.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261110083909_patron_month_funding_and_pending_offer_window.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261110110322_patron_inline_qr_source_and_engagement.sql').read_text(encoding='utf8'))
+   c.execute((ROOT/'supabase/migrations/20261111233353_patron_higher_receipt.sql').read_text(encoding='utf8'))
+   c.execute((ROOT/'supabase/migrations/20261112010000_patron_personal_gift.sql').read_text(encoding='utf8'))
   ids=[str(uuid4()) for _ in range(4)];player,other,balanced,admin=ids
   for index,pid in enumerate(ids):c.execute('insert into public.players(id,name,family_code,token_hash,support_mode,public_rankings) values(%s,%s,%s,%s,%s,true)',(pid,'Patron SQL '+str(index),'patron-test',secrets.token_hex(32),'younger' if pid==balanced else 'none'))
   # Use the existing schema's required admin columns, if present.
@@ -335,6 +337,9 @@ def main():
     except psycopg.errors.InsufficientPrivilege:pass
     else:raise AssertionError(f'Client role can invoke {function_name}')
    c.execute('reset role')
+  higher_receipt_acceptance(c,rpc,new_player,admin,opts)
+  from tools.test_patron_gifts_db import run_gift_acceptance
+  run_gift_acceptance(opts)
   http_acceptance(opts,new_player(),new_player(),admin)
   from tools.test_patron_manual_badge_db import run_manual_badge_acceptance
   funding_before_manual=rpc('proplet_patron_state_v1',player,False)['monthFunding']
@@ -346,6 +351,49 @@ def main():
   from tools.test_patron_inline_qr_db import run_inline_qr_acceptance
   run_inline_qr_acceptance(c,rpc,new_player,admin,opts)
  print('PASS patron SQL: visibility, account-wide lease and retry, 14/30/90-day scheduling, legacy evidence, news and newcomer gates, opt-out, pending QR, patron suppression, payment ownership/ledger, monthly dates, thanks, badge privacy and ACL; database='+name)
+
+def higher_receipt_acceptance(c,rpc,new_player,admin,opts):
+ from datetime import timedelta
+ today=c.execute("select (statement_timestamp() at time zone 'Europe/Prague')::date").fetchone()[0]
+ player=new_player()
+ intent=rpc('proplet_patron_intent_v1',player,str(uuid4()),199)['intent']
+ def confirm(amount=1000,approved=False,tx='higher-receipt',paid=today,actor=admin):
+  return rpc('proplet_patron_confirm_v3',actor,intent['id'],intent['reference'],tx,amount,'CZK','5531840001/5500',paid,approved)
+ for amount in (1,198,0,100001,None):assert confirm(amount,True)['code']=='payment_mismatch'
+ for approved in (False,None):assert confirm(1000,approved)['code']=='higher_amount_confirmation_required'
+ assert confirm(1000,True,paid=today+timedelta(days=1))['code']=='invalid_paid_on'
+ try:confirm(1000,True,actor=player)
+ except psycopg.errors.InsufficientPrivilege:pass
+ else:raise AssertionError('Non-admin approved higher receipt')
+ assert not rpc('proplet_patron_state_v1',player,False)['patron']
+ result=confirm(1000,True)
+ assert result['ok'] and not result['alreadyConfirmed']
+ assert result['intent']['amountCzk']==199 and result['intent']['totalConfirmedCzk']==1000
+ assert confirm(1000,True)['alreadyConfirmed']
+ assert confirm(999,True)['code']=='payment_mismatch'
+ assert confirm(199,False)['code']=='payment_mismatch'
+ assert confirm(1000,True,paid=today-timedelta(days=1))['code']=='paid_on_conflict'
+ assert confirm(1000,True,tx='second-bank-id')['code']=='already_confirmed_different_receipt'
+ audit=c.execute('select expected_amount_czk,higher_amount_approved from proplet_private.patron_audit where intent_id=%s',(intent['id'],)).fetchall()
+ assert audit==[(199,True)]
+ assert c.execute('select amount_czk from proplet_private.patron_payments where intent_id=%s',(intent['id'],)).fetchall()==[(1000,)]
+ # Concurrent monthly receipt replays must create exactly one payment + audit.
+ monthly=rpc('proplet_patron_intent_v1',player,str(uuid4()),199,'monthly',today)['intent']
+ def retry(_):
+  with psycopg.connect(**opts) as conn:
+   conn.execute('set role service_role')
+   return rpc('proplet_patron_confirm_v3',admin,monthly['id'],monthly['reference'],'higher-monthly',1000,'CZK','5531840001/5500',today,True,connection=conn)
+ with ThreadPoolExecutor(max_workers=2) as pool:replays=list(pool.map(retry,range(2)))
+ assert sum(not r['alreadyConfirmed'] for r in replays)==1
+ assert all(r['intent']['totalConfirmedCzk']==1000 for r in replays)
+ assert rpc('proplet_patron_confirm_v3',admin,monthly['id'],monthly['reference'],'higher-receipt',1000,'CZK','5531840001/5500',today,True)['code']=='bank_transaction_already_used'
+ for role in ('anon','authenticated'):
+  c.execute(sql.SQL('set role {}').format(sql.Identifier(role)))
+  try:confirm(1000,True)
+  except psycopg.errors.InsufficientPrivilege:pass
+  else:raise AssertionError('Public role can approve receipt')
+  c.execute('reset role')
+ print('PASS higher receipts: explicit approval, immutable QR, actual amount/audit, replay/date/duplicate conflicts, concurrent monthly dedup and ACL')
 
 def month_funding_acceptance(c,rpc,new_player,admin):
  """Real ledger totals: bank-date authority, Prague boundaries, retries/privacy."""
