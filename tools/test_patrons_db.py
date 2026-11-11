@@ -1,5 +1,5 @@
 """Real patron SQL acceptance, restricted to synthetic loopback databases."""
-import argparse,json,re,secrets
+import argparse,json,re,secrets,sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from uuid import uuid4
@@ -7,6 +7,8 @@ import psycopg
 from psycopg import sql
 
 ROOT=Path(__file__).resolve().parents[1]
+# CI invokes this file directly; resolve repository packages before any acceptance imports.
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--password-file',type=Path,required=True);p.add_argument('--database-report',type=Path);p.add_argument('--port',type=int,default=55432);p.add_argument('--user',default='proplet_test_admin');p.add_argument('--minimal',action='store_true');a=p.parse_args()
  opts=dict(host='127.0.0.1',port=a.port,user=a.user,password=a.password_file.read_text().strip(),autocommit=True)
@@ -440,8 +442,6 @@ def month_funding_acceptance(c,rpc,new_player,admin):
 
 def http_acceptance(opts,owner,other,admin):
  """Real native HTTP handlers over the disposable SQL schema, no mocked RPC."""
- import sys
- sys.path.insert(0,str(ROOT))
  from fastapi import FastAPI,HTTPException
  from fastapi.testclient import TestClient
  from backend import patrons
