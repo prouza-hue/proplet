@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.40-patron-personal1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.41-compact-controls1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
