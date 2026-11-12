@@ -1,11 +1,11 @@
 /* A compact overview with explicit expansion; list changes keep controls stable. */
-.ranking-view-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 22px;align-items:stretch}
-.ranking-view-tabs button{min-width:0;min-height:52px;padding:11px 10px;border:1px solid var(--td-line,var(--line));border-radius:11px;background:var(--td-paper,var(--paper));box-shadow:0 2px 0 color-mix(in srgb,var(--td-ink,var(--ink)) 12%,transparent);color:var(--td-ink,var(--ink));font:600 16px/1.25 Outfit,system-ui,sans-serif;cursor:pointer;touch-action:manipulation}
+.ranking-view-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 0 10px;align-items:stretch}
+.ranking-view-tabs button{min-width:0;min-height:44px;padding:7px 8px;border:1px solid var(--td-line,var(--line));border-radius:11px;background:var(--td-paper,var(--paper));box-shadow:0 2px 0 color-mix(in srgb,var(--td-ink,var(--ink)) 12%,transparent);color:var(--td-ink,var(--ink));font:600 14px/1.25 Outfit,system-ui,sans-serif;cursor:pointer;touch-action:manipulation}
 .ranking-view-tabs button.active{background:var(--td-blue,var(--blue));border-color:var(--td-blue,var(--blue));color:var(--td-paper,var(--paper));box-shadow:inset 0 -2px 0 #0002;font-weight:700}
 .ranking-view-tabs button:not(.active):hover{border-color:var(--td-blue,var(--blue));background:color-mix(in srgb,var(--td-blue,var(--blue)) 8%,var(--td-paper,var(--paper)))}
 .ranking-view-tabs button:active{box-shadow:none}
 .ranking-view-tabs button:focus-visible{outline:3px solid var(--td-blue,var(--blue));outline-offset:3px}
-@media(max-width:540px){.ranking-view-tabs{gap:6px}.ranking-view-tabs button{font-size:14px;padding:8px 4px;min-height:52px}}
+@media(max-width:540px){.ranking-view-tabs{gap:6px}.ranking-view-tabs button{font-size:13px;padding:5px 4px;min-height:44px}}
 @media(max-width:360px){.ranking-view-tabs{gap:5px}.ranking-view-tabs button{font-size:13px;padding-inline:3px}}
 html.tiskarna-ui body #screen-leaderboard.ranking-single-view{max-width:760px!important;width:100%;margin-inline:auto!important}
 #screen-leaderboard.ranking-single-view>.screen-title{position:absolute;width:1px;height:1px;margin:-1px!important;padding:0!important;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
@@ -76,4 +76,36 @@ html.tiskarna-ui #screen-leaderboard.ranking-single-view .ranking-segment button
   #screen-leaderboard .ranking-navigation-section .quality-ranking-head{gap:5px}
   #screen-leaderboard .ranking-navigation-section .ranking-section-head h2{font-size:19px}
   #screen-leaderboard .ranking-collapse-toggle{min-width:88px;padding-inline:7px;gap:4px}
+}
+
+/* Compact competition controls: preserve labels and touch targets, remove repeated titles. */
+#screen-leaderboard.ranking-single-view .ranking-navigation-section{position:relative}
+#screen-leaderboard.ranking-single-view .ranking-section-head{
+  position:absolute;right:0;top:0;margin:0!important;z-index:1;
+}
+#screen-leaderboard.ranking-single-view .ranking-section-head h2,
+#screen-leaderboard.ranking-single-view .ranking-section-summary{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;
+}
+#screen-leaderboard.ranking-single-view .quality-info-button{width:44px;height:44px}
+#screen-leaderboard.ranking-single-view .ranking-daily-segment{
+  width:calc(100% - 56px);max-width:245px;margin:0 0 4px!important;
+}
+#screen-leaderboard.ranking-single-view .ranking-control-row{
+  display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);
+  gap:16px;margin:0 0 4px;
+}
+#screen-leaderboard.ranking-single-view .ranking-control-row::before{display:none}
+#screen-leaderboard.ranking-single-view .ranking-control-row>.ranking-segment{
+  grid-column:auto;margin:0!important;gap:8px;
+}
+html.tiskarna-ui #screen-leaderboard.ranking-single-view .ranking-segment button{
+  min-width:0;padding:8px 2px!important;font-size:14px!important;
+}
+#screen-leaderboard.ranking-single-view .ranking-expand-list{margin:0;padding:8px 0;min-height:44px}
+@media(max-width:359px){
+  #screen-leaderboard.ranking-single-view .ranking-control-row{gap:10px}
+  #screen-leaderboard.ranking-single-view .ranking-control-row>.ranking-segment{gap:4px}
+  html.tiskarna-ui #screen-leaderboard.ranking-single-view .ranking-segment button{font-size:13px!important}
 }
