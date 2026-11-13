@@ -85,6 +85,21 @@ const AVATAR_NAMES=AVATAR_MANIFEST.map(a=>a.name);
 // Printshop masters already fill the same circular viewBox; no per-character zoom layer.
 function avatarSvg(bg,body){return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="31" fill="'+bg+'"/>'+body+'</svg>'}
 const PRIVATE_AVATAR_ART=avatarSvg('#E7DDCC','<circle cx="32" cy="27" r="11" fill="#8F877B"/><path d="M13 54q2-18 19-18t19 18" fill="#8F877B"/><path d="M20 24q12-11 24 0" stroke="#F6F0DE" stroke-width="3" fill="none"/><path d="M22 44q10 7 20 0" stroke="#C66B42" stroke-width="3" fill="none" stroke-linecap="round"/>');
+const EXCLUSIVE_AVATARS=Object.freeze({'datel-zdenek':Object.freeze({name:'Datel',src:'/assets/avatars/exclusive/datel-zdenek.webp'})});
+function exclusiveAvatar(value){return Object.hasOwn(EXCLUSIVE_AVATARS,String(value||'').trim())?EXCLUSIVE_AVATARS[String(value).trim()]:null}
+function selectableAvatars(base=LEGACY_AVATARS){
+ const model=window.PropletPatrons?.model;
+ const allowed=model?.authenticated&&Array.isArray(model.exclusiveAvatars)?model.exclusiveAvatars.filter(token=>exclusiveAvatar(token)):[];
+ return [...new Set([...base.filter(token=>!exclusiveAvatar(token)),...allowed])];
+}
+function avatarForToken(value,label){
+ const raw=String(value||'').trim(),meta=exclusiveAvatar(raw);
+ if(!meta)return avatarNode(visualAvatarIndex(raw),label||AVATAR_NAMES[visualAvatarIndex(raw)]||'Herní avatar');
+ const node=document.createElement('span'),img=document.createElement('img');
+ node.className='organic-avatar';node.dataset.avatarToken=raw;node.dataset.avatarFile='exclusive/'+raw+'.webp';node.dataset.avatarCategory='exclusive';node.setAttribute('role','img');node.setAttribute('aria-label',label||meta.name);
+ img.src=meta.src;img.alt='';img.width=64;img.height=64;img.decoding='async';img.loading='lazy';img.draggable=false;img.className='organic-avatar-print';node.appendChild(img);return node;
+}
+window.PropletOrganic=Object.freeze({avatarNode:avatarForToken,decorateAvatarElement,selectableAvatars});
 function legacyAvatarIndex(value){return LEGACY_AVATARS.indexOf(String(value||'').trim())}
 function avatarHash(value){let h=2166136261;for(const ch of String(value||'')){h^=ch.codePointAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function visualAvatarIndex(value){const raw=String(value||'').trim(),legacy=legacyAvatarIndex(raw);return legacy>=0?legacy:(raw?avatarHash(raw)%15:-1)}
@@ -108,14 +123,19 @@ function profileState(){try{return typeof getProfile==='function'?getProfile():n
 function decorateAvatarElement(el,key,label){
  if(!el||el.querySelector('img.google-profile-avatar'))return false;
  const raw=String(key??el.dataset.organicAvatarKey??el.textContent??'').trim();
- const idx=visualAvatarIndex(raw);if(idx<0)return false;
+ const idx=visualAvatarIndex(raw);if(idx<0&&!exclusiveAvatar(raw))return false;
  if(el.dataset.organicAvatarKey===raw&&el.querySelector('.organic-avatar'))return true;
- el.dataset.organicAvatarKey=raw;el.classList.add('organic-avatar-host');el.replaceChildren(avatarNode(idx,label||AVATAR_NAMES[idx]||'Herní avatar'));return true;
+ el.dataset.organicAvatarKey=raw;el.classList.add('organic-avatar-host');el.replaceChildren(avatarForToken(raw,label));return true;
 }
 function decorateAvatarPickers(){
- const p=profileState(),current=visualAvatarIndex(p?.avatar||'🙂');
+ const p=profileState(),current=exclusiveAvatar(p?.avatar)?-1:visualAvatarIndex(p?.avatar||'🙂');
  decorationAll('.avatar-choice').forEach(btn=>{
    const raw=String(btn.dataset.avatar||btn.dataset.editAvatar||'').trim(),idx=legacyAvatarIndex(raw);
+   if(exclusiveAvatar(raw)){
+    if(!selectableAvatars([]).includes(raw)){btn.remove();return}
+    const meta=exclusiveAvatar(raw);btn.dataset.organicAvatarKey=raw;btn.dataset.avatarCategory='exclusive';btn.classList.toggle('selected',!p?.useGoogleAvatar&&raw===p?.avatar);btn.setAttribute('aria-label',`Avatar: ${meta.name} — osobní dárek`);btn.title=meta.name;
+    if(btn.querySelector('.organic-avatar')?.dataset.avatarToken!==raw)btn.replaceChildren(avatarForToken(raw,meta.name));return;
+   }
    if(idx<0)return;
    if(RETIRED_AVATAR_IDS.has(AVATAR_MANIFEST[idx].id)){btn.remove();return}
    btn.classList.remove('organic-avatar-duplicate');btn.removeAttribute('aria-hidden');btn.tabIndex=0;btn.dataset.organicAvatarKey=raw;btn.dataset.avatarCategory=AVATAR_MANIFEST[idx].category;
@@ -135,9 +155,9 @@ function decorateInlineLeaderboardAvatars(){
    if(strong.querySelector('.organic-avatar'))return;
    const first=strong.firstChild;if(!first||first.nodeType!==Node.TEXT_NODE)return;
    const text=first.nodeValue||'',trimmed=text.trimStart();
-   const key=[...LEGACY_AVATARS].sort((a,b)=>b.length-a.length).find(k=>trimmed.startsWith(k))||(trimmed.match(/^(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*)/u)?.[1]||'');if(!key)return;
+   const key=[...LEGACY_AVATARS,...Object.keys(EXCLUSIVE_AVATARS)].sort((a,b)=>b.length-a.length).find(k=>trimmed.startsWith(k))||(trimmed.match(/^(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*)/u)?.[1]||'');if(!key)return;
    first.nodeValue=trimmed.slice(key.length).replace(/^\s+/,'');
-   const host=document.createElement('span');host.className='ranking-avatar organic-avatar-host';host.dataset.organicAvatarKey=key;host.appendChild(avatarNode(visualAvatarIndex(key),'Herní avatar'));
+   const host=document.createElement('span');host.className='ranking-avatar organic-avatar-host';host.dataset.organicAvatarKey=key;host.appendChild(avatarForToken(key,'Herní avatar'));
    strong.prepend(host);
  });
 }
@@ -508,9 +528,9 @@ function queueRoot(node){
 const observer=new MutationObserver(records=>{
  for(const record of records){
   if(record.type==='characterData'){
-   if(keyAt(record.target.nodeValue||''))queueRoot(record.target);
+   if(keyAt(record.target.nodeValue||'')||record.target.parentElement?.matches?.('[data-player-avatar],#profileChipAvatar,#rankingPrivacyPreviewAvatar,.profile-avatar-big,.leader-name>strong,.ranking-avatar,.leader-avatar,.home-ranking-avatar,.leaderboard-avatar'))queueRoot(record.target);
   }else for(const node of record.addedNodes){
-   if(node.nodeType===1||(node.nodeType===3&&keyAt(node.nodeValue||'')))queueRoot(node);
+   if(node.nodeType===1||(node.nodeType===3&&(keyAt(node.nodeValue||'')||node.parentElement?.matches?.('[data-player-avatar],#profileChipAvatar,#rankingPrivacyPreviewAvatar,.profile-avatar-big,.leader-name>strong,.ranking-avatar,.leader-avatar,.home-ranking-avatar,.leaderboard-avatar'))))queueRoot(node);
   }
  }
 });

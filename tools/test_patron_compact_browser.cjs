@@ -7,9 +7,11 @@ const index=fs.readFileSync(path.join(pub,'index.html'),'utf8'),theme=fs.readFil
 const styles=index.match(/<link[^>]+rel="stylesheet"[^>]*>/g).join('\n')+[...theme.matchAll(/\['(\/[^']+\.css\?[^']+)'/g)].map(m=>`<link rel="stylesheet" href="${m[1]}">`).join('\n');
 const html=`<!doctype html><html lang="cs" class="tiskarna-ui"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${styles}</head><body class="studio-edition today-one-screen"><main class="app-shell"><button id="origin">Podpořit Proplet</button><div id="winModal" class="hidden"></div></main><script>
 document.documentElement.dataset.theme=new URLSearchParams(location.search).get('theme')||'light';
-var currentScreen='daily',getProfile=()=>({id:window.__account||'fixture-player',name:'Pavel',avatar:'🙂',useGoogleAvatar:window.__privatePhoto===true,token:'fixture'});
+window.__profileOverrides={};window.__profileUpdates=[];
+var currentScreen='daily',getProfile=()=>({id:window.__account||'fixture-player',name:'Pavel',avatar:'🙂',useGoogleAvatar:window.__privatePhoto===true,token:'fixture',...window.__profileOverrides});
+var updateAccountProfile=patch=>{__profileUpdates.push(patch);Object.assign(__profileOverrides,patch)},renderProfile=()=>{const chip=document.querySelector('#profileChipAvatar');if(chip)chip.textContent=getProfile().avatar};
 window.__calls=[];window.__fail=false;window.__status={enabled:true,authenticated:true,patron:false,publicBadge:false,offersDisabled:false,canOffer:false};
-var api=async(path,options={})=>{const body=options.body?JSON.parse(options.body):null;__calls.push({path,body});if(path==='/api/patrons/gift'){__status.personalGift={...__status.personalGift,pending:false,status:body.action==='answer'?'answered':body.action==='decline'?'declined':'pending',answer:body.answer||null};return {ok:true,gift:structuredClone(__status.personalGift)}}if(path==='/api/patrons/intents'){if(__fail){__fail=false;throw Error('Synthetic offline failure')}if(window.__defer)await new Promise(resolve=>window.__resolve=resolve);return {intent:{...body,id:body.requestId,account:'TEST ONLY',reference:'9900000001',message:'Local test only'},payment:{spd:'SYNTHETIC-NONPAYABLE',qrSvg:'<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="white"/><text x="30" y="128" fill="black">TEST ONLY — NOT PAYABLE</text></svg>'}}}return structuredClone(__status)};
+var api=async(path,options={})=>{const body=options.body?JSON.parse(options.body):null;__calls.push({path,body});if(path==='/api/patrons/gift'){if(['equip','delivery_later'].includes(body.action)){__status.personalGift.delivery={...__status.personalGift.delivery,pending:false};return {ok:true,gift:structuredClone(__status.personalGift),...(body.action==='equip'?{avatar:'datel-zdenek'}:{})}}__status.personalGift={...__status.personalGift,pending:false,status:body.action==='answer'?'answered':body.action==='decline'?'declined':'pending',answer:body.answer||null};return {ok:true,gift:structuredClone(__status.personalGift)}}if(path==='/api/patrons/intents'){if(__fail){__fail=false;throw Error('Synthetic offline failure')}if(window.__defer)await new Promise(resolve=>window.__resolve=resolve);return {intent:{...body,id:body.requestId,account:'TEST ONLY',reference:'9900000001',message:'Local test only'},payment:{spd:'SYNTHETIC-NONPAYABLE',qrSvg:'<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="white"/><text x="30" y="128" fill="black">TEST ONLY — NOT PAYABLE</text></svg>'}}}return structuredClone(__status)};
 window.__announcements=new Map();window.PropletAnnouncements={register(entry){__announcements.set(entry.id,entry)},kick(){}};
 </script><script src="/organic-ui-v4023.js"></script><script src="/app/patrons.js"></script><script>document.dispatchEvent(new Event('proplet:ready'));document.querySelector('#origin').onclick=()=>PropletPatrons.open();</script></body></html>`;
 const types={'.js':'text/javascript','.css':'text/css','.woff2':'font/woff2','.webp':'image/webp','.svg':'image/svg+xml','.png':'image/png'};
@@ -64,6 +66,47 @@ for(const [width,height,label] of [[390,844,'mobile'],[690,829,'fold-wide']])for
  await giftPage.waitForFunction(()=>PropletPatrons.model.enabled);
  assert.equal(await giftPage.evaluate(()=>__announcements.get('patron-personal-gift-v1').eligible()),false,'saved answer does not reopen on account refresh');
  results.push({label,mode,personalGift:giftGeometry,reply:'saved'});await giftContext.close();
+}
+// Delivered one-off avatar: public rendering stays available, private selection requires entitlement.
+for(const [width,height,label] of [[390,844,'mobile'],[690,829,'fold-wide']])for(const mode of ['light','dark']){
+ const deliveryContext=await browser.newContext({viewport:{width,height},serviceWorkers:'block',reducedMotion:'reduce'});
+ await deliveryContext.route('**/*',r=>new URL(r.request().url()).origin===base?r.continue():r.abort());
+ const deliveryPage=await deliveryContext.newPage();deliveryPage.on('pageerror',e=>errors.push(e.message));
+ await deliveryPage.goto(base+'/?theme='+mode);await deliveryPage.waitForFunction(()=>window.PropletPatrons?.model.enabled);
+ assert.equal(await deliveryPage.evaluate(()=>__announcements.get('patron-personal-avatar-v1').eligible()),false);
+ assert.equal(await deliveryPage.evaluate(()=>PropletOrganic.selectableAvatars(['🙂','datel-zdenek']).includes('datel-zdenek')),false);
+ await deliveryPage.evaluate(async()=>{
+  __privatePhoto=true;__status.exclusiveAvatars=['datel-zdenek'];
+  __status.personalGift={pending:false,status:'answered',delivery:{pending:true,paragraphs:['Ahoj Zdenku,','datel je připravený a máš ho na výběr jenom ty. Jestli ho chceš rovnou pustit do světa, stačí říct a je hotovo :).','Ať tě Proplet baví i nadále!']}};
+  const samples=document.createElement('section');samples.id='avatarSamples';samples.innerHTML='<span id="profileChipAvatar">🙂</span><span class="leader-avatar" data-player-avatar="datel-zdenek"></span><div class="leader-name"><strong>datel-zdenek <span>Ukázka</span></strong></div>';document.querySelector('.app-shell').append(samples);
+  await PropletPatrons.refresh();await __announcements.get('patron-personal-avatar-v1').show({isCurrent:()=>true});
+ });
+ assert.equal(await deliveryPage.locator('#patronTitle').innerText(),'Ahoj Zdenku,');
+ assert.match(await deliveryPage.locator('.patron-gift-letter').innerText(),/datel je připravený a máš ho na výběr jenom ty/);
+ assert.match(await deliveryPage.locator('.patron-gift-letter').innerText(),/Ať tě Proplet baví i nadále!/);
+ await deliveryPage.waitForFunction(()=>{const img=document.querySelector('.patron-delivery-art img');return img?.complete&&img.naturalWidth>0});
+ assert.equal(await deliveryPage.locator('.patron-delivery-art img').getAttribute('src'),'/assets/avatars/exclusive/datel-zdenek.webp');
+ await deliveryPage.locator('#avatarSamples .leader-avatar img[src="/assets/avatars/exclusive/datel-zdenek.webp"]').waitFor({state:'attached'});
+ await deliveryPage.locator('#avatarSamples .leader-name img[src="/assets/avatars/exclusive/datel-zdenek.webp"]').waitFor({state:'attached'});
+ const deliveryGeometry=await deliveryPage.locator('#patronDialog').evaluate(d=>({scrollWidth:d.scrollWidth,clientWidth:d.clientWidth,rect:d.getBoundingClientRect().toJSON()}));
+ assert(deliveryGeometry.scrollWidth<=deliveryGeometry.clientWidth+1,'delivery dialog has no horizontal overflow');
+ assert(deliveryGeometry.rect.top>=0&&deliveryGeometry.rect.bottom<=height+1,'delivery dialog fits viewport');
+ await deliveryPage.screenshot({path:path.join(out,'delivered-avatar-'+label+'-'+mode+'.png')});
+ const equip=mode==='light';await deliveryPage.getByRole('button',{name:equip?'Nasadit datla':'Vyberu si ho později',exact:true}).click();
+ await deliveryPage.waitForFunction(()=>!document.querySelector('#patronDialog').open);
+ assert.deepEqual(await deliveryPage.evaluate(()=>__calls.find(c=>c.path==='/api/patrons/gift').body),{action:equip?'equip':'delivery_later'});
+ if(equip){
+  assert.deepEqual(await deliveryPage.evaluate(()=>__profileUpdates.at(-1)),{avatar:'datel-zdenek',useGoogleAvatar:false});
+  assert.equal(await deliveryPage.evaluate(()=>getProfile().useGoogleAvatar),false);
+  await deliveryPage.locator('#profileChipAvatar img[src="/assets/avatars/exclusive/datel-zdenek.webp"]').waitFor();
+ }else assert.equal(await deliveryPage.evaluate(()=>__profileUpdates.length),0,'later must not change avatar or Google-photo choice');
+ await deliveryPage.evaluate(()=>PropletPatrons.refresh());
+ assert.equal(await deliveryPage.evaluate(()=>PropletOrganic.selectableAvatars(['🙂']).includes('datel-zdenek')),true,'both choices retain entitlement in avatar picker');
+ assert.equal(await deliveryPage.evaluate(()=>__announcements.get('patron-personal-avatar-v1').eligible()),false);
+ await deliveryPage.evaluate(async()=>{__status.exclusiveAvatars=[];__status.personalGift=null;__profileOverrides={};__account='ordinary-player';document.dispatchEvent(new Event('proplet:account-changed'));await PropletPatrons.refresh()});
+ assert.equal(await deliveryPage.evaluate(()=>PropletOrganic.selectableAvatars(['🙂','datel-zdenek']).includes('datel-zdenek')),false,'account switch removes captured exclusive choices');
+ assert.equal(await deliveryPage.locator('#avatarSamples .leader-avatar img[src="/assets/avatars/exclusive/datel-zdenek.webp"]').count(),1,'other players still see public avatar');
+ results.push({label,mode,delivery:deliveryGeometry,action:equip?'equip':'delivery_later'});await deliveryContext.close();
 }
 // Request payload and lifecycle tests use the actual DOM and native amount validation.
 const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});await context.route('**/*',r=>new URL(r.request().url()).origin===base?r.continue():r.abort());const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.clock.setFixedTime(new Date('2026-11-06T22:59:00Z'));await page.goto(base);await page.waitForFunction(()=>window.PropletPatrons?.model.enabled);await open(page);

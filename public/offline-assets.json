@@ -1,7 +1,8 @@
 {
   "schemaVersion": 1,
   "assets": [
-    "/account-auth.js?v=ui-refinement1",
+    "/assets/avatars/exclusive/datel-zdenek.webp",
+    "/account-auth.js?v=woodpecker1",
     "/account-bonus-v3331.js?v=monthly-releaseprep6",
     "/account-conversion-v3331.css?v=ui-refinement1",
     "/account-conversion-v3331.js?v=ui-refinement1",
@@ -12,7 +13,7 @@
     "/app/client-diagnostics.js?v=3",
     "/app/content/free-expansion-release.js?v=1",
     "/app/monthly/competition.js?v=competition-ui1",
-    "/app/patrons.js?v=patron-personal1",
+    "/app/patrons.js?v=woodpecker1",
     "/app/rankings/rankings.js?v=recurring-patron1",
     "/app/weekly/competition.js?v=resource1",
     "/assets/hints/printshop/bonus-words-v1.webp",
@@ -57,7 +58,7 @@
     "/onboarding-return-v3332.css?v=1",
     "/p0-hotfix-v3336.css",
     "/p0-hotfix-v3336.js",
-    "/patrons.css?v=patron-personal1",
+    "/patrons.css?v=woodpecker1",
     "/printshop-release-polish.js?v=play-one-screen1",
     "/push-origin-v3325.js?v=settingssimple1",
     "/push-retention-v3329.css?v=1",

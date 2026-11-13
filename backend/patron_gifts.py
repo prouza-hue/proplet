@@ -4,6 +4,12 @@ from fastapi import Header, HTTPException, Request, Response
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 PLAYER_ID = '449e0545-26f8-4e37-b023-c06eeec9f307'
+EXCLUSIVE_AVATAR = 'datel-zdenek'
+DELIVERY_COPY = [
+    'Ahoj Zdenku,',
+    'datel je připravený a máš ho na výběr jenom ty. Jestli ho chceš rovnou pustit do světa, stačí říct a je hotovo :).',
+    'Ať tě Proplet baví i nadále!',
+]
 GIFT_ID = 'zdenek-personal-badge-20261112'
 COPY = [
     'Zdeňku, Vaše zpráva mě opravdu dojala.',
@@ -16,15 +22,19 @@ def state(player_id, db_rpc):
     if str(player_id) != PLAYER_ID:
         return {}
     try:
-        value = db_rpc('proplet_patron_gift_v1', {'p_player': str(player_id), 'p_action': 'read', 'p_answer': None})
+        value = db_rpc('proplet_patron_gift_v2', {'p_player': str(player_id), 'p_action': 'read', 'p_answer': None})
         gift = value.get('gift') if isinstance(value, dict) else None
-        return {'personalGift': {**gift, 'paragraphs': COPY}} if isinstance(gift, dict) else {}
+        if not isinstance(gift, dict):
+            return {}
+        if isinstance(gift.get('delivery'), dict):
+            gift = {**gift, 'delivery': {**gift['delivery'], 'paragraphs': DELIVERY_COPY, 'author': 'Pavel'}}
+        return {'personalGift': {**gift, 'paragraphs': COPY}, 'exclusiveAvatars': [EXCLUSIVE_AVATAR]}
     except HTTPException:
         return {}  # An optional personal note must not prevent loading patron status.
 
 class GiftBody(BaseModel):
     model_config = ConfigDict(extra='forbid')
-    action: Literal['answer', 'later', 'decline']
+    action: Literal['answer', 'later', 'decline', 'equip', 'delivery_later']
     answer: Optional[str] = Field(default=None, max_length=1000)
 
     @model_validator(mode='after')
@@ -45,7 +55,7 @@ def install(app, *, auth_player, require_admin, db_rpc, enforce_rate_limit):
         if str(player['id']) != PLAYER_ID:
             raise HTTPException(404, 'Osobní poděkování není dostupné.')
         enforce_rate_limit(request, 'patron_gift', limit=30, window_seconds=3600)
-        value = db_rpc('proplet_patron_gift_v1', {'p_player': str(player['id']), 'p_action': body.action, 'p_answer': body.answer})
+        value = db_rpc('proplet_patron_gift_v2', {'p_player': str(player['id']), 'p_action': body.action, 'p_answer': body.answer})
         if not isinstance(value, dict) or not value.get('ok'):
             raise HTTPException(409, 'Odpověď se nepodařilo uložit. Zkuste to prosím znovu.')
         return value

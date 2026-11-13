@@ -25,7 +25,33 @@ class GiftTests(unittest.TestCase):
   self.assertIn('Vaše',gifts.state(gifts.PLAYER_ID,self.rpc)['personalGift']['paragraphs'][0])
   r=self.client.post('/api/patrons/gift',json={'action':'answer','answer':'  Rys  '},headers={'Authorization':'Bearer target'})
   self.assertEqual(r.status_code,200);self.assertEqual(r.headers['cache-control'],'no-store')
-  self.rpc.assert_called_with('proplet_patron_gift_v1',{'p_player':gifts.PLAYER_ID,'p_action':'answer','p_answer':'Rys'})
+  self.rpc.assert_called_with('proplet_patron_gift_v2',{'p_player':gifts.PLAYER_ID,'p_action':'answer','p_answer':'Rys'})
+ def test_delivery_copy_and_actions(self):
+  self.rpc.return_value={'ok':True,'gift':{'delivery':{'pending':True,'avatar':gifts.EXCLUSIVE_AVATAR}}}
+  state=gifts.state(gifts.PLAYER_ID,self.rpc)
+  self.assertEqual(state['exclusiveAvatars'],[gifts.EXCLUSIVE_AVATAR])
+  self.assertEqual(state['personalGift']['delivery']['paragraphs'],gifts.DELIVERY_COPY)
+  self.assertEqual(state['personalGift']['delivery']['author'],'Pavel')
+  for action in ('equip','delivery_later'):
+   self.assertEqual(self.client.post('/api/patrons/gift',json={'action':action},headers={'Authorization':'Bearer target'}).status_code,200)
+   self.rpc.assert_called_with('proplet_patron_gift_v2',{'p_player':gifts.PLAYER_ID,'p_action':action,'p_answer':None})
+   self.assertEqual(self.client.post('/api/patrons/gift',json={'action':action,'answer':'x'},headers={'Authorization':'Bearer target'}).status_code,422)
+ def test_reserved_avatar_http_authority(self):
+  import server
+  from unittest.mock import patch
+  client=TestClient(server.app)
+  for pid in ('another-player',gifts.PLAYER_ID):
+   with patch.object(server,'auth_player',return_value={'id':pid,'avatar':'🙂','google_avatar_url':'https://example.test/photo'}),patch.object(server,'db_update') as update,patch.object(server,'enforce_rate_limit'):
+    for token in (gifts.EXCLUSIVE_AVATAR,' '+gifts.EXCLUSIVE_AVATAR+' '):
+     for google in (False,True):
+      update.reset_mock()
+      result=client.post('/api/avatar',json={'avatar':token,'use_google_avatar':google},headers={'Authorization':'Bearer player'})
+      self.assertEqual(result.status_code,200 if pid==gifts.PLAYER_ID else 403,result.text)
+      if pid!=gifts.PLAYER_ID:update.assert_not_called()
+    update.reset_mock()
+    self.assertEqual(client.post('/api/avatar',json={'avatar':gifts.EXCLUSIVE_AVATAR+'x'*20}).status_code,422)
+    update.assert_not_called()
+    self.assertEqual(client.post('/api/avatar',json={'avatar':'🐶'}).status_code,200)
  def test_invalid_and_spoofed_replies_never_write(self):
   for body in [{'action':'answer','answer':' '},{'action':'answer','answer':'a'*1001},{'action':'later','answer':'Rys'},{'action':'answer','answer':'Rys','playerId':'other'}]:
    self.assertEqual(self.client.post('/api/patrons/gift',json=body,headers={'Authorization':'Bearer target'}).status_code,422)

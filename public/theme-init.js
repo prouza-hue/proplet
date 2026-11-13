@@ -241,11 +241,11 @@
 
   const loadExtras=async()=>{
     loadScript('/challenge-cta-v3333.js?v=result-sticker1','propletChallengeCtaV3333');
-    await loadScript('/runtime-meta.js?v=compact-controls1','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=woodpecker1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=all-resume1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
-    await loadScript('/account-auth.js?v=ui-refinement1','propletAccountAuth',{wait:true});
+    await loadScript('/account-auth.js?v=woodpecker1','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
     loadScript('/game-layout-v3330.js?v=control-side3','propletGameLayout');
     await loadScript('/app/client-diagnostics.js?v=actor-context1','propletClientDiagnostics',{wait:true});
