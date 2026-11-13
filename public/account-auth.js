@@ -221,7 +221,8 @@ async function selectProfileAvatar(value,useGoogle=false){
 function openAvatarEditor(){
  const p=profile();if(!p||avatarSaveBusy)return;ensureModals();
  $('#avatarEditMessage').textContent='';
- const avatars=knownAvatars.length?knownAvatars:[p.avatar||'🙂'];
+ const baseAvatars=knownAvatars.length?knownAvatars:[p.avatar||'🙂'];
+ const avatars=typeof window!=='undefined'&&window.PropletOrganic?window.PropletOrganic.selectableAvatars(baseAvatars):baseAvatars;
  const google=$('#profileEditGoogleAvatar'),safeUrl=typeof safeGoogleAvatarUrl==='function'?safeGoogleAvatarUrl(p.googleAvatarUrl):'';
  google.innerHTML=safeUrl?`<button type="button" id="useGoogleAvatarBtn" class="google-avatar-choice ${p.useGoogleAvatar?'selected':''}"><img src="${esc(safeUrl)}" alt="" referrerpolicy="no-referrer"><span><strong>Fotka z Googlu</strong><small>${p.useGoogleAvatar?'Používáš v Propletu':'Použít jako avatar'}</small></span></button>`:(p.googleLinked?'<div class="google-avatar-unavailable"><strong>Fotku z Googlu načteme při příštím přihlášení přes Google.</strong></div>':'');
  $('#useGoogleAvatarBtn')?.addEventListener('click',()=>selectProfileAvatar(null,true));
@@ -230,6 +231,14 @@ function openAvatarEditor(){
  grid.querySelectorAll('[data-edit-avatar]').forEach(b=>b.onclick=()=>selectProfileAvatar(b.dataset.editAvatar));
  openModal('#avatarEditModal');$('#avatarEditTitle').focus({preventScroll:true});
 }
+document.addEventListener('proplet:exclusive-avatars-changed',()=>{
+ const modal=$('#avatarEditModal');if(!modal||modal.classList.contains('hidden')||avatarSaveBusy)return;
+ if(!profile()){closeAvatarEditor();return}
+ const selected=document.activeElement?.dataset?.editAvatar;
+ openAvatarEditor();
+ if(selected){const choice=[...modal.querySelectorAll('[data-edit-avatar]')].find(b=>b.dataset.editAvatar===selected);choice?.focus({preventScroll:true});}
+});
+document.addEventListener('proplet:account-changed',()=>{knownAvatars=knownAvatars.filter(a=>a!=='datel-zdenek');const modal=$('#avatarEditModal');if(modal&&!modal.classList.contains('hidden'))closeAvatarEditor();});
 async function saveDisplayName(){
  const input=$('#displayNameInput'),msg=$('#displayNameMessage'),btn=$('#saveDisplayNameBtn'),name=String(input.value||'').trim().replace(/\s+/g,' ');msg.textContent='';if(!name){msg.textContent='Napiš, jak ti má Proplet říkat.';return}if(name.length>24){msg.textContent='Přezdívka může mít nejvýš 24 znaků.';return}btn.disabled=true;
  try{const d=await call('/api/account/display-name',{method:'POST',body:{name}}),p=profile();if(typeof updateAccountProfile==='function')updateAccountProfile({name:d.name});else if(typeof saveProfile==='function')saveProfile({...p,name:d.name});if(typeof updateProfileChip==='function')updateProfileChip();if(typeof renderProfile==='function')renderProfile();if(typeof renderLeaderboard==='function')renderLeaderboard();closeModal('#profileEditModal');toast(`✎ Teď ti říkáme ${d.name}.`)}catch(e){msg.textContent=e.message}finally{btn.disabled=false}

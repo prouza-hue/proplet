@@ -262,7 +262,7 @@
         const account = profile.hasPassword
           ? `<div class="account-banner account-ok"><strong>☁️ Účet je v cloudu</strong><span>Na dalším zařízení se přihlas jako <b>${d.esc(profile.name)}</b> svým heslem. Tým k přihlášení nepotřebuješ.</span></div>`
           : '<div class="account-banner"><strong>💻 Zapni hraní na více zařízeních</strong><span>Nastav osobní heslo. Výsledky a XP zůstanou přesně tam, kde jsou.</span><button id="setPasswordBtn" class="secondary-btn">Nastavit heslo</button></div>';
-        const avatars = d.AVATARS.map(avatar => `<button class="avatar-choice ${avatar === (profile.avatar || '🙂') ? 'selected' : ''}" data-avatar="${avatar}" aria-label="Avatar ${avatar}">${avatar}</button>`).join('');
+        const avatars = (global.PropletOrganic?.selectableAvatars(d.AVATARS) || d.AVATARS).map(avatar => `<button class="avatar-choice ${avatar === (profile.avatar || '🙂') ? 'selected' : ''}" data-avatar="${avatar}" aria-label="Avatar ${avatar}">${avatar}</button>`).join('');
         const teamAccess = inTeam
           ? `<div class="team-access-card"><div><strong>👥 ${d.esc(profile.leagueName || profile.familyCode)}</strong><span>Týmové pořadí je aktivní. PIN slouží jen jako pozvánka pro další hráče.</span></div><button id="teamPinBtn" class="secondary-btn">Nastavit PIN</button></div>`
           : '<div class="team-access-card team-empty"><div><strong>👥 Tým je volitelný</strong><span>Účet funguje i bez něj. Přidej rodinu nebo partu, až budeš chtít společné pořadí.</span></div><button id="joinTeamBtn" class="secondary-btn">Přidat tým</button></div>';
@@ -315,6 +315,7 @@
       if (!profile?.token) return false;
       try {
         const result = await d.api('/api/avatar', {method: 'POST', body: JSON.stringify({avatar, use_google_avatar: false})});
+        if (d.getProfile()?.token !== profile.token) return false;
         d.updateAccountProfile({avatar: result.avatar, useGoogleAvatar: false, googleAvatarUrl: result.googleAvatarUrl || profile.googleAvatarUrl || null});
         updateProfileChip();
         d.renderProfile();

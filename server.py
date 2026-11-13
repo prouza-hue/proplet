@@ -2142,12 +2142,16 @@ def set_password(payload: PasswordSet, request: Request, authorization: Optional
 def set_avatar(payload: AvatarSet, request: Request, authorization: Optional[str] = Header(default=None)):
     enforce_rate_limit(request, "avatar_update", limit=60, window_seconds=3600)
     player = auth_player(authorization)
+    # Check the normalized reserved identity before either the custom or Google path.
+    from backend.patron_gifts import EXCLUSIVE_AVATAR, PLAYER_ID as GIFT_PLAYER_ID
+    avatar = (payload.avatar or "").strip()[:16]
+    if avatar == EXCLUSIVE_AVATAR and str(player["id"]) != GIFT_PLAYER_ID:
+        raise HTTPException(403, "Tento osobní avatar patří jinému hráči.")
     if payload.use_google_avatar:
         if not player.get("google_avatar_url"):
             raise HTTPException(400, "Google fotka zatím není dostupná. Přihlas se znovu přes Google.")
         db_update("players", {"id": player["id"]}, {"use_google_avatar": True})
         return {"ok": True, "avatar": player.get("avatar") or "🙂", "useGoogleAvatar": True, "googleAvatarUrl": player["google_avatar_url"]}
-    avatar = (payload.avatar or "").strip()[:16]
     if not avatar:
         raise HTTPException(400, "Vyber avatar")
     db_update("players", {"id": player["id"]}, {"avatar": avatar, "use_google_avatar": False})

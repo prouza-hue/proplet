@@ -22,7 +22,7 @@ def main():
  with psycopg.connect(**opts) as c:
   if a.minimal:
    c.execute("""do $$begin if not exists(select from pg_roles where rolname='anon') then create role anon;end if;if not exists(select from pg_roles where rolname='authenticated') then create role authenticated;end if;if not exists(select from pg_roles where rolname='service_role') then create role service_role bypassrls;end if;end$$;
-   create table public.players(id uuid primary key,name text,family_code text,token_hash text,support_mode text default 'none',public_rankings boolean default true,created_at timestamptz default now()-interval '10 days');
+   create table public.players(id uuid primary key,avatar text,use_google_avatar boolean default false,google_avatar_url text,name text,family_code text,token_hash text,support_mode text default 'none',public_rankings boolean default true,created_at timestamptz default now()-interval '10 days');
    create unique index players_family_name_ci on public.players(family_code,lower(name));
    create table public.results(id uuid primary key,player_id uuid references players(id),puzzle_id text,challenge_key text,mode text check(mode in('daily','daily_special','free','starter','tajenka')),difficulty text,best_elapsed_ms integer,best_moves integer,points integer,completed_at timestamptz,unique(player_id,challenge_key));
    create table public.admin_accounts(player_id uuid primary key,role text,active boolean);
@@ -38,6 +38,7 @@ def main():
    c.execute((ROOT/'supabase/migrations/20261110110322_patron_inline_qr_source_and_engagement.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261111233353_patron_higher_receipt.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261112010000_patron_personal_gift.sql').read_text(encoding='utf8'))
+   c.execute((ROOT/'supabase/migrations/20261113122612_patron_woodpecker_delivery.sql').read_text(encoding='utf8'))
   ids=[str(uuid4()) for _ in range(4)];player,other,balanced,admin=ids
   for index,pid in enumerate(ids):c.execute('insert into public.players(id,name,family_code,token_hash,support_mode,public_rankings) values(%s,%s,%s,%s,%s,true)',(pid,'Patron SQL '+str(index),'patron-test',secrets.token_hex(32),'younger' if pid==balanced else 'none'))
   # Use the existing schema's required admin columns, if present.
@@ -340,8 +341,9 @@ def main():
     else:raise AssertionError(f'Client role can invoke {function_name}')
    c.execute('reset role')
   higher_receipt_acceptance(c,rpc,new_player,admin,opts)
-  from tools.test_patron_gifts_db import run_gift_acceptance
+  from tools.test_patron_gifts_db import run_gift_acceptance,run_delivery_acceptance
   run_gift_acceptance(opts)
+  run_delivery_acceptance(opts)
   http_acceptance(opts,new_player(),new_player(),admin)
   from tools.test_patron_manual_badge_db import run_manual_badge_acceptance
   funding_before_manual=rpc('proplet_patron_state_v1',player,False)['monthFunding']
