@@ -41,7 +41,7 @@ def run_delivery_acceptance(opts):
  from concurrent.futures import ThreadPoolExecutor
  other=str(uuid4())
  with psycopg.connect(**opts) as c:
-  c.execute("insert into public.players(id,name,family_code,token_hash,avatar,use_google_avatar,google_avatar_url) values(%s,'Delivery QA','SOLO_DELIVERY',%s,'🐶',true,'https://example.test/avatar') on conflict(id) do nothing",(PLAYER_ID,str(uuid4())))
+  c.execute("insert into public.players(id,name,family_code,token_hash,avatar,use_google_avatar,google_avatar_url) values(%s,'Delivery QA','SOLO_DELIVERY',%s,'🐶',true,'https://lh3.googleusercontent.com/a/synthetic-delivery-fixture') on conflict(id) do nothing",(PLAYER_ID,str(uuid4())))
   c.execute("insert into public.players(id,name,family_code,token_hash) values(%s,'Delivery other','SOLO_DELIVERY',%s)",(other,str(uuid4())))
   c.execute("insert into proplet_private.patron_personal_gifts(player_id,gift_id,status,answer,delivery_avatar,delivery_status) values(%s,'zdenek-personal-badge-20261112','answered','Datel',%s,'pending') on conflict(player_id) do update set status='answered',answer='Datel',delivery_avatar=excluded.delivery_avatar,delivery_status='pending',delivered_at=null",(PLAYER_ID,EXCLUSIVE_AVATAR))
   before=c.execute('select count(*) from proplet_private.patron_payments').fetchone()[0]
