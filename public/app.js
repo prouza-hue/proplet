@@ -1,5 +1,13 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.42-woodpecker1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.43-refresh-today1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
+function resetReloadEntry(){
+ if(globalThis.performance?.getEntriesByType?.('navigation')?.[0]?.type!=='reload')return;
+ const url=new URL(location.href);
+ // Launch links are one-time entry points, never the default after Refresh.
+ for(const key of ['open','play','panel','collection'])url.searchParams.delete(key);
+ history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+}
+resetReloadEntry();
 // A preview may use real player data only after its own server explicitly opts in.
 // This is a UI capability, never authorization; all server write guards remain active.
 let livePlayerPreviewEnabled=false,runtimeCapabilitiesChecked=false,runtimeCapabilitiesFlight=null;
@@ -915,7 +923,8 @@ function nav(screen,{replace=false,fromPop=false}={}){
  applyScreen(screen);
 }
 function initNavigation(){
- const initial=ROUTE_SCREENS.has(history.state?.screen)&&history.state?.proplet?history.state.screen:'daily';
+ // A new document always starts on Today; history is only for in-session Back.
+ const initial='daily';
  history.replaceState({proplet:true,screen:initial},'',location.href);applyScreen(initial);
  async function handleBack(e){
   const modal=openTransientModal();

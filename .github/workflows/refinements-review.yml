@@ -34,6 +34,7 @@ on:
       - 'tools/build_refinements_review.py'
       - 'tools/qa_refinements_review.cjs'
       - 'tools/test_rankings_navigation_browser.cjs'
+      - 'tools/test_refresh_today_browser.cjs'
       - 'tools/test_patron_compact_browser.cjs'
       - 'tools/test_patron_receipt_browser.cjs'
       - 'public/admin/**'
@@ -85,6 +86,9 @@ jobs:
       - name: Verify ranking races, scroll, focus and failures
         if: ${{ !cancelled() }}
         run: node tools/test_rankings_navigation_browser.cjs
+      - name: Verify Today entry after refresh in browser and PWA
+        if: ${{ !cancelled() }}
+        run: node tools/test_refresh_today_browser.cjs
       - name: Verify compact support dialog and payment preparation
         if: ${{ !cancelled() }}
         run: node tools/test_patron_compact_browser.cjs
@@ -104,6 +108,7 @@ jobs:
           path: |
             artifacts/refinements-review/
             artifacts/ranking-navigation/
+            artifacts/refresh-today/
             artifacts/patron-compact/
             artifacts/support-inline-qr/
             artifacts/competition-ui/

@@ -49,8 +49,8 @@ function fixture(search='',catalogAvailable=true,now='2026-11-02T12:00:00Z'){
   const root={innerHTML:'',querySelector:s=>nodes.get(s),querySelectorAll:s=>s==='[data-monthly-panel]'?panelButtons:[],addEventListener:(n,f)=>rootEvents.set(n,f)};
   const host={setAttribute(){},attachShadow:()=>root};
   let profile=null;
-  const navs=[];
-  const context={console,Intl,URLSearchParams,location:{search},navigator:{onLine:true},monthlyPreviewNow:()=>new Date(now),Date,ROUTE_SCREENS:new Set(),currentScreen:'daily',getProfile:()=>profile,fetch:async()=>{if(!catalogAvailable)throw new Error('unavailable');return {ok:true,json:async()=>approvedCatalog};},
+  const navs=[],location=new URL('https://hrajproplet.cz/'+search),history={state:{proplet:true,screen:'daily'},replaceState(state,title,url){this.state=state;location.href=new URL(url,location).href;}};
+  const context={console,Intl,URL,URLSearchParams,location,history,navigator:{onLine:true},monthlyPreviewNow:()=>new Date(now),Date,ROUTE_SCREENS:new Set(),currentScreen:'daily',getProfile:()=>profile,fetch:async()=>{if(!catalogAvailable)throw new Error('unavailable');return {ok:true,json:async()=>approvedCatalog};},
     api:(url,options)=>{calls.push({url,options});return new Promise((resolve,reject)=>pending.push({resolve,reject}));},
     nav:s=>{context.currentScreen=s;navs.push(s);documentEvents.get('proplet:screen-changed')?.({detail:{screen:s}});},
     rankingsOrchestration:()=>({openView:v=>navs.push(v)}),openProfileModal:()=>{},
@@ -60,6 +60,15 @@ function fixture(search='',catalogAvailable=true,now='2026-11-02T12:00:00Z'){
   return {context,root,nodes,pending,calls,navs,detailWrites:()=>detailWrites,open:()=>context.window.PropletMonthlyCompetition.open(),setProfile:p=>{profile=p;documentEvents.get('proplet:account-changed')?.();},click:attribute=>rootEvents.get('click')({target:{closest:()=>({hasAttribute:n=>n===attribute})}}),clickData:dataset=>{const button={...element(),dataset,hasAttribute:()=>false};rootEvents.get('click')({target:{closest:()=>button}});return button;},content:()=>nodes.get('#content').innerHTML};
 }
 (async()=>{
+  // Browsing competition views must not leave a launch instruction behind for refresh.
+  const browsing=fixture('?utm_source=refresh-check#today',true,'2026-12-02T12:00:00Z');
+  const entryUrl=browsing.context.location.href;
+  browsing.open();browsing.clickData({monthlyPanel:'awards'});await tick();
+  browsing.nodes.get('#nextMonth').onclick();await tick();
+  assert(browsing.content().includes('Král prosince'),'month navigation still changes the displayed collection');
+  browsing.clickData({monthlyPanel:'standings'});
+  browsing.context.nav('daily');
+  assert.equal(browsing.context.location.href,entryUrl,'panel/month navigation leaves no stale monthly startup URL and preserves unrelated query/hash');
   clockContext.acceptMonthlyPreviewClock({environment:'preview',monthlyPreview:qaClock});
   const offlineStamp=clockContext.resultCompletedAt();
   clockContext.puzzleDB={datedDaily:true};clockContext.datedDaily=()=>({refresh:async()=>({monthlyPreview:{...qaClock,qaNow:'2026-11-03T10:00:00Z'}})});
