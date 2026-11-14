@@ -1,0 +1,67 @@
+{
+  "testedSha": "2057013e06eafaa39c35b99a2aec1c71f13ccde0",
+  "checks": [
+    {
+      "width": 320,
+      "result": "PASS",
+      "fontFaces": [
+        1,
+        1
+      ],
+      "pageErrors": []
+    },
+    {
+      "width": 390,
+      "result": "PASS",
+      "fontFaces": [
+        1,
+        1
+      ],
+      "pageErrors": []
+    },
+    {
+      "width": 690,
+      "result": "PASS",
+      "fontFaces": [
+        1,
+        1
+      ],
+      "pageErrors": []
+    },
+    {
+      "width": 1440,
+      "result": "PASS",
+      "fontFaces": [
+        1,
+        1
+      ],
+      "pageErrors": []
+    }
+  ],
+  "screenshots": [
+    "archive-320.png",
+    "play-320.png",
+    "today-320.png",
+    "season-320.png",
+    "archive-390.png",
+    "play-390.png",
+    "today-390.png",
+    "season-390.png",
+    "archive-690.png",
+    "play-690.png",
+    "today-690.png",
+    "season-690.png",
+    "archive-1440.png",
+    "play-1440.png",
+    "today-1440.png",
+    "season-1440.png"
+  ],
+  "layoutIssues": [],
+  "productionDaily": {
+    "status": 200,
+    "dailyDate": "2026-10-08",
+    "generation": 6,
+    "bankVersion": "daily-gen6-20261007-v1",
+    "serverToday": "2026-10-08"
+  }
+}

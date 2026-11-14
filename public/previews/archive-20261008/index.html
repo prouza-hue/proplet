@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="color-scheme" content="light dark">
+<title>Archiv a měsíční soutěž · Proplet · návrh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,750;9..144,800&family=Outfit:wght@400;500;600;650;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="design.css"><script src="design.js" defer></script>
+</head>
+<body>
+<aside class="review-bar" aria-label="Ovládání návrhu">
+<span><b>Návrh k posouzení</b><span class="review-note"> · modelový účet, bez ukládání</span></span>
+<div class="review-actions"><label class="sr" for="view-select">Obrazovka návrhu</label><select id="view-select"><option value="archive">Archiv</option><option value="play">Hrát</option><option value="today">Dnes</option><option value="season">Měsíční soutěž</option></select><button data-action="archive-cta">CTA Archivu</button><button data-action="season-cta">CTA soutěže</button><button data-action="theme" aria-label="Přepnout světlý a tmavý vzhled" title="Světlý / tmavý vzhled">◐</button></div>
+</aside>
+<div class="app">
+<header class="app-header"><button class="brand" data-view="today" aria-label="Proplet – Dnes"><img src="/brand/mark.svg" width="38" height="38" alt=""><span>proplet</span></button><div class="account"><span class="xp-total">24 680 <small>XP</small></span><button class="avatar" data-action="account" aria-label="Modelový hráč Alex">A</button></div></header>
+<main id="main" tabindex="-1"></main>
+<footer class="app-footer">Každé slovo má svoje místo.</footer>
+</div>
+<nav class="bottom-nav" aria-label="Hlavní navigace"></nav>
+<dialog id="dialog" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
+<div id="toast" class="toast" role="status" hidden></div>
+</body></html>
