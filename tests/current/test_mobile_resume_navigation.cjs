@@ -56,4 +56,17 @@ async function resume(){
   // A completed saved board must no longer override the next candidate.
   saved.completed['free:'+target.id]={puzzleId:target.id};assert.equal(context.resumableFreePuzzle('hard',[other,target]),null);
 }
-(async()=>{await navigation('mk100LaunchPreview','content');await navigation('freeRefreshAnnouncement','refresh');await pwaBack();await resume();console.log('PASS: root Android Back stays native; overlays retain close ownership; hard 319 resumes without altering progress.');})().catch(error=>{console.error(error);process.exitCode=1;});
+function startup(){
+ for(const screen of ['daily','free','leaderboard','monthly','weekly','profile','archive','game']){
+  const context={window:{addEventListener(){}},history:{state:{proplet:true,screen},replaceState(state){this.state=state;}},location:{href:'https://hrajproplet.cz/'},applyScreen(value){context.screen=value;}};
+  vm.createContext(context);vm.runInContext(extract('function initNavigation(){','function transientModals(){')+'\ninitNavigation();',context);
+  assert.equal(context.screen,'daily','refresh from '+screen);assert.equal(context.history.state.screen,'daily');
+ }
+ for(const type of ['navigate','reload','back_forward']){
+  const href='https://hrajproplet.cz/?open=monthly&panel=awards&collection=2026-12&play=board&utm_source=test#anchor';
+  const context={URL,location:{href},performance:{getEntriesByType:()=>[{type}]},history:{state:{proplet:true,screen:'monthly'},replaceState(state,title,url){context.result=url;}}};
+  vm.createContext(context);vm.runInContext(extract('function resetReloadEntry(){','resetReloadEntry();')+'resetReloadEntry();',context);
+  assert.equal(context.result,type==='reload'?'/?utm_source=test#anchor':undefined,'only reload consumes launch parameters');
+ }
+}
+(async()=>{startup();await navigation('mk100LaunchPreview','content');await navigation('freeRefreshAnnouncement','refresh');await pwaBack();await resume();console.log('PASS: root Android Back stays native; overlays retain close ownership; hard 319 resumes without altering progress.');})().catch(error=>{console.error(error);process.exitCode=1;});
