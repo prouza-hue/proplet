@@ -85,7 +85,7 @@ const AVATAR_NAMES=AVATAR_MANIFEST.map(a=>a.name);
 // Printshop masters already fill the same circular viewBox; no per-character zoom layer.
 function avatarSvg(bg,body){return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="31" fill="'+bg+'"/>'+body+'</svg>'}
 const PRIVATE_AVATAR_ART=avatarSvg('#E7DDCC','<circle cx="32" cy="27" r="11" fill="#8F877B"/><path d="M13 54q2-18 19-18t19 18" fill="#8F877B"/><path d="M20 24q12-11 24 0" stroke="#F6F0DE" stroke-width="3" fill="none"/><path d="M22 44q10 7 20 0" stroke="#C66B42" stroke-width="3" fill="none" stroke-linecap="round"/>');
-const EXCLUSIVE_AVATARS=Object.freeze({'datel-zdenek':Object.freeze({name:'Datel',src:'/assets/avatars/exclusive/datel-zdenek.webp'})});
+const EXCLUSIVE_AVATARS=Object.freeze({'datel-zdenek':Object.freeze({name:'Datel',src:'/assets/avatars/exclusive/datel-zdenek-v2.webp'})});
 function exclusiveAvatar(value){return Object.hasOwn(EXCLUSIVE_AVATARS,String(value||'').trim())?EXCLUSIVE_AVATARS[String(value).trim()]:null}
 function selectableAvatars(base=LEGACY_AVATARS){
  const model=window.PropletPatrons?.model;
