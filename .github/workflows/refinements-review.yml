@@ -86,9 +86,6 @@ jobs:
       - name: Verify ranking races, scroll, focus and failures
         if: ${{ !cancelled() }}
         run: node tools/test_rankings_navigation_browser.cjs
-      - name: Verify Today entry after refresh in browser and PWA
-        if: ${{ !cancelled() }}
-        run: node tools/test_refresh_today_browser.cjs
       - name: Verify compact support dialog and payment preparation
         if: ${{ !cancelled() }}
         run: node tools/test_patron_compact_browser.cjs
@@ -108,8 +105,41 @@ jobs:
           path: |
             artifacts/refinements-review/
             artifacts/ranking-navigation/
-            artifacts/refresh-today/
             artifacts/patron-compact/
             artifacts/support-inline-qr/
             artifacts/competition-ui/
+          retention-days: 7
+
+  refresh-today-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare native shell and isolated guest fixtures
+        env:
+          VERCEL_ENV: preview
+        run: |
+          python -m pip install --disable-pip-version-check -r requirements-dev.txt
+          python tools/build_runtime_content.py --check
+          python tools/generate_puzzles_bootstrap.py
+          python tools/build_archive_experience.py
+          python tools/build_bonus_recognition.py --check
+      - name: Install browser test runtime
+        run: |
+          npm install --prefix "$RUNNER_TEMP/proplet-refresh-browser" --no-save playwright@1.51.1
+          "$RUNNER_TEMP/proplet-refresh-browser/node_modules/.bin/playwright" install --with-deps chromium
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/proplet-refresh-browser/node_modules/playwright" >> "$GITHUB_ENV"
+      - name: Verify Today entry and preserved progress after browser and PWA refresh
+        run: node tools/test_refresh_today_browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: refresh-today-browser
+          path: artifacts/refresh-today/
           retention-days: 7
