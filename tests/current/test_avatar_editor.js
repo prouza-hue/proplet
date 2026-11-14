@@ -35,7 +35,7 @@ const organicContext={document:{createElement:()=>avatarElement()},window:{},get
 vm.createContext(organicContext);vm.runInContext(organic.slice(organic.indexOf('const LEGACY_AVATARS='),organic.indexOf('function emblemSpec(')),organicContext);
 const renderer=organicContext.window.PropletOrganic;
 const publicAvatar=renderer.avatarNode('datel-zdenek');
-assert.equal(publicAvatar.children[0].src,'/assets/avatars/exclusive/datel-zdenek.webp');assert.equal(publicAvatar.dataset.avatarCategory,'exclusive');
+assert.equal(publicAvatar.children[0].src,'/assets/avatars/exclusive/datel-zdenek-v2.webp');assert.equal(publicAvatar.dataset.avatarCategory,'exclusive');
 assert(!renderer.selectableAvatars(['🙂','datel-zdenek']).includes('datel-zdenek'));
 organicContext.window.PropletPatrons={model:{authenticated:true,exclusiveAvatars:['datel-zdenek','unrecognized-token']}};
 assert.deepEqual(Array.from(renderer.selectableAvatars(['🙂'])),['🙂','datel-zdenek']);

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "assets": [
-    "/assets/avatars/exclusive/datel-zdenek.webp",
+    "/assets/avatars/exclusive/datel-zdenek-v2.webp",
     "/account-auth.js?v=woodpecker1",
     "/account-bonus-v3331.js?v=monthly-releaseprep6",
     "/account-conversion-v3331.css?v=ui-refinement1",
@@ -13,7 +13,7 @@
     "/app/client-diagnostics.js?v=3",
     "/app/content/free-expansion-release.js?v=1",
     "/app/monthly/competition.js?v=competition-ui1",
-    "/app/patrons.js?v=woodpecker1",
+    "/app/patrons.js?v=woodpecker-contrast1",
     "/app/rankings/rankings.js?v=recurring-patron1",
     "/app/weekly/competition.js?v=resource1",
     "/assets/hints/printshop/bonus-words-v1.webp",

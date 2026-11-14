@@ -143,7 +143,7 @@ async function avatarInfoLifecycle(){
  assert.equal(await delivery.show({isCurrent:()=>false}),false);
  assert.equal(await delivery.show({isCurrent:()=>true}),true);
  assert.match(nodes.get('#patronDialog').innerHTML,/Nasadit datla/);
- assert.match(nodes.get('#patronDialog').innerHTML,/datel-zdenek.webp/);
+ assert.match(nodes.get('#patronDialog').innerHTML,/datel-zdenek-v2.webp/);
  assert.equal(delivery.eligible(),false);
  window.PropletPatrons.close();
  // Live disable must remove previously rendered support and bank details with no write.

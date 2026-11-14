@@ -85,9 +85,9 @@ for(const [width,height,label] of [[390,844,'mobile'],[690,829,'fold-wide']])for
  assert.match(await deliveryPage.locator('.patron-gift-letter').innerText(),/datel je připravený a máš ho na výběr jenom ty/);
  assert.match(await deliveryPage.locator('.patron-gift-letter').innerText(),/Ať tě Proplet baví i nadále!/);
  await deliveryPage.waitForFunction(()=>{const img=document.querySelector('.patron-delivery-art img');return img?.complete&&img.naturalWidth>0});
- assert.equal(await deliveryPage.locator('.patron-delivery-art img').getAttribute('src'),'/assets/avatars/exclusive/datel-zdenek.webp');
- await deliveryPage.locator('#avatarSamples .leader-avatar img[src="/assets/avatars/exclusive/datel-zdenek.webp"]').waitFor({state:'attached'});
- await deliveryPage.locator('#avatarSamples .leader-name img[src="/assets/avatars/exclusive/datel-zdenek.webp"]').waitFor({state:'attached'});
+ assert.equal(await deliveryPage.locator('.patron-delivery-art img').getAttribute('src'),'/assets/avatars/exclusive/datel-zdenek-v2.webp');
+ await deliveryPage.locator('#avatarSamples .leader-avatar img[src="/assets/avatars/exclusive/datel-zdenek-v2.webp"]').waitFor({state:'attached'});
+ await deliveryPage.locator('#avatarSamples .leader-name img[src="/assets/avatars/exclusive/datel-zdenek-v2.webp"]').waitFor({state:'attached'});
  const deliveryGeometry=await deliveryPage.locator('#patronDialog').evaluate(d=>({scrollWidth:d.scrollWidth,clientWidth:d.clientWidth,rect:d.getBoundingClientRect().toJSON()}));
  assert(deliveryGeometry.scrollWidth<=deliveryGeometry.clientWidth+1,'delivery dialog has no horizontal overflow');
  assert(deliveryGeometry.rect.top>=0&&deliveryGeometry.rect.bottom<=height+1,'delivery dialog fits viewport');
@@ -98,14 +98,14 @@ for(const [width,height,label] of [[390,844,'mobile'],[690,829,'fold-wide']])for
  if(equip){
   assert.deepEqual(await deliveryPage.evaluate(()=>__profileUpdates.at(-1)),{avatar:'datel-zdenek',useGoogleAvatar:false});
   assert.equal(await deliveryPage.evaluate(()=>getProfile().useGoogleAvatar),false);
-  await deliveryPage.locator('#profileChipAvatar img[src="/assets/avatars/exclusive/datel-zdenek.webp"]').waitFor();
+  await deliveryPage.locator('#profileChipAvatar img[src="/assets/avatars/exclusive/datel-zdenek-v2.webp"]').waitFor();
  }else assert.equal(await deliveryPage.evaluate(()=>__profileUpdates.length),0,'later must not change avatar or Google-photo choice');
  await deliveryPage.evaluate(()=>PropletPatrons.refresh());
  assert.equal(await deliveryPage.evaluate(()=>PropletOrganic.selectableAvatars(['🙂']).includes('datel-zdenek')),true,'both choices retain entitlement in avatar picker');
  assert.equal(await deliveryPage.evaluate(()=>__announcements.get('patron-personal-avatar-v1').eligible()),false);
  await deliveryPage.evaluate(async()=>{__status.exclusiveAvatars=[];__status.personalGift=null;__profileOverrides={};__account='ordinary-player';document.dispatchEvent(new Event('proplet:account-changed'));await PropletPatrons.refresh()});
  assert.equal(await deliveryPage.evaluate(()=>PropletOrganic.selectableAvatars(['🙂','datel-zdenek']).includes('datel-zdenek')),false,'account switch removes captured exclusive choices');
- assert.equal(await deliveryPage.locator('#avatarSamples .leader-avatar img[src="/assets/avatars/exclusive/datel-zdenek.webp"]').count(),1,'other players still see public avatar');
+ assert.equal(await deliveryPage.locator('#avatarSamples .leader-avatar img[src="/assets/avatars/exclusive/datel-zdenek-v2.webp"]').count(),1,'other players still see public avatar');
  results.push({label,mode,delivery:deliveryGeometry,action:equip?'equip':'delivery_later'});await deliveryContext.close();
 }
 // Request payload and lifecycle tests use the actual DOM and native amount validation.

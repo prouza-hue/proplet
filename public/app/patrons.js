@@ -95,7 +95,7 @@
     '<div class="patron-pending"><span class="patron-pending-dot"></span><p>'+'QR je připravené, platba zatím není potvrzená. Značku přidáme až po ověření příchozího převodu. Hledáme ho podle variabilního symbolu, ne podle přezdívky.'+'</p></div><button class="primary-btn patron-primary" data-close>Zpátky do hry</button>';
   }else if(model.step==='gift-delivery'){
    const paragraphs=model.personalGift?.delivery?.paragraphs||[];
-   content='<div class="patron-delivery-art"><img src="/assets/avatars/exclusive/datel-zdenek.webp" width="144" height="144" alt="Tvůj osobní avatar datla"></div>'+
+   content='<div class="patron-delivery-art"><img src="/assets/avatars/exclusive/datel-zdenek-v2.webp" width="144" height="144" alt="Tvůj osobní avatar datla"></div>'+
     '<h2 id="patronTitle" tabindex="-1">'+esc(paragraphs[0]||'Tvůj datel je tady.')+'</h2><div class="patron-gift-letter">'+paragraphs.slice(1).map(p=>'<p>'+esc(p)+'</p>').join('')+'<p>— Pavel</p></div>'+
     '<button class="primary-btn patron-primary" data-gift-equip '+(giftSaving?'disabled':'')+'>'+(giftSaving?'Ukládám…':'Nasadit datla')+'</button><button class="text-btn patron-dismiss" data-gift-delivery-later '+(giftSaving?'disabled':'')+'>Vyberu si ho později</button>';
   }else if(model.step==='gift'){
