@@ -20,11 +20,12 @@ def read(name):
 
 def select(name, changed, event='pull_request', base_missing=True, fetch_error=None):
     source = read(name)
-    patterns = json.loads(re.search(r'SCOPED_PATHS: >-\n\s+(\[[^\n]+\])', source)[1])
+    scope_key, raw_patterns = re.search(r'(SCOPED_PATHS|DOCUMENTATION_PATHS): >-\n\s+(\[[^\n]+\])', source).groups()
+    patterns = json.loads(raw_patterns)
     script = textwrap.dedent(re.search(r'        shell: python\n        run: \|\n(.*?)(?=\n  [a-z])', source, re.S)[1])
     with tempfile.TemporaryDirectory() as directory:
         output = Path(directory) / 'output'
-        with patch.dict(os.environ, {'SCOPED_PATHS': json.dumps(patterns), 'EVENT_NAME': event,
+        with patch.dict(os.environ, {scope_key: json.dumps(patterns), 'EVENT_NAME': event,
                                     'BASE_SHA': 'test-base', 'GITHUB_OUTPUT': str(output)}), \
              patch.object(subprocess, 'check_output', return_value=('\0'.join(changed) + '\0').encode()) as git, \
              patch.object(subprocess, 'run', return_value=SimpleNamespace(returncode=int(base_missing))) as exists, \
@@ -46,6 +47,14 @@ def select(name, changed, event='pull_request', base_missing=True, fetch_error=N
 
 
 class CIResourcePolicy(unittest.TestCase):
+    def test_runtime_gate_skips_only_plain_documentation(self):
+        name = 'current-runtime.yml'
+        self.assertFalse(select(name, ['README.md', 'docs/audit/results.md']))
+        for path in ['docs/SUPABASE_MIGRATION_MANIFEST.md', 'public/readme.md', 'backend/db.py',
+                     'tools/quality.cjs', '.github/workflows/current-runtime.yml']:
+            with self.subTest(path=path):
+                self.assertTrue(select(name, ['README.md', path]))
+
     def test_monthly_skips_presentation_but_retains_all_database_dependencies(self):
         for path in ['public/app/monthly/competition.js', 'public/monthly-competition.css',
                      'public/ranking-navigation.css', 'public/rewards/monthly/2026-11/king.webp',
@@ -88,7 +97,8 @@ class CIResourcePolicy(unittest.TestCase):
                 select(name, ['docs/only.md'], fetch_error=subprocess.CalledProcessError(128, 'git fetch'))
 
     def test_required_job_names_complete_or_fail_closed_not_pending(self):
-        for name, job in [('monthly-competition.yml', 'database'), ('v334-calibration.yml', 'gen4-contract')]:
+        for name, job in [('monthly-competition.yml', 'database'), ('v334-calibration.yml', 'gen4-contract'),
+                          ('current-runtime.yml', 'current-runtime'), ('current-runtime.yml', 'isolated-result-database')]:
             source = read(name)
             trigger = source[source.index('  pull_request:'):source.index('permissions:')]
             self.assertNotIn('paths:', trigger)
