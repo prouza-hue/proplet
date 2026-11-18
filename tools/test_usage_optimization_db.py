@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 import server
 from backend import postgres_rpc
+from word_discovery_concurrency import check_word_discovery_race
 
 
 def main():
@@ -117,6 +118,9 @@ def main():
             print('PASS guard quotas, revocation, service-only grants, ranking privacy and all statistics fields')
         finally:
             c.execute('rollback')
+
+    for recovered in (False, True):
+        check_word_discovery_race(options, recovered=recovered)
 
 
 if __name__=='__main__':
