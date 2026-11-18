@@ -25,7 +25,13 @@ async function today(page,label){
 }
 async function progressSurvives(){
  const ctx=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
- await ctx.addInitScript(()=>{document.addEventListener('proplet:ready',()=>window.__refreshBootReady=true,{once:true});localStorage.setItem('proplet-v3-7-required-onboarding','done');});
+ await ctx.addInitScript(()=>{
+  document.addEventListener('proplet:ready',()=>window.__refreshBootReady=true,{once:true});
+  for(const key of ['proplet-v3-7-required-onboarding','proplet-v3-16-2-helper-onboarding'])localStorage.setItem(key,'done');
+  localStorage.setItem('proplet-v3-16-2-helper-mode','none');
+  localStorage.setItem('proplet-v3-32-8-rule-principle-seen','1');
+  localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.now()}));
+ });
  const page=await ctx.newPage();page.setDefaultTimeout(20000);
  await page.route('**/*',route=>new URL(route.request().url()).origin===new URL(base).origin?route.continue():route.abort());
  await page.goto(base,{waitUntil:'domcontentloaded'});await ready(page);
@@ -97,8 +103,8 @@ async function run(viewport,standalone){
  }
  const health=await fetch(base+'/api/health').then(r=>r.json());assert(health.isolatedFixture&&health.database===false);
  browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
- if(!process.env.REFRESH_PROGRESS_ONLY)for(const viewport of [{width:390,height:844},{width:768,height:1000}])for(const standalone of [false,true])await run(viewport,standalone);
  await progressSurvives();
+ if(!process.env.REFRESH_PROGRESS_ONLY)for(const viewport of [{width:390,height:844},{width:768,height:1000}])for(const standalone of [false,true])await run(viewport,standalone);
  assert.deepEqual(errors,[],'browser exceptions');
  fs.writeFileSync(path.join(artifacts,process.env.REFRESH_PROGRESS_ONLY?'progress-report.json':'report.json'),JSON.stringify({ok:true,checks,errors},null,2));
  console.log('PASS refresh Today browser: '+checks.join('; '));
