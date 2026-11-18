@@ -29,12 +29,20 @@ async function progressSurvives(){
  const page=await ctx.newPage();page.setDefaultTimeout(20000);
  await page.route('**/*',route=>new URL(route.request().url()).origin===new URL(base).origin?route.continue():route.abort());
  await page.goto(base,{waitUntil:'domcontentloaded'});await ready(page);
+ await page.locator('.bottom-nav [data-nav="free"]').click();
+ await page.locator('#difficultyCards [data-play-free="easy"]').click();
+ await page.waitForFunction(()=>currentScreen==='game'&&currentGame?.mode==='free'&&gameElapsed(currentGame)>=1000);
  const saved=await page.evaluate(()=>{
-  const puzzle=puzzleDB.free.easy[0],key=challengeKey('free',puzzle,null),state=getState();
-  const answer=puzzle.answers[0];
-  const progress={puzzleId:puzzle.id,mode:'free',difficulty:'easy',dailyDate:null,found:[{answerIndex:0,word:answer.word,colorIndex:0,path:[...answer.path]}],moves:1,hints:0,wrongAttempts:0,maxHintLevel:0,cleanSolve:true,elapsedMs:12000,savedAt:Date.now()};
-  state.inProgress=state.inProgress||{};state.inProgress[key]=progress;saveState(state);nav('game');return {key,progress};
+  const puzzle=currentGame.puzzle;
+  currentGame.path=[...puzzle.answers[0].path];
+  submitPath();
+  pauseGameClock('background');
+  const key=challengeKey('free',puzzle,null);
+  return {key,progress:getState().inProgress[key]};
  });
+ assert.equal(saved.progress.found.length,1,'a word and its path were saved');
+ assert.equal(saved.progress.moves,1,'the submitted move was recorded');
+ assert.ok(saved.progress.elapsedMs>=1000,'the saved game has elapsed time');
  await page.reload({waitUntil:'domcontentloaded'});await ready(page);await today(page,'saved game refresh');
  assert.deepEqual(await page.evaluate(key=>getState().inProgress[key],saved.key),saved.progress,'refresh preserves found word/path, moves and elapsed time');
  checks.push('Saved free-game progress survives refresh unchanged');await ctx.close();

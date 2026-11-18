@@ -54,6 +54,9 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  if(!await page.locator('#freeOrderSettings details').evaluate(el=>el.open))await page.locator('#freeOrderSettings summary').click();
  await page.locator('#freeOrder-easy').selectOption('numeric');await page.waitForFunction(()=>freeOrder().record('easy').mode==='numeric');
  await page.evaluate(()=>nav('free'));await page.reload({waitUntil:'domcontentloaded'});
+ await page.locator('#screen-daily').waitFor({state:'visible'});
+ check('reload opens Today',await page.locator('.bottom-nav [data-nav="daily"]').evaluate(el=>el.classList.contains('active')));
+ await page.locator('.bottom-nav [data-nav="free"]').click();
  await page.waitForFunction(()=>document.querySelector('#freeOrderSettings')&&document.querySelectorAll('#difficultyCards [data-play-free]').length===6&&freeOrder().record('easy').mode==='numeric');
  check('reload retains the preference and the original unfinished board',await page.evaluate(id=>freeOrder().record('easy').mode==='numeric'&&freeProgress('easy').resume?.id===id&&document.querySelector('#difficultyCards [data-play-free="easy"]').textContent.includes('Pokračovat'),saved.id));
  await page.locator('#difficultyCards [data-play-free="easy"]').click();await verifyResume('Reload and changed-order resume',saved);
