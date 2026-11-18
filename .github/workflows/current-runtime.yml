@@ -24,22 +24,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - '**/*.py'
-      - 'content/**'
-      - 'data/**'
-      - 'public/**'
-      - 'vercel.json'
-      - 'requirements*.txt'
-      - 'SUPABASE*.sql'
-      - 'supabase/**'
-      - 'docs/SUPABASE_MIGRATION_MANIFEST.md'
-      - 'tests/current/**'
-      - 'tests/round3/**'
-      - 'tools/test_current.py'
-      - 'tools/validate_migration_manifest.py'
-      - 'tools/test_weekly_team_victories_scheduler.py'
-      - '.github/workflows/current-runtime.yml'
   workflow_dispatch:
 
 permissions:
@@ -50,10 +34,49 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      relevant: ${{ steps.scope.outputs.relevant }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - id: scope
+        name: Select runtime and database checks
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          DOCUMENTATION_PATHS: >-
+            ["README.md", "CHANGELOG.md", "CONTRIBUTING.md", "docs/*.md"]
+        shell: python
+        run: |
+          import fnmatch, json, os, subprocess
+          patterns = json.loads(os.environ['DOCUMENTATION_PATHS'])
+          if os.environ['EVENT_NAME'] != 'pull_request':
+              relevant = True
+          else:
+              base = os.environ['BASE_SHA']
+              if subprocess.run(['git', 'cat-file', '-e', base + '^{commit}'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False).returncode:
+                  subprocess.check_call(['git', 'fetch', '--no-tags', '--depth=1', 'origin', base])
+              changed = subprocess.check_output(['git', 'diff', '--name-only', '--no-renames', '-z', os.environ['BASE_SHA'], 'HEAD']).decode().split('\0')
+              relevant = any(
+                  path == 'docs/SUPABASE_MIGRATION_MANIFEST.md'
+                  or not any(fnmatch.fnmatchcase(path, pattern) for pattern in patterns)
+                  for path in changed if path
+              )
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('relevant=' + str(relevant).lower() + '\n')
+
   current-runtime:
+    needs: changes
+    if: ${{ always() && (needs.changes.result != 'success' || needs.changes.outputs.relevant == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - name: Require successful scope classification
+        if: ${{ needs.changes.result != 'success' }}
+        run: exit 1
       - name: Checkout branch
         uses: actions/checkout@v4
 
@@ -74,6 +97,8 @@ jobs:
           node tests/round3/test_transition.cjs
 
   isolated-result-database:
+    needs: changes
+    if: ${{ always() && (needs.changes.result != 'success' || needs.changes.outputs.relevant == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     services:
@@ -89,6 +114,9 @@ jobs:
           --health-cmd "pg_isready -U proplet_test_admin -d postgres"
           --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
+      - name: Require successful scope classification
+        if: ${{ needs.changes.result != 'success' }}
+        run: exit 1
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
