@@ -168,6 +168,7 @@ def db_select(
     /,
     *,
     columns: str = "*",
+    paginate: bool = False,
     **filters,
 ):
     requester = request_fn or db_request
@@ -177,7 +178,7 @@ def db_select(
             params[key] = f"eq.{value}"
     # Account history must be complete: PostgREST otherwise silently caps reads.
     # Keep point lookups and public/bounded ranking queries unchanged.
-    if table in {"results", "account_rewards", "streak_rescues"} and set(params) == {"select", "player_id"}:
+    if paginate or (table in {"results", "account_rewards", "streak_rescues"} and set(params) == {"select", "player_id"}):
         params.update({"order": "id.asc", "limit": "1000"})
         rows = []
         while True:

@@ -287,8 +287,8 @@ def db_request(method: str, table: str, *, params=None, body=None, prefer=None):
     )
 
 
-def db_select(table: str, *, columns: str = "*", **filters):
-    return backend_db.db_select(table, db_request, columns=columns, **filters)
+def db_select(table: str, *, columns: str = "*", paginate: bool = False, **filters):
+    return backend_db.db_select(table, db_request, columns=columns, paginate=paginate, **filters)
 
 
 def db_select_all(table: str, **filters):
@@ -1865,7 +1865,7 @@ def get_free_order(request: Request, authorization: Optional[str] = Header(defau
     player = auth_player(authorization)
     rows = db_select("player_free_order", player_id=player["id"])
     resumes = {}
-    sessions = db_select("play_sessions", player_id=player["id"], mode="free", finished=False)
+    sessions = db_select("play_sessions", columns="puzzle_id,last_seen", player_id=player["id"], mode="free", finished=False)
     for session in sorted(sessions, key=lambda r: str(r.get("last_seen") or "")):
         info = free_puzzle_info(session["puzzle_id"])
         if info and info["difficulty"] in FREE_DIFFICULTIES:
@@ -2475,7 +2475,11 @@ def completion_discovery_rewards(player_id: str, completed: list[dict]) -> list[
     """Decorate result history with earned discovery XP, without changing its ledger."""
     if not completed:
         return completed
-    rewards = db_select("account_rewards", columns="id,puzzle_id,reward_key,points,granted_at", player_id=player_id)
+    # A one-board delta only needs that board's rewards. Full sync still reads
+    # the ledger once, and both paths follow the id cursor to the final page.
+    puzzle_id = completed[0].get("puzzleId") if len(completed) == 1 else None
+    rewards = db_select("account_rewards", columns="id,puzzle_id,reward_key,points,granted_at",
+                        player_id=player_id, puzzle_id=puzzle_id, paginate=True)
     by_puzzle = {}
     for reward in rewards:
         if str(reward.get("reward_key") or "").startswith("word_discovery_v1:"):
