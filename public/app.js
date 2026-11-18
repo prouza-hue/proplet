@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.45-runtime-efficiency1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.46-monday-five1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 function resetReloadEntry(){
  if(globalThis.performance?.getEntriesByType?.('navigation')?.[0]?.type!=='reload')return;
