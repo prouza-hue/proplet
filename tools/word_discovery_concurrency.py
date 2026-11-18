@@ -14,14 +14,16 @@ from word_recognition_v3330 import install_word_recognition
 
 
 def device(connection, player, board):
-    def select(table, *, columns, player_id):
+    def select(table, *, columns, player_id, reward_key=None):
         assert table == "account_rewards" and player_id == player
         projection = sql.SQL(",").join(map(sql.Identifier, columns.split(",")))
+        predicate = sql.SQL(" and reward_key = %s") if reward_key is not None else sql.SQL("")
+        params = (player, reward_key) if reward_key is not None else (player,)
         query = sql.SQL(
             "select row_to_json(r) as row from (select {} from public.account_rewards "
-            "where player_id = %s order by id) r"
-        ).format(projection)
-        return [r["row"] for r in connection.execute(query, (player,))]
+            "where player_id = %s{} order by id) r"
+        ).format(projection, predicate)
+        return [r["row"] for r in connection.execute(query, params)]
 
     def rpc(name, payload):
         assert name == "proplet_claim_word_discovery"
