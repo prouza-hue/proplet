@@ -109,3 +109,28 @@ const tajenka=new Element(),tajenkaPlay=new Element('button'),tajenkaRecap=new E
 for(const state of [{daily:'before',special:false,done:false},{daily:'before',special:true,done:false},{daily:'complete',special:true,done:true},{daily:'complete',special:false,done:true}]){hero.dataset.studioState=state.daily;hero.classList.toggle('daily-special-selected',state.special);tajenka.classList.toggle('completed',state.done);extra.hidden=false;repaint();assert(rendered('tajenka'),'Today retains Tajenka with Extra, free resume and completed variants');rendered('tajenka').click();}
 assert.equal(tajenkaActions,4,'all variants keep their native start/resume/result target');
 console.log('PASS Today Tajenka remains reachable with Extra, resume and all-complete layouts');
+
+// Account hydration can publish or retire the weekly entry while Today stays open.
+const newsBanner=new Element(),newsAction=new Element('button');
+newsBanner.id='todayNewContentBanner';newsAction.id='playTodayNewContentBtn';
+screen.append(newsBanner);newsBanner.append(newsAction);
+const newsSelector='#todayNewContentBanner #playTodayNewContentBtn';
+selectors.set(newsSelector,newsAction);
+let newsStarts=0,freeResumes=0;
+newsAction.onclick=()=>newsStarts++;resumeCard.onclick=()=>freeResumes++;
+const bannerChanged=()=>screenObserver.callback([{type:'childList',target:newsBanner}]);
+body.classList.add('account-progress-pending');bannerChanged();flushFrames();
+const weeklyTile=rendered('monday-five');
+assert(weeklyTile.disabled,'weekly entry waits for verified account history');
+weeklyTile.click();assert.equal(newsStarts,0);
+body.classList.toggle('account-progress-pending',false);
+observers.find(o=>o.targets.includes(body)).callback();flushFrames();
+assert.equal(rendered('free'),undefined,'the weekly entry takes the free/resume slot');
+assert.equal(weeklyTile.disabled,false);weeklyTile.click();assert.equal(newsStarts,1);
+// The native renderer has just learned that all boards are completed.
+newsAction.remove();selectors.delete(newsSelector);newsBanner.classList.add('hidden');
+weeklyTile.click();assert.equal(newsStarts,1,'obsolete entry cannot start another weekly board');
+bannerChanged();flushFrames();
+assert.equal(rendered('monday-five'),undefined);assert.equal(weeklyTile.isConnected,false);
+rendered('free').click();assert.equal(freeResumes,1,'the original free-game resume action returns');
+console.log('PASS Today weekly entry follows account hydration and completion without navigation');

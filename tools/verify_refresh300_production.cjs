@@ -61,6 +61,21 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  check('reload retains the preference and the original unfinished board',await page.evaluate(id=>freeOrder().record('easy').mode==='numeric'&&freeProgress('easy').resume?.id===id&&document.querySelector('#difficultyCards [data-play-free="easy"]').textContent.includes('Pokračovat'),saved.id));
  await page.locator('#difficultyCards [data-play-free="easy"]').click();await verifyResume('Reload and changed-order resume',saved);
  await page.evaluate(()=>nav('daily'));saved=await readSaved();
+ // A published, unfinished batch owns the Today slot even with a saved free game.
+ // Seed a current batch so this remains reproducible between Monday releases.
+ const weeklyIds=await page.evaluate(()=>{
+  const levels=sortedFreeBank('medium').slice(0,5).map(({id,difficulty})=>({id,difficulty}));
+  puzzleDB.contentStatus={...puzzleDB.contentStatus,latestBatch:{id:'qa-monday',availableFrom:pragueDateISO(),count:5,levels}};
+  renderDaily();return levels.map(p=>p.id);
+ });
+ const todayNews=page.locator('#oneScreenToday [data-os-key="monday-five"]');
+ await todayNews.waitFor({state:'visible'});
+ check('published weekly batch takes priority over free resume',await todayNews.isEnabled()&&await page.locator('#oneScreenToday [data-os-key="free"]').count()===0);
+ await page.evaluate(ids=>{
+  const state=getState();
+  for(const id of ids)state.completed['free:'+id]={puzzleId:id,mode:'free',difficulty:'medium',completedAt:new Date().toISOString(),points:DIFF.medium.xp};
+  saveState(state);renderDaily();
+ },weeklyIds);
  const todayResume=page.locator('#oneScreenToday [data-os-key="free"]');
  await page.waitForFunction(()=>document.querySelector('#oneScreenToday [data-os-key="free"]')?.textContent.includes('Rozehráno'));
  check('Today exposes its native resume through the visible tile',await todayResume.isVisible()&&(await todayResume.getAttribute('aria-label')).includes('Snadná'));
@@ -69,7 +84,7 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  if(!await page.locator('#freeOrderSettings details').evaluate(el=>el.open))await page.locator('#freeOrderSettings summary').click();
  await page.locator('#freeOrder-easy').selectOption('varied');await page.waitForFunction(()=>freeOrder().record('easy').mode==='varied');await page.evaluate(()=>nav('free'));
  // Fixture: completed results for every difficulty, no unfinished board.
- await page.evaluate(()=>{const state=getState();state.inProgress={};for(const diff of Object.keys(DIFF)){const p=sortedFreeBank(diff)[0];state.completed['free:'+p.id]={puzzleId:p.id,mode:'free',difficulty:diff,level:p.meta.level,contentGeneration:p.meta.contentGeneration||4,elapsedMs:125000,moves:25,hintsUsed:0,cleanSolve:true,points:DIFF[diff].xp,completedAt:new Date().toISOString()}}saveState(state);currentGame=null;nav('free')});
+ await page.evaluate(()=>{const state=getState();state.inProgress={};state.completed={};for(const diff of Object.keys(DIFF)){const p=sortedFreeBank(diff)[0];state.completed['free:'+p.id]={puzzleId:p.id,mode:'free',difficulty:diff,level:p.meta.level,contentGeneration:p.meta.contentGeneration||4,elapsedMs:125000,moves:25,hintsUsed:0,cleanSolve:true,points:DIFF[diff].xp,completedAt:new Date().toISOString()}}saveState(state);currentGame=null;nav('free')});
  check('finished games leave no stale resume on either tab',await page.locator('#homeResumeCard,#freeResumeCard').count()===0&&await page.locator('#difficultyCards [data-play-free]').filter({hasText:'Pokračovat'}).count()===0);
  for(const theme of ['light','dark'])for(const width of [320,390,690,1440]){
   await page.setViewportSize({width,height:900});await page.evaluate(theme=>document.documentElement.dataset.theme=theme,theme);
