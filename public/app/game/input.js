@@ -54,10 +54,10 @@ function create(deps={}){
     el.setAttribute('aria-hidden','true');el.innerHTML='<div class="touch-magnifier-grid"></div>';dock.appendChild(el);return el;
   }
 
-  function renderMagnifier(centerIndex){
+  function renderMagnifier(centerIndex,el){
     const game=getGame();if(!game||centerIndex==null)return false;
     const p=game.puzzle,mask=new Set(p.mask),row=Math.floor(centerIndex/p.cols),col=centerIndex%p.cols,
-      root=ensureMagnifier(),grid=root?.querySelector('.touch-magnifier-grid'),cells=[],backIndex=game.path.length>1?game.path.at(-2):null;
+      root=el||ensureMagnifier(),grid=root?.querySelector('.touch-magnifier-grid'),cells=[],backIndex=game.path.length>1?game.path.at(-2):null;
     if(!grid)return false;
     for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
       if(Math.abs(dr)+Math.abs(dc)>1){cells.push('<span class="touch-mag-cell void"></span>');continue}
@@ -74,16 +74,22 @@ function create(deps={}){
   function showMagnifier(centerIndex){
     if(!magnifierEnabled()){hideMagnifier();return false}
     const el=ensureMagnifier();if(!el)return false;
-    renderMagnifier(centerIndex);
+    renderMagnifier(centerIndex,el);
     el.classList.remove('hidden');return true;
   }
   function currentWord(){const game=getGame();return game?.path?.map(i=>game.puzzle.letters[i]).join('')||''}
   function extendPath(index){
     const game=getGame();if(!game)return false;
     const path=game.path,last=path.at(-1);if(index===last)return false;
-    if(path.length>1&&index===path.at(-2)){path.pop();updateActive();renderMagnifier(path.at(-1));return true}
-    if(game.used.has(index)||path.includes(index)||!neighbours(last).includes(index))return false;
-    path.push(index);fx('step');updateActive();renderMagnifier(index);return true;
+    if(path.length>1&&index===path.at(-2))path.pop();
+    else{
+      if(game.used.has(index)||path.includes(index)||!neighbours(last).includes(index))return false;
+      path.push(index);fx('step');
+    }
+    updateActive();
+    const magnifier=query('#touchMagnifier');
+    if(magnifier&&!magnifier.classList.contains('hidden'))renderMagnifier(index,magnifier);
+    return true;
   }
   function samplePointer(x,y){
     const game=getGame();if(!game?.dragging)return false;
