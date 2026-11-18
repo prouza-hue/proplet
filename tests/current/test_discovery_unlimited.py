@@ -21,8 +21,11 @@ def rpc(name, params):
     key = 'word_discovery_v1:board-a:stáj'
     rows.append({'reward_key': key, 'points': 1, 'granted_at': datetime.now(TZ).isoformat(), 'reward_type': 'word_discovery'})
     return [{'newly_granted': True, 'awarded_points': 1, 'reason': 'granted', 'reward_key': key}]
+def select(_table, *, reward_key=None, **_kwargs):
+    return [row for row in rows if reward_key is None or row["reward_key"] == reward_key]
+
 app = FastAPI()
-install_word_recognition(app,db_select=lambda *a,**k:rows,db_rpc=rpc,auth_player=auth,tz=TZ,
+install_word_recognition(app,db_select=select,db_rpc=rpc,auth_player=auth,tz=TZ,
                          resolved_puzzle=lambda *a:puzzle,puzzle_exists=lambda *a:True)
 client = TestClient(app)
 headers = {'Authorization':'Bearer synthetic'}
