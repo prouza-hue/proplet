@@ -89,9 +89,13 @@ def rpc(name, params):
              "reason": "granted", "reward_key": key}]
 
 
+def select(_table, *, player_id, reward_key=None, **_kwargs):
+    return [row for row in rows[player_id] if reward_key is None or row["reward_key"] == reward_key]
+
+
 app = FastAPI()
 words.install_word_recognition(
-    app, db_select=lambda _table, **kw: rows[kw["player_id"]], db_rpc=rpc,
+    app, db_select=select, db_rpc=rpc,
     auth_player=auth, tz=tz,
     puzzle_exists=lambda puzzle, mode, difficulty: puzzle in boards and mode == "free" and difficulty == "easy",
     resolved_puzzle=lambda puzzle, *_: boards[puzzle],

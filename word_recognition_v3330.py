@@ -434,9 +434,17 @@ def install_word_recognition(
             raise HTTPException(400, "Slovo neodpovídá platné vedlejší cestě této desky")
 
         reward_key = _discovery_reward_key(payload.puzzle_id, normalized)
-        loaded_state = reward_state(player["id"])
-        _rows, existing_keys = loaded_state
-        if reward_key in existing_keys:
+        simulated = str(vercel_env or "").strip().lower() == "preview" and live_player_preview is not True
+        loaded_state = None
+        if simulated:
+            loaded_state = reward_state(player["id"])
+            already_granted = reward_key in loaded_state[1]
+        else:
+            # The atomic RPC arbitrates concurrent claims. This lookup just
+            # skips the write for a word that already has a receipt.
+            already_granted = bool(db_select("account_rewards", columns="id",
+                                             player_id=player["id"], reward_key=reward_key))
+        if already_granted:
             return {
                 "ok": True,
                 "recognized": True,
@@ -451,7 +459,7 @@ def install_word_recognition(
         now = datetime.now(tz) if tz else datetime.now().astimezone()
         # Ordinary preview simulates XP. Explicit live-player preview reaches the same
         # atomic RPC only after the auth, publication, date/binding and trace checks above.
-        if str(vercel_env or "").strip().lower() == "preview" and live_player_preview is not True:
+        if simulated:
             simulated_row = {
                 "reward_key": reward_key,
                 "points": WORD_DISCOVERY_XP,

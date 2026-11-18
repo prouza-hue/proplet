@@ -96,12 +96,13 @@ with patch("word_recognition_v3330._recognize_source", return_value="fixture"):
     value = reply.json()
     assert value["totalDiscoveryXp"] == 1502 and value["boardDiscoveryXp"] == 2
     assert key in value["rewardKeys"] and value["awardedPoints"] == 0
-    assert len(reads) == 2  # A real write MUST reread the changed recovery balance.
-    assert all(read[0] == "id,reward_key,points,granted_at,puzzle_id,reward_word" for read in reads)
+    full_read = ("id,reward_key,points,granted_at,puzzle_id,reward_word", {"player_id": "fixture"}, len(rows))
+    key_filters = {"player_id": "fixture", "reward_key": key}
+    assert reads == [("id", key_filters, 0), full_read]
     reads.clear()
     repeat = client.post("/api/word-discovery/claim", headers=headers, json=payload).json()
     assert repeat["limitReason"] == "duplicate" and repeat["totalDiscoveryXp"] == 1502
-    assert len(reads) == 1 and len(rpc_calls) == 1
+    assert reads == [("id", key_filters, 1), full_read] and len(rpc_calls) == 1
     # No cross-request memoization: an external update appears on the next status.
     rows[-1]["points"] = 4
     assert client.get("/api/word-discovery/status", headers=headers).json()["totalDiscoveryXp"] == 1505
@@ -110,4 +111,4 @@ with patch("word_recognition_v3330._recognize_source", return_value="fixture"):
     preview = discovery_client(preview=True).post("/api/word-discovery/claim", headers=headers, json=payload).json()
     assert preview["simulated"] is True and key in preview["rewardKeys"]
     assert len(reads) == 1 and len(rpc_calls) == 1
-print("PASS unique bonus lookup across 1500+ rewards; complete discovery keys; fresh recovery balance; duplicate/preview single read")
+print("PASS unique bonus and word lookups across 1500+ rewards; complete keys; fresh recovery balance; preview single read")

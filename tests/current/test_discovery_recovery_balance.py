@@ -49,8 +49,12 @@ def rpc(name, params):
              "reason": "recovered" if exchange else "granted", "reward_key": key}]
 
 
+def select(_table, *, reward_key=None, **_kwargs):
+    return [row for row in rows if reward_key is None or row["reward_key"] == reward_key]
+
+
 app = FastAPI()
-install_word_recognition(app, db_select=lambda *_a, **_kw: rows, auth_player=auth,
+install_word_recognition(app, db_select=select, auth_player=auth,
                          db_rpc=rpc, tz=TZ, puzzle_exists=lambda *_a: True,
                          resolved_puzzle=lambda *_a: puzzle)
 client = TestClient(app)
