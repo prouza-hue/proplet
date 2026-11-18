@@ -177,7 +177,10 @@ def db_select(
             params[key] = f"eq.{value}"
     # Account history must be complete: PostgREST otherwise silently caps reads.
     # Keep point lookups and public/bounded ranking queries unchanged.
-    if table in {"results", "account_rewards", "streak_rescues"} and set(params) == {"select", "player_id"}:
+    player_history = table in {"results", "account_rewards", "streak_rescues"} and set(params) == {"select", "player_id"}
+    board_reward_history = (table == "account_rewards" and set(params) == {"select", "player_id", "puzzle_id"}
+                            and (columns == "*" or "id" in columns.split(",")))
+    if player_history or board_reward_history:
         params.update({"order": "id.asc", "limit": "1000"})
         rows = []
         while True:

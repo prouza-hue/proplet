@@ -25,16 +25,30 @@ async function today(page,label){
 }
 async function progressSurvives(){
  const ctx=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
- await ctx.addInitScript(()=>{document.addEventListener('proplet:ready',()=>window.__refreshBootReady=true,{once:true});localStorage.setItem('proplet-v3-7-required-onboarding','done');});
+ await ctx.addInitScript(()=>{
+  document.addEventListener('proplet:ready',()=>window.__refreshBootReady=true,{once:true});
+  for(const key of ['proplet-v3-7-required-onboarding','proplet-v3-16-2-helper-onboarding'])localStorage.setItem(key,'done');
+  localStorage.setItem('proplet-v3-16-2-helper-mode','none');
+  localStorage.setItem('proplet-v3-32-8-rule-principle-seen','1');
+  localStorage.setItem('proplet-marketing-consent-v1',JSON.stringify({value:'denied',at:Date.now()}));
+ });
  const page=await ctx.newPage();page.setDefaultTimeout(20000);
  await page.route('**/*',route=>new URL(route.request().url()).origin===new URL(base).origin?route.continue():route.abort());
  await page.goto(base,{waitUntil:'domcontentloaded'});await ready(page);
+ await page.locator('.bottom-nav [data-nav="free"]').click();
+ await page.locator('#difficultyCards [data-play-free="easy"]').click();
+ await page.waitForFunction(()=>currentScreen==='game'&&currentGame?.mode==='free'&&gameElapsed(currentGame)>=1000);
  const saved=await page.evaluate(()=>{
-  const puzzle=puzzleDB.free.easy[0],key=challengeKey('free',puzzle,null),state=getState();
-  const answer=puzzle.answers[0];
-  const progress={puzzleId:puzzle.id,mode:'free',difficulty:'easy',dailyDate:null,found:[{answerIndex:0,word:answer.word,colorIndex:0,path:[...answer.path]}],moves:1,hints:0,wrongAttempts:0,maxHintLevel:0,cleanSolve:true,elapsedMs:12000,savedAt:Date.now()};
-  state.inProgress=state.inProgress||{};state.inProgress[key]=progress;saveState(state);nav('game');return {key,progress};
+  const puzzle=currentGame.puzzle;
+  currentGame.path=[...puzzle.answers[0].path];
+  submitPath();
+  pauseGameClock('background');
+  const key=challengeKey('free',puzzle,null);
+  return {key,progress:getState().inProgress[key]};
  });
+ assert.equal(saved.progress.found.length,1,'a word and its path were saved');
+ assert.equal(saved.progress.moves,1,'the submitted move was recorded');
+ assert.ok(saved.progress.elapsedMs>=1000,'the saved game has elapsed time');
  await page.reload({waitUntil:'domcontentloaded'});await ready(page);await today(page,'saved game refresh');
  assert.deepEqual(await page.evaluate(key=>getState().inProgress[key],saved.key),saved.progress,'refresh preserves found word/path, moves and elapsed time');
  checks.push('Saved free-game progress survives refresh unchanged');await ctx.close();
@@ -89,8 +103,8 @@ async function run(viewport,standalone){
  }
  const health=await fetch(base+'/api/health').then(r=>r.json());assert(health.isolatedFixture&&health.database===false);
  browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
- if(!process.env.REFRESH_PROGRESS_ONLY)for(const viewport of [{width:390,height:844},{width:768,height:1000}])for(const standalone of [false,true])await run(viewport,standalone);
  await progressSurvives();
+ if(!process.env.REFRESH_PROGRESS_ONLY)for(const viewport of [{width:390,height:844},{width:768,height:1000}])for(const standalone of [false,true])await run(viewport,standalone);
  assert.deepEqual(errors,[],'browser exceptions');
  fs.writeFileSync(path.join(artifacts,process.env.REFRESH_PROGRESS_ONLY?'progress-report.json':'report.json'),JSON.stringify({ok:true,checks,errors},null,2));
  console.log('PASS refresh Today browser: '+checks.join('; '));

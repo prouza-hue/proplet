@@ -45,7 +45,7 @@ with patch.object(server.DB_HTTP_CLIENT,'request',side_effect=AssertionError('ex
   def select_resume(table,**filters):
    assert filters.get('player_id')=='owner','resume lookup must remain account-scoped'
    if table=='player_free_order':return []
-   assert table=='play_sessions' and filters=={'player_id':'owner','mode':'free','finished':False}
+   assert table=='play_sessions' and filters=={'columns':'puzzle_id,last_seen','player_id':'owner','mode':'free','finished':False}
    return sessions
   with patch.object(server,'auth_player',return_value={'id':'owner'}),patch.object(server,'db_select',side_effect=select_resume),patch.object(server,'free_puzzle_info',side_effect=lambda puzzle_id:puzzles.get(puzzle_id)):
    result=client.get('/api/free-order');assert result.status_code==200,result.text

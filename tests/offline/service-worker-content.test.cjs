@@ -13,7 +13,7 @@ let reject=false,network=0;
 const context={console,URL,Response,caches,fetch:async()=>{network++;if(reject)throw Error('offline');return json({revision:'new'});},self:{location:new URL('https://hrajproplet.cz/sw.js'),addEventListener:(name,fn)=>(handlers[name]??=[]).push(fn),clients:{claim:async()=>{},matchAll:async()=>[]}}};
 vm.createContext(context);vm.runInContext(source,context);
 const constants=vm.runInContext('({shell:SHELL_CACHE,urls:SHELL,data:DATA_CACHE,index:OFFLINE_INDEX_CACHE,assets:OFFLINE_ASSET_CACHE})',context);
-async function fetchEvent(cache){let work;for(const fn of handlers.fetch)fn({request:{method:'GET',url:'https://hrajproplet.cz/api/rolling-content?week=2026-10-12',cache},respondWith:value=>{work=value;},waitUntil:()=>{}});return work;}
+async function fetchEvent(cache,path='/api/rolling-content?week=2026-10-12'){let work;for(const fn of handlers.fetch)fn({request:{method:'GET',url:new URL(path,context.self.location).href,cache},respondWith:value=>{work=value;},waitUntil:()=>{}});return work;}
 async function status(){let task,result;for(const fn of handlers.message)fn({data:{type:'GET_OFFLINE_STATUS'},ports:[{postMessage:value=>{result=value;}}],waitUntil:value=>{task=value;}});await task;return result;}
 (async()=>{
  const data=await caches.open(constants.data),url='https://hrajproplet.cz/api/rolling-content?week=2026-10-12';
@@ -22,6 +22,13 @@ async function status(){let task,result;for(const fn of handlers.message)fn({dat
  assert.equal(network,1);
  reject=true;
  await assert.rejects(fetchEvent('no-store'),/offline/,'a failed update cannot relabel cached old data as a new revision');
+ const dictionary='/valid-words-v3328.txt',assets=await caches.open(constants.assets);
+ await assets.put(dictionary,new Response('offline words'));
+ const before=network;
+ for(const url of [dictionary,dictionary+'?v=recognition6']){
+  assert.equal(await (await fetchEvent('force-cache',url)).text(),'offline words','both dictionary URLs work offline');
+ }
+ assert.equal(network,before,'a cached dictionary serves both URLs without fetching');
  const shell=await caches.open(constants.shell);
  await shell.put('/offline-assets.json',json({schemaVersion:1,assets:[]}));
  assert.equal((await status()).ready,false,'partial shell is never advertised as offline-ready');

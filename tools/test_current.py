@@ -9,6 +9,7 @@ the manifest is the reviewable source of truth for that boundary.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 from pathlib import Path
 import re
@@ -83,11 +84,15 @@ def _syntax_checks(root: Path, manifest: dict[str, Any], env: dict[str, str]) ->
     node_files = _files_for_globs(root, syntax.get("javascript_globs", []))
     passed = failed = 0
     for path in python_files:
-        command = [sys.executable, "-c", "import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_text(encoding='utf-8'))", str(path)]
-        if _run(command, root, f"python syntax {_relative(path, root)}", env):
-            passed += 1
-        else:
+        relative = _relative(path, root)
+        try:
+            ast.parse(path.read_text(encoding="utf-8"), filename=relative)
+        except (OSError, SyntaxError, ValueError, RecursionError) as exc:
+            print(f"FAIL python syntax {relative}: {exc}")
             failed += 1
+        else:
+            print(f"PASS python syntax {relative}")
+            passed += 1
     for path in node_files:
         if _run(["node", "--check", str(path)], root, f"node syntax {_relative(path, root)}", env):
             passed += 1
