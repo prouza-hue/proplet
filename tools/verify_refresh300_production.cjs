@@ -61,6 +61,21 @@ const checks=[],errors=[];function check(name,pass){checks.push({name,pass:!!pas
  check('reload retains the preference and the original unfinished board',await page.evaluate(id=>freeOrder().record('easy').mode==='numeric'&&freeProgress('easy').resume?.id===id&&document.querySelector('#difficultyCards [data-play-free="easy"]').textContent.includes('Pokračovat'),saved.id));
  await page.locator('#difficultyCards [data-play-free="easy"]').click();await verifyResume('Reload and changed-order resume',saved);
  await page.evaluate(()=>nav('daily'));saved=await readSaved();
+ // A published, unfinished batch owns the Today slot even with a saved free game.
+ // Seed a current batch so this remains reproducible between Monday releases.
+ const weeklyIds=await page.evaluate(()=>{
+  const levels=sortedFreeBank('medium').slice(0,5).map(({id,difficulty})=>({id,difficulty}));
+  puzzleDB.contentStatus={...puzzleDB.contentStatus,latestBatch:{id:'qa-monday',availableFrom:pragueDateISO(),count:5,levels}};
+  renderDaily();return levels.map(p=>p.id);
+ });
+ const todayNews=page.locator('#oneScreenToday [data-os-key="monday-five"]');
+ await todayNews.waitFor({state:'visible'});
+ check('published weekly batch takes priority over free resume',await todayNews.isEnabled()&&await page.locator('#oneScreenToday [data-os-key="free"]').count()===0);
+ await page.evaluate(ids=>{
+  const state=getState();
+  for(const id of ids)state.completed['free:'+id]={puzzleId:id,mode:'free',difficulty:'medium',completedAt:new Date().toISOString(),points:DIFF.medium.xp};
+  saveState(state);renderDaily();
+ },weeklyIds);
  const todayResume=page.locator('#oneScreenToday [data-os-key="free"]');
  await page.waitForFunction(()=>document.querySelector('#oneScreenToday [data-os-key="free"]')?.textContent.includes('Rozehráno'));
  check('Today exposes its native resume through the visible tile',await todayResume.isVisible()&&(await todayResume.getAttribute('aria-label')).includes('Snadná'));
