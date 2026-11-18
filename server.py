@@ -287,8 +287,8 @@ def db_request(method: str, table: str, *, params=None, body=None, prefer=None):
     )
 
 
-def db_select(table: str, *, columns: str = "*", paginate: bool = False, **filters):
-    return backend_db.db_select(table, db_request, columns=columns, paginate=paginate, **filters)
+def db_select(table: str, *, columns: str = "*", **filters):
+    return backend_db.db_select(table, db_request, columns=columns, **filters)
 
 
 def db_select_all(table: str, **filters):
@@ -2477,9 +2477,10 @@ def completion_discovery_rewards(player_id: str, completed: list[dict]) -> list[
         return completed
     # A one-board delta only needs that board's rewards. Full sync still reads
     # the ledger once, and both paths follow the id cursor to the final page.
-    puzzle_id = completed[0].get("puzzleId") if len(completed) == 1 else None
-    rewards = db_select("account_rewards", columns="id,puzzle_id,reward_key,points,granted_at",
-                        player_id=player_id, puzzle_id=puzzle_id, paginate=True)
+    filters = {"player_id": player_id}
+    if len(completed) == 1 and completed[0].get("puzzleId"):
+        filters["puzzle_id"] = completed[0]["puzzleId"]
+    rewards = db_select("account_rewards", columns="id,puzzle_id,reward_key,points,granted_at", **filters)
     by_puzzle = {}
     for reward in rewards:
         if str(reward.get("reward_key") or "").startswith("word_discovery_v1:"):
