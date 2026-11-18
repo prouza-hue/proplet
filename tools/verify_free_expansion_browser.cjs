@@ -24,6 +24,7 @@ fs.mkdirSync(out,{recursive:true});
     elapsedMs:120000,moves:p.answers.length,hintsUsed:0,points:0,completedAt:'2026-11-01T12:00:00Z'};
   }
   await context.addInitScript(({old})=>{
+   document.addEventListener('proplet:ready',()=>{window.__expansionBootReady=true},{once:true});
    if(localStorage.getItem('expansion-fixture'))return;
    localStorage.setItem('expansion-fixture','1');
    for(const k of ['proplet-v3-7-required-onboarding','proplet-v3-16-2-helper-onboarding'])localStorage.setItem(k,'done');
@@ -75,8 +76,12 @@ fs.mkdirSync(out,{recursive:true});
    check(`${first} replay gives no duplicate base XP`,await page.evaluate(()=>currentGame.winBaseXpAwarded===0));
    await page.evaluate(async({d,last})=>{closeTransientModals();await startGame(puzzleDB.free[d].find(p=>p.id===last),'free',null);currentGame.path=[...currentGame.puzzle.answers[0].path];submitPath();nav('free')},{d,last});
    await page.reload({waitUntil:'domcontentloaded'});
-   await page.waitForFunction(id=>typeof freeProgress==='function'&&freeProgress(id.split('-')[2])?.resume?.id===id,last);
+   await page.waitForFunction(()=>window.__expansionBootReady===true);
+   await page.locator('#propletBootScreen').waitFor({state:'detached'});
+   await page.locator('#screen-daily').waitFor({state:'visible'});
    await page.evaluate(()=>closeTransientModals());
+   await page.locator('.bottom-nav [data-nav="free"]').click();
+   await page.waitForFunction(id=>freeProgress(id.split('-')[2])?.resume?.id===id,last);
    await page.locator(`#difficultyCards [data-play-free="${d}"]`).click();
    await page.waitForFunction(id=>currentGame?.puzzle.id===id&&currentGame.found.length===1,last);
    check(`${last} retains its saved board and found word across reload`,true);
