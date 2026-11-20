@@ -165,6 +165,32 @@ async function firstWin(page,touch=false,style='drag',boardId='g4-e-001'){await 
   await scenario('invitation-priority',async page=>{
    await page.goto(url+'/?play=g4-e-002&kind=free&t=45000&h=0&m=8');await ready(page);await solve(page);await page.locator('#winPrimaryBtn').click();await page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.id==='g4-e-002');
   });
+  for(const mode of ['daily','tajenka']){
+   await scenario('guide-opens-'+mode,async page=>{
+    await control({entryVariant:'B'});
+    const entry=url+'/?open='+mode+'&via=pruvodce';
+    await page.goto(entry);
+    await page.waitForFunction(mode=>currentGame?.mode===mode&&document.querySelectorAll('#board .cell').length>0,mode);
+    assert.equal(new URL(page.url()).search,'');
+    assert.equal((await recording()).requests.some(r=>r.path==='/api/entry-experiment/assignment'),false);
+    if(mode==='tajenka'){
+     // Keep the normal first-play rules, and reopen a finished result without a replay.
+     await page.locator('#tajenkaRulesDone').click();
+     await solve(page);
+     const state=await page.evaluate(()=>tajenkaCompletion());
+     await page.goto(entry);
+     await page.waitForFunction(()=>tajenkaRecapOpen&&document.querySelector('#winModal:not(.hidden)'));
+     assert.deepEqual(await page.evaluate(()=>tajenkaCompletion()),state);
+     assert.equal(await page.evaluate(()=>currentGame?.mode==='tajenka'),false);
+    }else{
+     const path=await page.evaluate(()=>currentGame.puzzle.answers[0].path);
+     await draw(page,path);
+     await page.waitForFunction(()=>currentGame?.found.length===1);
+     await page.goto(entry);
+     await page.waitForFunction(()=>currentGame?.mode==='daily'&&currentGame.found.length===1);
+    }
+   });
+  }
   await scenario('existing-player-keeps-progress',async(page,context)=>{
    await context.addInitScript(()=>localStorage.setItem('proplet-v3-7-required-onboarding','done'));await page.goto(url);await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB);assert.equal(await page.evaluate(()=>currentGame?.mode==='starter'),false);assert.equal(await page.locator('#winModal').isVisible(),false);
   });

@@ -34,13 +34,21 @@ function verifyPresentation(){
 }
 function verifyPlatform(){
  const code=fs.readFileSync('public/analytics-init.js','utf8');
- function load(host='hrajproplet.cz',search='',environment='production',hash=''){
-  const nodes=[],c={window:{PROPLET_RUNTIME_META:{environment}},location:{hostname:host,search,hash},URL,URLSearchParams,document:{querySelector:()=>null,createElement:()=>({}),head:{append:s=>nodes.push(s)}}};vm.createContext(c);vm.runInContext(code,c);vm.runInContext(code,c);return {c,nodes};
+ function load(host='hrajproplet.cz',search='',environment='production',hash='',guide=false,referrer=''){
+  const nodes=[],c={window:{PROPLET_RUNTIME_META:environment?{environment}:undefined},location:{hostname:host,search,hash},URL,URLSearchParams,document:{referrer,documentElement:{hasAttribute:name=>guide&&name==='data-proplet-guide'},querySelector:()=>null,createElement:()=>({}),head:{append:s=>nodes.push(s)}}};vm.createContext(c);vm.runInContext(code,c);vm.runInContext(code,c);return {c,nodes};
  }
  const {c,nodes}=load();assert.deepEqual(nodes.map(x=>x.src),['/_vercel/insights/script.js','/_vercel/speed-insights/script.js']);
  for(const q of [c.window.vaq,c.window.siq]){const clean=q[0][1]({url:'https://hrajproplet.cz/?code=private#access_token=private',referrer:'https://example.test/?q=private#secret'});assert.equal(clean.url,'https://hrajproplet.cz/');assert.equal(clean.referrer,'https://example.test/');assert.equal(q[0][1]({url:'invalid'}),null);}
  for(const args of [['preview.vercel.app'],['localhost'],['hrajproplet.cz','?tutorial=1'],['hrajproplet.cz','?auth=google'],['hrajproplet.cz','?code=secret'],['hrajproplet.cz','','preview'],['hrajproplet.cz','','production','#access_token=secret']])assert.equal(load(...args).nodes.length,0);
- assert(fs.readFileSync('public/index.html','utf8').includes('/analytics-init.js?v=telemetry1'));
+ const guide=load('hrajproplet.cz','',null,'',true,'https://www.google.cz/');
+ assert.deepEqual(guide.nodes.map(x=>x.src),['/_vercel/insights/script.js']);
+ const clean=guide.c.window.vaq[0][1]({url:'https://hrajproplet.cz/jak-hrat.html?t=private#q'});
+ assert.equal(clean.url,'https://hrajproplet.cz/jak-hrat.html');
+ for(const args of [['preview.vercel.app','',null,'',true],['hrajproplet.cz','',null,'',false],['hrajproplet.cz','','preview','',true],['hrajproplet.cz','?code=secret',null,'',true],['hrajproplet.cz','',null,'',true,'https://search.example/?q=private#secret']])assert.equal(load(...args).nodes.length,0);
+ const home=fs.readFileSync('public/index.html','utf8');
+ const analyticsScript=home.match(/<script src="(\/analytics-init\.js\?v=[^"]+)"><\/script>/)?.[1];
+ assert(analyticsScript,'homepage loads versioned platform analytics');
+ assert(fs.readFileSync('public/sw.js','utf8').includes("'"+analyticsScript+"'"),'offline shell uses the same analytics revision');
  console.log('PASS platform collection loads once in canonical production only; query/hash/referrer redacted, technical/OAuth/preview excluded');
 }
 async function verifyDiagnostics(){

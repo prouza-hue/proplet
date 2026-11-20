@@ -18,7 +18,7 @@
 
     const links=document.createElement('small');
     links.className='footer-links';
-    links.innerHTML='<a href="/privacy.html">Soukromí</a> · <a href="/terms.html">Podmínky</a> · <button type="button" class="footer-report-link">Nahlásit chybu</button>';
+    links.innerHTML='<a href="/jak-hrat.html">Jak hrát</a> · <a href="/privacy.html">Soukromí</a> · <a href="/terms.html">Podmínky</a> · <button type="button" class="footer-report-link">Nahlásit chybu</button>';
 
     links.querySelector('.footer-report-link').onclick=()=>openSupportReport();
     footer.replaceChildren(line,author,version,links);

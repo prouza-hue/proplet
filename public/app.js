@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.47-word-xp1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.48-search1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 function resetReloadEntry(){
  if(globalThis.performance?.getEntriesByType?.('navigation')?.[0]?.type!=='reload')return;
@@ -3069,6 +3069,23 @@ async function refreshRollingContent(){
  try{const r=await fetch(url,{cache:'no-store',headers});if(!r.ok)throw new Error('rolling-content');const fresh=await r.json();if(mergeRollingContent(fresh))renderAfterRollingContent();return fresh}catch{return null}
 }
 
+function requestedGuideMode(params){
+ // Invitations, auth callbacks and explicit previews retain their own entry flows.
+ if(location.hash||params.size!==2||params.get('via')!=='pruvodce')return null;
+ const mode=params.get('open');
+ return mode==='daily'||mode==='tajenka'?mode:null;
+}
+function openGuideGame(mode){
+ if(currentScreen!=='daily'||openTransientModal())return;
+ history.replaceState(history.state,'',location.pathname);
+ if(!allowAccountGameStart())return;
+ if(mode==='daily'){startDaily();return}
+ if(!TAJENKA_AVAILABLE||!tajenkaPuzzle){showToast('Tajenka teď není k dispozici. Můžeš si zahrát dnešní výzvu.');return}
+ const completion=tajenkaCompletion();
+ if(completion)showTajenkaRecap(completion);
+ else startTajenka();
+}
+
 async function boot(){
  // Install reporting before boot awaits; errors in startup must retain their producer.
  bindClientErrorReporting();
@@ -3076,17 +3093,34 @@ async function boot(){
  if(previewRuntime())await loadRuntimeCapabilities();
  try{await ensureFirstStepsRuntime()}catch{reportClientError('first_steps_module_unavailable','first-steps-contract')}
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();globalThis.PropletArchiveExperience?.configure();
- const forcedTutorial=new URLSearchParams(location.search).get('tutorial')==='1';
+ const entryParams=new URLSearchParams(location.search),forcedTutorial=entryParams.get('tutorial')==='1';
+ const guideMode=requestedGuideMode(entryParams);
  if(freshStarterVisit()&&!forcedTutorial)await loadRuntimeCapabilities();
  try{
-  if(!forcedTutorial)await window.PropletFirstSteps.prepareEntry(entryExperimentEnabled,entryExperimentTest);
+  if(!guideMode&&!forcedTutorial)await window.PropletFirstSteps.prepareEntry(entryExperimentEnabled,entryExperimentTest);
  }catch{reportClientError('entry_assignment_failed','entry-contract');showPuzzleBootError();return}
- if(freshStarterVisit()&&!window.PropletFirstSteps?.directEntryPending()){starterBootTrace=createStarterTrace();trackStarterPhase(starterBootTrace,'requested')}
- try{puzzleDB=await loadPuzzleDatabaseWithRecovery();trackStarterPhase(starterBootTrace,'data_ready')}catch{window.PropletFirstSteps?.recordEntryLoadFailure?.();trackStarterPhase(starterBootTrace,'failed','data');try{reportClientError('puzzle_boot_failed','both-attempts-failed')}catch{}showPuzzleBootError();return}
+ if(!guideMode&&freshStarterVisit()&&!window.PropletFirstSteps?.directEntryPending()){starterBootTrace=createStarterTrace();trackStarterPhase(starterBootTrace,'requested')}
+ try{puzzleDB=await loadPuzzleDatabaseWithRecovery();trackStarterPhase(starterBootTrace,'data_ready')}catch{if(!guideMode)window.PropletFirstSteps?.recordEntryLoadFailure?.();trackStarterPhase(starterBootTrace,'failed','data');try{reportClientError('puzzle_boot_failed','both-attempts-failed')}catch{}showPuzzleBootError();return}
  await Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]);
  await loadTajenkaFixture();
  await freeOrder().configure();freeOrderLastRefreshAt=Date.now();
- document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();await globalThis.PropletArchiveExperience?.install();bind();bindClientErrorReporting();initNavigation();const requestedOpen=new URLSearchParams(location.search).get('open');if(requestedOpen==='free')nav('free',{replace:true});updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();renderDaily();renderFree();renderProfile();renderInstallUI();if(requestedOpen==='tajenka'&&!new URLSearchParams(location.search).has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();setTimeout(()=>{const installPreview=openInstallPreview();const directEntry=!installPreview&&!forcedTutorial&&window.PropletFirstSteps?.openDirectEntry();if(!directEntry&&!installPreview&&!(!livePlayerPreview()&&window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&new URLSearchParams(location.search).get('releasePreview')==='1'))openOnboarding(new URLSearchParams(location.search).get('tutorial')==='1');document.dispatchEvent(new CustomEvent('proplet:ready'));if(!installPreview&&!directEntry)openSpecialInvitation().catch(()=>{})},80);
+ document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();await globalThis.PropletArchiveExperience?.install();
+ bind();bindClientErrorReporting();initNavigation();
+ const requestedOpen=entryParams.get('open');
+ if(requestedOpen==='free')nav('free',{replace:true});
+ updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;
+ claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();
+ renderDaily();renderFree();renderProfile();renderInstallUI();
+ if(!guideMode&&requestedOpen==='tajenka'&&!entryParams.has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);
+ refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();
+ setTimeout(()=>{
+  const installPreview=openInstallPreview();
+  const directEntry=!guideMode&&!installPreview&&!forcedTutorial&&window.PropletFirstSteps?.openDirectEntry();
+  if(guideMode)openGuideGame(guideMode);
+  else if(!directEntry&&!installPreview&&!(!livePlayerPreview()&&window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&entryParams.get('releasePreview')==='1'))openOnboarding(forcedTutorial);
+  document.dispatchEvent(new CustomEvent('proplet:ready'));
+  if(!guideMode&&!installPreview&&!directEntry)openSpecialInvitation().catch(()=>{});
+ },80);
  const refreshDailyAfterResume=()=>Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]).then(()=>{if(currentScreen!=='game')renderDaily()}).catch(()=>{if(currentScreen==='daily')renderDaily()});
  window.addEventListener('online',refreshDailyAfterResume);window.addEventListener('focus',refreshDailyAfterResume);window.addEventListener('pageshow',refreshDailyAfterResume);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshDailyAfterResume()});
