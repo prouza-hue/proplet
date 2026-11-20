@@ -89,6 +89,45 @@ async function firstWin(page,touch=false,style='drag',boardId='g4-e-001'){await 
   finally{await page.evaluate(()=>productAnalytics()?.flush()).catch(()=>{});fs.writeFileSync(output,JSON.stringify(report,null,2));await context.close();}
  }
  try{
+  for(const mode of ['daily','tajenka']){
+   await scenario('guide-opens-'+mode,async page=>{
+    await control({entryVariant:'B'});
+    const guide=url+(mode==='daily'?'/denni-vyzva.html':'/tajenka.html');
+    const entry=url+'/?open='+mode+'&via=pruvodce';
+    await page.goto(guide);
+    await page.locator('main a.guide-play').click();
+    await page.waitForFunction(mode=>typeof currentGame!=='undefined'&&currentGame?.mode===mode&&document.querySelectorAll('#board .cell').length>0,mode);
+    assert.equal(new URL(page.url()).search,'');
+    assert.equal((await recording()).requests.some(r=>r.path==='/api/entry-experiment/assignment'),false);
+    if(mode==='tajenka'){
+     // Keep the normal first-play rules, and reopen a finished result without a replay.
+     await page.locator('#tajenkaRulesDone').click();
+     await solve(page);
+     const state=await page.evaluate(()=>tajenkaCompletion());
+     await page.goto(entry);
+     await page.waitForFunction(()=>typeof tajenkaRecapOpen!=='undefined'&&tajenkaRecapOpen&&document.querySelector('#winModal:not(.hidden)'));
+     assert.deepEqual(await page.evaluate(()=>tajenkaCompletion()),state);
+     assert.equal(await page.evaluate(()=>currentGame?.mode==='tajenka'),false);
+    }else{
+     // The desktop rail refits the whole board on first entry. Track each live
+     // cell during the drag instead of replaying coordinates from before the refit.
+     await page.waitForFunction(()=>document.documentElement.dataset.gameLayoutMode==='desktop-wide'&&currentGame.pausedAt==null);
+     await page.evaluate(()=>document.fonts.ready);
+     const path=await page.evaluate(()=>currentGame.puzzle.answers[0].path);
+     const cell=i=>page.locator('#board .cell[data-index="'+i+'"]');
+     await cell(path[0]).hover();
+     await page.mouse.down();
+     try{
+      for(const index of path.slice(1)){
+       await cell(index).hover({force:true});
+      }
+     }finally{await page.mouse.up()}
+     await page.waitForFunction(()=>currentGame?.found.length===1);
+     await page.goto(entry);
+     await page.waitForFunction(()=>typeof currentGame!=='undefined'&&currentGame?.mode==='daily'&&currentGame.found.length===1);
+    }
+   });
+  }
   for(const [mobile,style] of [[false,'drag'],[true,'drag'],[false,'tap'],[true,'tap'],[false,'mixed']])await scenario('short-'+(mobile?'touch':'mouse')+'-'+style+'-first-win',async page=>{
    await firstWin(page,mobile,style);
    await eventOnce('starter_completed');await eventOnce('onboarding_completed');await eventOnce('first_steps_v1_offer');
@@ -165,45 +204,6 @@ async function firstWin(page,touch=false,style='drag',boardId='g4-e-001'){await 
   await scenario('invitation-priority',async page=>{
    await page.goto(url+'/?play=g4-e-002&kind=free&t=45000&h=0&m=8');await ready(page);await solve(page);await page.locator('#winPrimaryBtn').click();await page.waitForFunction(()=>currentGame?.mode==='free'&&currentGame.puzzle.id==='g4-e-002');
   });
-  for(const mode of ['daily','tajenka']){
-   await scenario('guide-opens-'+mode,async page=>{
-    await control({entryVariant:'B'});
-    const guide=url+(mode==='daily'?'/denni-vyzva.html':'/tajenka.html');
-    const entry=url+'/?open='+mode+'&via=pruvodce';
-    await page.goto(guide);
-    await page.locator('main a.guide-play').click();
-    await page.waitForFunction(mode=>currentGame?.mode===mode&&document.querySelectorAll('#board .cell').length>0,mode);
-    assert.equal(new URL(page.url()).search,'');
-    assert.equal((await recording()).requests.some(r=>r.path==='/api/entry-experiment/assignment'),false);
-    if(mode==='tajenka'){
-     // Keep the normal first-play rules, and reopen a finished result without a replay.
-     await page.locator('#tajenkaRulesDone').click();
-     await solve(page);
-     const state=await page.evaluate(()=>tajenkaCompletion());
-     await page.goto(entry);
-     await page.waitForFunction(()=>tajenkaRecapOpen&&document.querySelector('#winModal:not(.hidden)'));
-     assert.deepEqual(await page.evaluate(()=>tajenkaCompletion()),state);
-     assert.equal(await page.evaluate(()=>currentGame?.mode==='tajenka'),false);
-    }else{
-     // The desktop rail refits the whole board on first entry. Track each live
-     // cell during the drag instead of replaying coordinates from before the refit.
-     await page.waitForFunction(()=>document.documentElement.dataset.gameLayoutMode==='desktop-wide'&&currentGame.pausedAt==null);
-     await page.evaluate(()=>document.fonts.ready);
-     const path=await page.evaluate(()=>currentGame.puzzle.answers[0].path);
-     const cell=i=>page.locator('#board .cell[data-index="'+i+'"]');
-     await cell(path[0]).hover();
-     await page.mouse.down();
-     try{
-      for(const index of path.slice(1)){
-       await cell(index).hover({force:true});
-      }
-     }finally{await page.mouse.up()}
-     await page.waitForFunction(()=>currentGame?.found.length===1);
-     await page.goto(entry);
-     await page.waitForFunction(()=>currentGame?.mode==='daily'&&currentGame.found.length===1);
-    }
-   });
-  }
   await scenario('existing-player-keeps-progress',async(page,context)=>{
    await context.addInitScript(()=>localStorage.setItem('proplet-v3-7-required-onboarding','done'));await page.goto(url);await page.waitForFunction(()=>typeof puzzleDB!=='undefined'&&puzzleDB);assert.equal(await page.evaluate(()=>currentGame?.mode==='starter'),false);assert.equal(await page.locator('#winModal').isVisible(),false);
   });
