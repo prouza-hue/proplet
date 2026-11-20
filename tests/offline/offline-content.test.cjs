@@ -41,7 +41,7 @@ function environment({store=new MemoryCaches(),online=true,installed=true,shellR
  const events=new EventTarget(),document=new EventTarget(),swEvents=new EventTarget();document.visibilityState='visible';
  let clock=Date.now(),standalone=installed,shellOkay=shellReady,profile=null,progressReady=true,pending=0,persistCalls=0,requests=[],onChange=[];
  const nav={onLine:online,storage:{persist:async()=>{persistCalls++;return false;}},serviceWorker:swEvents};
- const worker={postMessage(message,ports){assert.equal(message.type,'GET_OFFLINE_STATUS');ports[0].postMessage({ready:shellOkay});}};
+ const worker={postMessage(message,ports){assert.equal(message.type,'GET_OFFLINE_STATUS');ports[0].postMessage({ready:shellOkay,shell:'worker-current'});}};
  nav.serviceWorker.ready=Promise.resolve({active:worker});nav.serviceWorker.controller=worker;
  let rejectUrl=null;
  const fetch=async(url,options)=>{
@@ -58,7 +58,7 @@ function environment({store=new MemoryCaches(),online=true,installed=true,shellR
  const host={navigator:nav,document,caches:store,fetch,Response,MessageChannel:missingChannel?undefined:MessageChannel,AbortController,TextEncoder,TextDecoder,crypto:webcrypto,structuredClone,setTimeout,clearTimeout,matchMedia:()=>({matches:standalone}),addEventListener:events.addEventListener.bind(events)};
  const context={window:host,console};vm.createContext(context);vm.runInContext(source,context,{filename:'offline.js'});
  const api=host.PropletOffline.create({window:host,timeoutMs,now:()=>clock});
- const callbacks={isInstalled:()=>standalone,getProfile:()=>profile,hasCachedProgress:()=>progressReady,getPendingCount:()=>pending,onChange:s=>onChange.push(s)};
+ const callbacks={isInstalled:()=>standalone,expectedShell:'worker-current',getProfile:()=>profile,hasCachedProgress:()=>progressReady,getPendingCount:()=>pending,onChange:s=>onChange.push(s)};
  return {api,store,nav,document,host,callbacks,fixture,requests,onChange,
   advance:ms=>{clock+=ms;},setInstalled:value=>{standalone=value;},setShell:value=>{shellOkay=value;},setProfile:value=>{profile=value;},setProgress:value=>{progressReady=value;},setPending:value=>{pending=value;},fail:predicate=>{rejectUrl=predicate;},
   event:name=>events.dispatchEvent(new Event(name)),get persistCalls(){return persistCalls;}};
@@ -133,6 +133,19 @@ async function run(){
  const incomplete=environment({shellReady:false});const incompleteResult=await incomplete.api.install(incomplete.callbacks);
  assert.equal(incompleteResult.ready,false);assert.equal(incompleteResult.contentReady,false);assert.equal(await pointer(incomplete.store),undefined);assert.equal(incompleteResult.error,'offline-shell-incomplete');
  incomplete.setShell(true);assert.equal((await incomplete.api.prepare({force:true})).ready,true,'a manual retry can complete preparation');
+ // During an upgrade the old worker may reply after the new one takes control.
+ const upgrade=environment({store:first.store});
+ const currentWorker=upgrade.nav.serviceWorker.controller;
+ let oldPort;
+ upgrade.nav.serviceWorker.controller={postMessage(_message,[port]){oldPort=port;}};
+ const checking=upgrade.api.install(upgrade.callbacks);
+ await waitUntil(()=>oldPort);
+ upgrade.nav.serviceWorker.controller=currentWorker;
+ upgrade.nav.serviceWorker.dispatchEvent(new Event('controllerchange'));
+ oldPort.postMessage({ready:true,shell:'worker-previous'});
+ assert.equal((await checking).ready,false,'a complete previous shell cannot certify the current release');
+ await waitUntil(()=>upgrade.api.getState().ready);
+ assert.deepEqual(upgrade.requests.map(request=>request.url),['/api/offline-manifest'],'the replacement worker confirms the existing pack without another download');
  const unsupported=environment({missingChannel:true});assert.equal((await unsupported.api.install(unsupported.callbacks)).ready,false);assert.equal(unsupported.requests.length,0);
  // Unsupported storage and hung network promises fail gracefully and cannot
  // leave an unbounded preparation or a fabricated ready indication.

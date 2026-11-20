@@ -209,9 +209,9 @@ async def isolated_personal_boundary(request: Request, call_next):
             row["finished"] = True
         return response(row)
     if path == "/api/free-order/config":
-        return response({"enabled": False})
+        return response({"enabled": os.environ.get("OFFLINE_COLD_START_ONLY") == "1"})
     if path == "/api/free-order":
-        return response({"enabled": False, "records": {}, "resumeIds": {}})
+        return response({"enabled": os.environ.get("OFFLINE_COLD_START_ONLY") == "1", "records": {}, "resumeIds": {}})
     if path == "/api/mozkokalypsa/status":
         return response({"eligible": False, "active": False, "order": []})
     if path in {"/api/rescue-status", "/api/rescue/status"}:

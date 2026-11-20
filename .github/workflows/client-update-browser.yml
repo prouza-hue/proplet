@@ -5,6 +5,10 @@ on:
     paths:
       - 'public/app.js'
       - 'public/sw.js'
+      - 'public/app/offline.js'
+      - 'public/bootstrap-hydrator.js'
+      - 'tests/offline/browser.cjs'
+      - 'tests/offline/fixture_server.py'
       - 'tools/test_verified_client_updates.cjs'
       - 'tests/current/test_automatic_updates.js'
       - '.github/workflows/client-update-browser.yml'
@@ -13,6 +17,10 @@ on:
     paths:
       - 'public/app.js'
       - 'public/sw.js'
+      - 'public/app/offline.js'
+      - 'public/bootstrap-hydrator.js'
+      - 'tests/offline/browser.cjs'
+      - 'tests/offline/fixture_server.py'
       - 'tools/test_verified_client_updates.cjs'
       - '.github/workflows/client-update-browser.yml'
 permissions:
@@ -44,3 +52,13 @@ jobs:
         run: |
           node tests/current/test_automatic_updates.js
           node tools/test_verified_client_updates.cjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify a completely closed installed game without a reachable server
+        env:
+          NODE_PATH: /tmp/update-tools/node_modules
+          OFFLINE_COLD_START_ONLY: '1'
+        run: |
+          python -m pip install --disable-pip-version-check -r requirements.txt
+          CHROMIUM_EXECUTABLE_PATH="$(command -v google-chrome)" node tests/offline/browser.cjs

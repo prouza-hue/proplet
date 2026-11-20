@@ -77,6 +77,17 @@ for(const [name,block,unblock] of [
  f.timers.shift().fn();assert(f.loaderRemoved&&f.styleRemoved,'settled loading screen is removed');assert.deepEqual(f.readyEvents,[],'visual readiness alone never implies a successful game boot');
 }
 const failedStyle=bootFixture();failedStyle.styles[0].sheet=null;failedStyle.styles[0].dataset.loadFailed='1';failedStyle.window.__PROPLET_REVEAL_CURRENT_UI();assert.equal(failedStyle.context.revealed,true,'a terminal CSS error cannot trap the player behind an eternal loader');
+const localBoot=bootFixture();
+localBoot.document.documentElement.dataset.archiveReady='0';
+localBoot.document.fonts.status='loading';
+localBoot.styles[0].sheet=null;
+localBoot.bodyClasses.delete('one-screen-ready');
+localBoot.appEvents.get('proplet:ready')({detail:{localLaunch:true}});
+assert.equal(localBoot.context.revealed,false,'local gameplay waits for its stylesheet');
+localBoot.styles[0].sheet={};localBoot.timers.shift().fn();
+assert.equal(localBoot.context.revealed,false,'local gameplay waits for the home controls to be projected');
+localBoot.bodyClasses.add('one-screen-ready');localBoot.timers.shift().fn();
+assert.equal(localBoot.context.revealed,true,'a usable cached game opens while optional Archive data and fonts are pending');
 const errorBoot=bootFixture();errorBoot.document.readyState='loading';errorBoot.document.fonts.status='loading';errorBoot.styles[0].sheet=null;errorBoot.bodyClasses.delete('one-screen-ready');errorBoot.document.documentElement.dataset.archiveReady='0';
 errorBoot.window.__PROPLET_REVEAL_CURRENT_UI();assert.equal(errorBoot.context.revealed,false);
 errorBoot.window.__PROPLET_REVEAL_CURRENT_UI(true);assert.equal(errorBoot.context.revealed,true,'explicit native boot errors must remain actionable despite missing design dependencies');assert(!errorBoot.classes.has('proplet-current-ui-booting'));assert.equal(errorBoot.window.__PROPLET_CURRENT_UI_READY,undefined);assert.deepEqual(errorBoot.readyEvents,[]);

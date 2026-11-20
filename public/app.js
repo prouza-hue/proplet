@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.48-search1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.49-offline1';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 function resetReloadEntry(){
  if(globalThis.performance?.getEntriesByType?.('navigation')?.[0]?.type!=='reload')return;
@@ -1048,11 +1048,18 @@ async function finishRescue(passed){
 }
 function failRescue(){finishRescue(false)}
 
+// A fully hydrated local Free bank can run under the same account guard as
+// airplane mode when Wi-Fi stays connected but the server cannot be reached.
+function canPlayStoredFree(){
+ return isStandaloneApp()&&!!puzzleDB&&!puzzleDB.bootstrapSchema&&accountProgressAvailable();
+}
 let freeOrderController=null;
 function freeOrder(){
  if(freeOrderController)return freeOrderController;
  freeOrderController=window.PropletFreeOrderStore.create({engine:window.PropletFreeOrder,shared:window.PROPLET_SHARED_FREE_ORDER_MANIFEST,storage:localStorage,
-  profile:getProfile,api,uuid:newAttemptId,bank:sortedFreeBank,
+  profile:getProfile,
+  api:(path,options)=>api(path,path==='/api/free-order'&&!options?.method&&canPlayStoredFree()?{...options,timeoutMs:2000}:options),
+  uuid:newAttemptId,bank:sortedFreeBank,
   prepare:async()=>{await window.__PROPLET_ENSURE_FULL_PUZZLE_DB?.();await refreshRollingContent()},
   completed:diff=>{const slots=localFreeSlotState(diff);return sortedFreeBank(diff).filter(p=>slots.actual.has(Number(p.meta?.level))).map(p=>p.id)},
   hasHistory:scope=>{const state=getState(scope);return Object.values(state.completed||{}).some(r=>r.mode!=='starter')||Object.values(state.inProgress||{}).some(r=>r.mode!=='starter')||getQueue(scope).length>0},
@@ -1150,8 +1157,17 @@ function renderFree(){
 
 async function startFree(diff){
  if(!allowAccountGameStart())return;
- if(freeOrder().enabled()&&getProfile()?.token&&navigator.onLine){try{await freeOrder().sync()}catch{if(!freeOrder().ready()){showToast('Nejdřív načti uložené pořadí. Zkus to znovu.');return}}}
- const q=freeProgress(diff),p=q.resume||q.nextUnsolved||q.list[0];if(p)startGame(p,'free',null);
+ const profile=getProfile();
+ let offlineStart=false;
+ if(freeOrder().enabled()&&profile?.token&&navigator.onLine){
+  try{await freeOrder().sync()}
+  catch(error){
+   if(error.networkUnavailable&&canPlayStoredFree())offlineStart=true;
+   else if(!freeOrder().ready()){showToast('Nejdřív načti uložené pořadí. Zkus to znovu.');return}
+  }
+  if(getProfile()?.id!==profile.id||getProfile()?.token!==profile.token)return;
+ }
+ const q=freeProgress(diff),p=q.resume||q.nextUnsolved||q.list[0];if(p)startGame(p,'free',null,{offlineStart});
 }
 function showStarterDailyNudge(){const n=$('#starterDailyNudge'),hero=$('.daily-hero');if(n)n.classList.remove('hidden');hero?.classList.add('starter-next');setTimeout(()=>hero?.classList.remove('starter-next'),2400)}
 async function startDaily(options={}){if(currentGame?.mode==='starter'&&currentGame.finished&&(resumeSpecialInvitation()||window.PropletSharing?.resumeInvitation?.()))return;
@@ -1269,7 +1285,22 @@ async function startGame(puzzle,mode,dailyDate,options={}){
  if(mode==='rescue'&&currentScreen!=='daily'&&currentScreen!=='game')history.pushState({proplet:true,screen:'daily'},'',location.href);
  const launch=++gameLaunchSequence,scope=playerScope();
  let prepared;
- try{await claimTelemetryAfterAuth();prepared=puzzle?.meta?.archiveExperience?{fairPlay:false,restored:savedProgressFor(puzzle,mode,dailyDate)}:mode==='playtest'?await window.PropletPlaytest.prepare(puzzle):await fairPlay().prepare(puzzle,mode,dailyDate,mode==='rescue'||mode==='starter'?null:savedProgressFor(puzzle,mode,dailyDate))}catch(error){trackStarterPhase(starterTrace,'failed','prepare');showToast(error.message);return false}
+ try{
+  let offlineStart=options.offlineStart===true;
+  if(!offlineStart){
+   const claim=claimTelemetryAfterAuth();
+   if(mode==='free'&&canPlayStoredFree()){
+    // A guest-to-account claim may still be draining telemetry. Keep its
+    // original job and queue ownership, and start locally if it cannot finish.
+    let timer;
+    try{offlineStart=(await Promise.race([claim,new Promise(resolve=>{timer=setTimeout(()=>resolve(false),2000)})]))===false}
+    finally{clearTimeout(timer)}
+   }else await claim;
+  }
+  if(puzzle?.meta?.archiveExperience)prepared={fairPlay:false,restored:savedProgressFor(puzzle,mode,dailyDate)};
+  else if(mode==='playtest')prepared=await window.PropletPlaytest.prepare(puzzle);
+  else prepared=await fairPlay().prepare(puzzle,mode,dailyDate,mode==='rescue'||mode==='starter'?null:savedProgressFor(puzzle,mode,dailyDate),offlineStart);
+ }catch(error){trackStarterPhase(starterTrace,'failed','prepare');showToast(error.message);return false}
  if(launch!==gameLaunchSequence||scope!==playerScope()){trackStarterPhase(starterTrace,'cancelled','superseded');return false;}
  if(options.kdoRecovery&&prepared.restored?.found?.length!==puzzle.answers.length){
   if(prepared.replay){$('#tajenkaRecoveryNotice')?.classList.add('hidden');showToast('Tuhle Tajenku už máš dokončenou.')}
@@ -1723,7 +1754,7 @@ let fairPlayController=null;
 function fairPlay(){
  if(fairPlayController)return fairPlayController;
  if(!window.PropletFairPlay)return {prepare:async(p,m,d,restored)=>({restored}),pause(){},resume:async()=>null,start(){},stop(){},drain:async()=>{},finish:async()=>null};
- fairPlayController=window.PropletFairPlay.create({api,tajenkaFound:tajenkaFoundFromState,profile:getProfile,claim:()=>claimTelemetryAfterAuth(),restored:g=>{if(g===currentGame){renderGameBoard();renderGameHUD();saveGameProgress();if(!g.finished&&!g.isReplay&&g.found.length===g.puzzle.answers.length)queueMicrotask(()=>{if(g===currentGame&&!g.finished)finishGame()})}},completed:(p,m,d)=>m==='tajenka'?!!tajenkaCompletion(p):!!getState().completed[challengeKey(m,p,d)],completedAttempt:completedServerAttempt,elapsed:gameElapsed,key:challengeKey,now:()=>performance.now(),setInterval:(fn,ms)=>window.setInterval(fn,ms),clearInterval:id=>window.clearInterval(id),status:renderTimingStatus,persist:g=>{if(g===currentGame)saveGameProgress()},
+ fairPlayController=window.PropletFairPlay.create({api,canStartOffline:canPlayStoredFree,tajenkaFound:tajenkaFoundFromState,profile:getProfile,claim:()=>claimTelemetryAfterAuth(),restored:g=>{if(g===currentGame){renderGameBoard();renderGameHUD();saveGameProgress();if(!g.finished&&!g.isReplay&&g.found.length===g.puzzle.answers.length)queueMicrotask(()=>{if(g===currentGame&&!g.finished)finishGame()})}},completed:(p,m,d)=>m==='tajenka'?!!tajenkaCompletion(p):!!getState().completed[challengeKey(m,p,d)],completedAttempt:completedServerAttempt,elapsed:gameElapsed,key:challengeKey,now:()=>performance.now(),setInterval:(fn,ms)=>window.setInterval(fn,ms),clearInterval:id=>window.clearInterval(id),status:renderTimingStatus,persist:g=>{if(g===currentGame)saveGameProgress()},
  failure:(g,text)=>{if(g!==currentGame)return;clearTimeout(g.finishRetryTimer);g.finishRetryTimer=null;pauseGameClock('timing-error');message(text);showToast(text)},
  conflict:(g,text)=>{if(g!==currentGame)return;g.fairPlayConflict=true;g.fairPlay=false;pauseGameClock('other-device');showToast(text)}});
  return fairPlayController;
@@ -1793,6 +1824,7 @@ async function claimTelemetryAfterAuth(anonymousId){
  const key=`proplet-pending-telemetry-claim:${profile.id}`;
  let anon=anonymousId;try{anon=anon||localStorage.getItem(key);if(anon)localStorage.setItem(key,anon)}catch{}
  if(!anon)return true;
+ if(navigator.onLine===false)return false;
  if(anonymousClaimFlight?.key===key&&anonymousClaimFlight.anon===anon)return anonymousClaimFlight.promise;
  const flight={key,anon,promise:null};anonymousClaimFlight=flight;
  flight.promise=(async()=>{
@@ -2308,7 +2340,7 @@ async function recoverRuntimeUpdate({automatic=false,targetVersion='',forceReloa
  trackProductEvent('pwa_update_applied');
  if(!automatic)try{
   const keys=await caches.keys();
-  await Promise.all(keys.filter(key=>key.startsWith('proplet-')&&!key.startsWith('proplet-data-')).map(key=>caches.delete(key)));
+  await Promise.all(keys.filter(key=>key.startsWith('proplet-v')).map(key=>caches.delete(key)));
  }catch{}
  try{
   const reg=await navigator.serviceWorker?.getRegistration?.();
@@ -2696,7 +2728,7 @@ function renderOfflineStatus(value=window.PropletOffline?.getState?.()){
 function installOfflineSupport(){
  window.PropletOffline?.install?.({
   isInstalled:()=>isStandaloneApp()||(window.PROPLET_RUNTIME_META?.environment==='preview'&&new URLSearchParams(location.search).get('offline-preview')==='1'),
-  getProfile,hasCachedProgress:hasCachedAccountProgress,getPendingCount:()=>getQueue().length,onChange:renderOfflineStatus,
+  expectedShell:APP_PREVIEW_RELEASE,getProfile,hasCachedProgress:hasCachedAccountProgress,getPendingCount:()=>getQueue().length,onChange:renderOfflineStatus,
  });
  window.addEventListener('offline',()=>{
   const g=currentGame;if(g&&!g.finished){if(g.pausedAt==null)fairPlay().disconnected(g);renderTimingStatus(g);saveGameProgress();}
@@ -2993,7 +3025,7 @@ function renderTajenkaEntry(){
  root.classList.remove('hidden');root.querySelector('#tajenkaPreviewBtn').onclick=startTajenka;trackTajenkaView();
 }
 async function loadTajenkaFixture(){
- if(!refreshTajenkaAvailability()){tajenkaPuzzle=null;return null}
+ if(!refreshTajenkaAvailability()||navigator.onLine===false){tajenkaPuzzle=null;return null}
  try{const url=TAJENKA_PREVIEW?`/api/tajenka?week=${activeTajenkaWeek}`:'/api/tajenka',response=await fetch(url,{cache:'no-store'});if(!response.ok)throw new Error('tajenka-fixture');const puzzle=await response.json();if(!tajenkaFixtureValid(puzzle)||Number(puzzle.week)!==Number(activeTajenkaWeek))throw new Error('tajenka-fixture-invalid');tajenkaPuzzle=playableTajenkaPuzzle(puzzle);return tajenkaPuzzle}catch(error){console.warn('Tajenka fixture unavailable',error);tajenkaPuzzle=null;return null}
 }
 function contentWeekKey(iso=CONTENT_PREVIEW_DATE||pragueDateISO()){return addDaysISO(iso,-mondayWeekdayIndex(iso))}
@@ -3066,6 +3098,7 @@ async function refreshRollingContent(){
    }
   }catch{}
  }
+ if(navigator.onLine===false)return null;
  try{const r=await fetch(url,{cache:'no-store',headers});if(!r.ok)throw new Error('rolling-content');const fresh=await r.json();if(mergeRollingContent(fresh))renderAfterRollingContent();return fresh}catch{return null}
 }
 
@@ -3090,27 +3123,44 @@ async function boot(){
  // Install reporting before boot awaits; errors in startup must retain their producer.
  bindClientErrorReporting();
  // Resolve the capability before content selection, auth-return sync or the first render.
- if(previewRuntime())await loadRuntimeCapabilities();
+ if(previewRuntime()&&navigator.onLine!==false)await loadRuntimeCapabilities();
  try{await ensureFirstStepsRuntime()}catch{reportClientError('first_steps_module_unavailable','first-steps-contract')}
  applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();globalThis.PropletArchiveExperience?.configure();
  const entryParams=new URLSearchParams(location.search),forcedTutorial=entryParams.get('tutorial')==='1';
  const guideMode=requestedGuideMode(entryParams);
- if(freshStarterVisit()&&!forcedTutorial)await loadRuntimeCapabilities();
+ if(navigator.onLine!==false&&freshStarterVisit()&&!forcedTutorial)await loadRuntimeCapabilities();
  try{
-  if(!guideMode&&!forcedTutorial)await window.PropletFirstSteps.prepareEntry(entryExperimentEnabled,entryExperimentTest);
+  if(navigator.onLine!==false&&!guideMode&&!forcedTutorial)await window.PropletFirstSteps.prepareEntry(entryExperimentEnabled,entryExperimentTest);
  }catch{reportClientError('entry_assignment_failed','entry-contract');showPuzzleBootError();return}
  if(!guideMode&&freshStarterVisit()&&!window.PropletFirstSteps?.directEntryPending()){starterBootTrace=createStarterTrace();trackStarterPhase(starterBootTrace,'requested')}
  try{puzzleDB=await loadPuzzleDatabaseWithRecovery();trackStarterPhase(starterBootTrace,'data_ready')}catch{if(!guideMode)window.PropletFirstSteps?.recordEntryLoadFailure?.();trackStarterPhase(starterBootTrace,'failed','data');try{reportClientError('puzzle_boot_failed','both-attempts-failed')}catch{}showPuzzleBootError();return}
- await Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]);
- await loadTajenkaFixture();
- await freeOrder().configure();freeOrderLastRefreshAt=Date.now();
- document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();await globalThis.PropletArchiveExperience?.install();
- bind();bindClientErrorReporting();initNavigation();
  const requestedOpen=entryParams.get('open');
+ // The installed game's ordinary launch can render the saved bank and account
+ // history immediately. Explicit connected entry links keep their published content gates.
+ const localLaunch=navigator.onLine===false||(isStandaloneApp()&&!puzzleDB.bootstrapSchema&&!location.hash&&!guideMode&&(!requestedOpen||requestedOpen==='free')&&!entryParams.has('play')&&!forcedTutorial);
+ const refreshDailyAfterResume=async()=>{
+  if(navigator.onLine===false)return;
+  await Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]);
+  if(currentScreen!=='game')renderDaily();
+ };
+ if(!localLaunch){
+  await Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]);
+  await loadTajenkaFixture();
+  await freeOrder().configure();freeOrderLastRefreshAt=Date.now();
+ }
+ document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();
+ // Archive also installs on proplet:ready and retries on reconnection.
+ if(!localLaunch)await globalThis.PropletArchiveExperience?.install();
+ bind();bindClientErrorReporting();initNavigation();
  if(requestedOpen==='free')nav('free',{replace:true});
  updateProfileChip();const footerVersion=$('#appVersionFooter');if(footerVersion)footerVersion.textContent=`Proplet v${APP_VERSION}`;
  claimTelemetryAfterAuth();trackProductEvent('app_open');trackInboundCampaign();trackAppSession();
  renderDaily();renderFree();renderProfile();renderInstallUI();
+ if(localLaunch&&navigator.onLine!==false){
+  refreshDailyAfterResume().catch(()=>{});
+  loadTajenkaFixture().then(renderTajenkaEntry);
+  refreshFreeOrder();
+ }
  if(!guideMode&&requestedOpen==='tajenka'&&!entryParams.has('play')&&TAJENKA_AVAILABLE)setTimeout(startTajenka,0);
  refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();
  setTimeout(()=>{
@@ -3118,10 +3168,9 @@ async function boot(){
   const directEntry=!guideMode&&!installPreview&&!forcedTutorial&&window.PropletFirstSteps?.openDirectEntry();
   if(guideMode)openGuideGame(guideMode);
   else if(!directEntry&&!installPreview&&!(!livePlayerPreview()&&window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&entryParams.get('releasePreview')==='1'))openOnboarding(forcedTutorial);
-  document.dispatchEvent(new CustomEvent('proplet:ready'));
+  document.dispatchEvent(new CustomEvent('proplet:ready',{detail:{localLaunch}}));
   if(!guideMode&&!installPreview&&!directEntry)openSpecialInvitation().catch(()=>{});
  },80);
- const refreshDailyAfterResume=()=>Promise.allSettled([refreshDatedDaily(),refreshDatedSpecial()]).then(()=>{if(currentScreen!=='game')renderDaily()}).catch(()=>{if(currentScreen==='daily')renderDaily()});
  window.addEventListener('online',refreshDailyAfterResume);window.addEventListener('focus',refreshDailyAfterResume);window.addEventListener('pageshow',refreshDailyAfterResume);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshDailyAfterResume()});
  const refreshFreeOrderAfterResume=()=>refreshFreeOrder({forceConfig:true,minAgeMs:0});

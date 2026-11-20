@@ -42,7 +42,7 @@
     mountBootScreen();
     document.addEventListener('error',event=>{if(event.target?.matches?.('link[rel="stylesheet"]'))event.target.dataset.loadFailed='1';},true);
 
-    let revealRetry=0,homeFallback=false;
+    let revealRetry=0,homeFallback=false,localLaunch=false;
     window.__PROPLET_REVEAL_CURRENT_UI=(error=false)=>{
       if(revealed)return;
       // Native home modules used to reveal the page before its final projection.
@@ -50,8 +50,9 @@
       const parsed=document.readyState!=='loading';
       const styled=[...document.querySelectorAll('link[rel="stylesheet"]')].every(link=>link.sheet||link.dataset.loadFailed==='1');
       const oneScreen=!document.body?.classList.contains('today-one-screen')||document.body.classList.contains('one-screen-ready');
-      const home=document.documentElement.dataset.archiveReady==='1'||homeFallback;
-      if(!error&&(!parsed||!styled||!oneScreen||!home||document.fonts?.status==='loading')){
+      const home=localLaunch||document.documentElement.dataset.archiveReady==='1'||homeFallback;
+      const fontsReady=localLaunch||document.fonts?.status!=='loading';
+      if(!error&&(!parsed||!styled||!oneScreen||!home||!fontsReady)){
         if(!revealRetry)revealRetry=setTimeout(()=>{revealRetry=0;window.__PROPLET_REVEAL_CURRENT_UI();},50);
         return;
       }
@@ -68,10 +69,16 @@
 
     // A visual fallback can also reveal an error screen; only successful app boot
     // makes the consent notice eligible. Keep the flag for late-loaded modules.
-    document.addEventListener('proplet:ready',()=>{
+    document.addEventListener('proplet:ready',event=>{
       if(window.__PROPLET_CURRENT_UI_READY)return;
       window.__PROPLET_CURRENT_UI_READY=true;
       window.dispatchEvent(new Event('proplet-ui-ready'));
+      if(event?.detail?.localLaunch===true){
+        // Free play is already bound. The Archive and optional fonts can finish
+        // in the background while the player uses the fully styled local UI.
+        localLaunch=true;
+        window.__PROPLET_REVEAL_CURRENT_UI();
+      }
     },{once:true});
 
     let readyChecks=0;
@@ -241,7 +248,7 @@
 
   const loadExtras=async()=>{
     loadScript('/challenge-cta-v3333.js?v=result-sticker1','propletChallengeCtaV3333');
-    await loadScript('/runtime-meta.js?v=search1','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=offline-start1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=all-resume1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');

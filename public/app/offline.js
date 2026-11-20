@@ -160,7 +160,7 @@ function create(deps={}){
     if(!worker?.postMessage)return false;
     channel=new Channel();
     return await new Promise(resolve=>{
-     channel.port1.onmessage=event=>resolve(event?.data?.ready===true);
+     channel.port1.onmessage=event=>resolve(event.data?.ready===true&&typeof options.expectedShell==='string'&&event.data.shell===options.expectedShell);
      channel.port1.onmessageerror=()=>resolve(false);
      worker.postMessage({type:'GET_OFFLINE_STATUS'},[channel.port2]);
     });
@@ -286,11 +286,18 @@ function create(deps={}){
   listen(doc,'visibilitychange',()=>{if(doc?.visibilityState!=='hidden')safely(installed()?prepare({force:!!state.error||now()-lastManifestCheck>=60000}):refresh());});
   for(const event of ['proplet:account-changed','proplet:profile-refreshed','proplet:ready'])listen(doc,event,()=>safely(installed()?prepare():refresh()));
   listen(doc,'proplet:queue-changed',()=>safely(refresh()));
-  listen(nav.serviceWorker,'controllerchange',()=>safely(installed()?prepare({force:true}):refresh()));
+  listen(nav.serviceWorker,'controllerchange',()=>{
+   shellReady=false;publish({ready:false});
+   if(!installed()){safely(refresh());return;}
+   // An old worker's in-flight reply can arrive after the new worker claims
+   // the page. Recheck the new worker once that preparation has settled.
+   const current=flight;
+   safely(current?current.then(()=>prepare()):prepare({force:true}));
+  });
  }
  async function install(next={}){
   options={...options,...next};bind();persist();
-  try{if(installed()&&nav.onLine!==false)return await prepare();return await refresh({checkShell:installed()});}
+  try{return installed()?await prepare():await refresh();}
   catch{return publish({ready:false,error:'offline-storage-unavailable'});}
  }
  async function getPublicConfig(){try{const active=await loadActive();return active?{archiveEnabled:active.manifest.archiveEnabled===true}:null;}catch{return null;}}

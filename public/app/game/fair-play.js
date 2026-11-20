@@ -5,7 +5,12 @@ function create(deps){
  const online=()=>typeof deps.isOnline==='function'?deps.isOnline()!==false:global.navigator?.onLine!==false;
  let sequence=0,configPromise=null,active=null,chain=Promise.resolve(),timer=null,heartbeatMs=25000;
  const rememberConfig=value=>{const configured=Number(value?.heartbeatMs);if(configured>=10000&&configured<=30000)heartbeatMs=configured;return value};
- const config=()=>configPromise||(configPromise=deps.api('/api/play-session/config',{timeoutMs:2000}).then(value=>{global.PROPLET_ISOLATED_FAIR_PLAY_PREVIEW=value.isolatedPreview===true;try{global.localStorage?.setItem('proplet:fair-play-config',JSON.stringify(value))}catch{}return rememberConfig(value)}).catch(()=>{configPromise=null;try{return rememberConfig(JSON.parse(global.localStorage?.getItem('proplet:fair-play-config')||'{}'))}catch{return {enabled:false}}}));
+ const config=()=>configPromise||(configPromise=deps.api('/api/play-session/config',{timeoutMs:2000}).then(value=>{global.PROPLET_ISOLATED_FAIR_PLAY_PREVIEW=value.isolatedPreview===true;try{global.localStorage?.setItem('proplet:fair-play-config',JSON.stringify(value))}catch{}return rememberConfig(value)}).catch(error=>{
+   configPromise=null;
+   let cached={enabled:false};
+   try{cached=rememberConfig(JSON.parse(global.localStorage?.getItem('proplet:fair-play-config')||'{}'))}catch{}
+   return {...cached,networkUnavailable:error?.networkUnavailable===true};
+ }));
  function snapshot(g){return {found:g.found||[],elapsedMs:Math.round(deps.elapsed(g)),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,calmMode:!!g.calmMode,unverified:!!g.timingUnverified,mergedAttempts:!!g.mergedAttempts,disconnected:!!g.disconnected}}
  function command(g,action,progress){return {action,puzzle_id:g.puzzle.id,challenge_key:deps.key(g.mode,g.puzzle,g.dailyDate),mode:g.mode,difficulty:g.puzzle.difficulty,attempt_id:g.attemptId,owner_id:owner,sequence:++sequence,progress}}
  function stop(){if(timer!=null){deps.clearInterval(timer);timer=null}}
@@ -29,18 +34,22 @@ function create(deps){
    if(g.mode!=='tajenka'||!progress||!deps.tajenkaFound)return progress||{};
    return {...progress,found:deps.tajenkaFound(g.puzzle,{...progress,puzzleId:g.puzzle.id})};
  }
- async function prepare(puzzle,mode,dailyDate,restored){
+ async function prepare(puzzle,mode,dailyDate,restored,offlineStart=false){
    if(!['daily','daily_special','free','tajenka'].includes(mode))return {restored};
    // A first offline launch may have no cached server policy at all. Keep the
    // local attempt playable, but never manufacture verified competitive time.
-   if(!online())return {restored:{...restored,disconnected:true,timingUnverified:!!restored?.timingUnverified||!restored?.serverTimingAnchored},fairPlay:!!restored?.serverTimingAnchored};
-   if((await config()).enabled!==true)return {restored};
+   const localFree=mode==='free'&&deps.canStartOffline?.()===true;
+   const disconnectedStart=()=>({restored:{...restored,disconnected:true,timingUnverified:!!restored?.timingUnverified||!restored?.serverTimingAnchored},fairPlay:!!restored?.serverTimingAnchored});
+   if(!online()||(localFree&&offlineStart))return disconnectedStart();
+   const policy=await config();
+   if(localFree&&policy.networkUnavailable)return disconnectedStart();
+   if(policy.enabled!==true)return {restored};
    const g={puzzle,mode,dailyDate,...restored,found:restored?.found||[],attemptId:restored?.attemptId||global.crypto.randomUUID(),fairPlay:true,timingUnverified:restored?.timingUnverified};
    const progress={...snapshot(g),elapsedMs:restored?.elapsedMs||0};
    try{
      await chain;
      const profile=deps.profile();
-     const row=await deps.api('/api/play-session',{method:'POST',body:JSON.stringify(command(g,'open',progress)),authProfile:profile});
+     const row=await deps.api('/api/play-session',{method:'POST',body:JSON.stringify(command(g,'open',progress)),authProfile:profile,...(localFree?{timeoutMs:2000}:{})});
      const practice=mode==='daily_special'&&puzzle?.meta?.dailySpecialBinding?.rewardEligible===false;
      if(row.finished&&(practice||deps.completed?.(puzzle,mode,dailyDate)||await deps.completedAttempt?.(puzzle,mode,dailyDate,row.attempt_id,profile)))return {restored:null,fairPlay:false,replay:true};
      const serverProgress=restoreProgress(g,row.progress);
