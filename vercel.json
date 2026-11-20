@@ -41,6 +41,19 @@
   ],
   "headers": [
     {
+      "source": "/(.*)",
+      "missing": [{"type": "host", "value": "hrajproplet.cz"}],
+      "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow"}]
+    },
+    {
+      "source": "/design/:path*",
+      "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow"}]
+    },
+    {
+      "source": "/api/:path*",
+      "headers": [{"key": "X-Robots-Tag", "value": "noindex"}]
+    },
+    {
       "source": "/admin(.*)",
       "headers": [
         {

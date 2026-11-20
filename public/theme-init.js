@@ -241,7 +241,7 @@
 
   const loadExtras=async()=>{
     loadScript('/challenge-cta-v3333.js?v=result-sticker1','propletChallengeCtaV3333');
-    await loadScript('/runtime-meta.js?v=word-xp1','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=search1','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=all-resume1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
@@ -256,7 +256,7 @@
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
     loadScript('/competitive-sharing-v3331.js?v=analytics2','propletCompetitiveSharing');
-    loadScript('/footer-hotfix-v40120.js?v=mk100','propletFooterHotfixV40120');
+    loadScript('/footer-hotfix-v40120.js?v=search1','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=monthly-releaseprep6','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=ui-refinement1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=monthly-releaseprep6','propletSettingsIaV40122');

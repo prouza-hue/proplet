@@ -5,7 +5,11 @@
   // Aggregate acquisition only. Never run a platform probe from preview,
   // tutorial/technical runs, localhost or OAuth return URLs.
   const params=new URLSearchParams(location.search),meta=window.PROPLET_RUNTIME_META;
-  if(!['hrajproplet.cz','www.hrajproplet.cz'].includes(location.hostname)||meta?.environment!=='production'||params.get('tutorial')==='1'||params.has('auth')||params.has('code')||/access_token|refresh_token/.test(location.hash))return;
+  const guide=!meta && location.hostname==='hrajproplet.cz' && document.documentElement.hasAttribute('data-proplet-guide');
+  const productionGame=['hrajproplet.cz','www.hrajproplet.cz'].includes(location.hostname) && meta?.environment==='production';
+  if(!(productionGame||guide)||params.get('tutorial')==='1'||params.has('auth')||params.has('code')||/access_token|refresh_token/.test(location.hash))return;
+  // The Web Analytics SDK can also read document.referrer outside beforeSend.
+  if(guide && /[?#]/.test(document.referrer))return;
   const beforeSend=event=>{
     try{
       const url=new URL(event.url);url.search='';url.hash='';
@@ -16,9 +20,13 @@
   };
   window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};
   window.va('beforeSend',beforeSend);
-  window.si=window.si||function(){(window.siq=window.siq||[]).push(arguments)};
-  window.si('beforeSend',beforeSend);
-  for(const src of ['/_vercel/insights/script.js','/_vercel/speed-insights/script.js']){
+  const sources=['/_vercel/insights/script.js'];
+  if(productionGame){
+    window.si=window.si||function(){(window.siq=window.siq||[]).push(arguments)};
+    window.si('beforeSend',beforeSend);
+    sources.push('/_vercel/speed-insights/script.js');
+  }
+  for(const src of sources){
     if(document.querySelector('script[src="'+src+'"]'))continue;
     const script=document.createElement('script');script.src=src;script.defer=true;document.head.append(script);
   }
