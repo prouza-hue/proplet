@@ -168,8 +168,10 @@ async function firstWin(page,touch=false,style='drag',boardId='g4-e-001'){await 
   for(const mode of ['daily','tajenka']){
    await scenario('guide-opens-'+mode,async page=>{
     await control({entryVariant:'B'});
+    const guide=url+(mode==='daily'?'/denni-vyzva.html':'/tajenka.html');
     const entry=url+'/?open='+mode+'&via=pruvodce';
-    await page.goto(entry);
+    await page.goto(guide);
+    await page.locator('main a.guide-play').click();
     await page.waitForFunction(mode=>currentGame?.mode===mode&&document.querySelectorAll('#board .cell').length>0,mode);
     assert.equal(new URL(page.url()).search,'');
     assert.equal((await recording()).requests.some(r=>r.path==='/api/entry-experiment/assignment'),false);
@@ -183,8 +185,19 @@ async function firstWin(page,touch=false,style='drag',boardId='g4-e-001'){await 
      assert.deepEqual(await page.evaluate(()=>tajenkaCompletion()),state);
      assert.equal(await page.evaluate(()=>currentGame?.mode==='tajenka'),false);
     }else{
+     // The desktop rail refits the whole board on first entry. Track each live
+     // cell during the drag instead of replaying coordinates from before the refit.
+     await page.waitForFunction(()=>document.documentElement.dataset.gameLayoutMode==='desktop-wide'&&currentGame.pausedAt==null);
+     await page.evaluate(()=>document.fonts.ready);
      const path=await page.evaluate(()=>currentGame.puzzle.answers[0].path);
-     await draw(page,path);
+     const cell=i=>page.locator('#board .cell[data-index="'+i+'"]');
+     await cell(path[0]).hover();
+     await page.mouse.down();
+     try{
+      for(const index of path.slice(1)){
+       await cell(index).hover({force:true});
+      }
+     }finally{await page.mouse.up()}
      await page.waitForFunction(()=>currentGame?.found.length===1);
      await page.goto(entry);
      await page.waitForFunction(()=>currentGame?.mode==='daily'&&currentGame.found.length===1);
