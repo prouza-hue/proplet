@@ -10,12 +10,16 @@ const {chromium} = require('playwright');
 
 const root = path.resolve(__dirname, '../..');
 const port = Number(process.env.OFFLINE_FIXTURE_PORT || 8765);
-const origin = `http://127.0.0.1:${port}`;
+const fixtureOrigin = `http://127.0.0.1:${port}`;
+// A *.localhost origin is secure loopback in Chromium and takes the shipped
+// production path instead of the explicit 127.0.0.1 authoring-preview path.
+const flightOnly = process.env.OFFLINE_COLD_START_ONLY === '1';
+const origin = flightOnly ? `http://proplet.localhost:${port}` : fixtureOrigin;
 const evidence = process.env.OFFLINE_EVIDENCE_DIR || path.join(os.tmpdir(), 'proplet-offline-browser-evidence');
 fs.mkdirSync(evidence, {recursive:true});
 const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'proplet-offline-browser-'));
 const report = {fixtureOnly:true, productionWrites:0, startedAt:new Date().toISOString(), checks:[], browserErrors:[], externalRequests:[], failedRequests:[],httpFailures:[],workerEvents:[]};
-const json = (url, options) => fetch(origin + url, options).then(async r => {
+const json = (url, options) => fetch(fixtureOrigin + url, options).then(async r => {
   const body = await r.json();
   assert.ok(r.ok, `${url}: ${r.status} ${JSON.stringify(body)}`);
   return body;
@@ -115,17 +119,15 @@ async function startFreeBoard(page, difficulty) {
 
 async function traceWord(page, answer) {
   const before = await page.evaluate(() => currentGame.found.length);
-  // DOM pointer events use the actual board/input handlers and submitPath.
-  await page.evaluate(path => {
-    if (currentGame.pausedAt != null) resumeGameClock();
-    const cells = path.map(i => document.querySelector(`.cell[data-index="${i}"]`));
-    if (cells.some(c => !c)) throw Error('Missing board cell');
-    const event = (type,cell) => {const r=cell.getBoundingClientRect();return new PointerEvent(type,{bubbles:true,pointerId:1,isPrimary:true,pointerType:'mouse',button:0,buttons:type==='pointerup'?0:1,clientX:r.x+r.width/2,clientY:r.y+r.height/2});};
-    cells[0].dispatchEvent(event('pointerdown',cells[0]));
-    for (const cell of cells.slice(1)) cell.dispatchEvent(event('pointerenter',cell));
-    document.dispatchEvent(event('pointerup',cells.at(-1)));
-  }, answer.path);
-  await page.waitForFunction(n => currentGame.found.length === n + 1, before);
+  const points = await page.evaluate(path => path.map(index => {
+    const {x,y,width,height} = document.querySelector(`#board .cell[data-index="${index}"]`).getBoundingClientRect();
+    return {x:x+width/2,y:y+height/2};
+  }), answer.path);
+  await page.mouse.move(points[0].x, points[0].y);
+  await page.mouse.down();
+  for (const point of points.slice(1)) await page.mouse.move(point.x, point.y, {steps:3});
+  await page.mouse.up();
+  await page.waitForFunction(n => currentGame.found.length === n + 1, before, {timeout:5000});
 }
 
 async function solve(page, answers) {
@@ -134,10 +136,53 @@ async function solve(page, answers) {
   return page.evaluate(() => ({id:currentGame.puzzle.id,result:currentGame.resultRecord,queue:getQueue(),completed:getState().completed}));
 }
 
+// Closing the fixture removes the origin even for service-worker requests that
+// browser-only network emulation may miss. Then repeat with an open TCP socket
+// that never returns headers, as on a connected Wi-Fi network with no internet.
+async function flightColdStarts() {
+  await context.close();
+  context = null;
+  const stopped = new Promise(resolve => server.once('exit', resolve));
+  server.kill('SIGTERM');
+  await stopped;
+  server = null;
+
+  for (const offline of [true, false]) {
+    let hangingServer;
+    try {
+      if (!offline) {
+        hangingServer = require('node:http').createServer(() => {});
+        await new Promise((resolve, reject) => hangingServer.once('error', reject).listen(port, '127.0.0.1', resolve));
+      }
+      const page = await launch({offline});
+      const started = Date.now();
+      await page.goto(origin + '/', {waitUntil:'domcontentloaded', timeout:10000});
+      await network(offline);
+      assert.equal(await page.evaluate(() => navigator.onLine), !offline);
+      const difficulty = offline ? 'easy' : 'medium';
+      await page.locator('[data-nav="free"]').click({timeout:10000});
+      await page.locator(`[data-play-free="${difficulty}"]`).click({timeout:10000});
+      await page.waitForFunction(diff => window.currentGame?.puzzle?.difficulty === diff, difficulty, {timeout:10000});
+      const board = await page.evaluate(() => ({id:currentGame.puzzle.id, answers:currentGame.puzzle.answers}));
+      await traceWord(page, board.answers[0]);
+      const elapsedMs = Date.now() - started;
+      check('Cold start to first correct word', {transport:offline ? 'airplane' : 'unresponsive',elapsedMs,puzzleId:board.id});
+      assert.ok(elapsedMs < 10000, 'Reading an installed board must not wait for network timeouts');
+    } finally {
+      if (hangingServer) {
+        const closed = new Promise(done => hangingServer.close(done));
+        hangingServer.closeAllConnections();
+        await closed;
+      }
+      if (context) { await context.close(); context = null; }
+    }
+  }
+}
+
 async function main() {
   server = spawn(process.env.PYTHON || 'python', [path.join(__dirname, 'fixture_server.py')], {cwd:root,env:{...process.env,OFFLINE_FIXTURE_PORT:String(port)},stdio:['ignore','pipe','pipe']});
   server.stdout.on('data', data => {serverOutput += data}); server.stderr.on('data', data => {serverOutput += data});
-  await poll(async () => {try {return (await fetch(origin + '/__fixture/state')).ok}catch{return false}}, 30000);
+  await poll(async () => {try {return (await fetch(fixtureOrigin + '/__fixture/state')).ok}catch{return false}}, 30000);
   const alternative = await json('/__fixture/archive-alternative');
   let page = await launch();
   await ready(page);
@@ -146,6 +191,12 @@ async function main() {
   assert.equal(pack.profileReady,true); assert.equal(pack.controlled,true);
   assert.deepEqual(Object.keys(pack.counts).sort(),['easy','medium','hard','hardcore','mozkomor','mozkokalypsa'].sort());
   check('Automatic pack and service-worker shell ready', pack);
+  if (flightOnly) {
+    assert.equal(await page.evaluate(() => freeOrder().enabled()), true, 'Model the live signed-in free-order capability');
+    await flightColdStarts();
+    report.ok = true;
+    return;
+  }
   const contentSafety = await page.evaluate(async () => {
     const names=(await caches.keys()).filter(name=>name.startsWith('proplet-offline-content-v1-'));
     const paths=[];

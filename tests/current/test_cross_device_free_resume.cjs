@@ -39,15 +39,15 @@ function server(){
  return {api,sessions};
 }
 
-function device(name,shared){
+function device(name,shared,installed=false){
  const memory=new Map(),completed=new Set(),localResume=new Map();let profile={id:'same-account',token:'synthetic'},opened=null,opening=null;
  const storage={getItem:k=>memory.get(k)||null,setItem:(k,v)=>memory.set(k,v),removeItem:k=>memory.delete(k)};
  const store=Store.create({engine:Engine,storage,profile:()=>profile,bank:d=>banks[d],completed:d=>banks[d].filter(p=>completed.has(p.id)).map(p=>p.id),uuid:()=>`${name}-request`,api:shared.api});
- const fairPlay=FairPlay.create({owner:name,profile:()=>profile,elapsed:g=>g.elapsedMs||0,key:(_m,p)=>`free:${p.id}`,now:()=>0,isOnline:()=>true,setInterval:()=>1,clearInterval(){},api:shared.api});
+ const fairPlay=FairPlay.create({owner:name,canStartOffline:()=>installed,profile:()=>profile,elapsed:g=>g.elapsedMs||0,key:(_m,p)=>`free:${p.id}`,now:()=>0,isOnline:()=>true,setInterval:()=>1,clearInterval(){},api:shared.api});
  const progression=Progression.create({sortedFreeBank:d=>banks[d],localFreeSlotState:d=>({actual:new Set(banks[d].filter(p=>completed.has(p.id)).map(p=>p.meta.level)),transferred:new Set()}),resumableFreePuzzle:d=>localResume.get(d)||null});
  const cards={innerHTML:''};
- const context=vm.createContext({progression:()=>progression,freeOrder:()=>store,getProfile:()=>profile,navigator:{onLine:true},allowAccountGameStart:()=>true,
-  startGame(p,mode,date){opened=p;opening=fairPlay.prepare(p,mode,date,null);},showToast:message=>assert.fail(message),
+ const context=vm.createContext({progression:()=>progression,freeOrder:()=>store,getProfile:()=>profile,navigator:{onLine:true},canPlayStoredFree:()=>installed,allowAccountGameStart:()=>true,
+  startGame(p,mode,date,options){opened=p;opening=fairPlay.prepare(p,mode,date,null,options?.offlineStart);},showToast:message=>assert.fail(message),
   renderAccountProgressStatus(){},renderNewContentBanner(){},renderFreeResumeCard(){},newContentCount:()=>0,freeHistory:()=>({progress:[]}),
   DIFF:Object.fromEntries(difficulties.map(d=>[d,{label:d,xp:100}])),esc:s=>s,difficultyIconMarkup:()=>'',
   $:selector=>selector==='#difficultyCards'?cards:null,$$:()=>[],window:{}});
@@ -90,5 +90,24 @@ function device(name,shared){
   mobile.setProfile({id:'different-account',token:'other'});
   assert.equal(mobile.context.freeProgress(difficulty).resume.id,stale.id,`${difficulty}: changing accounts cannot expose the previous account's remote board`);
  }
+ // Wi-Fi can remain connected while the origin has disappeared. Preserve the
+ // saved board and unverified timing; a real lease conflict must still win.
+ const saved=banks.easy[2],requests=[];
+ let route='offline';
+ const pwa=device('installed',{async api(path,options){
+  requests.push(path);
+  if(path==='/api/free-order/config')return {enabled:true};
+  if(route==='offline')throw Object.assign(new Error('unreachable'),{networkUnavailable:true});
+  if(path==='/api/free-order')return {enabled:true,records:{},resumeIds:{}};
+  if(path==='/api/play-session/config')return {enabled:true};
+  assert.equal(options.timeoutMs,2000);
+  throw Object.assign(new Error('open elsewhere'),{status:409});
+ }},true);
+ pwa.localResume.set('easy',saved);await pwa.store.configure();
+ const local=await pwa.open('easy');
+ assert.equal(local.puzzle.id,saved.id);assert.equal(local.prepared.restored.timingUnverified,true);
+ assert.equal(requests.includes('/api/play-session'),false);
+ route='connected';
+ await assert.rejects(pwa.open('easy'),error=>error.status===409);
  console.log('PASS six free difficulties: independent devices, visible Continue, stale local override, exact board and full progress in both directions, completion and account isolation');
 })().catch(error=>{console.error(error);process.exitCode=1;});

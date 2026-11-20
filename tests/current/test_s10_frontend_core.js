@@ -99,13 +99,22 @@ async function verifyApiModule() {
     fetch: async () => ({ok:false,status:409,json:async()=>({detail:'Konflikt',requestId:'req:1'})}),
     getProfile:()=>null,getAnonymousId:()=> 'a',getVersion:()=> 'v',getPreviewDate:()=>'',isOnline:()=>true,
   });
-  await assert.rejects(httpClient('/api/fail'), error => error.message==='Konflikt · kód req:1' && error.status===409);
+  await assert.rejects(httpClient('/api/fail'), error => error.message==='Konflikt · kód req:1' && error.status===409 && !error.networkUnavailable);
 
   const timeoutClient = create({
     fetch: async (_u,o) => new Promise((_,reject) => o.signal.addEventListener('abort',()=>{const e=new Error('aborted');e.name='AbortError';reject(e);})),
     getProfile:()=>null,getAnonymousId:()=> 'a',getVersion:()=> 'v',getPreviewDate:()=>'',isOnline:()=>true,timeoutMs:5,
   });
-  await assert.rejects(timeoutClient('/api/slow'), /Server se neozval včas/);
+  await assert.rejects(timeoutClient('/api/slow'), error => error.networkUnavailable && /Server se neozval včas/.test(error.message));
+
+  const partialBodyClient = create({
+    fetch: async (_url, {signal}) => ({
+      ok:true,
+      json:()=>new Promise((_,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('timeout','AbortError')))),
+    }),
+    timeoutMs:5,
+  });
+  await assert.rejects(partialBodyClient('/api/partial'), error => error.networkUnavailable && /Server se neozval včas/.test(error.message));
 
   const offlineClient = create({
     fetch: async()=>{throw new Error('network')},getProfile:()=>null,getAnonymousId:()=> 'a',

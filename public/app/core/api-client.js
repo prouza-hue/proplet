@@ -41,29 +41,34 @@
           signal: controller.signal,
           cache: 'no-store',
         });
-      } catch (error) {
-        clearTimeout(timeout);
-        if (error?.name === 'AbortError') throw new Error('Server se neozval včas');
-        throw new Error(isOnline() ? 'Spojení se serverem selhalo' : 'Telefon je offline');
-      }
 
-      clearTimeout(timeout);
-      if (!response.ok) {
-        let message = `Server vrátil chybu ${response.status}`;
-        let requestId = '';
-        try {
-          const body = await response.json();
-          message = body.detail || body.message || message;
-          requestId = String(body.requestId || '').replace(/[^A-Za-z0-9_.:-]/g, '').slice(0, 24);
-        } catch (_) {}
-        if (requestId) message += ` · kód ${requestId}`;
-        const error = new Error(message);
-        error.status = response.status;
-        const retryAfter = response.headers?.get?.('Retry-After');
-        error.retryAfterMs = retryAfter ? (/^\d+$/.test(retryAfter) ? Number(retryAfter)*1000 : Math.max(0,Date.parse(retryAfter)-Date.now())) : 0;
-        throw error;
+        if (!response.ok) {
+          let message = `Server vrátil chybu ${response.status}`;
+          let requestId = '';
+          try {
+            const body = await response.json();
+            message = body.detail || body.message || message;
+            requestId = String(body.requestId || '').replace(/[^A-Za-z0-9_.:-]/g, '').slice(0, 24);
+          } catch (_) {}
+          if (requestId) message += ` · kód ${requestId}`;
+          const error = new Error(message);
+          error.status = response.status;
+          const retryAfter = response.headers?.get?.('Retry-After');
+          error.retryAfterMs = retryAfter ? (/^\d+$/.test(retryAfter) ? Number(retryAfter)*1000 : Math.max(0,Date.parse(retryAfter)-Date.now())) : 0;
+          throw error;
+        }
+        // A network may stop delivering data after it has returned the headers.
+        return await response.json();
+      } catch (error) {
+        if (response && (error?.status || (error?.name !== 'AbortError' && error?.name !== 'TypeError'))) throw error;
+        const failure = error?.name === 'AbortError'
+          ? new Error('Server se neozval včas')
+          : new Error(isOnline() ? 'Spojení se serverem selhalo' : 'Telefon je offline');
+        failure.networkUnavailable = true;
+        throw failure;
+      } finally {
+        clearTimeout(timeout);
       }
-      return response.json();
     };
   }
 
