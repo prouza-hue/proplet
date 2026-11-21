@@ -37,7 +37,7 @@ function closeInfoPopover(){q('#qualityInfoPopover')?.remove();setAttr(q('#daily
 function toggleInfoPopover(btn){
   if(q('#qualityInfoPopover')){closeInfoPopover();return}
   const pop=document.createElement('div');pop.id='qualityInfoPopover';pop.className='quality-info-popover';pop.setAttribute('role','tooltip');
-  pop.innerHTML='<strong>Jak se řadí Dnešní výzva</strong>Čisté řešení → méně nápověd → čas → tahy.';
+  pop.innerHTML='<strong>Jak se řadí Dnešní výzva</strong>Rozhoduje nižší počet nápověd, při shodě kratší čas a pak méně tahů.';
   document.body.appendChild(pop);
   const r=btn.getBoundingClientRect(),left=Math.min(window.innerWidth-pop.offsetWidth-12,Math.max(12,r.left));
   pop.style.left=`${left+window.scrollX}px`;pop.style.top=`${r.bottom+8+window.scrollY}px`;setAttr(btn,'aria-expanded','true');
@@ -168,7 +168,7 @@ async function enrichPlayedLevels(diff){
   const legacy=data?.legacyLevels||[],transferred=Number(data?.transferred||0);
   q('.legacy-history-v334',list)?.remove();if(!legacy.length)return;
   const section=document.createElement('section');section.className='legacy-history-v334';
-  section.innerHTML=`<h3>Dříve odehrané</h3><p>Tvoje starší výsledky zůstávají v historii. Původní desky už nemusí být znovu hratelné.</p>${legacy.slice().sort((a,b)=>(a.level||0)-(b.level||0)).map(r=>`<div class="legacy-history-row"><span class="level-index">${Number(r.level)||'–'}.</span><span><strong>${r.elapsedMs&&typeof fmtTime==='function'?fmtTime(r.elapsedMs):'Dokončeno'}</strong><small>${r.cleanSolve?'Čistě':r.hintsUsed?`💡 ${r.hintsUsed}×`:'Dokončeno'} · ${Number(r.moves||0)} tahů${r.calmMode?' · 🫧 Klid':''}</small></span><em>archiv</em></div>`).join('')}`;
+  section.innerHTML=`<h3>Dříve odehrané</h3><p>Tvoje starší výsledky zůstávají v historii. Původní desky už nemusí být znovu hratelné.</p>${legacy.slice().sort((a,b)=>(a.level||0)-(b.level||0)).map(r=>`<div class="legacy-history-row"><span class="level-index">${Number(r.level)||'–'}.</span><span><strong>${r.elapsedMs&&typeof fmtTime==='function'?fmtTime(r.elapsedMs):'Dokončeno'}</strong><small>${r.cleanSolve?'Bez nápovědy':r.hintsUsed?countCz(r.hintsUsed,'nápověda','nápovědy','nápověd'):'Dokončeno'} · ${Number(r.moves||0)} tahů${r.calmMode?' · 🫧 Klid':''}</small></span><em>archiv</em></div>`).join('')}`;
   list.appendChild(section);
 }
 function installHistoryWrapper(){if(typeof openPlayedLevels==='function'&&!openPlayedLevels.__qualityWrapped){const base=openPlayedLevels,wrapped=async function(diff){const out=await base(diff);if(out!==false)await enrichPlayedLevels(diff);return out};wrapped.__qualityWrapped=true;openPlayedLevels=wrapped}}

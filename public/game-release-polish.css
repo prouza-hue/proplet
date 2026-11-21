@@ -203,3 +203,118 @@ html.tiskarna-ui[data-theme=dark] #screen-game.tajenka-mode .tajenka-phrase{
   background:color-mix(in srgb,var(--r-board-mat) 82%,var(--r-paper))!important;
   border-color:var(--r-edge)!important;
 }
+html.tiskarna-ui #screen-game #cleanStatus.hidden{display:none!important}
+html.tiskarna-ui #screen-game .current-word:has(#cleanStatus.hidden)>div:first-child{
+  grid-column:1/-1;
+}
+
+/* Keep the word in progress next to the grid. The word list can grow in the
+   rail without moving the grid under the player's finger. */
+html.tiskarna-ui #screen-game .word-list-in-rail .game-board-column>.current-word{
+  grid-row:1!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:1fr!important;
+  flex:0 0 auto;
+  gap:10px!important;
+  padding:5px 10px!important;
+  height:48px!important;
+  min-height:48px!important;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .current-word:has(#cleanStatus.hidden)>div:first-child{
+  grid-column:1;
+  display:flex!important;
+  flex-wrap:nowrap;
+  gap:8px;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .current-word #currentWord{
+  min-width:0;
+  white-space:nowrap!important;
+  overflow-x:auto!important;
+  scrollbar-width:none;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .current-word #gameMessage{
+  grid-column:1!important;
+  grid-row:1!important;
+  align-self:center!important;
+  min-height:0!important;
+  max-height:2.7em!important;
+  overflow:auto!important;
+  text-align:start!important;
+  line-height:1.3!important;
+  font-size:13px!important;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail:not(:has(#board .cell.active)) .current-word:has(#gameMessage:not(:empty))>div:first-child,
+html.tiskarna-ui #screen-game .word-list-in-rail:has(#board .cell.active) .current-word #gameMessage{
+  display:none!important;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .game-control-column{
+  display:flex!important;
+  flex-direction:column;
+  min-height:0;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .game-control-column>.game-info{
+  position:relative;
+  display:block!important;
+  flex:0 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:9px!important;
+  margin:0;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .game-info .word-status-wrap{
+  display:grid;
+  gap:8px;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .game-info .word-status-wrap>.word-status-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:4px!important;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .game-info .stat-label{
+  display:block;
+  font-size:10px!important;
+  margin:0!important;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .remaining-row .stat-label{
+  padding-inline-end:4em;
+  line-height:1.5;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .game-progress{
+  position:absolute;
+  inset:8px 9px auto auto;
+  font-size:15px;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .word-status-row :is(.lengths,.found-words){
+  display:flex;
+  flex-wrap:wrap!important;
+  overflow:visible!important;
+  gap:4px!important;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .word-status-row .length-pill{
+  flex:0 0 auto!important;
+  min-width:22px!important;
+  font-size:12px;
+  height:22px;
+  min-height:22px;
+  padding:1px 4px;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .found-word-chip{
+  font-size:12px;
+  max-width:100%;
+  height:auto;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  padding:2px 5px;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail #magnifierDock{
+  order:1;
+  flex-shrink:0;
+  margin-block:auto;
+  align-self:center;
+}
+html.tiskarna-ui #screen-game .word-list-in-rail .game-actions{
+  order:2;
+  flex-shrink:0;
+  margin-top:auto;
+}

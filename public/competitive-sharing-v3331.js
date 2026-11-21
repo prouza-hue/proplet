@@ -104,7 +104,7 @@
   const diffLabel=diff=>DIFF?.[diff]?.label||diff||'Proplet';
   const cleanLabel=hints=>{
     const n=Number(hints||0);
-    return n===0?'✨ bez nápovědy':`💡 ${countCz(n,'nápověda','nápovědy','nápověd')}`;
+    return n===0?'bez nápovědy':countCz(n,'nápověda','nápovědy','nápověd');
   };
   const formatDelta=ms=>{
     const total=Math.max(1,Math.round(Number(ms||0)/1000));
@@ -183,11 +183,11 @@
     if(!hasBenchmark(bench))return {outcome:'complete',title:'🎯 Výzva dokončena',copy:'Teď můžeš poslat svůj výsledek dál.'};
     const aHints=Number(attempt.hintsUsed||0),bHints=Number(bench.hintsUsed||0),aClean=aHints===0,bClean=bHints===0;
     if(aClean!==bClean)return aClean
-      ?{outcome:'win',title:'🏆 Překonal jsi výzvu!',copy:'Vyhrál jsi čistým řešením.'}
-      :{outcome:'loss',title:'Těsně vedle.',copy:'Soupeř měl čisté řešení. Zkus to ještě jednou.'};
+      ?{outcome:'win',title:'🏆 Překonal jsi výzvu!',copy:'Desku jsi vyřešil bez nápovědy.'}
+      :{outcome:'loss',title:'Těsně vedle.',copy:'Soupeř vyřešil desku bez nápovědy.'};
     if(aHints!==bHints)return aHints<bHints
-      ?{outcome:'win',title:'🏆 Překonal jsi výzvu!',copy:`Použil jsi o ${bHints-aHints} ${bHints-aHints===1?'nápovědu':'nápovědy'} méně.`}
-      :{outcome:'loss',title:'Těsně vedle.',copy:`Soupeř použil o ${aHints-bHints} ${aHints-bHints===1?'nápovědu':'nápovědy'} méně.`};
+      ?{outcome:'win',title:'🏆 Překonal jsi výzvu!',copy:`Použil jsi o ${countCz(bHints-aHints,'nápovědu','nápovědy','nápověd')} méně.`}
+      :{outcome:'loss',title:'Těsně vedle.',copy:`Soupeř použil o ${countCz(aHints-bHints,'nápovědu','nápovědy','nápověd')} méně.`};
     // Compare the whole seconds shown to both players; invisible milliseconds
     // must not decide a result that looks like a tie.
     const dt=(Math.floor(Number(attempt.elapsedMs||0)/1000)-Math.floor(Number(bench.elapsedMs||0)/1000))*1000;

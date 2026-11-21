@@ -115,7 +115,7 @@
     const text=(el.textContent||'').trim();if(!text)return;
     el.dataset.v40122Compact='1';el.textContent='';
     const details=document.createElement('details');details.className='ranking-compact-explain';
-    details.innerHTML='<summary>ⓘ Pravidla pořadí</summary><p>Čisté řešení → méně nápověd → čas → tahy. Počítá se první dokončený pokus. Jméno se ukáže jen po souhlasu; jinak zůstává anonymní přezdívka.</p>';
+    details.innerHTML='<summary>ⓘ Pravidla pořadí</summary><p>Rozhoduje nižší počet nápověd, při shodě kratší čas a pak méně tahů. Počítá se první dokončený pokus. Jméno se ukáže jen po souhlasu; jinak zůstává anonymní přezdívka.</p>';
     el.appendChild(details);
   }
   function compactRankingExplanations(){qa('.daily-world-privacy').forEach(compactRankingNode);qa('.level-board-head>small').forEach(compactRankingNode)}

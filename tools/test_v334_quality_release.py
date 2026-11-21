@@ -96,7 +96,7 @@ for phrase in (
     assert phrase in client, phrase
 assert "Víc zábavy, menší frustrace!" not in client
 assert "Vyladili jsme obtížnost a komplet předělali všechny úrovně." not in client
-assert "Čisté řešení → méně nápověd → čas → tahy." in client
+assert "Rozhoduje nižší počet nápověd, při shodě kratší čas a pak méně tahů." in client
 assert "#screen-free>.screen-title" in css and "#screen-leaderboard>.screen-title" in css
 assert "appearance-card .section-head .eyebrow" in client
 

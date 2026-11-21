@@ -93,7 +93,7 @@
 
   function rowMarkup(rows){
     if(typeof rankingExpandedRows==='function')return rankingExpandedRows(rows||[]);
-    return (rows||[]).map(row=>`<div class="mini-leader-row result-player-row ${row.isMine?'me':''}" data-result-elapsed="${esc(row.elapsedMs??'')}" data-result-moves="${esc(row.moves??'')}" data-result-hints="${esc(row.hintsUsed??'')}" data-result-clean="${typeof row.cleanSolve==='boolean'?String(row.cleanSolve):''}"><b class="result-player-rank">${Number(row.rank)||'—'}.</b><span class="result-player-avatar" data-player-avatar="${esc(row.avatar||'🎭')}">${esc(row.avatar||'🎭')}</span><span class="result-player-copy"><strong>${row.isMine?'Ty':esc(row.name||'Anonymní propletač')}</strong><small>${row.cleanSolve?'Čistě':`Nápověda ${Number(row.hintsUsed)||0}×`} · ${countCzLocal(Number(row.moves)||0,'tah','tahy','tahů')}</small></span><em class="result-player-time">${fmtTimeLocal(row.elapsedMs)}</em></div>`).join('');
+    return (rows||[]).map(row=>`<div class="mini-leader-row result-player-row ${row.isMine?'me':''}" data-result-elapsed="${esc(row.elapsedMs??'')}" data-result-moves="${esc(row.moves??'')}" data-result-hints="${esc(row.hintsUsed??'')}" data-result-clean="${typeof row.cleanSolve==='boolean'?String(row.cleanSolve):''}"><b class="result-player-rank">${Number(row.rank)||'—'}.</b><span class="result-player-avatar" data-player-avatar="${esc(row.avatar||'🎭')}">${esc(row.avatar||'🎭')}</span><span class="result-player-copy"><strong>${row.isMine?'Ty':esc(row.name||'Anonymní propletač')}</strong><small>${cleanLabel(row)} · ${countCzLocal(Number(row.moves)||0,'tah','tahy','tahů')}</small></span><em class="result-player-time">${fmtTimeLocal(row.elapsedMs)}</em></div>`).join('');
   }
   function fitLongRankingNames(root){
     root?.querySelectorAll?.('.result-player-copy>strong').forEach(name=>{
@@ -209,7 +209,7 @@
   }
   function cleanLabel(result){
     const hints=Math.max(0,Number(result?.hints??result?.hintsUsed)||0);
-    return hints===0?'✨ Čistě · bez nápovědy':`💡 ${countCzLocal(hints,'nápověda','nápovědy','nápověd')}`;
+    return hints===0?'Bez nápovědy':countCzLocal(hints,'nápověda','nápovědy','nápověd');
   }
   function prepareTajenkaDailyResult(result,puzzleId,{recap=false,game=null}={}){
     const modal=q('#winModal'),board=q('#levelLeaderboardBox',modal);if(!modal||!board)return;
@@ -230,7 +230,7 @@
     const text=q('#winText',modal);if(text)text.textContent=resultLine(result);syncTajenkaSourceLine(modal,puzzleId);
     const chips=q('.win-summary-chips',modal);chips?.classList.remove('hidden');
     const xp=q('#winXp',modal);if(xp){xp.textContent='+200 XP';xp.classList.remove('hidden')}
-    const clean=q('#winClean',modal);if(clean){clean.textContent=cleanLabel(result);clean.classList.remove('hidden');clean.classList.toggle('hinted',Math.max(0,Number(result?.hints??result?.hintsUsed)||0)>0)}
+    const clean=q('#winClean',modal);if(clean){clean.textContent=cleanLabel(result);clean.classList.remove('hidden','hinted')}
     const share=q('#winShareBtn',modal);
     if(share){
       share.classList.remove('hidden');share.textContent='Vyzvat kamaráda';

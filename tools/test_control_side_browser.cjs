@@ -56,15 +56,35 @@ async function geometry(page,left){
   assert(g.toggle.y>=g.rail.y-1&&g.toggle.bottom<=g.h+1&&g.stage.height>80,JSON.stringify(g));
   return g;
 }
+async function checkWordPanels(page,wide){
+  const panels=await page.evaluate(()=>{
+    const list=document.querySelector('.game-info'),live=document.querySelector('.current-word'),stage=document.querySelector('#boardStage');
+    const rail=document.querySelector('.game-control-column'),board=document.querySelector('.game-board-column');
+    return {listInRail:list.parentNode===rail,listInBoard:list.parentNode===board,
+      liveAbove:live.parentNode===board&&live.getBoundingClientRect().bottom<=stage.getBoundingClientRect().top+1,
+      compact:live.offsetHeight<=56,listFits:list.scrollWidth<=list.clientWidth+1,
+      foundFillsRow:Math.abs(document.querySelector('#foundWords').clientWidth-document.querySelector('#lengths').clientWidth)<=2};
+  });
+  assert.equal(panels.listInRail,wide);assert.equal(panels.listInBoard,!wide);assert(panels.liveAbove,JSON.stringify(panels));
+  if(wide)assert(panels.compact&&panels.listFits&&panels.foundFillsRow,JSON.stringify(panels));
+}
 async function dragNext(page){
   await settle(page);
   const before=await page.evaluate(()=>currentGame.found.length);
   const points=await page.evaluate(()=>currentGame.puzzle.answers.find((a,i)=>!currentGame.found.some(f=>f.answerIndex===i)).path.map(i=>{
     const r=document.querySelector(`.cell[data-index="${i}"]`).getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};
   }));
-  await gesture(page,points);await page.waitForFunction(n=>currentGame.found.length===n+1,before);
+  const wordRail=await page.locator('.game-main.word-list-in-rail').count();
+  await gesture(page,points,wordRail?async()=>{
+    assert(await page.locator('#currentWord').isVisible(),'drag shows the live word');
+    assert.equal(await page.locator('#gameMessage').isVisible(),false,'previous feedback gives way to the gesture');
+  }:undefined);await page.waitForFunction(n=>currentGame.found.length===n+1,before);
   await settle(page);
   assert(await page.locator('#pathLayer .path-found').count()>0,'found path drawn');
+  if(wordRail){
+    assert(await page.locator('#gameMessage').isVisible(),'feedback visible after the gesture');
+    assert.equal(await page.locator('#currentWord').isVisible(),false,'empty selection gives way to feedback');
+  }
 }
 async function swapPreserving(page,left){
   await page.evaluate(()=>{
@@ -109,7 +129,7 @@ async function context(options){
   const health=await fetch(base+'/api/health').then(r=>r.json());assert(health.isolatedFixture&&health.database===false,'isolated static fixture required');
   browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage']});
   const ctx=await context({viewport:{width:768,height:1000},screen:{width:768,height:1000},hasTouch:true});
-  const page=await boot(ctx);await start(page);await geometry(page,false);await dragNext(page);
+  const page=await boot(ctx);await start(page);await geometry(page,false);await checkWordPanels(page,true);await dragNext(page);
   await swapPreserving(page,true);await dragNext(page);checks.push('actual word gestures before and after swap; game and DOM identity preserved');
   // A second pointer / keyboard activation must not move a board during a gesture.
   const cell=await page.locator('#board .cell:not(.used)').first().boundingBox();
@@ -119,6 +139,7 @@ async function context(options){
   await page.reload({waitUntil:'domcontentloaded'});await ready(page);
   await start(page);await geometry(page,true);checks.push('preference survives reload; gesture guard');
   await page.setViewportSize({width:390,height:844});await page.waitForFunction(()=>!document.body.classList.contains('game-tablet-landscape'));
+  await checkWordPanels(page,false);
   assert.equal(await page.locator('#gameSideToggle').isVisible(),false);assert.equal(await page.locator('.game-main').evaluate(el=>el.classList.contains('game-controls-left')),false);
   await page.setViewportSize({width:768,height:1000});await page.waitForFunction(()=>document.body.classList.contains('game-tablet-landscape'));await settle(page);await geometry(page,true);checks.push('phone hides switch, unfolding restores preference');
   // Fold training uses one column even though its device class still says rail.
@@ -184,7 +205,7 @@ async function context(options){
   await ctx.close();
   const short=await context({viewport:{width:800,height:540},screen:{width:800,height:540},hasTouch:true}),sp=await boot(short);
   await start(sp,'tajenka');await geometry(sp,false);await swapPreserving(sp,true);checks.push('short landscape tablet Tajenka bounds');await short.close();
-  const desktop=await context({viewport:{width:1440,height:900}}),dp=await boot(desktop);await start(dp);await geometry(dp,false);await swapPreserving(dp,true);await dragNext(dp);checks.push('desktop swap and drag');
+  const desktop=await context({viewport:{width:1440,height:900}}),dp=await boot(desktop);await start(dp);await geometry(dp,false);await checkWordPanels(dp,true);await swapPreserving(dp,true);await dragNext(dp);checks.push('desktop swap and drag');
   await dp.evaluate(()=>startStarter());await dp.waitForFunction(()=>currentGame?.mode==='starter');await settle(dp);
   assert.equal(await dp.locator('#gameSideToggle').isVisible(),true,'side-by-side desktop training retains swap');
   assert(await dp.evaluate(()=>{const b=document.querySelector('.board-stage').getBoundingClientRect(),a=document.querySelector('.game-actions').getBoundingClientRect();return a.right<=b.left+1||b.right<=a.left+1}),'desktop training has actual side-by-side controls');
