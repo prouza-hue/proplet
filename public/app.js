@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.50-pet-otisku2';
+const APP_PREVIEW_RELEASE='proplet-v4.10.50-pet-otisku3';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 function resetReloadEntry(){
  if(globalThis.performance?.getEntriesByType?.('navigation')?.[0]?.type!=='reload')return;
