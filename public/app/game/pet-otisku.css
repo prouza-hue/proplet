@@ -34,7 +34,7 @@
 .otisky-stamp.earned:nth-child(even) { transform: rotate(3deg); }
 html[data-theme="dark"] .otisky-result { --stamp-ink: #f49e80; }
 .otisky-note { margin: .7rem 0 0; }
-.otisky-sign { margin: .25rem 0 1rem; font: italic 1.3rem Georgia, serif; }
+.otisky-result .otisky-sign { margin: .2rem 0 .85rem; font: inherit; font-size: .8125rem; font-weight: 400; color: var(--td-muted, currentColor); }
 .otisky-award { font-weight: 700; }
 .otisky-actions { display: grid; grid-template-columns: 1fr; gap: .45rem; }
 .otisky-actions button { min-height: 2.7rem; }

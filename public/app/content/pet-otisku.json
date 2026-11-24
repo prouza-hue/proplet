@@ -3,7 +3,7 @@
     {
       "id": "otisk-2026-11-01",
       "title": "Tudy na poštu",
-      "stamp": "D",
+      "stamp": "K",
       "difficulty": "easy",
       "rows": 7,
       "cols": 7,
@@ -21,7 +21,7 @@
     {
       "id": "otisk-2026-11-02",
       "title": "Za přepážkou",
-      "stamp": "Í",
+      "stamp": "!",
       "difficulty": "medium",
       "rows": 5,
       "cols": 6,
@@ -39,7 +39,7 @@
     {
       "id": "otisk-2026-11-03",
       "title": "Přes celé město",
-      "stamp": "K",
+      "stamp": "Y",
       "difficulty": "medium",
       "rows": 6,
       "cols": 6,
@@ -57,7 +57,7 @@
     {
       "id": "otisk-2026-11-04",
       "title": "O dům vedle",
-      "stamp": "Y",
+      "stamp": "Í",
       "difficulty": "hard",
       "rows": 6,
       "cols": 7,
@@ -76,7 +76,7 @@
     {
       "id": "otisk-2026-11-05",
       "title": "Do vlastních rukou",
-      "stamp": "!",
+      "stamp": "D",
       "difficulty": "medium",
       "rows": 5,
       "cols": 7,

@@ -1,7 +1,7 @@
 (function installPetOtiskuGame(global) {
   'use strict';
 
-  const bankUrl = '/app/content/pet-otisku.json';
+  const bankUrl = '/app/content/pet-otisku.json?v=2';
   const apiPath = '/api/pet-otisku';
   const stamps = ['D', 'Í', 'K', 'Y', '!'];
   let bankPromise;
@@ -69,6 +69,7 @@
       if (id !== launchId || !sameAccount(context)) return false;
       if (!status.eligible) throw new Error('Dárek se otevře po potvrzení příspěvku.');
       context.completed = status.completed || [];
+      context.boardStamps = boards.map(puzzle => puzzle.stamp);
       const next = boards.findIndex((_, i) => !context.completed.includes(i + 1)) + 1;
       if (overview || (!board && !next)) {
         showCollection(boards, context);
@@ -122,22 +123,27 @@
     document.body.append(dialog);
     return dialog;
   }
-  function imprint(completed) {
+  function imprint({completed, boardStamps}) {
+    const earnedStamps = new Set(completed.map(n => boardStamps[n - 1]));
     const strip = element('div', '', 'otisky-strip');
     strip.setAttribute('role','img');
     strip.setAttribute('aria-label',completed.length === 5 ? 'Pět otisků. DÍKY!' : 'Získané otisky: ' + completed.length + ' z pěti');
-    stamps.forEach((letter, i) => {
-      const earned = completed.includes(i + 1);
+    stamps.forEach(letter => {
+      const earned = earnedStamps.has(letter);
       strip.append(element('span', earned ? letter : '', earned ? 'otisky-stamp earned' : 'otisky-stamp'));
     });
     return strip;
+  }
+  function appendThanks(view) {
+    view.append(element('p', 'Díky za každé propletené slovo!', 'otisky-note'),
+      element('p', 'Pavel', 'otisky-sign'));
   }
   function actionBar() { return element('div', '', 'otisky-actions'); }
   function showCollection(boards, context) {
     const complete = context.completed.length === boards.length;
     const view = sheet(complete ? 'Dopis je doručený' : 'Pět otisků');
-    view.append(imprint(context.completed));
-    if (complete) view.append(element('p','Jsem rád, že spolu hrajeme.','otisky-note'),element('p','Pavel','otisky-sign'));
+    view.append(imprint(context));
+    if (complete) appendThanks(view);
     const menu = actionBar();
     const next = boards.findIndex((_, i) => !context.completed.includes(i + 1)) + 1;
     boards.forEach((b, i) => {
@@ -191,9 +197,9 @@
     releaseGameWakeLock();
     const complete = context.completed.length === stamps.length;
     const view = sheet(complete ? 'Dopis je doručený' : game.puzzle.title);
-    view.append(imprint(context.completed));
+    view.append(imprint(context));
     view.append(element('p',receipt.awardedXp > 0 ? '+300 XP do osobní hodnosti' : 'Dohráno znovu · bez dalších XP','otisky-award'));
-    if (complete) view.append(element('p','Jsem rád, že spolu hrajeme.','otisky-note'),element('p','Pavel','otisky-sign'));
+    if (complete) appendThanks(view);
     const actions = actionBar();
     if (!complete) actions.append(button('Další deska', () => open({preview:context.preview}), true));
     actions.append(button('Přehled série', () => open({preview:context.preview,overview:true})),button('Zpět do Hrát', leave,complete));
