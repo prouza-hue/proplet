@@ -10,7 +10,7 @@
   const SESSION_KEY='proplet:announcements:session:v1';
   const RECEIPT_PREFIX='proplet:announcement:';
   const receiptKey=(id,account)=>RECEIPT_PREFIX+id+':account:'+account;
-  const automaticAllowed=c=>!!c?.ready&&!!c.account&&c.authenticated===true&&c.completed>=5
+  const automaticAllowed=(c,minimumCompleted=5)=>!!c?.ready&&!!c.account&&c.authenticated===true&&c.completed>=minimumCompleted
     &&c.onboarded===true&&!c.quiet&&!c.blocked&&!c.hidden&&!c.incoming
     &&['daily','free'].includes(c.screen);
   function create(deps){
@@ -47,13 +47,13 @@
         if(context.firstStepsPending===true)return false;
         if(context.firstStepsPending===false)return automaticAllowed({...context,quiet:false});
       }
-      return automaticAllowed(context);
+      return automaticAllowed(context,entry.minimumCompleted);
     };
     const nextEntry=context=>[...entries.values()].sort((a,b)=>(b.priority||0)-(a.priority||0)).find(entry=>(entry.nonModal===true||!sessionUsed())&&entryAllowed(entry,context)&&hasPending(entry.id,context));
     async function kick(){
       const context=deps.context();cancelStale(context);
       if(busy){rerun=true;return false}
-      if(!automaticAllowed({...context,quiet:false}))return false;
+      if(!automaticAllowed({...context,quiet:false},0))return false;
       const entry=nextEntry(context);
       if(!entry)return false;
       const ticket={account:context.account,entry};busy=ticket;

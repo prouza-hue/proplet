@@ -9,10 +9,10 @@
   <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
   <script src="/referral-transport.js?v=profile-entry1"></script>
-<script src="/runtime-meta.js?v=offline-start1" data-proplet-runtime-meta="1" data-loaded="1"></script>
+<script src="/runtime-meta.js?v=pet-otisku1" data-proplet-runtime-meta="1" data-loaded="1"></script>
   <script src="/app/client-diagnostics.js?v=actor-context1" id="propletClientDiagnostics"></script>
   <script src="/analytics-init.js?v=guide-seo1"></script>
-  <script src="/theme-init.js?v=offline-start1"></script>
+  <script src="/theme-init.js?v=pet-otisku1"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Spojuj sousední písmena do českých slov a zaplň celou desku. Zahraj si Proplet zdarma bez registrace. Každý den tě čeká nová slovní výzva." />
@@ -109,6 +109,8 @@
 <link rel="stylesheet" href="/today-one-screen.css?v=spacing1">
 <link rel="stylesheet" href="/ui-playtest-preview.css?v=1">
 <link rel="stylesheet" href="/patrons.css?v=woodpecker1">
+<link rel="stylesheet" href="/app/engagement/pet-otisku.css?v=1">
+<link rel="stylesheet" href="/app/game/pet-otisku.css?v=1">
 <link rel="stylesheet" href="/today-palette.css?v=1">
 </head>
 <body class="studio-edition today-one-screen">
@@ -210,7 +212,7 @@
       <div class="screen-title"><span class="eyebrow">VOLNÁ HRA</span><h1>Hrát</h1><p class="muted">Každá nová úroveň přidá XP. Série roste jen Denní výzvou.</p></div>
       <div id="newContentBanner" class="new-content-banner hidden"></div>
       <div id="difficultyCards" class="difficulty-grid"></div>
-      <div id="playBrowseLinks" class="play-browse-links"><button type="button" id="playHistoryEntry" class="play-browse-link"><span>Přehled úrovní</span><svg class="play-browse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg></button></div>
+      <div id="playBrowseLinks" class="play-browse-links"><button type="button" id="otiskyEntry" hidden class="play-browse-link"><span>Pět otisků</span><small>Dárek</small></button><button type="button" id="playHistoryEntry" class="play-browse-link"><span>Přehled úrovní</span><svg class="play-browse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg></button></div>
     </section>
 
     <section id="screen-leaderboard" class="screen">
@@ -813,7 +815,7 @@
   <script src="/app/account/tajenka-storage.js"></script>
   <script src="/app/account/statistics.js?v=ui-refinement1"></script>
   <script src="/app/account/account.js?v=woodpecker1"></script>
-  <script src="/app/game/state.js?v=offline-timing1"></script>
+  <script src="/app/game/state.js?v=pet-otisku1"></script>
   <script src="/app/game/fair-play.js?v=offline-start1"></script>
   <script src="/app/game/board.js?v=starterguide3"></script>
   <script src="/app/game/input.js?v=magnifier-render1"></script>
@@ -828,7 +830,7 @@
   <script src="/app/content/free-order-ui.js?v=ui-refinement5"></script>
   <script src="/app/content/daily-dated.js?v=dailygen6-20261008"></script>
   <script src="/app/content/daily-special.js?v=daily-specials1"></script>
-  <script src="/app/engagement/announcements.js?v=patron-delivery1"></script>
+  <script src="/app/engagement/announcements.js?v=pet-otisku1"></script>
   <script src="/app/content/daily-special-ui.js?v=daily-guard1"></script>
   <script src="/app/content/progression.js?v=progression-compat1"></script>
   <script src="/app/content/daily.js?v=daily-guard1"></script>
@@ -846,7 +848,7 @@
   <script src="/app/archive/solution-contract.js"></script>
   <script src="/app/archive/experience.js?v=play-one-screen1"></script>
   <script src="/release-news.js?v=expansion600news1"></script>
-  <script src="/app.js?v=offline-start1"></script>
+  <script src="/app.js?v=pet-otisku1"></script>
   <script src="/app/weekly/competition.js?v=resource1"></script>
   <script src="/app/monthly/competition.js?v=refresh-today1"></script>
 
@@ -863,7 +865,22 @@
 
   <script src="/ui-playtest-preview.js?v=1"></script>
 <script src="/visual-playtest.js?v=1"></script>
-<script src="/app/patrons.js?v=woodpecker-contrast1"></script>
+<dialog id="otiskyLetter" aria-labelledby="otiskyLetterTitle" aria-describedby="otiskyLetterCopy">
+  <div class="otisky-letter-sheet">
+    <div class="otisky-letter-art" aria-hidden="true"><div class="otisky-envelope"></div><img src="/assets/support/patron-letterpress-v1.webp" alt="" width="112" height="112" loading="lazy"></div>
+    <div class="otisky-letter-body">
+      <h2 id="otiskyLetterTitle" tabindex="-1"></h2>
+      <p id="otiskyLetterCopy" data-letter-copy></p>
+      <p class="otisky-signature">Pavel</p>
+      <p data-letter-preview hidden>Ukázka kampaně · testovací údaje</p>
+      <p role="status"></p>
+      <div class="otisky-letter-actions"><button type="button" data-letter-action></button><button type="button" data-letter-close></button></div>
+    </div>
+  </div>
+</dialog>
+<script src="/app/patrons.js?v=pet-otisku1"></script>
+<script src="/app/game/pet-otisku.js?v=1"></script>
+<script src="/app/engagement/pet-otisku.js?v=1"></script>
 </body>
 </html>
 
