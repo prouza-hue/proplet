@@ -806,6 +806,19 @@
       ]
     },
     {
+      "id": "pet-otisku-20261124",
+      "order": 690,
+      "version": "2026.11.24",
+      "path": "supabase/migrations/20261124210000_pet_otisku.sql",
+      "type": "migration",
+      "status": "prepared-supporter-series",
+      "sha256": "a13d1bc044f7a677d1b93be1900628adef65589044b1cc53f104901c386bd49d",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_account_xp_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

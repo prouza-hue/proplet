@@ -39,6 +39,9 @@ def main():
    c.execute((ROOT/'supabase/migrations/20261111233353_patron_higher_receipt.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261112010000_patron_personal_gift.sql').read_text(encoding='utf8'))
    c.execute((ROOT/'supabase/migrations/20261113122612_patron_woodpecker_delivery.sql').read_text(encoding='utf8'))
+   c.execute("""create table public.account_rewards(player_id uuid, points integer, reward_key text, reward_word text);
+   grant select on public.account_rewards to service_role;""")
+   c.execute((ROOT/'supabase/migrations/20261124210000_pet_otisku.sql').read_text(encoding='utf8'))
   ids=[str(uuid4()) for _ in range(4)];player,other,balanced,admin=ids
   for index,pid in enumerate(ids):c.execute('insert into public.players(id,name,family_code,token_hash,support_mode,public_rankings) values(%s,%s,%s,%s,%s,true)',(pid,'Patron SQL '+str(index),'patron-test',secrets.token_hex(32),'younger' if pid==balanced else 'none'))
   # Use the existing schema's required admin columns, if present.
@@ -541,6 +544,8 @@ def http_acceptance(opts,owner,other,admin):
  assert saved['publicBadge'] and saved['offersDisabled']
  rows=client.get('/api/admin/patrons?reference='+intent['reference'],headers=ah).json()['items']
  assert rows[0]['id']==intent['id'] and rows[0]['paymentCount']==1
+ from tools.test_pet_otisku_db import gift_series_acceptance
+ gift_series_acceptance(client,h,oh,opts,owner)
  enabled[0]=False;before=len(rpc_calls)
  assert client.get('/api/patrons',headers=h).json()=={'enabled':False}
  assert client.post('/api/patrons/intents',json=body,headers=h).status_code==503

@@ -89,6 +89,7 @@ function create(deps={}){
       runHooks('afterPersist',event);
       return false;
     }
+    if(game.mode==='otisky')return deps.writeOtiskyProgress?.(game)===true;
     if(game.mode==='playtest'){
       event.kind='playtest';event.saved=deps.writePlaytestProgress?.(game)!==false;
       runHooks('afterPersist',event);return event.saved;
