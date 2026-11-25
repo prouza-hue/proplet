@@ -1,5 +1,45 @@
 # Spojky v Propletu
 
+## Petřina varianta s křížením
+
+**25. 11. 2026.** Po druhém kole hráči vyzdvihli třetí desku. Pořád ale řešili Spojky rychleji, než jim bylo milé. Na Petřin návrh vznikl samostatný experiment ve větvi `preview/spojky-pruniky-20261125`. Vychází z předchozího pilotu `55157977b487fca2c2356d9b1d803c6fa9854c8c`. O zařazení varianty do Propletu rozhodne další hráčská zkouška.
+
+Dokončené slovo nechá všechna jeho písmena k dispozici. Hráč na nich může další tah začít, přejít přes ně nebo na nich skončit. V jednom slově se stejné políčko smí použít jednou. Po druhém nálezu je tak pro poslední spojku pořád otevřená celá mřížka. Ve třetím týdnu to znamená všech 30 polí, zatímco verze se zamykáním v té chvíli nabízela 18 nebo 19. Známá stopa zároveň může při hledání další cesty pomoct. Z délky trasy samotné nelze usoudit, jestli se tím partie prodlouží.
+
+| Týden | Co má ověřit |
+| --- | --- |
+| 1 | První křížení na menší desce. Tři kartičky hráči znají z minula. Čtvrtá dovoluje propojit i poslední slovo. |
+| 2 | Nové kartičky pro hráče, kteří už celé předchozí preview znají. |
+| 3 | Přímé srovnání s oblíbeným třetím týdnem. Obě verze mají stejné kartičky ve stejném pořadí, stejné nápovědy a mřížku 5 × 6. Rozmístění písmen se přizpůsobilo pravidlu o křížení. |
+| 4 | Druhá neznámá deska pro zkušené hráče. Jeden pojem potřebují přečíst ve dvou různých významech. |
+
+U písmene zůstává po dokončení drobná značka příslušné spojky. Každé slovo má vlastní barvu, tvar a pozici značky. Na společném políčku jsou vidět všechny příslušné značky, zatímco rozepsané slovo má výraznou souvislou stopu. V dokončené desce lze vybrat libovolné nalezené slovo a prohlédnout si jeho přesnou cestu. Experiment má vlastní úložiště rozehraných desek. Odkaz na předchozí verzi třetího týdne je přímo v nabídce Náhled.
+
+### Jak připravit další kříženou desku
+
+Autorský vstup je v `content/spojky/crossings.json`. Obsahuje kartičky, jejich významové vazby, nápovědy, nežádoucí alternativy a číselný seed každého týdne. Příkaz `python tools/generate_spojky_crossings.py` z něj vytvoří hratelnou banku. S volbou `--check` ji znovu vygeneruje do paměti a porovná její přesné znění s verzí připravenou k vydání. Tahy se řídí sousedností ze stávajícího generátoru Propletu.
+
+Generátor nejprve ověří, zda trojici vůbec propojí stejná písmena včetně diakritiky. Slova poskládá přes společná políčka, doplní klamné začátky a přidá zbývající písmena. Hotovou mřížku počítač projde všemi legálními cestami. Každé řešení musí jít napsat právě jednou a celý řetěz musí jít dohrát v libovolném pořadí. I když už jsou dvě spojky hotové, ta poslední vždy vede přes alespoň jedno dříve použité písmeno. Ruční posouzení dalších možných asociací zůstává součástí přípravy.
+
+| Týden | Rozměr | Políčka ve více spojkách | Nejdelší slepá cesta pro každou spojku v pořadí řetězu |
+| --- | --- | ---: | --- |
+| 1 | 5 × 4 | 2 | 2 / 2 / 2 písmena |
+| 2 | 5 × 5 | 2 | 3 / 4 / 4 písmena |
+| 3 | 5 × 6 | 3 | 4 / 4 / 4 písmena |
+| 4 | 5 × 6 | 3 | 4 / 5 / 5 písmen |
+
+Čísla v posledním sloupci říkají, kolik správných počátečních písmen lze po chybné cestě přečíst, než už další písmeno nenaváže. Ve čtvrtém týdnu se každá dvojice řešených slov potká na jiném políčku. U všech čtyř desek proběhla kontrola všech šesti dvojic kartiček vůči dalším odpovědím sestavitelným z mřížky. Dvě nezávislá čtení nenašla další rovnocennou spojku. Kontrola všech 24 pořadí nálezů prošla.
+
+V Chromiu byla čtvrtá deska dohrána dotykem přes dříve použitá písmena. Při zkoušce fungovala i nápověda na označeném políčku, oprava kartiček u hotového slova, obnova nálezů po načtení stránky a souběh dvou karet. V emulaci 344 × 882 a 768 × 1024 CSS pixelů se mřížka vešla na šířku a políčka měla přibližně 55 pixelů. Po opravě ukončení tahu otevřelo první klepnutí na výsledkovce detail cest. Každá zvýrazněná cesta odpovídala políčkům, přes která hráč skutečně táhl.
+
+### Jak posoudit změnu s hráči
+
+S lidmi, kteří už hráli předchozí čtyři týdny, začít novým druhým nebo čtvrtým týdnem. K porovnání obou pravidel rozdělit hráče, kteří třetí týden ještě neviděli, mezi obě verze téže sady. Každému dát jen jednu z nich. Druhé hraní stejných asociací by zvýhodnilo zapamatované odpovědi.
+
+Pozorovatel si může poznamenat čas první, druhé a třetí spojky a použití nápovědy. Po hře stačí dvě otázky. „Co tě při posledním slově zdrželo?“ a „Který moment by sis chtěl zahrát znovu?“ Delší partie stojí za rozvoj, když hráče bavila další spojitost nebo návrat přes už známé písmeno. Pokud většinu času jen zjišťovali, jestli obarvené políčko ještě funguje, je potřeba přepracovat značení. Výsledek posuzujeme společně s délkou hry a chutí zahrát si další desku.
+
+## Předchozí pilot se zamykáním
+
 **25. 11. 2026.** Samostatný čtyřtýdenní pilot připravený ke kontrole. Vznikl ve větvi `preview/spojky-pilot-20261125` z produkční verze 4.10.50, commit `4b5f00ba6c8dc2eae0fd94b5e6b54a45680d2584`. Vercel v den přípravy přiřazoval `hrajproplet.cz` deploymentu `dpl_BcH4wQUM8qreP5DgXr2yxKbn1VFk`. Produkční databází je Supabase `proplet`. Herní stav v náhledu uchovává jen prohlížeč.
 
 Vstup je `/design/spojky/index.html`. V modelovém kalendáři začínají týdny v pondělí 30. listopadu a 7., 14. a 21. prosince 2026. Výchozí odkaz během pilotu vybírá týden podle pražského data. V nabídce **Náhled** lze přepnout na libovolný týden. Dnes ukazuje modelovou středu s běžnou výzvou, Extra, denní Tajenkou s archivem a rozehranou volnou hrou. Hrát jde celá cesta Spojek od první ukázky až po vyřešený řetěz. Čtení autorského řešení na `#reseni` ponechá stav dané desky zachovaný.

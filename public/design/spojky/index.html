@@ -6,8 +6,8 @@
   <meta name="color-scheme" content="light dark">
   <meta name="robots" content="noindex, nofollow">
   <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; form-action 'none'; object-src 'none'">
-  <meta name="description" content="Čtyři týdenní desky Spojek v hratelném náhledu Propletu.">
-  <title>Spojky · Proplet</title>
+  <meta name="description" content="Spojky s křížením. Čtyři hratelné desky, ve kterých může jedno písmeno patřit k více slovům.">
+  <title>Spojky s křížením · Proplet</title>
   <base href="/design/spojky/">
   <link rel="icon" href="/brand/mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/fonts/proplet-fonts.css">
@@ -20,10 +20,10 @@
   <div id="pilot-app"></div>
   <dialog id="pilot-menu" class="pilot-dialog" aria-labelledby="pilot-menu-title">
     <div class="pilot-dialog-head">
-      <h2 id="pilot-menu-title">Náhled Spojek</h2>
+      <h2 id="pilot-menu-title">Spojky s křížením</h2>
       <button type="button" class="pilot-close" data-action="close-menu" aria-label="Zavřít náhled">×</button>
     </div>
-    <p class="pilot-intro">Všechny čtyři týdny si můžeš zahrát hned. Každá deska si pamatuje, kde jsi skončil.</p>
+    <p class="pilot-intro">Ve 2. a 4. týdnu tě čekají nové kartičky. Ve 3. týdnu si můžeš zkusit známé spojky v nové mřížce.</p>
     <div id="pilot-weeks" class="pilot-weeks" role="group" aria-label="Týden zobrazený na Dnes"></div>
     <div class="pilot-settings-row">
       <label for="pilot-theme">Vzhled</label>
@@ -34,6 +34,7 @@
       </select>
     </div>
     <button type="button" class="pilot-review-link" data-action="review">Prohlédnout řešení desek</button>
+    <a class="pilot-compare" href="https://proplet-mkjlsncn6-pavel-prouzas-projects.vercel.app/design/spojky/index.html?tyden=3#hra">Zahrát 3. týden v původní verzi se zamykáním</a>
     <button type="button" class="pilot-reset" data-action="ask-reset" hidden>Začít tento týden znovu</button>
   </dialog>
   <dialog id="pilot-detail" class="pilot-dialog pilot-detail" aria-labelledby="pilot-detail-title">

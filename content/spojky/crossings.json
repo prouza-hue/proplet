@@ -1,0 +1,138 @@
+[
+  {
+    "id": "spojky-cross-01-v1",
+    "start": "2026-11-30",
+    "height": 4,
+    "width": 5,
+    "seed": 11,
+    "minShared": 2,
+    "falseStartLength": 2,
+    "chain": ["Pes", "Kniha", "Strom", "Rovnice"],
+    "shuffle": [3, 0, 2, 1],
+    "answers": [
+      {
+        "word": "HŘBET",
+        "clue": "Psa po něm pohladíš. V knihovně na něm najdeš název knihy.",
+        "explanation": "Psa můžeš po hřbetě podrbat. Na hřbetě knihy si v polici přečteš její název."
+      },
+      {
+        "word": "LIST",
+        "clue": "Jeden obrátíš, druhý na podzim spadne.",
+        "explanation": "Papírový list v knize otočíš. Ten ze stromu si mezi stránkami můžeš vylisovat."
+      },
+      {
+        "word": "KOŘEN",
+        "clue": "Jeden drží strom v zemi. Když druhý dosadíš za x, rovnice platí.",
+        "explanation": "Kořeny stromu berou z půdy vodu. Kořen rovnice je hodnota, pro kterou se obě strany rovnají."
+      }
+    ],
+    "avoid": [
+      "HŘBETY", "LISTY", "LÍSTEK", "LISTÍ", "KOŘENY", "KOŘÍNEK", "KOŘÍNKY", "KLACEK", "VĚTEV",
+      "KŮRA", "STÍN", "PAPÍR", "DŘEVO", "OBAL", "UCHO", "UŠI", "TLAPA", "RODOKMEN", "TITUL",
+      "PÍSMO", "PÍSMENO", "RŮST", "ROD", "VZOREC", "OBSAH", "ČÍSLO", "ZÁKLAD", "STRANA", "STRÁNKA",
+      "DŘEŇ", "KORUNA"
+    ]
+  },
+  {
+    "id": "spojky-cross-02-v1",
+    "start": "2026-12-07",
+    "height": 5,
+    "width": 5,
+    "seed": 12,
+    "minShared": 2,
+    "falseStartLength": 3,
+    "chain": ["Účes", "Film", "Stan", "Štafeta"],
+    "shuffle": [2, 0, 3, 1],
+    "answers": [
+      {
+        "word": "STŘIH",
+        "clue": "U kadeřníka si ho můžeš vybrat podle fotky. V kině tě přenese z jednoho záběru do druhého.",
+        "explanation": "Střih dává účesu tvar. Ve filmu určuje, kde jeden záběr končí a další začíná."
+      },
+      {
+        "word": "PLÁTNO",
+        "clue": "V kině ho máš před očima. V kempu ho můžeš mít napnuté nad spacákem.",
+        "explanation": "V kině se na plátno promítá film. Stanové plátno musí vydržet déšť i vítr."
+      },
+      {
+        "word": "KOLÍK",
+        "clue": "Jeden zatlučeš do země. S druhým běžíš k někomu, kdo už nastavuje ruku.",
+        "explanation": "Stanový kolík drží napnutou šňůru. Štafetový si běžci předávají z ruky do ruky."
+      }
+    ],
+    "avoid": [
+      "STŘIHY", "SESTŘIH", "SESTŘIHY", "KOSTÝM", "KOSTÝMY", "HŘEBEN", "HŘEBENY", "VLNA", "SCÉNA",
+      "OBRAZ", "REKLAMA", "PLÁTNA", "PLÁTĚNKO", "PLACHTA", "CELTA", "LÁTKA", "PROJEKCE",
+      "PROJEKTOR", "KINO", "TÁBOR", "PÁSEK", "PÁS", "PÁSKA", "KOLÍKY", "KOLÍČEK", "TYČ", "TYČKA",
+      "TYČE", "TYČKY", "HŮL", "HŮLKA", "ŠTAFETA", "BĚH"
+    ]
+  },
+  {
+    "id": "spojky-cross-03-v1",
+    "start": "2026-12-14",
+    "height": 6,
+    "width": 5,
+    "seed": 13,
+    "minShared": 3,
+    "falseStartLength": 4,
+    "chain": ["Letadlo", "Motýl", "Svářeč", "Duha"],
+    "shuffle": [1, 3, 0, 2],
+    "answers": [
+      {
+        "word": "KŘÍDLO",
+        "clue": "Pod jedním může viset motor. Druhé se třepotá nad záhonem.",
+        "explanation": "Letadlo má křídla pevná. Motýl těmi svými při letu mává."
+      },
+      {
+        "word": "KUKLA",
+        "clue": "Housenka se v ní promění k nepoznání. V dílně má vpředu tmavé sklo.",
+        "explanation": "Motýl se z kukly vylíhne. Svářeč pod tou svou schová oči i celý obličej."
+      },
+      {
+        "word": "OBLOUK",
+        "clue": "Jeden se po dešti klene přes oblohu. Druhý přeskočí mezi elektrodou a plechem.",
+        "explanation": "Duha na nebi vykreslí barevný oblouk. Svářeč elektrickým obloukem taví kov."
+      }
+    ],
+    "avoid": [
+      "KŘÍDLA", "LET", "LÉTÁ", "LÉTAT", "TRUP", "KOV", "OCEL", "STROJ", "PŘILBA", "NEBE", "OBLOHA",
+      "MRAK", "MRAKY", "KUKLY", "OCHRANA", "HELMA", "HELMY", "BARVA", "BARVY", "BARVU", "PESTROST",
+      "OBLOUKY", "SVĚTLO", "LESK", "ZÁŘE", "BAREVNOST", "LETEC", "LETCI", "LETUŠKA", "PLACHTĚNÍ",
+      "VZDUCH", "KŘÍDÉLKO", "PILOT", "OKO", "OČI", "PÁS", "JISKRA", "JISKRY"
+    ]
+  },
+  {
+    "id": "spojky-cross-04-v1",
+    "start": "2026-12-21",
+    "height": 6,
+    "width": 5,
+    "seed": 100,
+    "minShared": 3,
+    "falseStartLength": 5,
+    "chain": ["Pohoří", "Kolo", "Raketa", "Tiskárna"],
+    "shuffle": [1, 3, 0, 2],
+    "answers": [
+      {
+        "word": "SEDLO",
+        "clue": "Jedno leží mezi dvěma vrcholy. To druhé si před vyjížďkou posuneš o kousek výš.",
+        "explanation": "Sedlo je snížené místo v horském hřebeni. Na kole se z něj zvedáš, když šlapeš vestoje."
+      },
+      {
+        "word": "VÝPLET",
+        "clue": "V jednom napínáš dráty. Od druhého se odráží míček.",
+        "explanation": "Výplet kola spojuje náboj s ráfkem. U tenisové rakety ho tvoří napnuté struny."
+      },
+      {
+        "word": "TRYSKA",
+        "clue": "Z jedné se žene horký plyn. Z druhé vyletí kapka inkoustu.",
+        "explanation": "Raketová tryska usměrňuje proud spalin. V inkoustové tiskárně dávkují trysky barvu na papír."
+      }
+    ],
+    "avoid": [
+      "RÁM", "RÁMY", "STRUNA", "STRUNY", "DRÁT", "DRÁTY", "SÍŤ", "SÍŤKA", "DÍRA", "PŘEVOD",
+      "OZUBENÍ", "VÁLEC", "MOTOR", "HLAVA", "HLAVICE", "VENTIL", "SEDLA", "SEDÁTKO", "PRŮSMYK",
+      "VÝPLETY", "TRYSKY", "DÝZA", "VÁLCE", "ŘEMEN", "ŘETĚZ", "PAPÍR", "ZUB", "ZUBY", "BRZDA",
+      "KOLO", "VRCHOL", "PLÁŠŤ", "POHON", "KOŠÍK"
+    ]
+  }
+]

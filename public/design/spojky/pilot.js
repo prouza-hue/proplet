@@ -16,7 +16,7 @@ const weeks = boards.map((board, index) => {
     next: following ? `Další deska v pondělí ${shortDate(calendarDate(following.start))}` : 'Poslední deska pilotu.',
   };
 });
-const settingsKey = 'proplet.spojky.pilot.settings.v1';
+const settingsKey = 'proplet.spojky.crossings.settings.v1';
 const app = document.querySelector('#pilot-app');
 const menu = document.querySelector('#pilot-menu');
 const detail = document.querySelector('#pilot-detail');
@@ -154,7 +154,7 @@ function render({ forceToday = false } = {}) {
     mounted = key;
     app.replaceChildren();
     app.className = isToday ? '' : 'pilot-game-page';
-    const title = isToday ? 'Dnes' : view === 'reseni' ? `Řešení · ${week}. týden` : `Spojky · ${week}. týden`;
+    const title = isToday ? 'Dnes · Spojky s křížením' : view === 'reseni' ? `Řešení · ${week}. týden` : `Spojky s křížením · ${week}. týden`;
     document.title = `${title} · Proplet`;
     if (isToday) {
       renderToday(app, { week, weekStart: board.start, progress: getProgress(board), nextLabel: weeks[week - 1].next,

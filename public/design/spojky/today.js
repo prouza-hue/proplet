@@ -49,9 +49,9 @@ export function renderToday(root, {week, weekStart, progress, nextLabel, onPlay,
   const range = shortDate.formatRange(monday, monday + 6 * dayMillis);
   const started = progress.status === 'started';
   const complete = progress.status === 'complete';
-  const linkHint = started ? `Rozehráno · ${progress.found} ze 3` : 'Nová týdenní deska';
+  const linkHint = started ? `Rozehráno · ${progress.found} ze 3` : 'Slova se mohou křížit';
   const linkAction = complete ? 'Řetěz' : started ? 'Pokračovat' : 'Hrát';
-  const linkLabel = complete ? 'Prohlédnout dokončený řetěz Spojek' : started ? 'Pokračovat ve Spojkách' : 'Hrát novou týdenní desku Spojek';
+  const linkLabel = complete ? 'Prohlédnout dokončený řetěz Spojek' : started ? 'Pokračovat ve Spojkách' : 'Hrát Spojky s křížením';
   const nav = navigation.map(([label, glyph], i) => `<button type="button"
       ${i === 0 ? 'aria-current="page"' : `data-other="${label}"`}>
     <svg viewBox="0 0 24 24" aria-hidden="true">${glyph}</svg><span>${label}</span>

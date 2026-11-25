@@ -2,8 +2,7 @@ const assert = require('node:assert/strict');
 const { pathToFileURL } = require('node:url');
 const path = require('node:path');
 
-// A different spelling route can be legal yet strand the other two words.
-// Play out every find in every order using only letters still on the board.
+// The board always stays open. The only forbidden reuse is inside one spelling route.
 function verifyBoard(board) {
   const { rows, answers, chain, shuffle } = board;
   const width = rows[0].length;
@@ -31,35 +30,40 @@ function verifyBoard(board) {
     for (let i = 0; i < tiles.length; i++) walk(i, []);
     return matches;
   }
-  function hasFalseLead(word, locked, solutions) {
-    for (let length = 2; length < word.length; length++) {
-      for (const prefix of routes(word.slice(0, length), locked)) {
-        const canFinish = solutions.some(solution => prefix.every((tile, step) => tile === solution[step]));
-        if (!canFinish) return true;
-      }
-    }
-    return false;
+  const open = new Set();
+  const solutions = answers.map(answer => {
+    const found = routes(answer.word, open);
+    assert.equal(found.length, 1, `${board.id}: expected exactly one route for ${answer.word}`);
+    const [solution] = found;
+    assert.deepEqual(solution, answer.path, `${board.id}: hint must follow the valid route for ${answer.word}`);
+    const starts = routes(answer.word.slice(0, 2), open);
+    assert(starts.some(trace => trace[0] !== solution[0]), `${board.id}: no other plausible start for ${answer.word}`);
+    return solution;
+  });
+  const visits = Array(tiles.length).fill(0);
+  for (const solution of solutions) {
+    for (const tile of solution) visits[tile]++;
   }
+  assert(visits.filter(count => count > 1).length >= 2, `${board.id}: expected crossings on two distinct tiles`);
+  assert(visits.includes(0), `${board.id}: no unused letters`);
+
   const orders = new Set();
-  function play(order, locked) {
+  function play(order, previouslyUsed) {
     if (order.length === answers.length) {
-      assert(locked.size < tiles.length, `${board.id}: all letters were used`);
       orders.add(order.join(''));
       return;
     }
-    answers.forEach(({ word, path: hintPath }, i) => {
+    answers.forEach(({ word }, i) => {
       if (order.includes(i)) return;
-      const available = routes(word, locked);
-      assert(available.length, `${board.id}: ${word} is unreachable after [${order}]; locked [${[...locked]}]`);
-      if (!order.length) assert(available.some(trace => trace.join() === hintPath.join()), `${board.id}: wrong hint path for ${word}`);
+      const route = solutions[i];
       if (order.length === answers.length - 1) {
-        // At least one plausible start or turn must survive locking the other two links.
-        assert(hasFalseLead(word, locked, available), `${board.id}: ${word} has no false lead after [${order}]`);
+        assert(route.some(tile => previouslyUsed.has(tile)), `${board.id}: the last word ${word} never reuses a tile`);
+        assert.equal(routes(word, previouslyUsed).length, 0, `${board.id}: ${word} can bypass all prior words`);
       }
-      for (const trace of available) play([...order, i], new Set([...locked, ...trace]));
+      play([...order, i], new Set([...previouslyUsed, ...route]));
     });
   }
-  play([], new Set());
+  play([], open);
   assert.equal(orders.size, 6, board.id);
 }
 
@@ -74,5 +78,5 @@ function verifyBoard(board) {
     assert.equal(Date.parse(board.start) - monday, i * 7 * 86400000);
     verifyBoard(board);
   });
-  console.log('Four weekly boards, all find orders and locking routes verified.');
+  console.log('Four crossing boards, all 24 find orders and required shared tiles verified.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
