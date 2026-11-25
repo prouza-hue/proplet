@@ -240,6 +240,8 @@ async def launch_safety_middleware(request: Request, call_next):
         response.headers["Cache-Control"] = (
             "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400"
         )
+    elif path.startswith("/api/editorial/tajenka"):
+        response.headers["Cache-Control"] = "private, no-store"
     elif path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
     return response
@@ -5718,6 +5720,9 @@ install_visual_pilot_push(
 )
 
 admin_workspace.install(globals())
+
+from backend import tajenka_editorial
+tajenka_editorial.install(app, root=ROOT)
 
 from backend import release_news
 release_news.install(app, auth_player=auth_player, db_rpc=db_rpc,

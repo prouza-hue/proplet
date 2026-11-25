@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#f5f0e5">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <title>Redakce Tajenek · Proplet</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/design/tajenky-redakce/redakce.css">
+  <script defer src="/design/tajenky-redakce/redakce.js"></script>
+</head>
+<body>
+  <main class="desk">
+    <header class="mast">
+      <img src="/brand/wordmark.svg" alt="Proplet" class="wordmark" width="96" height="24">
+      <div class="mast-actions">
+        <span id="sync" class="sync" role="status" aria-live="polite">Načítám…</span>
+        <button type="button" id="export" class="quiet-button" disabled><span aria-hidden="true">↓</span> Export JSON</button>
+      </div>
+    </header>
+    <section class="cover" aria-labelledby="title">
+      <div>
+        <h1 id="title">Redakce Tajenek</h1>
+        <div id="progress" class="progress-line" hidden><progress id="progressBar" value="0" max="29" aria-label="Schválená vydání"></progress><span id="progressText"></span></div>
+      </div>
+      <img src="/assets/announcements/tajenka-denne.webp" width="128" height="128" alt="" class="cover-art">
+    </section>
+    <section id="notice" class="notice" role="status" hidden>
+      <span id="noticeText"></span>
+      <button id="retry" type="button" class="quiet-button" hidden>Zkusit znovu</button>
+    </section>
+    <div id="delivery" class="delivery" hidden><p id="deliveryText" role="status" aria-live="polite"></p><button id="submit" type="button">Odevzdat připomínky</button></div>
+    <div id="workspace" class="workspace" hidden>
+      <aside id="index" class="index" aria-labelledby="indexTitle">
+        <div class="index-head"><h2 id="indexTitle">Přehled vydání</h2><span id="resultCount"></span></div>
+        <div id="groups" class="group-tabs" aria-label="Výběr sady"></div>
+        <label class="search"><span aria-hidden="true" class="search-glyph"></span><input id="search" type="search" placeholder="Hledat ve větách a vodítkách" aria-label="Hledat ve větách a vodítkách" autocomplete="off"></label>
+        <div class="filter-row">
+          <select id="stateFilter" aria-label="Filtrovat podle stavu">
+            <option value="">Všechny stavy</option><option value="pending">Ke kontrole</option><option value="approved">Schváleno</option><option value="revise">Přepracovat</option><option value="conflict">Ke sloučení</option>
+          </select>
+          <select id="categoryFilter" aria-label="Filtrovat podle stylu"><option value="">Všechny styly</option></select>
+        </div>
+        <div id="editionList" class="edition-list"></div>
+      </aside>
+      <section id="editor" class="editor" aria-label="Úprava vydání" tabindex="-1"></section>
+    </div>
+    <noscript><p class="notice">Redakce potřebuje zapnutý JavaScript.</p></noscript>
+  </main>
+</body>
+</html>

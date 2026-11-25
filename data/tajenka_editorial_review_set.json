@@ -1,0 +1,1432 @@
+{
+  "setId": "daily-tajenka-2026-12",
+  "contentRevision": "d3581583901dfa33",
+  "editions": [
+    {
+      "id": "tajenka-v2-week-26",
+      "date": "2026-12-01",
+      "group": "existing",
+      "category": "czech",
+      "phrase": "Pražský orloj existuje přes šest století.",
+      "source": {
+        "label": "Prague City Tourism",
+        "url": "https://prague.eu/en/about-the-old-town-astronomical-clock/"
+      },
+      "answers": [
+        {
+          "word": "PRAŽSKÝ",
+          "clue": "Patřící hlavnímu městu Česka."
+        },
+        {
+          "word": "ORLOJ",
+          "clue": "Hodiny ukazující víc než jen čas."
+        },
+        {
+          "word": "EXISTUJE",
+          "clue": "Je skutečně na světě."
+        },
+        {
+          "word": "ŠEST",
+          "clue": "Číslo mezi pěti a sedmi."
+        },
+        {
+          "word": "STOLETÍ",
+          "clue": "Období sta let."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-27",
+      "date": "2026-12-02",
+      "group": "existing",
+      "category": "fact",
+      "phrase": "U mořských koníků rodí mláďata samci.",
+      "source": {
+        "label": "Smithsonian Institution",
+        "url": "https://www.si.edu/object/yt_Mb89JUB7atM"
+      },
+      "answers": [
+        {
+          "word": "MOŘSKÝCH",
+          "clue": "Patřících k oceánu nebo moři."
+        },
+        {
+          "word": "KONÍKŮ",
+          "clue": "Drobných ryb se zahnutým krkem."
+        },
+        {
+          "word": "RODÍ",
+          "clue": "Přivádí mládě na svět."
+        },
+        {
+          "word": "MLÁĎATA",
+          "clue": "Nedospělí potomci zvířat."
+        },
+        {
+          "word": "SAMCI",
+          "clue": "Jedinci mužského pohlaví u zvířat."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-28",
+      "date": "2026-12-03",
+      "group": "existing",
+      "category": "observation",
+      "phrase": "Čisté prádlo se skládá nejlépe zítra.",
+      "source": null,
+      "answers": [
+        {
+          "word": "ČISTÉ",
+          "clue": "Bez špíny."
+        },
+        {
+          "word": "PRÁDLO",
+          "clue": "Textilie určené k praní."
+        },
+        {
+          "word": "SKLÁDÁ",
+          "clue": "Dává do úhledných vrstev."
+        },
+        {
+          "word": "NEJLÉPE",
+          "clue": "Nejúspěšnějším způsobem."
+        },
+        {
+          "word": "ZÍTRA",
+          "clue": "Den po dnešku."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-29",
+      "date": "2026-12-04",
+      "group": "existing",
+      "category": "fact",
+      "phrase": "Hlemýžď má v tlamě tisíce drobných zubů.",
+      "source": {
+        "label": "Natural History Museum of Los Angeles County",
+        "url": "https://nhm.org/stories/microscopic-look-snail-jaws"
+      },
+      "answers": [
+        {
+          "word": "HLEMÝŽĎ",
+          "clue": "Plž s ulitou."
+        },
+        {
+          "word": "TLAMĚ",
+          "clue": "Ústech zvířete."
+        },
+        {
+          "word": "TISÍCE",
+          "clue": "Několik násobků jednoho tisíce."
+        },
+        {
+          "word": "DROBNÝCH",
+          "clue": "Velmi malých."
+        },
+        {
+          "word": "ZUBŮ",
+          "clue": "Tvrdých útvarů v ústech."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-30",
+      "date": "2026-12-05",
+      "group": "existing",
+      "category": "observation",
+      "phrase": "Vysavač najde drobný šroubek dřív než ty.",
+      "source": null,
+      "answers": [
+        {
+          "word": "VYSAVAČ",
+          "clue": "Spotřebič, který saje prach."
+        },
+        {
+          "word": "NAJDE",
+          "clue": "Objeví hledanou věc."
+        },
+        {
+          "word": "DROBNÝ",
+          "clue": "Velmi malý."
+        },
+        {
+          "word": "ŠROUBEK",
+          "clue": "Malý spojovací díl se závitem."
+        },
+        {
+          "word": "DŘÍV",
+          "clue": "V časnějším okamžiku."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-31",
+      "date": "2026-12-06",
+      "group": "existing",
+      "category": "proverb",
+      "phrase": "Jablko nepadá daleko od stromu.",
+      "source": null,
+      "answers": [
+        {
+          "word": "JABLKO",
+          "clue": "Kulatý plod jabloně."
+        },
+        {
+          "word": "NEPADÁ",
+          "clue": "Nesměřuje dolů volným pádem."
+        },
+        {
+          "word": "DALEKO",
+          "clue": "Ve velké vzdálenosti."
+        },
+        {
+          "word": "STROMU",
+          "clue": "Dřevině s kmenem a korunou."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-32",
+      "date": "2026-12-07",
+      "group": "existing",
+      "category": "fact",
+      "phrase": "Motýl poznává chutě pomocí nohou.",
+      "source": {
+        "label": "Washington State University",
+        "url": "https://askdruniverse.wsu.edu/2026/07/16/butterflies-taste-feet/"
+      },
+      "answers": [
+        {
+          "word": "MOTÝL",
+          "clue": "Hmyz s velkými křídly."
+        },
+        {
+          "word": "POZNÁVÁ",
+          "clue": "Zjišťuje nebo rozlišuje."
+        },
+        {
+          "word": "CHUTĚ",
+          "clue": "Vjemy sladkého, slaného a dalších."
+        },
+        {
+          "word": "POMOCÍ",
+          "clue": "S využitím něčeho."
+        },
+        {
+          "word": "NOHOU",
+          "clue": "Končetinou určenou k chůzi."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-33",
+      "date": "2026-12-08",
+      "group": "existing",
+      "category": "observation",
+      "phrase": "Čerstvě umyté okno přivolá déšť.",
+      "source": null,
+      "answers": [
+        {
+          "word": "ČERSTVĚ",
+          "clue": "Před velmi krátkou dobou."
+        },
+        {
+          "word": "UMYTÉ",
+          "clue": "Očištěné vodou."
+        },
+        {
+          "word": "OKNO",
+          "clue": "Prosklený otvor ve zdi."
+        },
+        {
+          "word": "PŘIVOLÁ",
+          "clue": "Způsobí, že něco přijde."
+        },
+        {
+          "word": "DÉŠŤ",
+          "clue": "Voda padající z mraků."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-34",
+      "date": "2026-12-09",
+      "group": "existing",
+      "category": "fact",
+      "phrase": "Sovy nehýbou očima, proto otáčejí hlavou.",
+      "source": {
+        "label": "Smithsonian Q?rius",
+        "url": "https://qrius.si.edu/taxonomy/term/12125"
+      },
+      "answers": [
+        {
+          "word": "SOVY",
+          "clue": "Noční draví ptáci s velkýma očima."
+        },
+        {
+          "word": "NEHÝBOU",
+          "clue": "Nedávají něco do pohybu."
+        },
+        {
+          "word": "OČIMA",
+          "clue": "Orgány zraku."
+        },
+        {
+          "word": "OTÁČEJÍ",
+          "clue": "Mění směr pootočením."
+        },
+        {
+          "word": "HLAVOU",
+          "clue": "Částí těla nad krkem."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-35",
+      "date": "2026-12-10",
+      "group": "existing",
+      "category": "observation",
+      "phrase": "Rajče v lednici čeká na lepší časy.",
+      "source": null,
+      "answers": [
+        {
+          "word": "RAJČE",
+          "clue": "Červený plod často v salátu."
+        },
+        {
+          "word": "LEDNICI",
+          "clue": "Chladicím spotřebiči na potraviny."
+        },
+        {
+          "word": "ČEKÁ",
+          "clue": "Zůstává, dokud něco nenastane."
+        },
+        {
+          "word": "LEPŠÍ",
+          "clue": "Kvalitnější nebo výhodnější."
+        },
+        {
+          "word": "ČASY",
+          "clue": "Období nebo chvíle."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-36",
+      "date": "2026-12-11",
+      "group": "existing",
+      "category": "fact",
+      "phrase": "Kolibříci umějí létat také pozpátku.",
+      "source": {
+        "label": "Smithsonian National Zoo",
+        "url": "https://nationalzoo.si.edu/migratory-birds/hummingbirds"
+      },
+      "answers": [
+        {
+          "word": "KOLIBŘÍCI",
+          "clue": "Drobní ptáci, kteří umějí viset ve vzduchu."
+        },
+        {
+          "word": "UMĚJÍ",
+          "clue": "Jsou schopni něco dělat."
+        },
+        {
+          "word": "LÉTAT",
+          "clue": "Pohybovat se vzduchem pomocí křídel."
+        },
+        {
+          "word": "TAKÉ",
+          "clue": "Rovněž."
+        },
+        {
+          "word": "POZPÁTKU",
+          "clue": "Směrem dozadu."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-37",
+      "date": "2026-12-12",
+      "group": "existing",
+      "category": "observation",
+      "phrase": "Banán dozraje ve chvíli, kdy odejdeš z domu.",
+      "source": null,
+      "answers": [
+        {
+          "word": "BANÁN",
+          "clue": "Žluté zahnuté ovoce."
+        },
+        {
+          "word": "DOZRAJE",
+          "clue": "Dosáhne plné zralosti."
+        },
+        {
+          "word": "CHVÍLI",
+          "clue": "Krátkou dobu."
+        },
+        {
+          "word": "ODEJDEŠ",
+          "clue": "Přestaneš být na místě."
+        },
+        {
+          "word": "DOMU",
+          "clue": "Do místa, kde bydlíš."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-38",
+      "date": "2026-12-13",
+      "group": "new",
+      "category": "proverb",
+      "phrase": "Svatá Lucie noci upije, ale dne nepřidá.",
+      "source": {
+        "label": "Český rozhlas Plus",
+        "url": "https://plus.rozhlas.cz/svata-lucie-noci-upije-ale-dne-neprida-k-vysvetleni-pranostiky-potrebujete-8639493"
+      },
+      "answers": [
+        {
+          "word": "SVATÁ",
+          "clue": "Tak se říká třeba Anežce České nebo Ludmile."
+        },
+        {
+          "word": "LUCIE",
+          "clue": "Plná podoba jména Lucka."
+        },
+        {
+          "word": "NOCI",
+          "clue": "Čeho k ránu ubývá, když se blíží svítání?"
+        },
+        {
+          "word": "UPIJE",
+          "clue": "Napije se a ve sklenici toho trochu ubude."
+        },
+        {
+          "word": "NEPŘIDÁ",
+          "clue": "Nedá k tomu nic navíc."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-39",
+      "date": "2026-12-14",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Lístek z tramvaje dojel do půlky knížky.",
+      "source": null,
+      "answers": [
+        {
+          "word": "LÍSTEK",
+          "clue": "Vstupenka nebo jízdenka."
+        },
+        {
+          "word": "TRAMVAJE",
+          "clue": "Městského vozu na kolejích."
+        },
+        {
+          "word": "DOJEL",
+          "clue": "Dorazil do cíle na kolech."
+        },
+        {
+          "word": "PŮLKY",
+          "clue": "Jedné ze dvou stejných částí."
+        },
+        {
+          "word": "KNÍŽKY",
+          "clue": "Svazku stránek na čtení."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-40",
+      "date": "2026-12-15",
+      "group": "new",
+      "category": "czech",
+      "phrase": "Dřív visely vánoční stromky u stropu.",
+      "source": {
+        "label": "Český rozhlas České Budějovice",
+        "url": "https://budejovice.rozhlas.cz/tradice-vanocnich-stromecku-k-nam-prisla-z-nemecka-nejprve-je-lide-veseli-nad-8122685"
+      },
+      "answers": [
+        {
+          "word": "DŘÍV",
+          "clue": "Za starých časů."
+        },
+        {
+          "word": "VISELY",
+          "clue": "Byly připevněné nahoře a dole se ničeho nedotýkaly."
+        },
+        {
+          "word": "VÁNOČNÍ",
+          "clue": "Jaké bývá cukroví pečené v prosinci?"
+        },
+        {
+          "word": "STROMKY",
+          "clue": "Malé smrky, jedličky nebo borovice."
+        },
+        {
+          "word": "STROPU",
+          "clue": "Horní plochy místnosti. Mouchu u ní najdeš nejvýš."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-41",
+      "date": "2026-12-16",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Papír dojde přesně v půlce dárku.",
+      "source": null,
+      "answers": [
+        {
+          "word": "PAPÍR",
+          "clue": "List, na který se dá psát nebo kreslit."
+        },
+        {
+          "word": "DOJDE",
+          "clue": "Nezbude ho ani kousek."
+        },
+        {
+          "word": "PŘESNĚ",
+          "clue": "Na milimetr nebo na vteřinu."
+        },
+        {
+          "word": "PŮLCE",
+          "clue": "Přesně uprostřed, mezi začátkem a koncem."
+        },
+        {
+          "word": "DÁRKU",
+          "clue": "Zabaleného překvapení pod stromkem."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-42",
+      "date": "2026-12-17",
+      "group": "new",
+      "category": "fact",
+      "phrase": "Na Marsu zapadá Slunce do modré záře.",
+      "source": {
+        "label": "NASA/JPL",
+        "url": "https://science.nasa.gov/resource/color-variations-in-the-sky-at-sunset/"
+      },
+      "answers": [
+        {
+          "word": "MARSU",
+          "clue": "Na které planetě jezdí vozítko Curiosity?"
+        },
+        {
+          "word": "ZAPADÁ",
+          "clue": "Mizí večer za obzorem."
+        },
+        {
+          "word": "SLUNCE",
+          "clue": "Hvězda, kolem které obíhá Země."
+        },
+        {
+          "word": "MODRÉ",
+          "clue": "Barvy chrp nebo pomněnek."
+        },
+        {
+          "word": "ZÁŘE",
+          "clue": "Jasné světlo kolem plamene nebo nad obzorem."
+        }
+      ],
+      "alternative": {
+        "date": "2026-12-17",
+        "phrase": "Při tiché scéně šustí i prázdný sáček.",
+        "category": "observation",
+        "source": null,
+        "answers": [
+          {
+            "word": "TICHÉ",
+            "clue": "Takové, při které skoro nic neslyšíš."
+          },
+          {
+            "word": "SCÉNĚ",
+            "clue": "V jednom výjevu z filmu."
+          },
+          {
+            "word": "ŠUSTÍ",
+            "clue": "Vydává zvuk jako suché listí."
+          },
+          {
+            "word": "PRÁZDNÝ",
+            "clue": "Nic už v něm není."
+          },
+          {
+            "word": "SÁČEK",
+            "clue": "Malý pytlík na svačinu."
+          }
+        ]
+      }
+    },
+    {
+      "id": "tajenka-v2-week-43",
+      "date": "2026-12-18",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Pravá rukavice přežila čtyři levé.",
+      "source": null,
+      "answers": [
+        {
+          "word": "PRAVÁ",
+          "clue": "Ta na straně, kde většina lidí drží tužku."
+        },
+        {
+          "word": "RUKAVICE",
+          "clue": "Palčák nebo jeho prstový příbuzný."
+        },
+        {
+          "word": "PŘEŽILA",
+          "clue": "Vydržela déle než ostatní."
+        },
+        {
+          "word": "ČTYŘI",
+          "clue": "Počet stran čtverce."
+        },
+        {
+          "word": "LEVÉ",
+          "clue": "Protějšky pravých, třeba mezi botami."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-44",
+      "date": "2026-12-19",
+      "group": "new",
+      "category": "fact",
+      "phrase": "Sobům v zimě zmodrá vrstva za sítnicí.",
+      "source": {
+        "label": "University College London",
+        "url": "https://discovery.ucl.ac.uk/id/eprint/1424253/"
+      },
+      "answers": [
+        {
+          "word": "SOBŮM",
+          "clue": "Kterým severským paroháčům se nasazuje postroj k saním?"
+        },
+        {
+          "word": "ZIMĚ",
+          "clue": "Ve kterém ročním období u nás nejčastěji mrzne?"
+        },
+        {
+          "word": "ZMODRÁ",
+          "clue": "Získá barvu pomněnky."
+        },
+        {
+          "word": "VRSTVA",
+          "clue": "Jedna z částí položených přes sebe, třeba u dortu."
+        },
+        {
+          "word": "SÍTNICÍ",
+          "clue": "Za kterou částí oka s tyčinkami a čípky?"
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-45",
+      "date": "2026-12-20",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Křivé kousky mizí rovnou z plechu.",
+      "source": null,
+      "answers": [
+        {
+          "word": "KŘIVÉ",
+          "clue": "Pravítko by k nim nepřiléhalo."
+        },
+        {
+          "word": "KOUSKY",
+          "clue": "Drobné části celku."
+        },
+        {
+          "word": "MIZÍ",
+          "clue": "Ztrácejí se před očima."
+        },
+        {
+          "word": "ROVNOU",
+          "clue": "Přímo, bez zastávky."
+        },
+        {
+          "word": "PLECHU",
+          "clue": "Kovového tácu, na kterém se peče."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-46",
+      "date": "2026-12-21",
+      "group": "new",
+      "category": "czech",
+      "phrase": "V Poniklé foukají duté skleněné perle.",
+      "source": {
+        "label": "Rautis v Poniklé",
+        "url": "https://www.rautis.cz/exkurze-do-vyroby-perlickovych-ozdob/"
+      },
+      "answers": [
+        {
+          "word": "PONIKLÉ",
+          "clue": "Ve které obci u Jilemnice? Začíná na „Poni“."
+        },
+        {
+          "word": "FOUKAJÍ",
+          "clue": "Vydechují vzduch, jako když chtějí zhasit svíčku."
+        },
+        {
+          "word": "DUTÉ",
+          "clue": "Uvnitř prázdné, jako brčko."
+        },
+        {
+          "word": "SKLENĚNÉ",
+          "clue": "Vyrobené ze stejného materiálu jako okenní tabule."
+        },
+        {
+          "word": "PERLE",
+          "clue": "Sklářské korálky. Hledané slovo končí na E."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-47",
+      "date": "2026-12-22",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Z chodby vypadá stromek skoro rovně.",
+      "source": null,
+      "answers": [
+        {
+          "word": "CHODBY",
+          "clue": "Průchodu mezi místnostmi."
+        },
+        {
+          "word": "VYPADÁ",
+          "clue": "Na pohled působí."
+        },
+        {
+          "word": "STROMEK",
+          "clue": "Malý smrk, jedle nebo borovice."
+        },
+        {
+          "word": "SKORO",
+          "clue": "Téměř, ale kousek ještě chybí."
+        },
+        {
+          "word": "ROVNĚ",
+          "clue": "Bez náklonu na stranu."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-48",
+      "date": "2026-12-23",
+      "group": "new",
+      "category": "quote",
+      "phrase": "„Hoj, ty štědrý večere, ty tajemný svátku!“",
+      "source": {
+        "label": "University of Oxford",
+        "url": "https://czech.mml.ox.ac.uk/karel-jaromir-erben-kytice-1853-1861#6",
+        "author": "Karel Jaromír Erben",
+        "work": "Kytice, Štědrý den (II)"
+      },
+      "answers": [
+        {
+          "word": "ŠTĚDRÝ",
+          "clue": "Kdo se ochotně rozdělí, ten je…"
+        },
+        {
+          "word": "VEČERE",
+          "clue": "Část dne po odpoledni. Básník ji tady oslovuje."
+        },
+        {
+          "word": "TAJEMNÝ",
+          "clue": "Záhadný, plný něčeho nevysvětleného."
+        },
+        {
+          "word": "SVÁTKU",
+          "clue": "Oslov slavnostní den, jako by stál před tebou."
+        }
+      ],
+      "alternative": {
+        "date": "2026-12-26",
+        "phrase": "Žolíky se u dědy hrají podle jiných pravidel.",
+        "category": "observation",
+        "source": null,
+        "answers": [
+          {
+            "word": "ŽOLÍKY",
+            "clue": "Karetní hra, při které se vykládají postupky a trojice."
+          },
+          {
+            "word": "DĚDY",
+            "clue": "Tátova nebo mámina otce."
+          },
+          {
+            "word": "HRAJÍ",
+            "clue": "Co dělají lidé, když rozdají karty a začnou partii?"
+          },
+          {
+            "word": "JINÝCH",
+            "clue": "Odlišných od těch obvyklých."
+          },
+          {
+            "word": "PRAVIDEL",
+            "clue": "Pokynů, které určují, co se ve hře smí."
+          }
+        ]
+      }
+    },
+    {
+      "id": "tajenka-v2-week-49",
+      "date": "2026-12-24",
+      "group": "new",
+      "category": "fact",
+      "phrase": "Při premiéře Tiché noci zněla kytara.",
+      "source": {
+        "label": "Stille Nacht Gesellschaft",
+        "url": "https://www.stillenacht.at/en/history-of-the-song"
+      },
+      "answers": [
+        {
+          "word": "PREMIÉŘE",
+          "clue": "Při prvním veřejném uvedení skladby nebo hry."
+        },
+        {
+          "word": "TICHÉ",
+          "clue": "Bez hluku, sotva slyšitelné."
+        },
+        {
+          "word": "NOCI",
+          "clue": "Opak dne, ve spojení „uprostřed hluboké …“."
+        },
+        {
+          "word": "ZNĚLA",
+          "clue": "Bylo ji slyšet."
+        },
+        {
+          "word": "KYTARA",
+          "clue": "Šest strun, krk a tělo. Co je to za nástroj?"
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-50",
+      "date": "2026-12-25",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Na společné fotce hledáš nejdřív sebe.",
+      "source": null,
+      "answers": [
+        {
+          "word": "SPOLEČNÉ",
+          "clue": "Takové, na které jsou všichni pohromadě."
+        },
+        {
+          "word": "FOTCE",
+          "clue": "Na snímku z fotoaparátu."
+        },
+        {
+          "word": "HLEDÁŠ",
+          "clue": "Pátráš, kde co je."
+        },
+        {
+          "word": "NEJDŘÍV",
+          "clue": "Jako vůbec první věc."
+        },
+        {
+          "word": "SEBE",
+          "clue": "Svou vlastní osobu."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-51",
+      "date": "2026-12-26",
+      "group": "new",
+      "category": "fact",
+      "phrase": "Čerstvý prašan tlumí hluk ulice.",
+      "source": {
+        "label": "National Snow and Ice Data Center",
+        "url": "https://nsidc.org/learn/parts-cryosphere/snow/science-snow"
+      },
+      "answers": [
+        {
+          "word": "ČERSTVÝ",
+          "clue": "Právě upečený, utržený nebo napadaný."
+        },
+        {
+          "word": "PRAŠAN",
+          "clue": "Sypký sníh, ze kterého koulí moc nenaděláš."
+        },
+        {
+          "word": "TLUMÍ",
+          "clue": "Zeslabuje, podobně jako špunty do uší."
+        },
+        {
+          "word": "HLUK",
+          "clue": "To, co se ozývá z rušné křižovatky."
+        },
+        {
+          "word": "ULICE",
+          "clue": "Mezi domy po ní chodí lidé a jezdí auta."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-52",
+      "date": "2026-12-27",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Řízek na cestu zmizí před prvním tunelem.",
+      "source": null,
+      "answers": [
+        {
+          "word": "ŘÍZEK",
+          "clue": "Plátek masa v trojobalu."
+        },
+        {
+          "word": "CESTU",
+          "clue": "Výpravu z jednoho místa na druhé."
+        },
+        {
+          "word": "ZMIZÍ",
+          "clue": "Bude rázem pryč."
+        },
+        {
+          "word": "PRVNÍM",
+          "clue": "Takovým, před kterým žádný další nebyl."
+        },
+        {
+          "word": "TUNELEM",
+          "clue": "Podzemním průjezdem skrz kopec."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-53",
+      "date": "2026-12-28",
+      "group": "new",
+      "category": "fact",
+      "phrase": "Lední medvěd má pod srstí černou kůži.",
+      "source": {
+        "label": "Polar Bears International",
+        "url": "https://www.polarbearsinternational.org/news-media/articles/why-polar-bears-have-black-skin/"
+      },
+      "answers": [
+        {
+          "word": "LEDNÍ",
+          "clue": "Jaký medvěd loví na arktickém ledu?"
+        },
+        {
+          "word": "MEDVĚD",
+          "clue": "Šelma, jejímž příbuzným je grizzly."
+        },
+        {
+          "word": "SRSTÍ",
+          "clue": "Čím má liška pokrytý hřbet?"
+        },
+        {
+          "word": "ČERNOU",
+          "clue": "Jakou barvu mají saze?"
+        },
+        {
+          "word": "KŮŽI",
+          "clue": "Co si můžeš při pádu odřít na koleni?"
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-54",
+      "date": "2026-12-29",
+      "group": "new",
+      "category": "proverb",
+      "phrase": "Zakázané ovoce chutná nejlépe.",
+      "source": {
+        "label": "Univerzita Palackého v Olomouci",
+        "url": "https://kompetence.ff.upol.cz/wp-content/uploads/2018/06/PRISLOVI_-_PRZYS%C5%81OWIA.pdf"
+      },
+      "answers": [
+        {
+          "word": "ZAKÁZANÉ",
+          "clue": "Takové, které si podle pravidel nesmíš vzít."
+        },
+        {
+          "word": "OVOCE",
+          "clue": "Jablka, třešně i švestky jedním slovem."
+        },
+        {
+          "word": "CHUTNÁ",
+          "clue": "Je dobré na jazyku."
+        },
+        {
+          "word": "NEJLÉPE",
+          "clue": "Tak dobře jako žádná jiná možnost."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-55",
+      "date": "2026-12-30",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Malíček potmě pozná každou židli.",
+      "source": null,
+      "answers": [
+        {
+          "word": "MALÍČEK",
+          "clue": "Nejmenší prst na noze i na ruce."
+        },
+        {
+          "word": "POTMĚ",
+          "clue": "Když je zhasnuto a není vidět."
+        },
+        {
+          "word": "POZNÁ",
+          "clue": "Dovede určit, co má před sebou."
+        },
+        {
+          "word": "KAŽDOU",
+          "clue": "Jednu jako druhou, bez výjimky."
+        },
+        {
+          "word": "ŽIDLI",
+          "clue": "Kus nábytku s opěradlem, obvykle pro jednoho."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-56",
+      "date": "2026-12-31",
+      "group": "new",
+      "category": "fact",
+      "phrase": "Madrid vítá nový rok dvanácti kuličkami vína.",
+      "source": {
+        "label": "Turismo Madrid",
+        "url": "https://www.esmadrid.com/en/whats-on/new-years-eve-party-puerta-sol"
+      },
+      "answers": [
+        {
+          "word": "MADRID",
+          "clue": "Hlavní město Španělska."
+        },
+        {
+          "word": "VÍTÁ",
+          "clue": "Zdraví toho, kdo právě přišel."
+        },
+        {
+          "word": "DVANÁCTI",
+          "clue": "S kolika měsíci počítá kalendář?"
+        },
+        {
+          "word": "KULIČKAMI",
+          "clue": "Drobnými kulatými korálky."
+        },
+        {
+          "word": "VÍNA",
+          "clue": "Doplň spojení „hrozen zralého …“."
+        }
+      ],
+      "alternative": {
+        "date": "2026-12-31",
+        "phrase": "Kuchyň slaví půlnoc o dvě minuty dřív.",
+        "category": "observation",
+        "source": null,
+        "answers": [
+          {
+            "word": "KUCHYŇ",
+            "clue": "Místnost se sporákem."
+          },
+          {
+            "word": "SLAVÍ",
+            "clue": "Připomíná si významný den. Třeba přípitkem."
+          },
+          {
+            "word": "PŮLNOC",
+            "clue": "Okamžik, kdy se jedno datum mění v druhé."
+          },
+          {
+            "word": "MINUTY",
+            "clue": "Úseky po šedesáti sekundách."
+          },
+          {
+            "word": "DŘÍV",
+            "clue": "V časovém předstihu."
+          }
+        ]
+      }
+    },
+    {
+      "id": "tajenka-v2-week-57",
+      "date": "2027-01-01",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Do nového diáře píšu úhledně. Zatím.",
+      "source": null,
+      "answers": [
+        {
+          "word": "NOVÉHO",
+          "clue": "Do právě pořízeného, ještě nepoužitého."
+        },
+        {
+          "word": "DIÁŘE",
+          "clue": "Do zápisníku s předtištěnými daty."
+        },
+        {
+          "word": "PÍŠU",
+          "clue": "Pokládám slova na papír."
+        },
+        {
+          "word": "ÚHLEDNĚ",
+          "clue": "Pečlivě a čitelně."
+        },
+        {
+          "word": "ZATÍM",
+          "clue": "Pro tuto chvíli."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-58",
+      "date": "2027-01-02",
+      "group": "new",
+      "category": "czech",
+      "phrase": "Slovo robot vymyslel Josef Čapek.",
+      "source": {
+        "label": "Karel Čapek – život a dílo",
+        "url": "https://karelcapek.cz/cs/filmove-adaptace-karel-capek"
+      },
+      "answers": [
+        {
+          "word": "SLOVO",
+          "clue": "Mezi dvěma mezerami věty bývá právě jedno."
+        },
+        {
+          "word": "ROBOT",
+          "clue": "Stroj, který vykonává práci podle programu."
+        },
+        {
+          "word": "VYMYSLEL",
+          "clue": "Přišel s vlastním nápadem."
+        },
+        {
+          "word": "JOSEF",
+          "clue": "Křestní jméno s domácí podobou Pepa."
+        },
+        {
+          "word": "ČAPEK",
+          "clue": "Příjmení bratrů, kteří spolu napsali Ze života hmyzu."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-59",
+      "date": "2027-01-03",
+      "group": "new",
+      "category": "fact",
+      "phrase": "V lednu bývá Země Slunci nejblíž.",
+      "source": {
+        "label": "Astronomický ústav AV ČR",
+        "url": "https://www.asu.cas.cz/articles/2206/19/proc-svata-lucie-noci-upije-ale-dne-neprida"
+      },
+      "answers": [
+        {
+          "word": "LEDNU",
+          "clue": "V kterém měsíci se slaví Nový rok?"
+        },
+        {
+          "word": "BÝVÁ",
+          "clue": "Obvykle je."
+        },
+        {
+          "word": "ZEMĚ",
+          "clue": "Planeta, na které bydlíme."
+        },
+        {
+          "word": "SLUNCI",
+          "clue": "Které hvězdě vděčíme za denní světlo?"
+        },
+        {
+          "word": "NEJBLÍŽ",
+          "clue": "V nejmenší vzdálenosti."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-60",
+      "date": "2027-01-04",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Zimní bunda vrací drobné až napřesrok.",
+      "source": null,
+      "answers": [
+        {
+          "word": "ZIMNÍ",
+          "clue": "Do mrazu a sněhu."
+        },
+        {
+          "word": "BUNDA",
+          "clue": "Kratší svrchní oděv s rukávy."
+        },
+        {
+          "word": "VRACÍ",
+          "clue": "Dává zpátky."
+        },
+        {
+          "word": "DROBNÉ",
+          "clue": "Mince místo bankovek."
+        },
+        {
+          "word": "NAPŘESROK",
+          "clue": "Až v příštím roce."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-61",
+      "date": "2027-01-05",
+      "group": "new",
+      "category": "fact",
+      "phrase": "Část písku na Havaji prošla rybou.",
+      "source": {
+        "label": "NOAA",
+        "url": "https://oceanservice.noaa.gov/facts/sand.html"
+      },
+      "answers": [
+        {
+          "word": "ČÁST",
+          "clue": "Díl, který patří k většímu celku."
+        },
+        {
+          "word": "PÍSKU",
+          "clue": "Čeho je plný dětský kyblík na pláži?"
+        },
+        {
+          "word": "HAVAJI",
+          "clue": "Na kterém souostroví leží Honolulu?"
+        },
+        {
+          "word": "PROŠLA",
+          "clue": "Dostala se z jedné strany na druhou."
+        },
+        {
+          "word": "RYBOU",
+          "clue": "Živočichem se žábrami a ploutvemi."
+        }
+      ],
+      "alternative": {
+        "date": "2027-01-04",
+        "phrase": "V pondělí peřina váží celý metrák.",
+        "category": "observation",
+        "source": null,
+        "answers": [
+          {
+            "word": "PONDĚLÍ",
+            "clue": "Den hned po neděli."
+          },
+          {
+            "word": "PEŘINA",
+            "clue": "Přikrývka, do které se dá zachumlat."
+          },
+          {
+            "word": "VÁŽÍ",
+            "clue": "Má určitou hmotnost."
+          },
+          {
+            "word": "CELÝ",
+            "clue": "Úplný, bez jediného chybějícího kousku."
+          },
+          {
+            "word": "METRÁK",
+            "clue": "Hovorově sto kilo."
+          }
+        ]
+      }
+    },
+    {
+      "id": "tajenka-v2-week-62",
+      "date": "2027-01-06",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Pod gaučem zbyl dílek modré oblohy.",
+      "source": null,
+      "answers": [
+        {
+          "word": "GAUČEM",
+          "clue": "Pod pohovkou v obýváku."
+        },
+        {
+          "word": "ZBYL",
+          "clue": "Zůstal jako poslední."
+        },
+        {
+          "word": "DÍLEK",
+          "clue": "Kousek skládačky, který do něčeho zapadne."
+        },
+        {
+          "word": "MODRÉ",
+          "clue": "Barvy pomněnek."
+        },
+        {
+          "word": "OBLOHY",
+          "clue": "Nebe nad hlavou."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-63",
+      "date": "2027-01-07",
+      "group": "new",
+      "category": "fact",
+      "phrase": "Tučňák oslí staví hnízdo z kamínků.",
+      "source": {
+        "label": "British Antarctic Survey",
+        "url": "https://www.bas.ac.uk/blogpost/antarctic-blog-breeding-season-begins-on-bird-island/"
+      },
+      "answers": [
+        {
+          "word": "TUČŇÁK",
+          "clue": "Pták, který se pod vodou pohání křídly."
+        },
+        {
+          "word": "OSLÍ",
+          "clue": "Jaké uši se dělají přehnutím rohu stránky?"
+        },
+        {
+          "word": "STAVÍ",
+          "clue": "Buduje, třeba dům."
+        },
+        {
+          "word": "HNÍZDO",
+          "clue": "Ptačí kolébka pro vejce."
+        },
+        {
+          "word": "KAMÍNKŮ",
+          "clue": "Z čeho bývá mozaika, když nepoužiješ sklo?"
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-64",
+      "date": "2027-01-08",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Spící kocour slyší krájet šunku.",
+      "source": null,
+      "answers": [
+        {
+          "word": "SPÍCÍ",
+          "clue": "Ten, kdo právě podřimuje."
+        },
+        {
+          "word": "KOCOUR",
+          "clue": "Samec domácí šelmy, která přede."
+        },
+        {
+          "word": "SLYŠÍ",
+          "clue": "Vnímá ušima."
+        },
+        {
+          "word": "KRÁJET",
+          "clue": "Dělit nožem na plátky."
+        },
+        {
+          "word": "ŠUNKU",
+          "clue": "Libovou uzeninu krájenou u pultu."
+        }
+      ]
+    },
+    {
+      "id": "tajenka-v2-week-65",
+      "date": "2027-01-09",
+      "group": "new",
+      "category": "fact",
+      "phrase": "Most z Londýna stojí v arizonské poušti.",
+      "source": {
+        "label": "Go Lake Havasu",
+        "url": "https://www.golakehavasu.com/london-bridge/"
+      },
+      "answers": [
+        {
+          "word": "MOST",
+          "clue": "Stavba, po které se přechází přes řeku."
+        },
+        {
+          "word": "LONDÝNA",
+          "clue": "Ze kterého města znáš Big Ben?"
+        },
+        {
+          "word": "STOJÍ",
+          "clue": "Je postavený na svém místě."
+        },
+        {
+          "word": "ARIZONSKÉ",
+          "clue": "Patřící k americkému státu s Grand Canyonem."
+        },
+        {
+          "word": "POUŠTI",
+          "clue": "V krajině, kde skoro neprší."
+        }
+      ],
+      "alternative": {
+        "date": "2027-01-07",
+        "phrase": "Na pohlednici vydržel sníh i celé léto.",
+        "category": "observation",
+        "source": null,
+        "answers": [
+          {
+            "word": "POHLEDNICI",
+            "clue": "Na obrázku poslaném poštou třeba z hor."
+          },
+          {
+            "word": "VYDRŽEL",
+            "clue": "Zůstal až do konce."
+          },
+          {
+            "word": "SNÍH",
+            "clue": "Bílá pokrývka z vloček."
+          },
+          {
+            "word": "CELÉ",
+            "clue": "Úplné, od začátku do konce."
+          },
+          {
+            "word": "LÉTO",
+            "clue": "Období mezi jarem a podzimem."
+          }
+        ]
+      }
+    },
+    {
+      "id": "tajenka-v2-week-66",
+      "date": "2027-01-10",
+      "group": "new",
+      "category": "observation",
+      "phrase": "Z gauče se každá penalta kope snadno.",
+      "source": null,
+      "answers": [
+        {
+          "word": "GAUČE",
+          "clue": "Pohovky, z níž je vidět na televizi."
+        },
+        {
+          "word": "KAŽDÁ",
+          "clue": "Všechny, jedna jako druhá."
+        },
+        {
+          "word": "PENALTA",
+          "clue": "Pokutový kop ve fotbale."
+        },
+        {
+          "word": "KOPE",
+          "clue": "Trefuje míč nohou."
+        },
+        {
+          "word": "SNADNO",
+          "clue": "Bez velké námahy."
+        }
+      ]
+    }
+  ]
+}

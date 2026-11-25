@@ -1,0 +1,8 @@
+# Převzetí redakce denních Tajenek
+
+Redakce pro prosinec 2026 používá větev `review/tajenka-denne-redakce-2026`. Soubor `data/tajenka_editorial_review_set.json` je výchozí stav, který Pavel dostal ke kontrole. Obsahuje 29 nových návrhů, 12 dříve připravených prosincových vydání a původní znění u pěti výměn.
+
+1. V izolovaném projektu Supabase `eanzztstmwlamwfdskbf` spusť `tools/editorial/read_submitted_tajenka.sql`. Prázdný výsledek znamená, že ke zpracování není nové podání. Operátor k tomu nepotřebuje odkaz redaktora.
+2. Spoj vrácené záznamy s výchozí sadou podle `id`. Každý obsahuje návrh znění, komentář k vydání, případné přepisy a komentáře k jednotlivým nápovědám a stav. Uchovej i schválení a vznesené připomínky, u kterých hráč větu nepřepsal. Při náhradě celé věty znovu slaď hledaná slova, nápovědy, zdroj a geometrii.
+3. Výchozí obsah této redakční větve zahrnuje pět žánrových náhrad i nové pořadí. Aktualizuj obsah herní větve `feature/denni-tajenka-prosinec-2026` (PR 279) z této sady a zapracuj podané změny. Před úpravou již vydané desky ověř dopad na existující rozehrání a výsledky. Herní větev přebírá obsahové soubory, redakční rozhraní a jeho přístupové údaje patří do odděleného prostředí.
+4. Každému převzetí dej v historii herní větve identitu `Tajenka editorial 2026-12 revision N`. Po přerušení nejprve ověř, zda commit a jeho náhled už existují. Spusť obsahový validátor, připrav hratelný náhled a ověř, že odpovídá zpracované revizi. Podání označ jako zpracované až po úspěšném převzetí, podmíněným zápisem pro stejnou revizi popsaným v SQL souboru. Pokud Pavel mezitím obsah upravil a odevzdal znovu, převzít je třeba novější revizi.
