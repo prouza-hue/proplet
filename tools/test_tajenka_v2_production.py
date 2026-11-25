@@ -6,6 +6,10 @@ import json
 import re
 from pathlib import Path
 
+from build_tajenka_v2_candidates import spelling_paths, validate_board_candidate
+from promote_tajenka_v2 import DEFAULT_DAILY
+from validate_tajenka_content_v2 import DEFAULT_OVERLAY, overlay_words, validate_candidate, word_tokens
+
 ROOT = Path(__file__).resolve().parents[1]
 APPROVED = ROOT / "data" / "tajenka_v2_approved.json"
 CLUES = ROOT / "data" / "tajenka_v2_clues.json"
@@ -67,25 +71,43 @@ def assert_phrase_coverage(puzzle: dict) -> None:
 
 def main() -> None:
     approved = json.loads(APPROVED.read_text(encoding="utf-8"))
+    editions = json.loads(DEFAULT_DAILY.read_text(encoding="utf-8"))["boards"]
     clue_payload = json.loads(CLUES.read_text(encoding="utf-8"))
     prod = json.loads(PROD.read_text(encoding="utf-8"))
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    source_boards = approved["boards"]
+    original = approved["boards"]
+    source_boards = original + editions
     puzzles = prod["puzzles"]
     clues = clue_payload.get("clues") or {}
     assert clue_payload.get("version") == 1 and isinstance(clues, dict)
     assert approved.get("failures") == []
-    assert len(source_boards) == len(puzzles) == len(manifest["boards"]) == 37
-    assert prod["version"] == 2 and prod["weeks"] == 37 and prod["rewardXp"] == 200
+    assert len(original) == 37 and sum(len(b["answers"]) for b in original) == 184
+    assert len(source_boards) == len(puzzles) == len(manifest["boards"]) == prod["weeks"]
+    assert prod["version"] == 2 and prod["rewardXp"] == 200
+    original_bytes = json.dumps(puzzles[:37], ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+    assert hashlib.sha256(original_bytes).hexdigest() == "9a654dedceab1e961026ade789ac98d694c4fdf8a78fc3c6772d124a4cbc680b", "Original Tajenka editions changed"
 
-    required_words = {answer["word"] for board in source_boards for answer in board["answers"]}
+    required_words = {answer["word"] for board in original for answer in board["answers"]}
     assert set(clues) == required_words, f"clue coverage mismatch missing={sorted(required_words-set(clues))} extra={sorted(set(clues)-required_words)}"
+    allowed = overlay_words(json.loads(DEFAULT_OVERLAY.read_text(encoding="utf-8")))
+    seen_texts = {" ".join(word_tokens(board["displayText"])) for board in original}
+    for source in editions:
+        anchors = [{"surface": a["word"], "suitability": "strong"} for a in source["answers"]]
+        review = validate_candidate({**source, "anchors": anchors}, approved_overlay=allowed, seen_texts=seen_texts)
+        assert review["status"] == "pass", review
+        validate_board_candidate(source)
+        mask = set(source["mask"])
+        for answer in source["answers"]:
+            assert len(answer["word"]) >= 4, "Daily editions must keep every answer visible in the game"
+            paths = spelling_paths(answer["word"], source["letters"], mask, limit=2)
+            assert paths == [tuple(answer["path"])], (source["id"], answer["word"], paths)
 
     answer_count = 0
     for week, (source, puzzle, frozen) in enumerate(zip(source_boards, puzzles, manifest["boards"]), 1):
         assert puzzle["week"] == week
         assert puzzle["id"] == f"tajenka-v2-week-{week:02d}"
         assert puzzle["sourceId"] == source["id"] == frozen["sourceId"]
+        board_clues = clues if week <= len(original) else {a["word"]: a["clue"] for a in source["answers"]}
         expected = digest(source)
         assert digest(puzzle) == expected == puzzle["meta"]["geometrySha256"] == frozen["geometrySha256"], puzzle["id"]
         assert puzzle["mask"] == source["mask"]
@@ -102,7 +124,7 @@ def main() -> None:
             assert all(b in set(neighbours(a, cols, rows)) for a, b in zip(answer["path"], answer["path"][1:]))
             assert "".join(puzzle["letters"][cell] for cell in answer["path"]) == answer["word"]
             clue = str(answer.get("clue") or "").strip()
-            assert clue == str(clues[answer["word"]]).strip(), f"{puzzle['id']} {answer['word']}: clue mismatch"
+            assert clue == str(board_clues[answer["word"]]).strip(), f"{puzzle['id']} {answer['word']}: clue mismatch"
             assert 3 <= len(clue) <= 90, f"{puzzle['id']} {answer['word']}: invalid clue length"
             assert not clue.startswith("Hledej slovo dlouhé"), f"{puzzle['id']} {answer['word']}: semantic clue fell back to length"
         assert puzzle["meta"].get("alternativeFullPaths") == 0
@@ -114,21 +136,16 @@ def main() -> None:
         if puzzle.get("category") == "quote":
             assert puzzle["source"].get("author") and puzzle["source"].get("work"), puzzle["id"]
 
-    assert answer_count == 184, f"expected 184 playable anchors, got {answer_count}"
     config = (ROOT / "backend/config.py").read_text(encoding="utf-8")
-    server = (ROOT / "server.py").read_text(encoding="utf-8")
     app = (ROOT / "public/app.js").read_text(encoding="utf-8")
     result_fix = (ROOT / "public/tajenka-release-fix.js").read_text(encoding="utf-8")
     assert 'tajenka_bank_path=data_root / "tajenka_weekend_v2.json"' in config
-    assert 'Query(default=None, ge=1, le=37)' in server
-    assert 'const TAJENKA_PREPARED_WEEKS=37;' in app
-    assert 'Math.min(37,' in app
     assert 'function tajenkaPhraseTokens(' in app
     assert 'puzzle?.tajenka?.companions' in app
     assert "tajenka&&level===1" in app and "pick.a.clue" in app, "Tajenka level-1 hint must read semantic clue metadata"
     assert 'currentSourceMarkup' in result_fix and 'tajenka-result-source' in result_fix
     assert "Pět slov, jedna společná myšlenka." not in app
-    print("Tajenka v2 production validation: 37/37 frozen boards + 184/184 semantic clues PASS")
+    print(f"Tajenka v2 production validation: {len(original)} original + {len(editions)} daily boards, {answer_count} semantic clues PASS")
 
 
 if __name__ == "__main__":

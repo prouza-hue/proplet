@@ -819,6 +819,19 @@
       ]
     },
     {
+      "id": "daily-tajenka-news-20261125",
+      "order": 700,
+      "version": "2026.11.25",
+      "path": "supabase/migrations/20261125120100_daily_tajenka_news.sql",
+      "type": "migration",
+      "status": "prepared-daily-tajenka-announcement",
+      "sha256": "a6e1ab34175f28dadf51d93c190a45f84b6a49836f2e989b98ecb1156a7def01",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_release_news_v1"
+      ]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",
