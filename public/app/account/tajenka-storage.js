@@ -51,10 +51,13 @@
     if (preferred.puzzleId !== fallback.puzzleId) return savedAt(preferred) >= savedAt(fallback) ? preferred : fallback;
     const newer = savedAt(preferred) >= savedAt(fallback) ? preferred : fallback;
     const older = newer === preferred ? fallback : preferred;
+    const differentAttempts = !!(older.attemptId && newer.attemptId && older.attemptId !== newer.attemptId);
     return {
       ...older,
       ...newer,
       found: mergeFound(newer.found, older.found),
+      mergedAttempts: !!(newer.mergedAttempts || older.mergedAttempts || differentAttempts),
+      timingUnverified: !!(newer.timingUnverified || older.timingUnverified || differentAttempts),
       moves: Math.max(Number(preferred.moves) || 0, Number(fallback.moves) || 0),
       hints: Math.max(Number(preferred.hints) || 0, Number(fallback.hints) || 0),
       wrongAttempts: Math.max(Number(preferred.wrongAttempts) || 0, Number(fallback.wrongAttempts) || 0),

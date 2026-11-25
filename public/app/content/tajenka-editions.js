@@ -120,6 +120,7 @@
   }catch{if(token===view&&dialog.open)errorMessage(navigator.onLine===false?'Tuhle Tajenku si poprvé otevři s připojením.':'Tajenku se nepodařilo načíst.',()=>open())}
  }
  function openFromNews(){if(!available())return false;const p=deps.current();return !readyToday()||deps.status(p.id)==='done'?open():deps.openPuzzle(p)}
+ document.addEventListener('proplet:tajenka-ready',()=>{if(dialog?.open)open()});
  const api={configure(options){deps=options},available,readyToday,isReview,remember,cached,list,load,open,openFromNews,syncPlayEntry,close};
  global.PropletDailyTajenka=api;
 })(typeof window!=='undefined'?window:globalThis);

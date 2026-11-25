@@ -849,7 +849,7 @@ function saveGameProgress(){
  s.inProgress[key]={puzzleId:g.puzzle.id,mode:g.mode,difficulty:g.puzzle.difficulty,dailyDate:g.dailyDate||null,found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,cleanSolve:(g.hints||0)===0,elapsedMs:Math.round(elapsed),attemptId:g.attemptId||null,serverTimingAnchored:!!g.serverTimingAnchored,disconnected:!!g.disconnected,timingUnverified:!!g.timingUnverified,wordDiscoveryXpAwarded:Math.max(0,Number(g.wordDiscoveryXpAwarded)||0),helperOffered:!!g.helperOffered,helperHintUsed:!!g.helperHintUsed,postStarterWarmup:!!g.postStarterWarmup,savedAt:Date.now()};saveState(s);g.lastAutosaveAt=Date.now();
 }
 function saveTajenkaGameProgress(g=currentGame){
- if(!g||g.mode!=='tajenka'||g.finished)return;
+ if(!g||g.mode!=='tajenka'||g.finished||g.tajenkaScope&&g.tajenkaScope!==playerScope())return;
  const state=tajenkaState();
  if(g.isReplay||tajenkaCompletion(g.puzzle,state))return;
  const row={puzzleId:g.puzzle.id,mode:'tajenka',wordDiscoveryXpAwarded:Math.max(0,Number(g.wordDiscoveryXpAwarded)||0),found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,elapsedMs:Math.round(gameElapsed(g)),attemptId:g.attemptId,serverTimingAnchored:!!g.serverTimingAnchored,disconnected:!!g.disconnected,timingUnverified:!!g.timingUnverified,mergedAttempts:!!g.mergedAttempts,calmMode:!!g.calmMode,savedAt:Date.now()};
@@ -1329,7 +1329,7 @@ async function startGame(puzzle,mode,dailyDate,options={}){
  }
  const totalLimit=options.rescueTotalLimitMs||30000,remaining=options.limitMs||totalLimit,restored=prepared.restored,sessionEvent={puzzle,mode,dailyDate,options,restored,data:Object.create(null)};if(!review)runGameSessionHooks('beforeStart',sessionEvent);options=sessionEvent.options||options;const found=restored?.found||[],used=new Map();found.forEach(f=>f.path.forEach(i=>used.set(i,f.colorIndex)));
  let baseElapsedMs=mode==='rescue'?Math.max(0,totalLimit-remaining):(restored?.elapsedMs||0);
- currentGame={starterTrace,puzzle,mode,dailyDate,tajenkaReview:review,tajenkaEditionsScreen:options.tajenkaEditionsScreen,kdoRecovery:options.kdoRecovery===true,found,used,path:[],wrongPath:[],dragging:false,lastPointer:null,moves:restored?.moves||0,start:performance.now(),pausedAt:null,pauseReason:null,baseElapsedMs,elapsedMs:baseElapsedMs,finished:false,lastFound:[],hints:restored?.hints||0,wrongAttempts:restored?.wrongAttempts||0,maxHintLevel:restored?.maxHintLevel||0,cleanSolve:(restored?.hints||0)===0,attemptId:mode==='starter'?null:(restored?.attemptId||newAttemptId()),wordDiscoveryXpAwarded:Math.max(0,Number(restored?.wordDiscoveryXpAwarded)||0),rescueFinished:false,rescueTotalLimitMs:totalLimit,rescueOffsetMs:baseElapsedMs,lastAutosaveAt:Date.now(),lastProgressAt:performance.now(),helperOffered:!!restored?.helperOffered,helperHintUsed:!!restored?.helperHintUsed,nextHintSource:'manual',isReplay:mode==='tajenka'?!!tajenkaCompletion(puzzle):!!getState().completed[challengeKey(mode,puzzle,dailyDate)],contentBatchId:options.contentBatchId||null,postStarterWarmup:!!(options.postStarterWarmup||restored?.postStarterWarmup),starterHardDirect:!!options.starterHardDirect,starterHintUsed:false,starterHintOfferShown:false,starterTrackedWordCount:0,starterGuidePath:[],undoSnapshot:null};
+ currentGame={starterTrace,puzzle,mode,dailyDate,tajenkaScope:mode==='tajenka'?scope:null,tajenkaReview:review,tajenkaEditionsScreen:options.tajenkaEditionsScreen,kdoRecovery:options.kdoRecovery===true,found,used,path:[],wrongPath:[],dragging:false,lastPointer:null,moves:restored?.moves||0,start:performance.now(),pausedAt:null,pauseReason:null,baseElapsedMs,elapsedMs:baseElapsedMs,finished:false,lastFound:[],hints:restored?.hints||0,wrongAttempts:restored?.wrongAttempts||0,maxHintLevel:restored?.maxHintLevel||0,cleanSolve:(restored?.hints||0)===0,attemptId:mode==='starter'?null:(restored?.attemptId||newAttemptId()),wordDiscoveryXpAwarded:Math.max(0,Number(restored?.wordDiscoveryXpAwarded)||0),rescueFinished:false,rescueTotalLimitMs:totalLimit,rescueOffsetMs:baseElapsedMs,lastAutosaveAt:Date.now(),lastProgressAt:performance.now(),helperOffered:!!restored?.helperOffered,helperHintUsed:!!restored?.helperHintUsed,nextHintSource:'manual',isReplay:mode==='tajenka'?!!tajenkaCompletion(puzzle):!!getState().completed[challengeKey(mode,puzzle,dailyDate)],contentBatchId:options.contentBatchId||null,postStarterWarmup:!!(options.postStarterWarmup||restored?.postStarterWarmup),starterHardDirect:!!options.starterHardDirect,starterHintUsed:false,starterHintOfferShown:false,starterTrackedWordCount:0,starterGuidePath:[],undoSnapshot:null};
  currentGame.firstStepsTelemetry=review?null:(window.PropletFirstSteps?.captureFirstGame(puzzle,options)||null);
  if(mode==='otisky'){currentGame.otisky=options.otisky;currentGame.isReplay=options.otisky.completed.includes(options.otisky.board)}
  if(mode==='playtest')window.PropletPlaytest.attach(currentGame);
@@ -1520,7 +1520,7 @@ async function finishStarterGame(g){
  if(getProfile()?.token&&!old)syncQueue({announce:false}).catch(()=>{});
 }
 async function finishTajenkaGame(g){
- if(!g||g.mode!=='tajenka'||g.finished)return;
+ if(!g||g.mode!=='tajenka'||g.finished||g.tajenkaScope&&g.tajenkaScope!==playerScope())return;
  g.finished=true;g.justCompleted=true;g.elapsedMs=gameElapsed(g);stopTimer();releaseGameWakeLock();renderGameBoard();renderGameHUD();updateGameFeel();
  const state=tajenkaState(),old=tajenkaCompletion(g.puzzle,state),rewardXp=g.tajenkaReview||old?0:Number(g.puzzle.meta?.rewardXp)||TAJENKA_REWARD_XP,completion={puzzleId:g.puzzle.id,found:g.found.map(f=>({answerIndex:f.answerIndex,word:f.word,colorIndex:f.colorIndex,path:[...f.path]})),moves:g.moves||0,hints:g.hints||0,elapsedMs:Math.round(g.elapsedMs),completedAt:resultCompletedAt(),rewarded:true,rewardXp};state.version=Math.max(3,Number(state.version)||0);state.completions=state.completions||{};
  if(!old){state.completions[g.puzzle.id]=completion;state.completed=completion}
@@ -1528,9 +1528,10 @@ async function finishTajenkaGame(g){
  if(state.progressByPuzzle)delete state.progressByPuzzle[g.puzzle.id];
  saveTajenkaState(state);
  if(g.puzzle.id===KDO_PUZZLE_ID){recoveryRequest++;recoveryPuzzle=null;$('#tajenkaRecoveryNotice')?.classList.add('hidden')}
- if(!g.tajenkaReview&&TAJENKA_RELEASE_ENABLED&&!old){const rec={puzzleId:g.puzzle.id,challengeKey:challengeKey('tajenka',g.puzzle,null),mode:'tajenka',difficulty:g.puzzle.difficulty||'medium',dailyDate:null,level:null,contentGeneration:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:rewardXp,hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:g.serverTimingAnchored?g.attemptId:null,timingUnverified:!!g.timingUnverified,calmMode:!!g.calmMode,cleanSolve:(g.hints||0)===0,completedAt:completion.completedAt};queueResult(rec);if(getProfile()?.token)syncQueue({announce:false}).catch(()=>{})}
+ if(!g.tajenkaReview&&TAJENKA_RELEASE_ENABLED&&!old){const rec={puzzleId:g.puzzle.id,challengeKey:challengeKey('tajenka',g.puzzle,null),mode:'tajenka',difficulty:g.puzzle.difficulty||'medium',dailyDate:null,level:null,contentGeneration:null,elapsedMs:Math.max(1000,Math.round(g.elapsedMs)),moves:Math.max(1,g.moves),points:rewardXp,hintsUsed:g.hints||0,wrongAttempts:g.wrongAttempts||0,maxHintLevel:g.maxHintLevel||0,attemptId:g.serverTimingAnchored?g.attemptId:null,timingUnverified:!!g.timingUnverified,mergedAttempts:!!g.mergedAttempts,calmMode:!!g.calmMode,cleanSolve:(g.hints||0)===0,completedAt:completion.completedAt};queueResult(rec);if(getProfile()?.token)syncQueue({announce:false}).catch(()=>{})}
  trackProductEvent('tajenka_completed');
  await sleep(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?220:760);
+ if(currentGame!==g||currentScreen!=='game'||g.tajenkaScope&&g.tajenkaScope!==playerScope())return;
  $('#screen-game').classList.add('tajenka-mode');$('#winModal').classList.remove('starter-win','hidden');$('#levelLeaderboardBox')?.classList.add('hidden');$('#winAccountBtn')?.classList.add('hidden');renderWinBadges();$('#winFeedback')?.classList.add('hidden');$('#winDetails')?.classList.add('hidden');$('#winBadge').textContent='✦';$('#winTitle').textContent='Tajenka odhalena!';$('#winPraise').classList.add('hidden');$('#winText').textContent=`${fmtTime(g.elapsedMs)} · ${countCz(g.moves,'tah','tahy','tahů')} · Tajenka`;setWinXpDisplay(rewardXp?`+${rewardXp} XP · jednou za tuto Tajenku`:'Znovu · bez dalších XP');$('#winClean').classList.remove('hidden','hinted');$('#winClean').textContent='Bonus bez žebříčku';const phrase=$('#tajenkaWinPhrase'),words=tajenkaPhraseWords(g.puzzle);if(phrase){phrase.classList.remove('hidden');phrase.innerHTML=`<strong>${esc(g.puzzle.tajenka.phrase)}</strong><small>${countCz(words.length,'nalezené slovo','nalezená slova','nalezených slov')}</small>`}$('#winWords').innerHTML='';$('#winReplayBtn').classList.add('hidden');$('#winShareBtn').classList.add('hidden');$('#winMenuBtn').classList.add('hidden');$('#winPrimaryBtn').classList.remove('hidden');$('#winPrimaryBtn').textContent='Zpět na Dnes';confetti();fx('win');renderTajenkaEntry();
 }
 function retryPendingFinish(g){
@@ -1545,6 +1546,7 @@ function retryPendingFinish(g){
 }
 async function finishGame(){
  if(!currentGame||currentGame.finished||currentGame.finishing)return;
+ if(currentGame.tajenkaScope&&currentGame.tajenkaScope!==playerScope()){refreshTajenkaPlayer();return}
  clearTimeout(currentGame.finishRetryTimer);currentGame.finishRetryTimer=null;
  if(currentGame.mode==='daily_special'&&currentGame.puzzle?.meta?.dailySpecialBinding?.rewardEligible!==false&&navigator.onLine===false){saveGameProgress();message('Všechna slova jsou uložená. Dokončení Extra výzvy potvrdíme po připojení.');return}
  currentGame.finishing=true;
@@ -2843,9 +2845,10 @@ async function togglePushReminder(){
 function bind(){
  document.addEventListener('proplet:ready',refreshKdoNotice,{once:true});
  document.addEventListener('proplet:account-changed',refreshKdoNotice);
+ document.addEventListener('proplet:account-changed',refreshTajenkaPlayer);
  document.addEventListener('proplet:profile-refreshed',hideClaimedKdoNotice);
  window.addEventListener('online',refreshKdoNotice);
- window.addEventListener('storage',event=>{if(event.key===tajenkaStateKey())hideClaimedKdoNotice()});
+ window.addEventListener('storage',event=>{if(event.key===PROFILE_KEY||event.key===null)refreshTajenkaPlayer();if(event.key===tajenkaStateKey())hideClaimedKdoNotice()});
 
  const starterModalObserver=new MutationObserver(()=>{if(currentGame?.mode==='starter'&&currentGame.path?.length)gameInputController?.resetStarter()});
  $$('.modal').forEach(modal=>starterModalObserver.observe(modal,{attributes:true,attributeFilter:['class']}));
@@ -2895,7 +2898,7 @@ const TAJENKA_DAILY_START='2026-12-01';
 let activeTajenkaWeek=null;
 let TAJENKA_AVAILABLE=false;
 let tajenkaPuzzle=null;
-let tajenkaRecapOpen=false,tajenkaRecapPuzzle=null,tajenkaRecapFromEditions=false;
+let tajenkaRecapOpen=false,tajenkaRecapPuzzle=null,tajenkaRecapFromEditions=false,tajenkaRecapScope=null;
 let tajenkaLoadSerial=0,tajenkaReviewState={},tajenkaReviewRules=false;
 
 function tajenkaReleaseSlotForISO(iso=pragueDateISO()){
@@ -3034,9 +3037,21 @@ function hideClaimedKdoNotice(){
   recoveryRequest++;recoveryPuzzle=null;$('#tajenkaRecoveryNotice')?.classList.add('hidden');
  }
 }
+function refreshTajenkaPlayer(){
+ const scope=playerScope(),g=currentGame;
+ if(currentScreen==='game'&&g?.tajenkaScope&&g.tajenkaScope!==scope){
+  g.fairPlay=false;clearTimeout(g.finishRetryTimer);fairPlay().stop();
+  $('#winModal')?.classList.add('hidden');$('#tajenkaRulesModal')?.classList.add('hidden');
+  nav(g.tajenkaEditionsScreen||'daily',{replace:true});showToast('Účet se změnil. Tajenku otevři znovu.');return;
+ }
+ if(tajenkaRecapOpen&&tajenkaRecapScope!==scope){
+  tajenkaRecapOpen=false;$('#winModal')?.classList.add('hidden');
+  if(tajenkaRecapFromEditions)window.PropletDailyTajenka?.open();
+ }else if(document.querySelector('#tajenkaEditionsDialog[open]'))window.PropletDailyTajenka?.open();
+}
 function showTajenkaRecap(completion=tajenkaCompletion(),puzzle=tajenkaPuzzle,fromEditions=false){
  if(!puzzle||!completion||completion.puzzleId!==puzzle.id)return;
- tajenkaRecapOpen=true;tajenkaRecapPuzzle=puzzle;tajenkaRecapFromEditions=fromEditions;trackProductEvent('tajenka_recap_opened');
+ tajenkaRecapOpen=true;tajenkaRecapPuzzle=puzzle;tajenkaRecapFromEditions=fromEditions;tajenkaRecapScope=playerScope();trackProductEvent('tajenka_recap_opened');
  $('#winModal').classList.remove('starter-win','hidden');$('#starterHardActions')?.classList.add('hidden');$('#levelLeaderboardBox')?.classList.add('hidden');$('#winAccountBtn')?.classList.add('hidden');renderWinBadges();$('#winFeedback')?.classList.add('hidden');$('#winDetails')?.classList.add('hidden');
  $('#winBadge').textContent='✦';$('#winTitle').textContent='Tajenka odhalena';$('#winPraise').classList.add('hidden');$('#winText').textContent=`${fmtTime(Number(completion.elapsedMs)||0)} · ${countCz(Number(completion.moves)||0,'tah','tahy','tahů')}`;setWinXpDisplay('Vyřešeno');$('#winClean').classList.add('hidden');
  const phrase=$('#tajenkaWinPhrase');if(phrase){phrase.classList.remove('hidden');phrase.innerHTML=`<strong>${esc(puzzle.tajenka.phrase)}</strong>`}
@@ -3092,7 +3107,7 @@ async function loadTajenkaFixture(){
  const ready=refreshTajenkaAvailability(),week=activeTajenkaWeek,review=dailyTajenkaUI?.isReview();
  if(!ready&&!review){tajenkaPuzzle=null;return null}
  const expected='tajenka-v2-week-'+String(week).padStart(2,'0');
- const fallback=()=>!TAJENKA_PREVIEW&&dailyTajenkaUI?.cached(expected);
+ const fallback=()=>!review&&!TAJENKA_PREVIEW&&dailyTajenkaUI?.cached(expected);
  let puzzle=null;
  try{
   if(review){const listing=await dailyTajenkaUI.list();puzzle=listing.editions.length?await dailyTajenkaUI.load(listing.editions[0].id):null}
@@ -3208,7 +3223,9 @@ async function boot(){
  // Resolve the capability before content selection, auth-return sync or the first render.
  if(previewRuntime()&&navigator.onLine!==false)await loadRuntimeCapabilities();
  try{await ensureFirstStepsRuntime()}catch{reportClientError('first_steps_module_unavailable','first-steps-contract')}
- applyTheme(getSettings().theme);showPuzzleBootLoading();migrateScopedStorage();migrateTajenkaStorage();globalThis.PropletArchiveExperience?.configure();
+ applyTheme(getSettings().theme);showPuzzleBootLoading();
+ if(!dailyTajenkaUI?.isReview()){migrateScopedStorage();migrateTajenkaStorage()}
+ globalThis.PropletArchiveExperience?.configure();
  const entryParams=new URLSearchParams(location.search),forcedTutorial=entryParams.get('tutorial')==='1';
  const guideMode=requestedGuideMode(entryParams),tajenkaReview=dailyTajenkaUI?.isReview();
  const stampPreview=previewRuntime()&&['dar','prosba'].includes(entryParams.get('pet_otisku'));
@@ -3232,7 +3249,7 @@ async function boot(){
   await loadTajenkaFixture();
   await freeOrder().configure();freeOrderLastRefreshAt=Date.now();
  }
- document.body.classList.remove('landscape-game-blocked');reconcileLocalGen4Rewards();
+ document.body.classList.remove('landscape-game-blocked');if(!tajenkaReview)reconcileLocalGen4Rewards();
  // Archive also installs on proplet:ready and retries on reconnection.
  if(!localLaunch)await globalThis.PropletArchiveExperience?.install();
  bind();bindClientErrorReporting();initNavigation();
