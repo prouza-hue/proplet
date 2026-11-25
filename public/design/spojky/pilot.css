@@ -1,0 +1,72 @@
+:root {
+  color-scheme: light;
+  --pilot-bg: #fcf5e8;
+  --pilot-ink: #272b30;
+  --pilot-paper: #fffbf2;
+  --pilot-quiet: #625e55;
+  --pilot-line: #d7c9ae;
+  --pilot-green: #245b52;
+  --pilot-picked: #e2eee2;
+  --pilot-mark: #2d6357;
+  --pilot-shadow: #d9cfb9;
+  --pilot-contrast: #fff9e9;
+  font-family: Outfit, system-ui, sans-serif;
+  color: var(--pilot-ink);
+  background: var(--pilot-bg);
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --pilot-bg: #222323;
+  --pilot-ink: #fff3de;
+  --pilot-paper: #303232;
+  --pilot-quiet: #d3c9b8;
+  --pilot-line: #68655e;
+  --pilot-green: #b0ddc9;
+  --pilot-picked: #234c40;
+  --pilot-mark: #a1d5b9;
+  --pilot-shadow: #191c1a;
+  --pilot-contrast: #1b332c;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; min-width: 0; }
+button, select { font: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+button:focus-visible, select:focus-visible { outline: 3px solid var(--pilot-green); outline-offset: 3px; }
+button, select, a { -webkit-tap-highlight-color: transparent; }
+body:has(dialog[open]) { overflow: hidden; }
+.pilot-game-page { min-height: 100svh; }
+.pilot-dialog {
+  color: var(--pilot-ink); background: var(--pilot-paper); border: 1px solid var(--pilot-line); border-radius: 18px;
+  padding: clamp(16px, 4.5vw, 28px); width: min(29rem, calc(100% - 1.5rem)); max-height: calc(100dvh - 2rem);
+  overscroll-behavior: contain; overflow-y: auto; box-shadow: 0 4px 0 var(--pilot-shadow), 0 18px 65px #151b1940;
+}
+.pilot-dialog::backdrop { background: rgb(23 28 25 / 52%); }
+.pilot-dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pilot-dialog h2 { margin: 0; font: 690 clamp(1.55rem, 5.4vw, 2rem)/1.08 Fraunces, Georgia, serif; letter-spacing: -.035em; }
+.pilot-dialog p { font-size: 1rem; line-height: 1.4; }
+.pilot-intro { margin: 8px 0 16px; color: var(--pilot-quiet); }
+.pilot-close { width: 44px; min-height: 44px; flex: none; border: 1px solid var(--pilot-line); border-radius: 50%; background: transparent; color: var(--pilot-ink); font: 400 1.75rem/1 Outfit, sans-serif; }
+.pilot-weeks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.pilot-week {
+  position: relative; display: flex; align-items: flex-start; flex-direction: column; gap: .18rem; text-align: left;
+  padding: .6rem .85rem; border: 1px solid var(--pilot-line); border-radius: 9px;
+  background: var(--pilot-paper); color: var(--pilot-ink); box-shadow: 0 2px 0 var(--pilot-shadow);
+}
+.pilot-week[aria-pressed="true"] { background: var(--pilot-picked); border-color: var(--pilot-mark); box-shadow: 0 2px 0 var(--pilot-mark); }
+.pilot-week[aria-pressed="true"]::after { content: '✓'; position: absolute; right: 7px; top: 6px; color: var(--pilot-green); font-weight: 700; }
+.pilot-week strong { margin-right: .55rem; font: 680 1.16rem/1.25 Fraunces, Georgia, serif; }
+.pilot-week span { font-size: .875rem; line-height: 1.25; color: var(--pilot-quiet); }
+.pilot-week small { font-size: .8125rem; line-height: 1.25; color: var(--pilot-green); }
+.pilot-settings-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .4rem 1rem; margin: 1.1rem 0 .85rem; }
+.pilot-settings-row label { font-weight: 600; }
+.pilot-settings-row select { min-height: 44px; max-width: 100%; padding: .4rem .7rem; border: 1px solid var(--pilot-line); border-radius: 8px; background-color: var(--pilot-paper); color: var(--pilot-ink); }
+.pilot-review-link, .pilot-confirm { display: block; width: 100%; min-height: 46px; border: 1px solid var(--pilot-mark); border-radius: 9px; padding: .55rem .75rem; font-weight: 600; color: var(--pilot-green); background: var(--pilot-picked); }
+.pilot-reset { display: block; margin: .45rem auto 0; padding: .35rem .6rem; min-height: 44px; border: 0; color: var(--pilot-quiet); background: transparent; text-decoration: underline; text-underline-offset: .15em; }
+.pilot-detail-actions { display: flex; gap: 8px; }
+.pilot-detail-actions > button { flex: 1; }
+.pilot-confirm { background: var(--pilot-green); color: var(--pilot-contrast); }
+.pilot-review-switch { width: min(100% - 2rem, 34rem); margin: .5rem auto 1.5rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
+.pilot-review-switch button { min-height: 44px; padding: .35em .62em; border: 1px solid var(--pilot-line); border-radius: 7px; color: var(--pilot-ink); font-size: .95rem; background: var(--pilot-paper); }
+.pilot-review-switch button[aria-pressed="true"] { border-color: var(--pilot-mark); background: var(--pilot-picked); color: var(--pilot-green); box-shadow: inset 0 -2px var(--pilot-mark); }
+@media (max-width: 22rem) { .pilot-week { padding: .55rem; } }

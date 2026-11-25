@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; form-action 'none'; object-src 'none'">
+  <meta name="description" content="Čtyři týdenní desky Spojek v hratelném náhledu Propletu.">
+  <title>Spojky · Proplet</title>
+  <base href="/design/spojky/">
+  <link rel="icon" href="/brand/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/fonts/proplet-fonts.css">
+  <link rel="stylesheet" href="./pilot.css">
+  <link rel="stylesheet" href="./today.css">
+  <link rel="stylesheet" href="./game.css">
+  <script type="module" src="./pilot.js"></script>
+</head>
+<body>
+  <div id="pilot-app"></div>
+  <dialog id="pilot-menu" class="pilot-dialog" aria-labelledby="pilot-menu-title">
+    <div class="pilot-dialog-head">
+      <h2 id="pilot-menu-title">Náhled Spojek</h2>
+      <button type="button" class="pilot-close" data-action="close-menu" aria-label="Zavřít náhled">×</button>
+    </div>
+    <p class="pilot-intro">Všechny čtyři týdny si můžeš zahrát hned. Každá deska si pamatuje, kde jsi skončil.</p>
+    <div id="pilot-weeks" class="pilot-weeks" role="group" aria-label="Týden zobrazený na Dnes"></div>
+    <div class="pilot-settings-row">
+      <label for="pilot-theme">Vzhled</label>
+      <select id="pilot-theme">
+        <option value="auto">Podle zařízení</option>
+        <option value="light">Světlý</option>
+        <option value="dark">Tmavý</option>
+      </select>
+    </div>
+    <button type="button" class="pilot-review-link" data-action="review">Prohlédnout řešení desek</button>
+    <button type="button" class="pilot-reset" data-action="ask-reset" hidden>Začít tento týden znovu</button>
+  </dialog>
+  <dialog id="pilot-detail" class="pilot-dialog pilot-detail" aria-labelledby="pilot-detail-title">
+    <div class="pilot-dialog-head"><h2 id="pilot-detail-title"></h2><button type="button" class="pilot-close" data-action="close-detail" aria-label="Zavřít">×</button></div>
+    <p id="pilot-detail-copy"></p>
+    <div class="pilot-detail-actions"><button type="button" class="pilot-review-link" data-action="close-detail">Zpět na Dnes</button><button type="button" class="pilot-confirm" data-action="reset" hidden>Začít znovu</button></div>
+  </dialog>
+  <noscript>Pro hraní Spojek zapni v prohlížeči JavaScript.</noscript>
+</body>
+</html>
