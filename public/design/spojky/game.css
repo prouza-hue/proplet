@@ -100,6 +100,7 @@ html[data-theme=dark] .sj-game {
 .sj-game .sj-cell.sj-end { box-shadow: inset 0 0 0 2px var(--sj-on-strong); }
 .sj-game .sj-cell.sj-tip { outline: 2px dashed var(--sj-mark); outline-offset: -5px; }
 .sj-game .sj-cell[data-ink] { --sj-trace: var(--sj-color); background: var(--sj-wash); border-color: var(--sj-color); color: var(--sj-color); cursor: default; }
+.sj-grid-details .sj-cell:not([data-ink]) { color: var(--sj-muted); background: transparent; border: 1px dashed var(--sj-tray-line); }
 .sj-cell[data-to]::after { content: ''; position: absolute; z-index: 1; display: block; pointer-events: none; background: var(--sj-trace); border-radius: 1.5px; }
 .sj-cell[data-to=r]::after, .sj-cell[data-to=l]::after { width: calc(var(--sj-gap) + 3px); height: 4px; top: calc(50% - 2px); }
 .sj-cell[data-to=r]::after { left: calc(100% - 1px); }
@@ -156,6 +157,10 @@ html[data-theme=dark] .sj-game {
 .sj-grid-details summary:hover, .sj-top button:hover, .sj-clear:hover { text-decoration: underline; text-underline-offset: .14em; }
 .sj-next-week { margin: 1rem 0 0; padding-top: .75rem; border-top: 1px dashed var(--sj-edge); color: var(--sj-muted); font-size: .97rem; }
 .sj-game button:active:not(:disabled):not(.sj-cell), .sj-grid-details summary:active { transform: translateY(1px); }
+@media (max-width: 37.99rem) and (max-height: 43rem) {
+  .sj-playing .sj-tray { --sj-size: clamp(2.75rem, 7.5svh, 3.42rem); }
+  .sj-play-layout { row-gap: .65rem; }
+}
 @container (max-width: 24rem) {
   .sj-long-cards .sj-nouns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .sj-tray { --sj-pad: .36rem; --sj-gap: .2rem; }

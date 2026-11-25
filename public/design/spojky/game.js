@@ -72,6 +72,9 @@ function button(className, text, action) {
   return element;
 }
 
+// Touch can produce a compatibility click with detail === 0 as well as a pointerup.
+const nonPointerClick = event => event.detail === 0 && !event.pointerType && !event.sourceCapabilities?.firesTouchEvents;
+
 function bindCards(container, onPick) {
   let touch = null;
   const handledAt = new WeakMap();
@@ -94,7 +97,7 @@ function bindCards(container, onPick) {
   container.addEventListener('click', event => {
     const card = event.target.closest('[data-card]');
     if (!card) return;
-    if (event.detail > 0 && event.timeStamp - (handledAt.get(card) ?? -Infinity) < 800) return;
+    if (!nonPointerClick(event) && event.timeStamp - (handledAt.get(card) ?? -Infinity) < 800) return;
     onPick(Number(card.dataset.card));
   });
 }
@@ -124,8 +127,9 @@ function rulesDialog(frame) {
   rules.append(el('h2', '', 'Jak hrát Spojky'),
     el('p', '', 'Pila a hřeben mají zuby. Podobně patří každá spojka ke dvěma kartičkám.'),
     el('p', '', 'Vyber dvojici kartiček a najdi jejich společné slovo. Nebo začni slovem a kartičky přiřaď potom.'),
-    el('p', '', 'Písmena spoj tahem nebo na ně postupně klepej. Pokračuj nahoru, dolů nebo do stran. Každé políčko smíš ve slově použít jednou.'),
-    el('p', '', 'Tři spojky můžeš najít v libovolném pořadí. Dohromady vytvoří jeden řetěz.'),
+    el('p', '', 'Spojuj písmena tahem nebo postupným klepáním. Sousední políčka musí mít společnou stranu. Každé můžeš ve slově použít jen jednou.'),
+    el('p', '', 'Klepnutím na poslední písmeno ho odebereš. Klepnutím do prázdna zrušíš celý tah.'),
+    el('p', '', 'Tři spojky můžeš najít v libovolném pořadí. Některá písmena zůstanou volná.'),
     button('sj-primary', 'Zpátky ke hře', () => dialog.close()));
   dialog.append(rules);
   dialog.addEventListener('click', event => {
@@ -361,20 +365,40 @@ export function mountGame(root, options) {
     update();
   }
 
-  function addCell(i, start) {
+  function tapCell(i) {
+    if (locked(i)) return;
+    const step = state.path.indexOf(i);
     const end = state.path.at(-1);
-    if (locked(i) || end === i || targetWord() >= 0) return;
     notice = '';
-    if (state.path.length >= 2 && state.path.at(-2) === i) state.path.pop();
-    else if (state.path.includes(i)) {
-      if (start) { notice = 'Políčko můžeš ve slově použít jen jednou.'; paint(); }
-      return;
-    } else if (end == null || neighbors(end, i, cols)) state.path.push(i);
-    else {
-      if (start) { notice = 'Navazuj přes společnou stranu. Pro nové slovo zruš tah.'; paint(); }
-      return;
-    }
+    if (i === end) state.path.pop();
+    else if (step >= 0) state.path.length = step + 1;
+    else if (end != null && neighbors(end, i, cols) && targetWord() < 0) state.path.push(i);
+    else state.path = [i];
     update();
+  }
+
+  function extendDrag(i) {
+    const end = state.path.at(-1);
+    if (i === end || locked(i)) return;
+    if (i === state.path.at(-2)) state.path.pop();
+    else if (neighbors(end, i, cols) && !state.path.includes(i) && targetWord() < 0) state.path.push(i);
+    else return;
+    notice = '';
+    update();
+  }
+
+  function clearPath() {
+    if (!state.path.length) return;
+    state.path = [];
+    state.hintTarget = -1;
+    notice = '';
+    update();
+  }
+
+  function clickOutside(event) {
+    if (!grid?.isConnected || !state.path.length || event.button !== 0) return;
+    if (grid.contains(event.target) || event.target.closest?.('button, a, input, select, textarea, summary, dialog, [role="button"]')) return;
+    clearPath();
   }
 
   function askHint() {
@@ -383,7 +407,8 @@ export function mountGame(root, options) {
     const target = ready >= 0 ? ready : pair >= 0 && !state.found[pair] ? pair : state.found.findIndex(path => !path);
     if (target < 0) return;
     notice = '';
-    if (!board.answers[target].word.startsWith(selectedWord())) state.path = [];
+    const hintPath = trailFor(board, board.answers[target], new Set(state.found.flatMap(path => path || [])));
+    if (ready < 0 && !state.path.every((i, step) => i === hintPath[step])) state.path = [];
     state.pair = [target, target + 1];
     state.hints[target] = Math.min(3, state.hints[target] + 1);
     state.hintTarget = target;
@@ -397,14 +422,21 @@ export function mountGame(root, options) {
 
   function traceTo(x, y) {
     if (!activePointer) return;
+    if (!activePointer.moved) {
+      if (Math.hypot(x - activePointer.x, y - activePointer.y) < 8) return;
+      // A continuous stroke starts at this press, even beside an older tapped word.
+      activePointer.moved = true;
+      state.path = [activePointer.start];
+      notice = '';
+      update();
+    }
     const { x: fromX, y: fromY } = activePointer;
     const steps = Math.max(1, Math.ceil(Math.hypot(x - fromX, y - fromY) / 10));
     for (let s = 1; s <= steps && activePointer; s++) {
       const index = hitAt(fromX + (x - fromX) * s / steps, fromY + (y - fromY) * s / steps);
       if (index >= 0 && index !== activePointer.last) {
-        activePointer.moved = true;
         activePointer.last = index;
-        addCell(index, false);
+        extendDrag(index);
       }
     }
     if (activePointer) { activePointer.x = x; activePointer.y = y; }
@@ -413,12 +445,14 @@ export function mountGame(root, options) {
   function bindGrid() {
     grid.addEventListener('pointerdown', event => {
       const cell = event.target.closest('[data-cell]');
-      if (activePointer || event.button !== 0 || !cell || cell.disabled) return;
+      if (activePointer || event.isPrimary === false || event.button !== 0) return;
+      if (!cell) { clearPath(); return; }
+      if (cell.disabled) return;
       const i = Number(cell.dataset.cell);
       event.preventDefault();
-      activePointer = { id: event.pointerId, x: event.clientX, y: event.clientY, last: i, moved: false };
+      activePointer = { id: event.pointerId, x: event.clientX, y: event.clientY, start: i, last: i, moved: false };
       grid.setPointerCapture(event.pointerId);
-      addCell(i, true);
+      if (!state.path.length) paintCells(cells, state.found, [i], -1, true);
     });
     grid.addEventListener('pointermove', event => {
       if (activePointer?.id === event.pointerId) traceTo(event.clientX, event.clientY);
@@ -427,20 +461,26 @@ export function mountGame(root, options) {
       if (activePointer?.id !== event.pointerId) return;
       traceTo(event.clientX, event.clientY);
       if (!activePointer) return;
-      const wasDrag = activePointer.moved;
+      const { moved, start } = activePointer;
       stopPointer();
-      if (wasDrag && state.path.length > 1 && targetWord() < 0 && !board.answers.some((answer, i) => !state.found[i] && answer.word.startsWith(selectedWord()))) {
-        notice = 'Tohle slovo kartičky nespojuje. Zkus jinou cestu.';
-        paint();
+      if (!moved) tapCell(start);
+      else if (targetWord() < 0) {
+        state.path = [];
+        notice = 'Zkus jinou cestu.';
+        update();
       }
     });
     for (const name of ['pointercancel', 'lostpointercapture']) grid.addEventListener(name, event => {
-      if (activePointer?.id === event.pointerId) activePointer = null;
+      if (activePointer?.id !== event.pointerId) return;
+      const { moved } = activePointer;
+      activePointer = null;
+      if (moved && targetWord() < 0) clearPath();
+      else paint();
     });
     grid.addEventListener('click', event => {
       // Keyboard and assistive clicks have no pointer gesture to handle them.
       const cell = event.target.closest('[data-cell]');
-      if (event.detail === 0 && cell && !cell.disabled) addCell(Number(cell.dataset.cell), true);
+      if (nonPointerClick(event) && cell && !cell.disabled) tapCell(Number(cell.dataset.cell));
     });
     grid.addEventListener('keydown', event => {
       const delta = { ArrowUp: -cols, ArrowDown: cols, ArrowLeft: -1, ArrowRight: 1 }[event.key];
@@ -525,7 +565,7 @@ export function mountGame(root, options) {
     blocks.setAttribute('role', 'img');
     Array.from('ZUBY').forEach(letter => blocks.append(el('span', '', letter)));
     example.append(blocks);
-    const explanation = el('p', 'sj-intro-copy', 'Na desce dostaneš čtyři kartičky. Najdi v mřížce tři slova, která je takhle propojí.');
+    const explanation = el('p', 'sj-intro-copy', 'Najdi v mřížce tři slova, která takhle propojí čtyři kartičky. Některá písmena zůstanou volná.');
     sheet.append(header, example, explanation, button('sj-primary', 'Jdu hrát', () => { write(introKey, '1'); showGame(); }));
     frame.replaceChildren(topRow(onBack), sheet);
     header.querySelector('h1').focus({ preventScroll: true });
@@ -551,5 +591,12 @@ export function mountGame(root, options) {
 
   display();
   window.addEventListener('storage', storageChange);
-  return { destroy() { stopPointer(); dialog?.close(); window.removeEventListener('storage', storageChange); frame.remove(); } };
+  document.addEventListener('click', clickOutside);
+  return { destroy() {
+    stopPointer();
+    dialog?.close();
+    window.removeEventListener('storage', storageChange);
+    document.removeEventListener('click', clickOutside);
+    frame.remove();
+  } };
 }

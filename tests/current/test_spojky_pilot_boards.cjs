@@ -31,9 +31,19 @@ function verifyBoard(board) {
     for (let i = 0; i < tiles.length; i++) walk(i, []);
     return matches;
   }
+  function hasFalseLead(word, locked, solutions) {
+    for (let length = 2; length < word.length; length++) {
+      for (const prefix of routes(word.slice(0, length), locked)) {
+        const canFinish = solutions.some(solution => prefix.every((tile, step) => tile === solution[step]));
+        if (!canFinish) return true;
+      }
+    }
+    return false;
+  }
   const orders = new Set();
   function play(order, locked) {
     if (order.length === answers.length) {
+      assert(locked.size < tiles.length, `${board.id}: all letters were used`);
       orders.add(order.join(''));
       return;
     }
@@ -42,6 +52,10 @@ function verifyBoard(board) {
       const available = routes(word, locked);
       assert(available.length, `${board.id}: ${word} is unreachable after [${order}]; locked [${[...locked]}]`);
       if (!order.length) assert(available.some(trace => trace.join() === hintPath.join()), `${board.id}: wrong hint path for ${word}`);
+      if (order.length === answers.length - 1) {
+        // At least one plausible start or turn must survive locking the other two links.
+        assert(hasFalseLead(word, locked, available), `${board.id}: ${word} has no false lead after [${order}]`);
+      }
       for (const trace of available) play([...order, i], new Set([...locked, ...trace]));
     });
   }

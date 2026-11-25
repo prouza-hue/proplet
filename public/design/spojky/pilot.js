@@ -30,7 +30,7 @@ function scheduledWeek() {
   const index = boards.findLastIndex(board => board.start <= today);
   return Math.max(1, index + 1);
 }
-const settings = { week: scheduledWeek(), theme: 'auto' };
+const settings = { theme: 'auto' };
 let game;
 let mounted = '';
 let isResetDialog = false;
@@ -72,7 +72,7 @@ function go(view, week, { replace = false, previous = null } = {}) {
 }
 function goHome() {
   if (history.state?.pilot && history.state.previous === 'dnes') history.back();
-  else go('dnes', settings.week, { replace: true });
+  else go('dnes', route().week, { replace: true });
 }
 function makeButton(text, callback, className) {
   const button = document.createElement('button');
@@ -89,7 +89,6 @@ function showMenu(week) {
     const progress = getProgress(boards[index]);
     const button = makeButton('', () => {
       menu.close();
-      settings.week = number;
       go('dnes', number, { replace: true });
       focusToday();
     }, 'pilot-week');
@@ -158,7 +157,6 @@ function render({ forceToday = false } = {}) {
     const title = isToday ? 'Dnes' : view === 'reseni' ? `Řešení · ${week}. týden` : `Spojky · ${week}. týden`;
     document.title = `${title} · Proplet`;
     if (isToday) {
-      settings.week = week;
       renderToday(app, { week, weekStart: board.start, progress: getProgress(board), nextLabel: weeks[week - 1].next,
         onPlay: () => go('hra', week, { previous: 'dnes' }),
         onPreview: () => go('nahled', week, { previous: 'dnes' }), onOther: showOther });
