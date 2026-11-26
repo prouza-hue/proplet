@@ -1,5 +1,5 @@
 import { boards } from './boards.js';
-import { getProgress, mountGame, resetProgress, reviewSolution } from './game.js';
+import { getProgress, mountGame, mountGameTutorial, resetProgress, reviewSolution } from './game.js';
 import { renderToday } from './today.js';
 
 // These four weeks are the pilot's review calendar. Everybody sees the same board for a week.
@@ -61,7 +61,7 @@ function route() {
   const url = new URL(location.href);
   const picked = Number(url.searchParams.get('tyden'));
   const view = url.hash.slice(1);
-  return { week: validWeek(picked) ? picked : scheduledWeek(), view: ['hra', 'reseni', 'nahled'].includes(view) ? view : 'dnes' };
+  return { week: validWeek(picked) ? picked : scheduledWeek(), view: ['hra', 'navod', 'reseni', 'nahled'].includes(view) ? view : 'dnes' };
 }
 function go(view, week, { replace = false, previous = null } = {}) {
   const url = new URL(location.href);
@@ -154,8 +154,13 @@ function render({ forceToday = false } = {}) {
     mounted = key;
     app.replaceChildren();
     app.className = isToday ? '' : 'pilot-game-page';
-    const title = isToday ? 'Dnes · Spojky s křížením' : view === 'reseni' ? `Řešení · ${week}. týden` : `Spojky s křížením · ${week}. týden`;
-    document.title = `${title} · Proplet`;
+    const titles = {
+      dnes: 'Dnes · Spojky s křížením',
+      reseni: `Řešení · ${week}. týden`,
+      navod: 'Jak hrát Spojky',
+      hra: `Spojky s křížením · ${week}. týden`,
+    };
+    document.title = `${titles[isToday ? 'dnes' : view]} · Proplet`;
     if (isToday) {
       renderToday(app, { week, weekStart: board.start, progress: getProgress(board), nextLabel: weeks[week - 1].next,
         onPlay: () => go('hra', week, { previous: 'dnes' }),
@@ -168,6 +173,9 @@ function render({ forceToday = false } = {}) {
       if (view === 'reseni') {
         game = reviewSolution(target, options);
         app.append(reviewSwitcher(week));
+      } else if (view === 'navod') {
+        game = mountGameTutorial(target, { onBack: goHome,
+          onPlay: () => go('hra', week, { replace: true, previous: history.state?.previous }) });
       } else {
         game = mountGame(target, options);
       }
@@ -177,9 +185,11 @@ function render({ forceToday = false } = {}) {
   if (view === 'nahled') showMenu(week);
 }
 menu.querySelector('[data-action="close-menu"]').addEventListener('click', goHome);
-menu.querySelector('[data-action="review"]').addEventListener('click', () => {
-  go('reseni', route().week, { replace: true, previous: history.state?.previous });
-});
+for (const [action, view] of [['tutorial', 'navod'], ['review', 'reseni']]) {
+  menu.querySelector(`[data-action="${action}"]`).addEventListener('click', () => {
+    go(view, route().week, { replace: true, previous: history.state?.previous });
+  });
+}
 menu.querySelector('[data-action="ask-reset"]').addEventListener('click', () => {
   const { week } = route();
   showDetail(`Začít ${week}. týden znovu?`, 'Smažou se tvoje nalezené spojky, rozdělaný tah a nápovědy z této desky.', true);

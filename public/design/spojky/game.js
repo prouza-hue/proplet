@@ -1,7 +1,8 @@
-import { gridFor, paintCells } from './ink.js';
+import { bindTaps, gridFor, nonPointerClick, paintCells } from './ink.js';
+import { mountTutorial } from './tutorial.js';
 
 const storagePrefix = 'proplet.spojky.crossings.v1.';
-const introKey = `${storagePrefix}example`;
+const introKey = `${storagePrefix}tutorial.v2`;
 const sessionCopy = new Map();
 const unwritten = new Set();
 
@@ -77,40 +78,8 @@ function el(tag, className, text) {
 function button(className, text, action) {
   const element = el('button', className, text);
   element.type = 'button';
-  if (action) element.addEventListener('click', action);
+  if (action) bindTaps(element, 'button', action);
   return element;
-}
-
-// Touch can produce a compatibility click with detail === 0 as well as a pointerup.
-const nonPointerClick = event => event.detail === 0 && !event.pointerType && !event.sourceCapabilities?.firesTouchEvents;
-
-function bindTaps(container, selector, activate) {
-  let touch = null;
-  const handledAt = new WeakMap();
-  container.addEventListener('pointerdown', event => {
-    const control = event.target.closest(selector);
-    if (!control || !event.isPrimary) return;
-    handledAt.delete(control);
-    touch = event.pointerType === 'touch' && event.button === 0 ? { control, id: event.pointerId, x: event.clientX, y: event.clientY } : null;
-  });
-  container.addEventListener('pointercancel', event => { if (touch?.id === event.pointerId) touch = null; });
-  container.addEventListener('pointerup', event => {
-    if (touch?.id !== event.pointerId) return;
-    const { control, x, y } = touch;
-    touch = null;
-    if (Math.hypot(event.clientX - x, event.clientY - y) > 12 || document.elementFromPoint(event.clientX, event.clientY)?.closest(selector) !== control) return;
-    // Chromium can suppress the first compatibility click after a drag on the grid.
-    handledAt.set(control, event.timeStamp);
-    activate(control);
-  });
-  container.addEventListener('click', event => {
-    const control = event.target.closest(selector);
-    if (!control) return;
-    // Summary has its own default activation. Toggle it exactly once for touch, mouse and keyboard.
-    event.preventDefault();
-    if (!nonPointerClick(event) && event.timeStamp - (handledAt.get(control) ?? -Infinity) < 800) return;
-    activate(control);
-  });
 }
 
 function topRow(onBack, onRules) {
@@ -131,18 +100,18 @@ function heading(text, week) {
   return header;
 }
 
-function rulesDialog(frame) {
+function rulesDialog(frame, onTutorial) {
   const dialog = el('dialog', 'sj-dialog');
   dialog.setAttribute('aria-label', 'Jak hrát Spojky');
   const rules = el('div', 'sj-dialog-copy');
+  const actions = el('div', 'sj-rule-actions');
+  actions.append(button('sj-primary', 'Zpátky ke hře', () => dialog.close()),
+    button('sj-try-tutorial', 'Zahrát si ukázku', () => { dialog.close(); onTutorial(); }));
   rules.append(el('h2', '', 'Jak hrát Spojky'),
-    el('p', '', 'Pila a hřeben mají zuby. Podobně patří každá spojka ke dvěma kartičkám.'),
-    el('p', '', 'Vyber dvojici kartiček a najdi jejich společné slovo. Nebo začni slovem a kartičky přiřaď potom.'),
-    el('p', '', 'Spojuj písmena tahem nebo postupným klepáním. Sousední políčka musí mít společnou stranu. V jednom slově smíš každé políčko použít jen jednou.'),
-    el('p', '', 'Každá nalezená spojka má pod písmeny vlastní značku. Přes označené písmeno můžeš vést další slovo. Pak pod ním uvidíš obě značky.'),
-    el('p', '', 'Klepnutím na poslední písmeno ho odebereš. Klepnutím do prázdna zrušíš celý tah.'),
-    el('p', '', 'Tři spojky můžeš najít v libovolném pořadí. Některá písmena zůstanou volná.'),
-    button('sj-primary', 'Zpátky ke hře', () => dialog.close()));
+    el('p', '', 'Čtyři kartičky spojíš třemi slovy. Vyber dvě kartičky a v mřížce najdi slovo, které patří k oběma. Můžeš začít i slovem a kartičky přiřadit potom.'),
+    el('p', '', 'Písmena spojuj tahem nebo klepáním přes společnou stranu políček. V jednom slově smíš každé políčko použít jednou. Další slovo přes něj může vést znovu.'),
+    el('p', '', 'Nalezenou spojku poznáš podle stejné značky na kartičkách a pod písmeny. Některá písmena zůstanou volná i po dohrání.'),
+    el('p', '', 'Klepnutím na poslední písmeno ho odebereš. Klepnutím do prázdna zrušíš celý tah.'), actions);
   dialog.append(rules);
   dialog.addEventListener('click', event => {
     if (event.target === dialog) {
@@ -154,26 +123,74 @@ function rulesDialog(frame) {
   return dialog;
 }
 
-function partialChain(board, found) {
-  const fragment = document.createDocumentFragment();
-  let group;
-  found.forEach((path, i) => {
-    if (!path) { group = null; return; }
-    if (!group) {
-      group = el('p', 'sj-fragment');
-      group.append(el('span', 'sj-fragment-card', board.chain[i]));
-      fragment.append(group);
-    }
-    const link = el('span', 'sj-fragment-link', board.answers[i].word.toLocaleLowerCase('cs'));
-    link.dataset.ink = String(i);
-    group.append(link, el('span', 'sj-fragment-card', board.chain[i + 1]));
+function showChainProgress(board, found, { cards, counter, track, goal, groups, inks }) {
+  const known = board.chain.map(() => []);
+  found.forEach((path, link) => {
+    if (!path) return;
+    known[link].push({ card: link + 1, link });
+    known[link + 1].push({ card: link, link });
   });
-  return fragment;
+  const remaining = found.filter(path => !path).length;
+  counter.textContent = remaining === 1 ? 'Zbývá 1 spojka' : `Zbývají ${remaining} spojky`;
+  counter.parentElement.dataset.remaining = String(remaining);
+  // The marks count discoveries. Their positions carry no clues about the author's word order.
+  Array.from(track.children).forEach((slot, i) => slot.toggleAttribute('data-gap', i >= found.length - remaining));
+  cards.forEach(card => {
+    const links = known[Number(card.dataset.card)];
+    const stamps = links.map(({ link }) => {
+      const stamp = el('span', 'sj-stamp');
+      stamp.dataset.ink = String(inks[link]);
+      return stamp;
+    });
+    card.querySelector('.sj-noun-marks').replaceChildren(...stamps);
+    const words = links.map(({ link }) => board.answers[link].word.toLocaleLowerCase('cs'));
+    if (words.length) card.setAttribute('aria-description', `Spojeno ${words.length === 1 ? 'slovem' : 'slovy'} ${words.join(', ')}.`);
+    else card.removeAttribute('aria-description');
+  });
+  const free = board.shuffle.filter(i => !known[i].length);
+  const names = free.map(i => `„${board.chain[i]}“`);
+  if (remaining === found.length) goal.textContent = 'Začni dvojicí kartiček nebo slovem v mřížce.';
+  else if (free.length === 2) goal.textContent = `${names.join(' a ')} ještě nemají spojku.`;
+  else if (free.length === 1) goal.textContent = `Připoj kartičku ${names[0]}.`;
+  else goal.textContent = 'Propoj obě dvojice.';
+
+  groups.replaceChildren();
+  const seen = new Set();
+  // Walk only discovered edges. Choose the first visible endpoint in the shuffled card order.
+  for (const start of board.shuffle) {
+    if (known[start].length !== 1 || seen.has(start)) continue;
+    const group = el('p', 'sj-fragment');
+    let card = start;
+    while (true) {
+      seen.add(card);
+      group.append(el('span', 'sj-fragment-card', board.chain[card]));
+      const next = known[card].find(edge => !seen.has(edge.card));
+      if (!next) break;
+      const link = el('span', 'sj-fragment-link', board.answers[next.link].word.toLocaleLowerCase('cs'));
+      link.dataset.ink = String(inks[next.link]);
+      group.append(link);
+      card = next.card;
+    }
+    groups.append(group);
+  }
+  groups.hidden = !groups.children.length;
+}
+
+function openTutorial(frame, { onPlay, onBack, replay = false }) {
+  return mountTutorial(frame, { replay, onBack, onPlay() { write(introKey, '1'); onPlay(); } });
+}
+
+export function mountGameTutorial(root, options) {
+  const frame = el('section', 'sj-game');
+  root.replaceChildren(frame);
+  const tutorial = openTutorial(frame, options);
+  return { destroy() { tutorial.destroy(); frame.remove(); } };
 }
 
 function showResult(frame, { board, week, onBack, nextLabel }, found, review) {
   const sheet = el('section', 'sj-sheet sj-result');
   const header = heading(review ? 'Řešení Spojek' : 'Řetěz je celý!', week);
+  const { tray, cells, inks } = gridFor(board, false);
   const list = el('ol', 'sj-sequence');
   list.setAttribute('aria-label', 'Celý řetěz');
   board.chain.forEach((noun, i) => {
@@ -182,7 +199,7 @@ function showResult(frame, { board, week, onBack, nextLabel }, found, review) {
     const answer = board.answers[i];
     if (answer) {
       const link = el('div', 'sj-link');
-      link.dataset.ink = String(i);
+      link.dataset.ink = String(inks[i]);
       link.append(el('b', 'sj-link-word', answer.word.toLocaleLowerCase('cs')), el('p', 'sj-link-meaning', answer.explanation || answer.clue));
       item.append(link);
     }
@@ -190,14 +207,13 @@ function showResult(frame, { board, week, onBack, nextLabel }, found, review) {
   });
   const details = el('details', 'sj-grid-details');
   details.append(el('summary', '', 'Ukázat slova v mřížce'));
-  const { tray, cells } = gridFor(board, false);
   const picker = el('div', 'sj-trace-picker');
   picker.setAttribute('role', 'group');
   picker.setAttribute('aria-label', 'Zvýraznit cestu');
   const choices = ['Všechny', ...board.answers.map(answer => answer.word.toLocaleLowerCase('cs'))].map((label, i) => {
     const owner = i - 1;
     const choice = button('sj-trace-choice', label);
-    if (owner >= 0) choice.dataset.ink = String(owner);
+    if (owner >= 0) choice.dataset.ink = String(inks[owner]);
     picker.append(choice);
     return choice;
   });
@@ -209,7 +225,7 @@ function showResult(frame, { board, week, onBack, nextLabel }, found, review) {
   details.append(picker, tray);
   bindTaps(details, 'summary, .sj-trace-choice', control => {
     if (control.tagName === 'SUMMARY') details.open = !details.open;
-    else highlight(Number(control.dataset.ink ?? -1));
+    else highlight(choices.indexOf(control) - 1);
   });
   const spread = el('div', 'sj-result-spread');
   spread.append(list, details);
@@ -244,7 +260,10 @@ export function mountGame(root, options) {
   let activePointer = null;
   let notice = '';
   let dialog;
-  let cards, cells, grid, counter, word, status, hints, clear, fragments;
+  let tutorial;
+  let chainProgress;
+  let previousFinds;
+  let cards, cells, grid, word, status, hints, clear, feedback;
 
   function save() {
     const { found, ...draft } = state;
@@ -276,14 +295,17 @@ export function mountGame(root, options) {
   }
 
   function paint() {
-    const count = state.found.filter(Boolean).length;
     const activeHint = state.hintTarget;
     const target = targetWord();
     const typed = selectedWord();
     const tip = activeHint >= 0 && state.hints[activeHint] >= 2 ? board.answers[activeHint].path[0] : -1;
     cards.forEach(card => card.setAttribute('aria-pressed', String(state.pair.includes(Number(card.dataset.card)))));
     paintCells(cells, state.found, state.path, tip, true);
-    counter.textContent = `${count} ze ${board.answers.length}`;
+    const finds = state.found.map(Boolean).join(',');
+    if (finds !== previousFinds) {
+      showChainProgress(board, state.found, chainProgress);
+      previousFinds = finds;
+    }
     word.textContent = typed;
     word.hidden = !typed;
     if (notice) status.textContent = notice;
@@ -294,13 +316,12 @@ export function mountGame(root, options) {
     else if (typed) status.textContent = typed.length === 1 ? 'Pokračuj sousedním písmenem.' : '';
     else if (state.pair.length === 2) status.textContent = 'Najdi v mřížce slovo, které k oběma sedí.';
     else if (state.pair.length === 1) status.textContent = 'Přidej druhou kartičku.';
-    else status.textContent = count ? 'Další spojka může vést i přes označená písmena.' : 'Začni dvojicí kartiček nebo slovem. Spojky se můžou křížit.';
+    else status.textContent = '';
+    feedback.classList.toggle('sj-no-feedback', !typed && !status.textContent);
     clear.hidden = !state.pair.length && !state.path.length;
     clear.textContent = state.path.length ? 'Zrušit tah' : 'Zrušit výběr';
     const hintLabel = hints.querySelector('span');
     hintLabel.textContent = activeHint >= 0 && state.hints[activeHint] < 3 ? 'Další nápověda' : 'Nápověda';
-    fragments.replaceChildren(partialChain(board, state.found));
-    fragments.hidden = count === 0;
   }
 
   function stopPointer() {
@@ -430,11 +451,11 @@ export function mountGame(root, options) {
 
   function bindGrid() {
     grid.addEventListener('pointerdown', event => {
-      const cell = event.target.closest('[data-cell]');
       if (activePointer || event.isPrimary === false || event.button !== 0) return;
-      if (!cell) { clearPath(); return; }
-      if (cell.disabled) return;
-      const i = Number(cell.dataset.cell);
+      // Touch target adjustment can redirect a tap in the gutter to a nearby letter.
+      const i = hitAt(event.clientX, event.clientY);
+      if (i < 0) { clearPath(); return; }
+      if (cells[i].disabled) return;
       event.preventDefault();
       activePointer = { id: event.pointerId, x: event.clientX, y: event.clientY, start: i, last: i, moved: false };
       grid.setPointerCapture(event.pointerId);
@@ -481,6 +502,7 @@ export function mountGame(root, options) {
 
   function showGame() {
     finishing = false;
+    previousFinds = null;
     dialog?.close();
     frame.replaceChildren();
     state.started = true;
@@ -488,24 +510,35 @@ export function mountGame(root, options) {
     const sheet = el('section', 'sj-sheet sj-playing');
     if (board.chain.some(noun => noun.length > 7)) sheet.classList.add('sj-long-cards');
     const header = heading('Spojky', week);
-    counter = el('span', 'sj-count');
-    counter.setAttribute('aria-label', 'Nalezené spojky');
-    header.append(counter);
+    const tally = el('div', 'sj-count');
+    const counter = el('strong', 'sj-count-text');
+    counter.setAttribute('role', 'status');
+    const track = el('span', 'sj-progress-track');
+    track.setAttribute('aria-hidden', 'true');
+    board.answers.forEach(() => track.append(el('span', 'sj-progress-slot')));
+    tally.append(counter, track);
+    header.append(tally);
     const content = el('div', 'sj-play-layout');
+    const cardArea = el('div', 'sj-card-area');
     const nouns = el('div', 'sj-nouns');
     nouns.setAttribute('role', 'group');
     nouns.setAttribute('aria-label', 'Kartičky k propojení');
     cards = board.shuffle.map(i => {
-      const card = button('sj-noun', board.chain[i]);
+      const card = button('sj-noun');
       card.dataset.card = String(i);
+      const marks = el('span', 'sj-noun-marks');
+      marks.setAttribute('aria-hidden', 'true');
+      card.append(el('span', 'sj-noun-name', board.chain[i]), marks);
       nouns.append(card);
       return card;
     });
     bindTaps(nouns, '[data-card]', card => chooseCard(Number(card.dataset.card)));
+    const goal = el('p', 'sj-chain-goal');
+    cardArea.append(nouns, goal);
     const field = gridFor(board, true);
     ({ grid, cells } = field);
     const moves = el('div', 'sj-moves');
-    const feedback = el('div', 'sj-feedback');
+    feedback = el('div', 'sj-feedback');
     feedback.setAttribute('role', 'status');
     feedback.setAttribute('aria-atomic', 'true');
     word = el('b', 'sj-word');
@@ -530,43 +563,48 @@ export function mountGame(root, options) {
     });
     buttons.append(hints, clear);
     moves.append(feedback, buttons);
-    fragments = el('div', 'sj-fragments');
+    const fragments = el('div', 'sj-fragments');
     fragments.setAttribute('role', 'region');
-    fragments.setAttribute('aria-label', 'Nalezené spojky');
-    content.append(nouns, field.tray, moves, fragments);
+    fragments.setAttribute('aria-label', 'Objevené části řetězu');
+    chainProgress = { cards, counter, track, goal, groups: fragments, inks: field.inks };
+    content.append(cardArea, field.tray, moves, fragments);
     sheet.append(header, content);
     frame.append(topRow(onBack, () => dialog.showModal()), sheet);
-    dialog = rulesDialog(frame);
+    dialog = rulesDialog(frame, () => showTutorial(true));
     bindGrid();
     paint();
     header.querySelector('h1').focus({ preventScroll: true });
   }
 
-  function showIntro() {
-    const sheet = el('section', 'sj-sheet sj-intro');
-    const header = heading('Spojky', week);
-    const example = el('div', 'sj-example');
-    example.append(el('h2', 'sj-question', 'Co mají společného pila a hřeben?'));
-    const blocks = el('div', 'sj-example-tiles');
-    blocks.setAttribute('aria-label', 'Zuby.');
-    blocks.setAttribute('role', 'img');
-    Array.from('ZUBY').forEach(letter => blocks.append(el('span', '', letter)));
-    example.append(blocks);
-    const explanation = el('p', 'sj-intro-copy', 'Najdi tři slova, která takhle propojí čtyři kartičky. Jejich cesty se kříží. Písmeno z jedné spojky můžeš použít i v další.');
-    sheet.append(header, example, explanation, button('sj-primary', 'Jdu hrát', () => { write(introKey, '1'); showGame(); }));
-    frame.replaceChildren(topRow(onBack), sheet);
-    header.querySelector('h1').focus({ preventScroll: true });
+  function showTutorial(replay = false) {
+    stopPointer();
+    frame.replaceChildren();
+    function resume() {
+      tutorial.destroy();
+      tutorial = null;
+      state = loadState(board);
+      if (state.found.every(Boolean)) display();
+      else showGame();
+      if (replay) frame.querySelector('.sj-rules-button')?.focus({ preventScroll: true });
+    }
+    tutorial = openTutorial(frame, { onPlay: resume, onBack: replay ? resume : onBack, replay });
   }
 
   function display() {
     if (state.found.every(Boolean)) { finishing = true; showResult(frame, options, state.found, false); }
     else if (state.started || read(introKey)) showGame();
-    else showIntro();
+    else showTutorial();
   }
 
   function storageChange(event) {
     if (event.key !== null && event.key !== draftKey && !answerKeys.includes(event.key)) return;
     const latest = loadState(board);
+    if (tutorial) {
+      state = latest;
+      lastProgress = progressOf(state);
+      onProgress?.(lastProgress);
+      return;
+    }
     if (!latest.started && event.newValue === null) { stopPointer(); onBack(); return; }
     if (finishing && latest.found.every(Boolean)) return;
     // Finish the local stroke even when the other tab is busy selecting letters.
@@ -584,6 +622,7 @@ export function mountGame(root, options) {
   document.addEventListener('click', clickOutside);
   return { destroy() {
     stopPointer();
+    tutorial?.destroy();
     dialog?.close();
     window.removeEventListener('storage', storageChange);
     document.removeEventListener('click', clickOutside);

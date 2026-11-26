@@ -9,6 +9,8 @@ const weekdays = [
 const dayMillis = 24 * 60 * 60 * 1000;
 const namedDate = new Intl.DateTimeFormat('cs-CZ', {weekday:'long', day:'numeric', month:'long', timeZone:'UTC'});
 const shortDate = new Intl.DateTimeFormat('cs-CZ', {day:'numeric', month:'numeric', timeZone:'UTC'});
+const proplet = 'https://hrajproplet.cz';
+const patronHeart = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20S3 14.5 3 8.5C3 3 10 2.5 12 7c2-4.5 9-4 9 1.5C21 14.5 12 20 12 20Z" fill="currentColor"/></svg>';
 
 // The same four navigation signs as the Proplet shell.
 const navigation = [
@@ -105,9 +107,23 @@ export function renderToday(root, {week, weekStart, progress, nextLabel, onPlay,
         ${tile({key:'free',label:'Rozehráno',detail:'Úroveň 12',image:printshop + 'medium.webp'})}
         ${tile({key:'team',label:'Soutěže',detail:'Týdenní · měsíční',image:'/assets/navigation/competitions-v1.webp'})}
       </div>
+      <a class="pt-support" href="${proplet}/?open=daily#patronTodayLink:~:text=Podpo%C5%99it%20Proplet"
+         aria-label="Podpořit Proplet na hrajproplet.cz" title="Přejít k podpoře na hrajproplet.cz">
+        <span class="pt-stamps" aria-hidden="true"><i>${patronHeart}</i><i>${patronHeart}</i></span>
+        <strong>Podpořit Proplet</strong><span class="pt-support-arrow" aria-hidden="true">→</span>
+      </a>
     </section>
 
-    <footer class="pt-footer">© 2026 Proplet <span aria-hidden="true">·</span> Pavel Prouza</footer>
+    <footer class="pt-footer">
+      <div>© 2026 Proplet <span aria-hidden="true">·</span> Pavel Prouza</div>
+      <nav class="pt-footer-links" aria-label="O Propletu">
+        <a href="${proplet}/jak-hrat.html">Jak hrát</a>
+        <a href="${proplet}/privacy.html">Soukromí</a>
+        <a href="${proplet}/terms.html">Podmínky</a>
+        <a href="${proplet}/?open=daily#appVersionFooter:~:text=Nahl%C3%A1sit%20chybu"
+           aria-label="Nahlásit chybu na hrajproplet.cz" title="Přejít k hlášení chyby na hrajproplet.cz">Nahlásit chybu</a>
+      </nav>
+    </footer>
     <nav class="pt-nav" aria-label="Hlavní navigace">${nav}</nav>
   </div></div>`;
 

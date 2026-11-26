@@ -1,5 +1,59 @@
 const fields = new WeakMap();
 
+// Touch can produce a compatibility click with detail === 0 as well as a pointerup.
+export const nonPointerClick = event => event.detail === 0 && !event.pointerType && !event.sourceCapabilities?.firesTouchEvents;
+
+// A pointerup may replace the screen or open a modal. Its compatibility click can
+// then land on a completely different element at the same spot.
+function consumeTouchClick(tap) {
+  const doc = tap.target.ownerDocument;
+  const { pointerId, clientX, clientY } = tap;
+  function release() {
+    clearTimeout(timer);
+    doc.removeEventListener('click', consume, true);
+    doc.removeEventListener('pointerdown', release, true);
+    doc.removeEventListener('keydown', release, true);
+  }
+  function consume(click) {
+    if (nonPointerClick(click)) return;
+    const samePointer = click.pointerType === 'touch' && click.pointerId === pointerId;
+    if (!samePointer && Math.hypot(click.clientX - clientX, click.clientY - clientY) > 24) return;
+    click.preventDefault();
+    click.stopImmediatePropagation();
+    release();
+  }
+  const timer = setTimeout(release, 800);
+  doc.addEventListener('click', consume, true);
+  doc.addEventListener('pointerdown', release, true);
+  doc.addEventListener('keydown', release, true);
+}
+
+export function bindTaps(container, selector, activate) {
+  let touch = null;
+  container.addEventListener('pointerdown', event => {
+    const control = event.target.closest(selector);
+    if (!control || !event.isPrimary) return;
+    touch = event.pointerType === 'touch' && event.button === 0 ? { control, id: event.pointerId, x: event.clientX, y: event.clientY } : null;
+  });
+  container.addEventListener('pointercancel', event => { if (touch?.id === event.pointerId) touch = null; });
+  container.addEventListener('pointerup', event => {
+    if (touch?.id !== event.pointerId) return;
+    const { control, x, y } = touch;
+    touch = null;
+    if (Math.hypot(event.clientX - x, event.clientY - y) > 12 || document.elementFromPoint(event.clientX, event.clientY)?.closest(selector) !== control) return;
+    // Chromium can suppress the first compatibility click after a drag on the grid.
+    consumeTouchClick(event);
+    activate(control);
+  });
+  container.addEventListener('click', event => {
+    const control = event.target.closest(selector);
+    if (!control) return;
+    // Summary has its own default activation. Toggle it exactly once for touch, mouse and keyboard.
+    event.preventDefault();
+    activate(control);
+  });
+}
+
 function span(className) {
   const element = document.createElement('span');
   element.className = className;
@@ -10,8 +64,23 @@ function position(i, columns) {
   return `řádek ${Math.floor(i / columns) + 1}, sloupec ${i % columns + 1}`;
 }
 
+function inkOrder(board) {
+  const inks = board.answers.map((_, i) => i);
+  // Named weekly boards have their own palette. A stamp must not identify the middle link.
+  if (!board.id) return inks;
+  let seed = 0;
+  for (const char of board.id) seed = (Math.imul(seed, 31) + char.codePointAt(0)) >>> 0;
+  for (let i = inks.length - 1; i > 0; i--) {
+    const pick = seed % (i + 1);
+    [inks[i], inks[pick]] = [inks[pick], inks[i]];
+    seed = Math.floor(seed / (i + 1));
+  }
+  return inks;
+}
+
 export function gridFor(board, interactive) {
   const columns = board.rows[0].length;
+  const inks = inkOrder(board);
   const tray = document.createElement('div');
   tray.className = 'sj-tray';
   tray.style.setProperty('--sj-cols', columns);
@@ -32,8 +101,8 @@ export function gridFor(board, interactive) {
     return cell;
   });
   tray.append(grid);
-  fields.set(cells, { grid, board, printed: [], descriptions: [] });
-  return { tray, grid, cells };
+  fields.set(cells, { grid, board, inks, printed: [], descriptions: [] });
+  return { tray, grid, cells, inks };
 }
 
 function direction(from, to) {
@@ -56,17 +125,17 @@ function printFound(cells, field, found) {
       if (step === -1) return;
       owners.push(owner);
       const stamp = span('sj-stamp');
-      stamp.dataset.ink = String(owner);
+      stamp.dataset.ink = String(field.inks[owner]);
       layer.append(stamp);
       if (step + 1 < trail.length) {
         const seam = span('sj-seam');
-        seam.dataset.ink = String(owner);
+        seam.dataset.ink = String(field.inks[owner]);
         seam.dataset.side = direction(i, trail[step + 1]);
         layer.append(seam);
       }
     });
     if (owners.length) {
-      cell.dataset.owners = owners.join(' ');
+      cell.dataset.owners = owners.map(owner => field.inks[owner]).join(' ');
       cell.append(layer);
     } else {
       delete cell.dataset.owners;
@@ -91,7 +160,7 @@ export function paintCells(cells, found, path, tip, interactive, focus = -1) {
     cell.classList.toggle('sj-tip', i === tip);
     cell.classList.toggle('sj-trace-focus', !live && selected);
     cell.classList.toggle('sj-trace-start', !live && step === 0);
-    if (!live && selected) cell.dataset.ink = String(focus);
+    if (!live && selected) cell.dataset.ink = String(field.inks[focus]);
     else delete cell.dataset.ink;
     if (selected && step + 1 < trail.length) cell.dataset.to = direction(i, trail[step + 1]);
     else delete cell.dataset.to;

@@ -1,5 +1,17 @@
 # Spojky v Propletu
 
+## Návod a průběh hry před vydáním
+
+**26. 11. 2026.** Po dalším playtestu Pavel hodnotí křížení jako zábavnější. Větev `preview/spojky-pruniky-navod-20261126` navazuje na čtyři zkoušené desky ve verzi `7a03b6e`. O vydání se rozhodne po kontrole tohoto náhledu.
+
+Na přímém odkazu `?tyden=3#navod` si hráč vyzkouší krátký cvičný řetěz a pak přejde na třetí desku. Hřeben a zip mají zuby. Po označeném Z projde také jezdec, který propojí zip se šachy. Běžná deska má čtyři kartičky a tři spojky. Ukázku lze přeskočit, otevřít znovu z pravidel nebo spustit v nabídce Náhled.
+
+Hra ukazuje počet zbývajících spojek, na kartičkách jejich objevené značky a pohromadě už spojené úseky. Po dvou nálezech záleží na jejich uspořádání. Pokud už hráč spojil tři kartičky, hra pojmenuje čtvrtou, kterou zbývá připojit. Pokud má dvě oddělené dvojice, vyzve ho, aby je propojil. Celý řetěz se ukáže po dohrání.
+
+Podobu podpory a patičky jsme porovnali s živou kartou Dnes na `hrajproplet.cz`, verze 4.10.52 (`270f383`). Pod herními kartami je „Podpořit Proplet“. Pod čarou jsou „Jak hrát“, „Soukromí“, „Podmínky“ a „Nahlásit chybu“. V samostatném náhledu podpora i hlášení vedou k příslušnému tlačítku na produkčním Dnes. Tam hráč otevře plnohodnotný dialog. Při začlenění do hlavní aplikace se použijí její stávající obsluhy tlačítek.
+
+V mobilním Chromiu jsme prověřili oba možné tvary řetězu po dvou nálezech. Opakování návodu uprostřed třetí desky i obnovení stránky zachovalo nálezy, zvolenou dvojici, dvě použité nápovědy a dvě rozepsaná písmena. Desku šlo dokončit pokračováním téhož slova. Po napsání cvičného slova tahem první klepnutí otevřelo desku nebo vrátilo hráče k rozdělanému slovu. Při přeskočení návodu i otevření pravidel se provedla vždy právě jedna akce. Na telefonu se šířkou 360 a výškou 640 CSS pixelů se na Dnes vešly i podpora, patička a spodní navigace.
+
 ## Petřina varianta s křížením
 
 **25. 11. 2026.** Po druhém kole hráči vyzdvihli třetí desku. Pořád ale řešili Spojky rychleji, než jim bylo milé. Na Petřin návrh vznikl samostatný experiment ve větvi `preview/spojky-pruniky-20261125`. Vychází z předchozího pilotu `55157977b487fca2c2356d9b1d803c6fa9854c8c`. O zařazení varianty do Propletu rozhodne další hráčská zkouška.
