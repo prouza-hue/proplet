@@ -3,14 +3,14 @@ import { playSamples } from './preview-play-boards.js';
 import { reviewRhythm } from './today.js';
 
 const dailies = {
-  easy: ['g6-d-20261116', 'Snadná · deska z 16. listopadu'],
-  medium: ['g6-d-20261118', 'Střední · deska z 18. listopadu'],
-  hard: ['g6-d-20261121', 'Těžká · deska z 21. listopadu'],
+  easy: ['g4-e-001', 'Snadná'],
+  medium: ['g4-m-001', 'Střední'],
+  hard: ['g4-h-001', 'Těžká'],
 };
 const extras = {
-  hardcore: ['g6-ds-hardcore-w06', 'Mozkožrout · deska z 18. listopadu'],
-  mozkomor: ['g6-ds-mozkomor-w06', 'Mozkomor · deska z 20. listopadu'],
-  mozkokalypsa: ['g6-ds-mozkokalypsa-w06', 'Mozkokalypsa · deska z 22. listopadu'],
+  hardcore: ['g4-x-001', 'Mozkožrout'],
+  mozkomor: ['g4-z-001', 'Mozkomor'],
+  mozkokalypsa: ['mk100-v2-001', 'Mozkokalypsa'],
 };
 
 function boardOptions(kind, day) {
@@ -26,10 +26,10 @@ function boardOptions(kind, day) {
   const isExtra = kind === 'extra';
   const sample = isExtra ? extras[rhythm.extra] : dailies[rhythm.daily];
   if (!sample || (!isExtra && kind !== 'daily')) return null;
-  const [id, subtitle] = sample;
+  const [id, difficultyLabel] = sample;
   return {
     puzzle: playSamples[id], progressKey: kind + '.' + day,
-    title: isExtra ? 'Extra' : 'Denní výzva', subtitle,
+    title: isExtra ? 'Extra' : 'Denní výzva', subtitle: `${difficultyLabel} · ukázková deska`,
     mode: isExtra ? 'daily_special' : 'daily', resultTitle: isExtra ? 'Extra výzva splněna' : 'Denní výzva splněna',
   };
 }

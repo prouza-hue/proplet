@@ -2,13 +2,13 @@
 
 ## Dnes s denní Tajenkou a týdenními Spojkami
 
-**26. 11. 2026.** Hratelný náhled ve větvi `preview/spojky-pruniky-navod-20261126` vychází z produkční verze 4.10.53 (`4f3a377`) a z předání denní Tajenky (`e34035a`). K posouzení je středa 16. prosince 2026 na adrese `/design/spojky/index.html?datum=2026-12-16`. Sejdou se Střední denní výzva, třetí týden Spojek, denní Tajenka č. 41 a Extra Mozkožrout. Modelový hráč dokončil pondělní sadu a má rozehranou 12. úroveň volné hry. O nasazení Spojek do produkce rozhodne Pavel po náhledu.
+**26. 11. 2026.** Hratelný náhled ve větvi `preview/spojky-pruniky-navod-20261126` vychází z produkční verze 4.10.53 (`4f3a377`) a z předání denní Tajenky (`e34035a`). Ve středu 16. prosince se sejdou Střední denní výzva, třetí týden Spojek, denní Tajenka č. 41 a Extra Mozkožrout. Modelový hráč dokončil pondělní sadu a má rozehranou 12. úroveň volné hry. O nasazení Spojek do produkce rozhodne Pavel po náhledu. [Otevřít Dnes ve větvi Spojek](https://proplet-git-preview-spojky-prunik-65a488-pavel-prouzas-projects.vercel.app/design/spojky/index.html?datum=2026-12-16)
 
 Denní výzva má největší kartu. Vedlejší týdenní rozvrh se na telefonu přesune pod ni. Následuje fialový pruh Spojek se vstupem do schválené hry s křížením. Extra, Tajenka, Rozehráno a Soutěže tvoří na telefonu dvě dvojice a na rozloženém Foldu jeden řádek. Pod hrami je „Podpořit Proplet“. Pod čarou jsou čtyři odkazy „Jak hrát“, „Soukromí“, „Podmínky“ a „Nahlásit chybu“. V samostatném náhledu vedou podpora a hlášení chyby k příslušným akcím na hrajproplet.cz.
 
 Klepnutím na tělo Tajenky se otevře dnešní deska, uložené pokračování nebo hotový výsledek. Kalendář v rohu má vlastní dotykovou plochu a otevře sedm skutečných dat vydání. Pro modelovou středu jsou to 10.–16. prosince. Každé vydání má vlastní postup. Tlačítko „Zpět do kalendáře“ vrací hráče k původnímu seznamu. V nabídce „Náhled“ lze změnit den i výchozí stav volné hry. V úterý 15. prosince zaujme místo uvolněné po Extra Archiv.
 
-Termíny a obtížnosti odpovídají produkčnímu rozpisu. Samotné Tajenky, denní desky a Extra si v náhledu lze zahrát na již zveřejněných zadáních. Budoucí řešení tak zůstanou hráčům do dne vydání překvapením. Hraní ukládá postup do prohlížeče a vyčíslené odměny odpovídají pravidlům produkce.
+Termíny a obtížnosti odpovídají produkčnímu rozpisu. V kalendáři si lze zahrát dříve vydané Tajenky. Denní výzva a Extra používají veřejné ukázkové desky odpovídající obtížnosti. Budoucí řešení tak zůstanou hráčům do dne vydání překvapením. Hraní ukládá postup do prohlížeče a vyčíslené odměny odpovídají pravidlům produkce.
 
 Snímky ze stejného rozehraného profilu v dotykovém Chromiu jsou uložené zde. [Mobil, 390 × 844 CSS px](spojky-preview/dnes-mobil.png) · [Rozložený Fold, 690 × 829 CSS px](spojky-preview/dnes-fold.png)
 
