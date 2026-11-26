@@ -3110,7 +3110,8 @@ async function loadTajenkaFixture(){
  const fallback=()=>!review&&!TAJENKA_PREVIEW&&dailyTajenkaUI?.cached(expected);
  let puzzle=null;
  try{
-  if(review){const listing=await dailyTajenkaUI.list();puzzle=listing.editions.length?await dailyTajenkaUI.load(listing.editions[0].id):null}
+  if(review&&TAJENKA_PREVIEW)puzzle=await dailyTajenkaUI.load(expected);
+  else if(review){const listing=await dailyTajenkaUI.list();puzzle=listing.editions.length?await dailyTajenkaUI.load(listing.editions[0].id):null}
   else if(navigator.onLine===false)puzzle=fallback();
   else{
    const url=TAJENKA_PREVIEW?`/api/tajenka?week=${week}`:'/api/tajenka',response=await fetch(url,{cache:'no-store'});
