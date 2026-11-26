@@ -10,7 +10,13 @@ async function run() {
   const values = new Map();
   let player = 'p1', calls = 0, refuse = true;
   const store = {inProgress: {}, completed: {}};
-  const document = {addEventListener() {}, dispatchEvent() {}, getElementById() {return null;}};
+  const node = tag => ({
+    tag, textContent:'', children:[], attrs:{}, open:false,
+    append(...children) { this.children.push(...children); },
+    setAttribute(name,value) { this.attrs[name]=value; },
+    addEventListener() {}, remove() {}, close() { this.open=false; }, showModal() { this.open=true; }
+  });
+  const document = {body:node('body'), createElement:node, addEventListener() {}, dispatchEvent() {}, getElementById() {return null;}};
   const context = vm.createContext({
     document, COLORS: ['blue'], currentScreen:'daily', getProfile: () => ({id:player}),
     playerScope: () => player, gameElapsed: () => 1500, stopTimer() {},
@@ -98,10 +104,13 @@ async function run() {
     return true;
   };
   values.set('proplet:pet-otisku:nov26:preview:completed','[1,2]');
+  values.set('proplet:pet-otisku:2026-12:preview:completed','[1,2,3,4,5]');
+  values.set('proplet:pet-otisku:2026-12:preview:fixture-0',JSON.stringify({found:[1]}));
   assert.equal(await gift.open({edition:december,preview:true}),true);
   const demo=context.currentGame;
   assert.equal(demo.otisky.board,1);
-  assert.equal(fetches[0],'/app/content/2026-12.json');
+  assert.equal(gift.restore(demo.puzzle,demo.otisky),null);
+  assert.equal(fetches[0],'/app/content/2026-12.json?v=2');
   demo.found=demo.puzzle.answers.map(item);
   await gift.finish(demo);
   assert.deepEqual(Array.from(gift.previewCompleted(december)),[1]);
@@ -110,5 +119,35 @@ async function run() {
   assert.equal(context.currentGame.otisky.board,2);
   assert.equal(await gift.open({edition:december,preview:true,board:4}),false);
   assert.equal(fetches.length,1);
+  // Neither progress nor accessible names expose a fragment of the final note.
+  // The original November letter puzzle still reveals its earned characters.
+  async function overview(edition) {
+    assert.equal(await gift.open({edition,preview:true,overview:true}),true);
+    return document.body.children.at(-1);
+  }
+  const partial = await overview(december);
+  const strip = partial.children[1];
+  assert.equal(strip.className,'otisky-progress');
+  assert.deepEqual(strip.children.map(n=>n.textContent),['','Dohráno 1 z 5']);
+  assert.deepEqual(strip.children[0].attrs,{'aria-hidden':'true'});
+  assert.deepEqual(strip.attrs,{});
+  assert.doesNotMatch(JSON.stringify(partial),/NÁŠUP|Když zbude|otisky-sign/);
+  const legacy = await overview('2026-11');
+  assert.equal(legacy.children[1].className,'otisky-strip');
+  assert.deepEqual(legacy.children[1].children.map(n=>n.textContent),['','','K','','!']);
+  for (let n=2;n<=5;n++) {
+    assert.equal(await gift.open({edition:december,preview:true}),true);
+    const nextGame=context.currentGame;
+    assert.equal(nextGame.otisky.board,n);
+    nextGame.found=nextGame.puzzle.answers.map(item);
+    await gift.finish(nextGame);
+    const result=await overview(december);
+    if(n<5) assert.doesNotMatch(JSON.stringify(result),/NÁŠUP|Když zbude|otisky-sign/);
+    else {
+      assert.equal(result.children[0].textContent,'NÁŠUP');
+      assert.match(JSON.stringify(result),/Když zbude/);
+      assert.match(JSON.stringify(result),/Pavel/);
+    }
+  }
 }
 run().catch(error=>{console.error(error);process.exitCode=1;});
