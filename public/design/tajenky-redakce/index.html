@@ -32,6 +32,10 @@
       <span id="noticeText"></span>
       <button id="retry" type="button" class="quiet-button" hidden>Zkusit znovu</button>
     </section>
+    <form id="accessForm" class="access-form" hidden>
+      <label for="privateLink">Původní soukromý odkaz</label>
+      <div class="access-row"><input type="password" id="privateLink" required autocomplete="off" spellcheck="false"><button type="submit" class="small-button">Otevřít redakci</button></div>
+    </form>
     <div id="delivery" class="delivery" hidden><p id="deliveryText" role="status" aria-live="polite"></p><button id="submit" type="button">Odevzdat připomínky</button></div>
     <div id="workspace" class="workspace" hidden>
       <aside id="index" class="index" aria-labelledby="indexTitle">

@@ -33,7 +33,7 @@
   let loading = null, sending = null, submitting = false, revision = null, submission = null;
   let debounce = null, retryTimer = null, retryDelay = 5000;
   let editions = [], byId = new Map(), selected = null, group = 'new', displayed = [];
-  let submitMessage = '';
+  let submitMessage = '', firstOnlineSet = true;
   const records = new Map(), drafts = new Map(), rowErrors = new Map();
   const blank = () => ({version:0,fields:{}});
   const record = id => records.get(id) || blank();
@@ -185,7 +185,8 @@
   function lockAccess() {
     locked=true;connected=false;clearTimeout(retryTimer);
     $('workspace').hidden=true;$('delivery').hidden=true;$('progress').hidden=true;$('export').disabled=true;
-    notice('Pro otevření redakce použij platný soukromý odkaz.');paintStatus();
+    $('accessForm').hidden=false;
+    notice('Redakci můžeš otevřít stejným soukromým odkazem jako minule.');paintStatus();
   }
   function offline() {
     connected=false;
@@ -202,11 +203,17 @@
     loading=(async()=>{
       try {
         const [set,reviews]=await Promise.all([api('/set'),api()]);
+        const contentChanged=read('set')?.contentRevision!==set.data.contentRevision;
         installSet(set.data.editions);write('set',set.data);
         if(!reviews.data?.reviews || !Number.isInteger(reviews.data.revision)) throw Error('reviews');
         for(const e of editions) applyRecord(e.id,reviews.data.reviews[e.id] || blank());
         setHead(reviews.data); connected=true;retryDelay=5000;notice();
-        paintAll(false);schedule(100);
+        if(firstOnlineSet && set.data.contentRevision==='2026-12-review-64-r2') {
+          const firstPending=editions.find(e=>e.group==='new' && trackedStatus(e)==='pending');
+          if(firstPending) { $('stateFilter').value='pending';selected=firstPending.id; }
+        }
+        firstOnlineSet=false;
+        paintAll(contentChanged);schedule(100);
       } catch(error) {
         if(error.status===401||error.status===403) lockAccess();
         else { offline(); if(editions.length) paintAll(false); }
@@ -548,6 +555,22 @@
     } else if(key==='head') { const head=read(key);if(head)setHead(head,false); }
     else return;
     if(editions.length) {paintIndex();if(byId.has(selected))patchEditor(byId.get(selected));paintStatus();schedule();}
+  });
+  $('accessForm').addEventListener('submit',event=>{
+    event.preventDefault();
+    const input=$('privateLink');
+    let key='';
+    try {
+      const link=new URL(input.value.trim());
+      if(link.protocol==='https:') key=new URLSearchParams(link.hash.slice(1)).get('k') || '';
+    } catch {}
+    if(!/^[A-Za-z0-9_-]{32,128}$/.test(key)) {
+      notice('Vlož celý původní soukromý odkaz včetně části za znakem #.');
+      input.focus();return;
+    }
+    input.value='';
+    history.replaceState(history.state,'',location.pathname+location.search+'#k='+encodeURIComponent(key));
+    location.reload();
   });
   $('stateFilter').addEventListener('change',selectThroughFilters);
   $('categoryFilter').addEventListener('change',selectThroughFilters);
