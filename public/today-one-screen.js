@@ -52,7 +52,7 @@
   const archiveResume=q('#axArchiveResume'),freeResume=q('#homeResumeCard');
   const resume=visible(archiveResume)?archiveResume:visible(freeResume)?freeResume:null;
   const difficultyCount=document.querySelectorAll('#difficultyCards [data-play-free]').length;
-  const free={key:'free',title:resume?'Rozehráno':'Volná hra',detail:resume?text(resume.querySelector('strong')).replace(/^Rozehráno:\s*/,'').replace(/^Rozehráno v Archivu\s*·?\s*/,'Archiv · '):difficultyCount?difficultyCount+' obtížností':'',art:resume?icon(resume):'/difficulty/printshop/easy.webp',target:resume?'#'+resume.id:q('#axHomeFree .ax-card-action')?'#axHomeFree .ax-card-action':'.bottom-nav [data-nav="free"]',label:resume?text(resume):'Volná hra. Vybrat obtížnost.',kind:complete?'free next':'free'};
+  const free={key:'free',title:resume?'Rozehráno':'Volná hra',detail:resume?text(resume.querySelector('strong')).replace(/^Rozehráno:\s*/,'').replace(/^Rozehráno v Archivu\s*[:·]?\s*/,'Archiv · '):difficultyCount?difficultyCount+' obtížností':'',art:resume?icon(resume):'/difficulty/printshop/easy.webp',target:resume?'#'+resume.id:q('#axHomeFree .ax-card-action')?'#axHomeFree .ax-card-action':'.bottom-nav [data-nav="free"]',label:resume?text(resume):'Volná hra. Vybrat obtížnost.',kind:complete?'free next':'free'};
   const newsTarget='#todayNewContentBanner #playTodayNewContentBtn';
   const playTile=!resume&&visible(q('#todayNewContentBanner'))&&q(newsTarget)
    ?{key:'monday-five',title:'Pondělní pětka',detail:'Hrát novinky',art:'/weekly-banner-icon-optimized.svg',target:newsTarget,kind:free.kind}
