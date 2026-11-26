@@ -8,6 +8,13 @@
  const button=(cls,label)=>{const el=make('button',cls,label);el.type='button';return el};
  const isReview=()=>!!deps?.previewHost()&&new URLSearchParams(location.search).get('tajenkaReview')==='1';
  const available=()=>!!deps&&(isReview()||(deps.enabled()&&deps.today()>=deps.dailyFrom));
+ function nextIsTomorrow(){
+  if(!deps)return false;
+  if(isReview())return true;
+  const today=deps.today(),tomorrow=new Date(today+'T12:00:00Z');
+  tomorrow.setUTCDate(tomorrow.getUTCDate()+1);
+  return deps.slotForDate(today)!==deps.slotForDate(tomorrow.toISOString().slice(0,10));
+ }
  const readyToday=()=>{const p=deps?.current();return available()&&!!p&&(isReview()||p.week===deps.slotForDate(deps.today()))};
  const validId=id=>typeof id==='string'&&/^tajenka-v2-week-\d{2,}$/.test(id);
  const validDate=date=>/^\d{4}-\d{2}-\d{2}$/.test(date||'');
@@ -121,6 +128,6 @@
  }
  function openFromNews(){if(!available())return false;const p=deps.current();return !readyToday()||deps.status(p.id)==='done'?open():deps.openPuzzle(p)}
  document.addEventListener('proplet:tajenka-ready',()=>{if(dialog?.open)open()});
- const api={configure(options){deps=options},available,readyToday,isReview,remember,cached,list,load,open,openFromNews,syncPlayEntry,close};
+ const api={configure(options){deps=options},available,nextIsTomorrow,readyToday,isReview,remember,cached,list,load,open,openFromNews,syncPlayEntry,close};
  global.PropletDailyTajenka=api;
 })(typeof window!=='undefined'?window:globalThis);

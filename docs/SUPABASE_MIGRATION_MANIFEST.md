@@ -61,7 +61,8 @@ Sprint 16 legacy cleanup nemění SQL soubory, pořadí migrací ani databázi. 
 
 ## Denní Tajenka
 
-Migrace `20261125120100_daily_tajenka_news.sql` přidává prosincovou kampaň do
-existující evidence oznámení. Od 1. 12. 2026 00.00 v Praze může první zařízení
-získat jednu účtenku pro hráče s účtem založeným před spuštěním a alespoň
-pěti dokončenými deskami. Původní listopadová kampaň má vlastní účtenky.
+Migrace `20261125120100_daily_tajenka_news.sql` založila kampaň v evidenci
+oznámení. Navazující `20261126193400_daily_tajenka_launch_nov27.sql` posouvá
+spuštění i hranici stáří účtu na 27. 11. 2026 v 00.00 pražského času.
+Oznámení může právě jednou převzít hráč s účtem založeným před spuštěním
+a alespoň pěti dokončenými deskami. Kampaň z 1. listopadu má vlastní účtenky.

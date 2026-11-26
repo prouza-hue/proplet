@@ -31,3 +31,16 @@ UI on mobile and Fold-sized viewports, and distinguish preview from production.
   create a preview per edit. Create one exact-commit preview when review needs it.
 - Read billing totals only when relevant to the task. Keep timestamped observations;
   never infer billed bytes from request counts or claim savings before measuring them.
+
+## Monthly supporter gifts
+
+From December 2026 onward, show neutral progress after chapters 1–4. Reveal the whole
+payoff only after chapter 5, including in the collection and accessibility labels.
+Check the proposed payoff against the series title, chapter titles and target words.
+
+The opening puzzle may teach the theme. For later chapters, record plausible Czech
+words or partial paths that compete for the same cells and why they fail. Check
+whether a player can simply read targets from the title or across straight rows.
+Review those decisions in a blind playthrough alongside exhaustive uniqueness checks.
+More tiles, a higher difficulty label or a larger dictionary hit count alone cannot
+establish how challenging a board feels. Distinguish automated replay from human timing.

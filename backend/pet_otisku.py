@@ -1,4 +1,4 @@
-"""November supporter series. Personal awards are issued by the database."""
+"""Monthly supporter series. Personal awards are issued by the database."""
 import json
 from functools import lru_cache
 from pathlib import Path
@@ -28,13 +28,25 @@ def solutions():
     return json.loads(SOLUTION_FILE.read_text(encoding="utf8"))
 
 
+@lru_cache(maxsize=12)
+def edition_solutions(edition):
+    if edition == "2026-11":
+        return solutions()
+    if edition == "2026-12":
+        return json.loads((SOLUTION_FILE.parent / "gift_2026_12_solutions.json").read_text(encoding="utf8"))
+    raise HTTPException(404, "Tato edice není dostupná.")
+
+
 def install(app, *, auth_player, db_rpc, enforce_rate_limit):
-    def call(player_id, action, board=None):
-        result = db_rpc("proplet_pet_otisku_v1", {
+    def call(player_id, action, board=None, edition="2026-11"):
+        result = db_rpc("proplet_gift_edition_v1", {
+            "p_month": edition + "-01",
             "p_player": player_id, "p_action": action, "p_board": board,
         })
         if not isinstance(result, dict):
             raise HTTPException(503, "Dárková série je dočasně nedostupná.")
+        if result.get("code") == "unknown":
+            raise HTTPException(404, "Tato edice není dostupná.")
         if result.get("code") == "ineligible":
             raise HTTPException(403, "Tato série patří podporovatelům Propletu.")
         if result.get("code") == "locked":
@@ -63,3 +75,26 @@ def install(app, *, auth_player, db_rpc, enforce_rate_limit):
         if body.solution != solutions().get(f"otisk-2026-11-{body.board:02}"):
             raise HTTPException(422, "Řešení desky není úplné.")
         return call(pid, "complete", body.board)
+
+    @app.get("/api/gift-editions/{edition}")
+    def edition_state(edition: str, request: Request, response: Response,
+                      authorization: Optional[str] = Header(default=None)):
+        owner = player(request, response, authorization)
+        edition_solutions(edition)
+        return call(owner, "read", edition=edition)
+
+    @app.post("/api/gift-editions/{edition}/seen")
+    def edition_seen(edition: str, body: StampSeen, request: Request, response: Response,
+                     authorization: Optional[str] = Header(default=None)):
+        owner = player(request, response, authorization)
+        edition_solutions(edition)
+        return call(owner, body.kind, edition=edition)
+
+    @app.post("/api/gift-editions/{edition}/complete")
+    def edition_complete(edition: str, body: StampFinish, request: Request, response: Response,
+                         authorization: Optional[str] = Header(default=None)):
+        owner = player(request, response, authorization)
+        answer = edition_solutions(edition).get(f"otisk-{edition}-{body.board:02}")
+        if body.solution != answer:
+            raise HTTPException(422, "Řešení desky není úplné.")
+        return call(owner, "complete", body.board, edition)

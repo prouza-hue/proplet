@@ -832,6 +832,17 @@
       ]
     },
     {
+      "id": "daily-tajenka-launch-nov27",
+      "order": 701,
+      "version": "2026.11.26",
+      "path": "supabase/migrations/20261126193400_daily_tajenka_launch_nov27.sql",
+      "type": "migration",
+      "status": "daily-tajenka-launch-november-27",
+      "sha256": "83096151bf7485a91e62bcaeceab5cf5036bf08931d4d21659e9c9f0d4a5cd69",
+      "supersedes": [],
+      "replaced_rpc_definitions": []
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

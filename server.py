@@ -148,7 +148,9 @@ REWARD_STATS_COLUMNS = "id,points,reward_key,reward_word"
 RESCUE_COLUMNS = "id,missed_date,puzzle_id,status,started_at,completed_at,elapsed_ms"
 TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)
 TAJENKA_TWICE_WEEKLY_START = date(2026, 9, 12)
-TAJENKA_DAILY_START = date(2026, 12, 1)
+TAJENKA_DAILY_START = date(2026, 11, 27)
+# Three evergreen editions bring daily play forward without moving the December calendar.
+TAJENKA_NOVEMBER_BRIDGE = (63, 65, 66)
 GEN4_RETURNING_BONUS_XP = 500
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
@@ -911,7 +913,7 @@ def load_tajenka_bank() -> dict:
 
 @lru_cache(maxsize=1)
 def tajenka_release_dates() -> tuple[date, ...]:
-    """Start of each numbered edition, followed by the first unprepared date."""
+    """Chronological release slots, followed by the first unprepared date."""
     dates = [TAJENKA_FIRST_SATURDAY]
     for _ in range(int(load_tajenka_bank().get("weeks") or 0)):
         previous = dates[-1]
@@ -926,15 +928,23 @@ def tajenka_release_dates() -> tuple[date, ...]:
     return tuple(dates)
 
 
+@lru_cache(maxsize=1)
+def tajenka_release_order() -> tuple[int, ...]:
+    """Permanent puzzle numbers in release order. Saved progress keeps its original ID."""
+    weeks = [int(puzzle["week"]) for puzzle in load_tajenka_bank().get("puzzles", [])]
+    november_bridge = [week for week in TAJENKA_NOVEMBER_BRIDGE if week in weeks]
+    return tuple([week for week in weeks if week <= 25] + november_bridge
+                 + [week for week in weeks if week > 25 and week not in november_bridge])
+
+
 def tajenka_week_for(day: date) -> Optional[int]:
     dates = tajenka_release_dates()
-    week = bisect_right(dates, day)
-    return week if 0 < week < len(dates) else None
+    slot = bisect_right(dates, day)
+    return tajenka_release_order()[slot - 1] if 0 < slot < len(dates) else None
 
 
-def last_released_tajenka_week(day: date) -> int:
-    dates = tajenka_release_dates()
-    return min(bisect_right(dates, day), len(dates) - 1)
+def released_tajenka_weeks(day: date) -> tuple[int, ...]:
+    return tajenka_release_order()[:bisect_right(tajenka_release_dates(), day)]
 
 
 def tajenka_puzzle_for_week(week: int) -> Optional[dict]:
@@ -1349,9 +1359,9 @@ def is_daily_generation_upgrade(old: dict, payload: ResultCreate) -> bool:
 
 def released_tajenka(puzzle_id: str, today: date) -> Optional[dict]:
     # A past edition remains valid for its shared link, saved game and queued XP.
-    latest = last_released_tajenka_week(today)
+    released = released_tajenka_weeks(today)
     return next((p for p in load_tajenka_bank().get("puzzles", [])
-                 if p.get("id") == puzzle_id and 1 <= int(p.get("week") or 0) <= latest), None)
+                 if p.get("id") == puzzle_id and int(p.get("week") or 0) in released), None)
 
 
 def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
@@ -1509,12 +1519,13 @@ def recent_tajenky(review: bool = False):
     if review and isolated_preview and VERCEL_GIT_COMMIT_REF == backend_config.DAILY_TAJENKA_REVIEW_BRANCH:
         today = date(2026, 12, 19)
     dates = tajenka_release_dates()
-    latest = last_released_tajenka_week(today)
+    released = released_tajenka_weeks(today)
     editions = []
-    for week in range(latest, max(0, latest - 7), -1):
+    for slot in reversed(range(max(0, len(released) - 7), len(released))):
+        week = released[slot]
         puzzle = tajenka_puzzle_for_week(week)
         if puzzle:
-            editions.append({"id": puzzle["id"], "week": week, "date": dates[week - 1].isoformat(),
+            editions.append({"id": puzzle["id"], "week": week, "date": dates[slot].isoformat(),
                              "difficulty": puzzle["difficulty"]})
     return JSONResponse({"date": today.isoformat(), "dailyFrom": TAJENKA_DAILY_START.isoformat(),
                          "editions": editions}, headers={"Cache-Control": "private, no-store"})

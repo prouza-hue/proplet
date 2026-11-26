@@ -10,10 +10,10 @@ def check_release_news(options):
     if options.get('host')!='127.0.0.1' or not options.get('dbname','').startswith('proplet_test_'):
         raise ValueError('Only a fresh isolated test database is supported')
     player_ids=[str(uuid.uuid4()) for _ in range(4)]
-    existing,newcomer,beginner,december_newcomer=player_ids
+    existing,newcomer,beginner,daily_tajenka_newcomer=player_ids
     with psycopg.connect(**options) as c:
         c.execute("update monthly_competition_settings set isolated=true,preview_now='2026-10-31 22:59:59+00',preview_anchor_at=null")
-        for pid,created in zip(player_ids,['2026-10-01','2026-10-31 23:00:00+00','2026-10-01','2026-11-30 23:00:00+00']):
+        for pid,created in zip(player_ids,['2026-10-01','2026-10-31 23:00:00+00','2026-10-01','2026-11-26 23:00:00+00']):
             c.execute('insert into players(id,name,family_code,token_hash,created_at) values(%s,%s,%s,%s,%s)',
                 (pid,'Release '+pid[:8],'SOLO_NEWS','fixture-'+pid,created))
             for index in range(4 if pid==beginner else 5):
@@ -57,15 +57,15 @@ def check_release_news(options):
         dec=lambda pid,claim=False:c.execute('select proplet_campaign_news_v1(%s,%s,%s)',(campaign,pid,claim)).fetchone()[0]
         for role in ('anon','authenticated'):
             assert not c.execute("select has_function_privilege(%s,'public.proplet_campaign_news_v1(text,uuid,boolean)','EXECUTE')",(role,)).fetchone()[0]
-        c.execute("update monthly_competition_settings set preview_now='2026-11-30 22:59:59+00'")
+        c.execute("update monthly_competition_settings set preview_now='2026-11-26 22:59:59+00'")
         assert not dec(existing,True)['enabled']
-        c.execute("update monthly_competition_settings set preview_now='2026-11-30 23:00:00+00'")
-        assert dec(existing)['canShowAutomatically'], 'November receipt must not consume December announcement'
-        assert not dec(december_newcomer,True)['eligible'] and not dec(beginner,True)['eligible']
+        c.execute("update monthly_competition_settings set preview_now='2026-11-26 23:00:00+00'")
+        assert dec(existing)['canShowAutomatically'], 'A claim for the November release must not consume the daily Tajenka announcement'
+        assert not dec(daily_tajenka_newcomer,True)['eligible'] and not dec(beginner,True)['eligible']
         assert not c.execute('select exists(select 1 from release_news_receipts where campaign_id=%s)',(campaign,)).fetchone()[0]
     race('select proplet_campaign_news_v1(%s,%s,true)',(campaign,existing))
     with psycopg.connect(**options) as c:
         assert c.execute('select count(*) from release_news_receipts where campaign_id=%s and player_id=%s',(campaign,existing)).fetchone()[0]==1
         assert not c.execute('select proplet_campaign_news_v1(%s,%s,true)',(campaign,existing)).fetchone()[0]['displayGranted']
         c.execute("update monthly_competition_settings set preview_now='2026-10-31 23:00:00+00'")
-    return 'release news: November and December independent Prague cutoffs, active campaign/returning account/five completions required; GET read-only; two eight-device races yield exactly one claim each'
+    return 'release news: separate November 1 and 27 Prague cutoffs, active campaign/returning account/five completions required; GET read-only; two eight-device races yield exactly one claim each'

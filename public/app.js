@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.51-denni-tajenka1';
+const APP_PREVIEW_RELEASE='proplet-v4.10.53-denni-tajenka2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 function resetReloadEntry(){
  if(globalThis.performance?.getEntriesByType?.('navigation')?.[0]?.type!=='reload')return;
@@ -2894,7 +2894,8 @@ const TAJENKA_RELEASE_ENABLED=window.PROPLET_RUNTIME_META?.capabilities?.tajenka
 const requestedTajenkaWeek=Math.max(1,Number.parseInt(new URLSearchParams(location.search).get('tajenka_week')||'1',10)||1);
 const TAJENKA_FIRST_SATURDAY=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaFirstSaturday||'2026-08-29';
 const TAJENKA_TWICE_WEEKLY_START=window.PROPLET_RUNTIME_META?.capabilities?.tajenkaTwiceWeeklyStart||'2026-09-12';
-const TAJENKA_DAILY_START='2026-12-01';
+const TAJENKA_DAILY_START='2026-11-27';
+const TAJENKA_NOVEMBER_BRIDGE=[63,65,66];
 let activeTajenkaWeek=null;
 let TAJENKA_AVAILABLE=false;
 let tajenkaPuzzle=null;
@@ -2902,7 +2903,14 @@ let tajenkaRecapOpen=false,tajenkaRecapPuzzle=null,tajenkaRecapFromEditions=fals
 let tajenkaLoadSerial=0,tajenkaReviewState={},tajenkaReviewRules=false;
 
 function tajenkaReleaseSlotForISO(iso=pragueDateISO()){
- if(iso>=TAJENKA_DAILY_START)return 26+dayOffsetISO(iso,TAJENKA_DAILY_START);
+ if(iso>=TAJENKA_DAILY_START){
+  const offset=dayOffsetISO(iso,TAJENKA_DAILY_START);
+  if(offset===0)return 25;
+  if(offset<=TAJENKA_NOVEMBER_BRIDGE.length)return TAJENKA_NOVEMBER_BRIDGE[offset-1];
+  let week=25+offset-TAJENKA_NOVEMBER_BRIDGE.length;
+  for(const released of TAJENKA_NOVEMBER_BRIDGE)if(week>=released)week++;
+  return week;
+ }
  const initialOffset=dayOffsetISO(iso,TAJENKA_FIRST_SATURDAY);
  if(initialOffset<0)return null;
  const cadenceOffset=dayOffsetISO(iso,TAJENKA_TWICE_WEEKLY_START);

@@ -87,3 +87,17 @@ console.log('PASS: Kdo and již are visible on entry. The four saved paths compl
  state={inProgress:old};await context.refreshKdoNotice();assert.equal(hidden,true);
  console.log('PASS: KDO apology checks the original four paths and excludes partial, newer and already rewarded games.');
 })().catch(err=>{console.error(err);process.exitCode=1});
+
+// Replay the real front-end slot selector across the bridge and compare authoring dates.
+const clock=vm.createContext({window:{}});
+const readRange=(from,to)=>app.substring(app.indexOf(from),app.indexOf(to,app.indexOf(from)));
+vm.runInContext(readRange('function dayOffsetISO(', '\n'),clock);
+vm.runInContext(readRange('const TAJENKA_FIRST_SATURDAY=', 'let activeTajenkaWeek='),clock);
+vm.runInContext(readRange('function tajenkaReleaseSlotForISO(', 'function refreshTajenkaAvailability('),clock);
+const slot=clock.tajenkaReleaseSlotForISO;
+assert.deepEqual(['26','27','28','29','30'].map(day=>slot('2026-11-'+day)),[24,25,63,65,66]);
+assert.equal(slot('2026-12-01'),26);
+for(const board of JSON.parse(fs.readFileSync('content/tajenka-v2/daily-editions.json','utf8')).boards) {
+ assert.equal(slot(board.releaseDate),board.week);
+}
+console.log('PASS: Today selects each stable puzzle ID on its scheduled Prague date.');
