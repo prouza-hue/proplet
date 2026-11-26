@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const { pathToFileURL } = require('node:url');
 const path = require('node:path');
 
@@ -69,14 +70,19 @@ function verifyBoard(board) {
 
 (async () => {
   const moduleUrl = pathToFileURL(path.resolve(__dirname, '../../public/design/spojky/boards.js'));
-  const { boards } = await import(moduleUrl.href);
-  assert.equal(boards.length, 4);
-  assert.equal(new Set(boards.map(board => board.id)).size, 4);
+  const { boards: pilot } = await import(moduleUrl.href);
+  const { boards, launchDate } = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../data/spojky_weeks.json'), 'utf8'));
+  const publicIds = ['spojky-cross-01-v1', 'spojky-cross-02-v1', 'spojky-cross-03-v1', 'spojky-cross-04-v1'];
+  assert.deepEqual(pilot.map(board => board.id), publicIds);
+  assert.deepEqual(boards.slice(0, pilot.length), pilot, 'returning pilot players need the original grids');
+  assert.ok(boards.length >= 8, 'the launch bank must cover at least the opening eight weeks');
+  assert.equal(new Set(boards.map(board => board.id)).size, boards.length);
   const monday = Date.parse(boards[0].start);
   assert.equal(new Date(monday).getUTCDay(), 1);
+  assert.equal(launchDate, '2026-11-27');
   boards.forEach((board, i) => {
     assert.equal(Date.parse(board.start) - monday, i * 7 * 86400000);
     verifyBoard(board);
   });
-  console.log('Four crossing boards, all 24 find orders and required shared tiles verified.');
+  console.log(`${boards.length} weekly crossing boards, all ${boards.length * 6} find orders and four public pilot boards verified.`);
 })().catch(error => { console.error(error); process.exitCode = 1; });

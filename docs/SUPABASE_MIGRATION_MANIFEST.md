@@ -66,3 +66,5 @@ oznámení. Navazující `20261126193400_daily_tajenka_launch_nov27.sql` posouv�
 spuštění i hranici stáří účtu na 27. 11. 2026 v 00.00 pražského času.
 Oznámení může právě jednou převzít hráč s účtem založeným před spuštěním
 a alespoň pěti dokončenými deskami. Kampaň z 1. listopadu má vlastní účtenky.
+
+`20261127010000_spojky_launch_news.sql` připravuje společné oznámení Tajenky a Spojek se stejným termínem a stejným publikem. Přečtení původního oznámení nechá hráči jednu pozvánku na Spojky. Po převzetí společné pozvánky už starší klient původní oznámení nezobrazí. Obě kampaně mají vlastní účtenky. Přímý náhled ve větvi žádnou účtenku nevytváří.

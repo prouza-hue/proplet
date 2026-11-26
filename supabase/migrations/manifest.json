@@ -843,6 +843,17 @@
       "replaced_rpc_definitions": []
     },
     {
+      "id": "spojky-joint-launch-news-20261127",
+      "order": 702,
+      "version": "2026.11.27",
+      "path": "supabase/migrations/20261127010000_spojky_launch_news.sql",
+      "type": "migration",
+      "status": "prepared-joint-spojky-tajenka-announcement",
+      "sha256": "8a97c2ebd6b7735bc6e9f3f3a875e216ff9f6c4c8480ff54419dc9a2e2ab59ef",
+      "supersedes": [],
+      "replaced_rpc_definitions": ["public.proplet_campaign_news_v1"]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

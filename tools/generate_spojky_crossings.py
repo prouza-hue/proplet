@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Build the isolated Spojky crossing preview from editorial words and fixed seeds."""
+"""Build the weekly Spojky bank and the four previously published pilot boards."""
 from __future__ import annotations
 
 import argparse
 from collections import Counter
+from datetime import date, timedelta
 import json
 from pathlib import Path
 import random
@@ -15,6 +16,8 @@ from proplet_content.io import atomic_write_text
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "content/spojky/crossings.json"
 OUTPUT = ROOT / "public/design/spojky/boards.js"
+BANK = ROOT / "data/spojky_weeks.json"
+PILOT_IDS = tuple(f"spojky-cross-{number:02d}-v1" for number in range(1, 5))
 
 
 def draw_path(word, tiles, graph, rng, anchors, accept):
@@ -161,15 +164,40 @@ def render(boards):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=SOURCE)
-    parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--output", type=Path, help="write a standalone JS export; only the pilot may be public")
+    parser.add_argument("--bank-output", type=Path, help="write the server-side weekly bank")
     parser.add_argument("--check", action="store_true", help="verify that the checked-in grids can be reproduced")
     args = parser.parse_args()
-    result = render([layout(spec) for spec in json.loads(args.input.read_text(encoding="utf-8"))])
-    if args.check:
-        if args.output.read_text(encoding="utf-8") != result:
-            raise SystemExit(f"Generated boards differ from {args.output}")
-    else:
-        atomic_write_text(args.output, result)
+    if args.output is None and args.bank_output is None:
+        args.output, args.bank_output = OUTPUT, BANK
+    specs = json.loads(args.input.read_text(encoding="utf-8"))
+    if not specs:
+        parser.error("The editorial source must contain at least one week.")
+    boards = [layout(spec) for spec in specs]
+    outputs = {}
+    if args.output is not None:
+        if args.output.resolve().is_relative_to(ROOT / "public"):
+            by_id = {board["id"]: board for board in boards}
+            outputs[args.output] = render([by_id[board_id] for board_id in PILOT_IDS])
+        else:
+            outputs[args.output] = render(boards)
+    if args.bank_output is not None:
+        if args.bank_output.resolve().is_relative_to(ROOT / "public"):
+            parser.error("The weekly bank belongs outside public/.")
+        starts = [date.fromisoformat(board["start"]) for board in boards]
+        launch = date.fromisoformat(specs[0]["launchDate"])
+        if (starts[0].weekday() != 0 or not 0 <= (starts[0] - launch).days <= 6
+                or any(b - a != timedelta(days=7) for a, b in zip(starts, starts[1:]))
+                or len({board["id"] for board in boards}) != len(boards)):
+            parser.error("Each board needs a stable unique ID and a consecutive Monday; check the opening week.")
+        bank = {"launchDate": launch.isoformat(), "boards": boards}
+        outputs[args.bank_output] = json.dumps(bank, ensure_ascii=False, indent=2) + "\n"
+    for path, result in outputs.items():
+        if args.check:
+            if path.read_text(encoding="utf-8") != result:
+                raise SystemExit(f"Generated boards differ from {path}")
+        else:
+            atomic_write_text(path, result)
 
 
 if __name__ == "__main__":

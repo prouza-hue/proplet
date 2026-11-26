@@ -67,5 +67,21 @@ def check_release_news(options):
     with psycopg.connect(**options) as c:
         assert c.execute('select count(*) from release_news_receipts where campaign_id=%s and player_id=%s',(campaign,existing)).fetchone()[0]==1
         assert not c.execute('select proplet_campaign_news_v1(%s,%s,true)',(campaign,existing)).fetchone()[0]['displayGranted']
+        joint='weekly-spojky-daily-tajenka-2026-11'
+        news=lambda key,pid,claim=False:c.execute('select proplet_campaign_news_v1(%s,%s,%s)',(key,pid,claim)).fetchone()[0]
+        c.execute("update monthly_competition_settings set preview_now='2026-11-26 22:59:59+00'")
+        assert not news(joint,existing,True)['enabled']
+        c.execute("update monthly_competition_settings set preview_now='2026-11-26 23:00:00+00'")
+        follow_up=news(joint,existing)
+        assert follow_up['sawDailyTajenka'] and follow_up['canShowAutomatically'], 'Old receipt gets the Spojky follow-up'
+        assert not news(joint,daily_tajenka_newcomer,True)['eligible'] and not news(joint,beginner,True)['eligible']
+        assert not news(joint,newcomer)['sawDailyTajenka'] and news(campaign,newcomer)['canShowAutomatically']
+        assert news(joint,newcomer,True)['displayGranted']
+        assert not news(campaign,newcomer,True)['eligible'], 'An older client must not show legacy news after the combined invitation'
+        assert not news(joint,newcomer,True)['displayGranted']
+        assert not c.execute('select exists(select 1 from release_news_receipts where campaign_id=%s and player_id=%s)',(campaign,newcomer)).fetchone()[0], 'Only genuine receipts are recorded'
+    race('select proplet_campaign_news_v1(%s,%s,true)',(joint,existing))
+    with psycopg.connect(**options) as c:
+        assert c.execute('select count(*) from release_news_receipts where campaign_id=%s and player_id=%s',(joint,existing)).fetchone()[0]==1
         c.execute("update monthly_competition_settings set preview_now='2026-10-31 23:00:00+00'")
-    return 'release news: separate November 1 and 27 Prague cutoffs, active campaign/returning account/five completions required; GET read-only; two eight-device races yield exactly one claim each'
+    return 'release news: cutoffs at Prague midnight, five confirmed completions, legacy and joint invitations, suppression after joint and three single-winner cross-device races'

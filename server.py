@@ -36,6 +36,7 @@ from backend import config as backend_config
 from backend import results as result_domain
 from backend import archive as archive_domain
 from backend import referrals as referral_domain
+from backend import spojky
 from backend import play_sessions, free_order
 from backend.config import (
     APP_VERSION,
@@ -1529,6 +1530,29 @@ def recent_tajenky(review: bool = False):
                              "difficulty": puzzle["difficulty"]})
     return JSONResponse({"date": today.isoformat(), "dailyFrom": TAJENKA_DAILY_START.isoformat(),
                          "editions": editions}, headers={"Cache-Control": "private, no-store"})
+
+
+@app.get("/api/spojky")
+def current_spojky(review: Optional[str] = None):
+    """Serve the current weekly board; only editorial preview can change its date."""
+    headers = {"Cache-Control": "private, no-store"}
+    if review is not None:
+        isolated = (VERCEL_ENV == "preview" and backend_config.spojky_review_branch(VERCEL_GIT_COMMIT_REF)
+                    and not LIVE_PLAYER_PREVIEW)
+        local = not VERCEL_ENV and os.environ.get("PROPLET_SPOJKY_LOCAL_REVIEW") == "1"
+        if not (isolated or local):
+            raise HTTPException(404, "Redakční náhled Spojek není dostupný", headers=headers)
+        if review == "editions":
+            return JSONResponse(spojky.editorial_calendar(), headers=headers)
+        try:
+            day = date.fromisoformat(review)
+            if day.isoformat() != review:
+                raise ValueError
+        except ValueError:
+            raise HTTPException(400, "Neplatné datum Spojek", headers=headers) from None
+    else:
+        day = current_prague_date()
+    return JSONResponse(spojky.edition_for(day), headers=headers)
 
 
 @app.get("/")

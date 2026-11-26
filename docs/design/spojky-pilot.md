@@ -1,5 +1,29 @@
 # Spojky v Propletu
 
+## Startovní sada a společné oznámení
+
+**27. 11. 2026.** Ve větvi Spojek je připravený kandidát 4.11.0. Denní Tajenka už začala v produkční verzi 4.10.53 (`4f3a377`). První Spojky se po schválení mohou přidat hned. O vydání hry na hrajproplet.cz a použití připravené databázové migrace rozhodne Pavel.
+
+| Co vyzkoušet | Odkaz do hratelného náhledu |
+|---|---|
+| Pavlův přehled všech vydání. „Hrát“ otevře skutečnou hru, „Řešení“ samostatně odhalí hotový řetěz a cesty. | [Osm týdnů Spojek](https://proplet-git-preview-spojky-prunik-65a488-pavel-prouzas-projects.vercel.app/design/spojky/vydani.html) |
+| Hráč se poprvé dozví o obou novinkách. Každé tlačítko otevře příslušnou hru. | [Společné oznámení nad kartou Dnes](https://proplet-git-preview-spojky-prunik-65a488-pavel-prouzas-projects.vercel.app/?open=daily&tajenkaReview=1&tajenka=1&tajenka_week=25&spojkyReview=2026-11-27) |
+| Hráč už četl o denní Tajence. Pozvánka představí týdenní Spojky. | [Pozvánka pro tohoto hráče](https://proplet-git-preview-spojky-prunik-65a488-pavel-prouzas-projects.vercel.app/?open=daily&tajenkaReview=1&tajenka=1&tajenka_week=25&spojkyReview=2026-11-27&spojkyNews=seen) |
+
+První deska pokrývá pátek 27. listopadu až neděli 6. prosince. V pondělí 30. listopadu hráči zůstane rozehraný řetěz. Od 7. prosince se desky střídají v pondělí o pražské půlnoci. První čtyři vydání zachovávají desky z playtestu včetně jejich ID a pořadí. Další čtyři začínají 28. prosince a 4., 11. a 18. ledna. Poslední platí do neděle 24. ledna 2027.
+
+Na skutečném Dnes pozná hráč novou desku, rozdělané Spojky i hotový řetěz. Při návratu na stejném zařízení se obnoví nálezy i rozdělaný tah. Po dohrání uvidí termín další desky, pokud je připravená. Zakládání a střídání účtů používá oddělený herní postup. Automatické oznámení je určeno přihlášeným hráčům s účtem před startem denní Tajenky a alespoň pěti různými dokončenými deskami. Databáze hlídá doručení napříč zařízeními. Ruční náhled otevře stejné oznámení bez zaznamenání převzetí.
+
+Všech osm desek lze dohrát ve všech šesti pořadích nálezů. Zkouška čtyř nových vydání bez řešení odkryla u jedné desky druhý smysluplný řetěz. Po výměně kartičky jsme znovu prověřili všech šest dvojic. Na telefonu i rozloženém Foldu jsme vyzkoušeli oba vstupy z oznámení a návrat do rozehrané hry. Databázová zkouška potvrdila jediné převzetí pozvánky i při souběžném otevření z více zařízení. [Oznámení na mobilu](spojky-preview/launch-cta-mobil.png) · [Oznámení na rozloženém Foldu](spojky-preview/launch-cta-fold.png)
+
+### Další vydání
+
+Úkol „Doplnit týdenní Spojky“ kontroluje zásobu každé pondělí podle skutečně nasazené banky. Když první nepokryté pondělí nastane do 14 dní, připraví dalších osm desek do vlastní větve `preview/spojky-davka-YYYYMMDD` s datem první nové desky. Při současné zásobě vychází příprava na 11. ledna pro týden od 25. ledna. Rozpracovanou dávku dokončí ve stejné větvi. Pavel dostane odkaz k vyzkoušení a rozhodne o vydání.
+
+Autorským zdrojem je `content/spojky/crossings.json`. Po doplnění desek spusť `python tools/generate_spojky_crossings.py`, následně `python tools/generate_spojky_crossings.py --check`. Generátor vytváří soukromou banku `data/spojky_weeks.json`. Pro každé vydání je třeba projít všech šest dvojic kartiček a hledat další přirozená řešení, která by hráč mohl v mřížce sestavit. Redakční zkoušku začni promíchanými kartičkami a mřížkou, bez klíče a nápověd. Na produkci vrací `/api/spojky` jen právě hratelnou desku. Po skončení poslední se dlaždice skryje.
+
+Při schváleném vydání patří před aplikaci migrace `20261127010000_spojky_launch_news.sql`, která naváže na již doručená oznámení Tajenky. [Pořadí migrací](../SUPABASE_MIGRATION_MANIFEST.md)
+
 ## Dnes s denní Tajenkou a týdenními Spojkami
 
 **26. 11. 2026.** Hratelný náhled ve větvi `preview/spojky-pruniky-navod-20261126` vychází z produkční verze 4.10.53 (`4f3a377`) a z předání denní Tajenky (`e34035a`). Ve středu 16. prosince se sejdou Střední denní výzva, třetí týden Spojek, denní Tajenka č. 41 a Extra Mozkožrout. Modelový hráč dokončil pondělní sadu a má rozehranou 12. úroveň volné hry. O nasazení Spojek do produkce rozhodne Pavel po náhledu. [Otevřít Dnes ve větvi Spojek](https://proplet-git-preview-spojky-prunik-65a488-pavel-prouzas-projects.vercel.app/design/spojky/index.html?datum=2026-12-16)

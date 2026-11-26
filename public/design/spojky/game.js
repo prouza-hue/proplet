@@ -2,7 +2,7 @@ import { bindTaps, gridFor, nonPointerClick, paintCells } from './ink.js';
 import { mountTutorial } from './tutorial.js';
 
 const storagePrefix = 'proplet.spojky.crossings.v1.';
-const introKey = `${storagePrefix}tutorial.v2`;
+const storageKey = (name, scope = '') => `${storagePrefix}${scope ? scope + '.' : ''}${name}`;
 const sessionCopy = new Map();
 const unwritten = new Set();
 
@@ -22,8 +22,6 @@ function write(key, value) {
   } catch { unwritten.add(key); }
 }
 
-const boardKey = board => `${storagePrefix}${board.id}`;
-const answerKey = (board, index) => `${boardKey(board)}.answer.${index}`;
 const signature = board => [board.rows.join('/'), ...board.chain, ...board.answers.map(answer => answer.word)].join('|');
 const blankState = board => ({ signature: signature(board), started: false, found: board.answers.map(() => null), pair: [], path: [], hints: board.answers.map(() => 0), hintTarget: -1 });
 const lettersOf = board => Array.from(board.rows.join(''));
@@ -38,18 +36,19 @@ function readJson(key) {
   try { return JSON.parse(read(key)); } catch { return null; }
 }
 
-function loadState(board) {
+function loadState(board, scope) {
   const state = blankState(board);
+  const key = storageKey(board.id, scope);
   const letters = lettersOf(board);
   const validPath = path => Array.isArray(path) && path.length <= letters.length && new Set(path).size === path.length && path.every((n, i) =>
     Number.isInteger(n) && n >= 0 && n < letters.length && (i === 0 || neighbors(n, path[i - 1], board.rows[0].length)));
   // Each find has its own receipt. Two tabs can finish different words without overwriting either path.
   board.answers.forEach((answer, i) => {
-    const receipt = readJson(answerKey(board, i));
+    const receipt = readJson(`${key}.answer.${i}`);
     if (receipt?.signature === state.signature && validPath(receipt.path) && spells(receipt.path, letters) === answer.word) state.found[i] = receipt.path;
   });
   state.started = state.found.some(Boolean);
-  const stored = readJson(boardKey(board));
+  const stored = readJson(key);
   if (stored?.signature !== state.signature) return state;
   state.started ||= stored.started === true;
   state.hints.forEach((_, i) => {
@@ -62,10 +61,25 @@ function loadState(board) {
   return state;
 }
 
-export function getProgress(board) { return progressOf(loadState(board)); }
+export function getProgress(board, scope) { return progressOf(loadState(board, scope)); }
 export function resetProgress(board) {
-  board.answers.forEach((_, i) => write(answerKey(board, i), null));
-  write(boardKey(board), null);
+  const key = storageKey(board.id);
+  board.answers.forEach((_, i) => write(`${key}.answer.${i}`, null));
+  write(key, null);
+}
+
+// Each found word has its own key, so signing in can keep finds from both players' stores.
+export function transferProgress(from, to) {
+  if (!from || from === to) return;
+  const prefix = storageKey('', from);
+  const keys = new Set(sessionCopy.keys());
+  try { for (let i = 0; i < localStorage.length; i++) keys.add(localStorage.key(i)); } catch { /* Memory only. */ }
+  for (const key of keys) {
+    if (!key?.startsWith(prefix)) continue;
+    const destination = to && storageKey(key.slice(prefix.length), to);
+    if (destination && read(destination) === null) write(destination, read(key));
+    if (!destination || !unwritten.has(destination)) write(key, null);
+  }
 }
 
 function el(tag, className, text) {
@@ -82,9 +96,9 @@ function button(className, text, action) {
   return element;
 }
 
-function topRow(onBack, onRules) {
+function topRow(onBack, onRules, backLabel = 'Dnes') {
   const row = el('div', 'sj-top');
-  const back = button('sj-back', 'Dnes', onBack);
+  const back = button('sj-back', backLabel, onBack);
   back.prepend(el('span', 'sj-back-arrow'));
   row.append(back);
   if (onRules) row.append(button('sj-rules-button', 'Pravidla', onRules));
@@ -176,8 +190,8 @@ function showChainProgress(board, found, { cards, counter, track, goal, groups, 
   groups.hidden = !groups.children.length;
 }
 
-function openTutorial(frame, { onPlay, onBack, replay = false }) {
-  return mountTutorial(frame, { replay, onBack, onPlay() { write(introKey, '1'); onPlay(); } });
+function openTutorial(frame, { onPlay, onBack, replay = false, storageScope }) {
+  return mountTutorial(frame, { replay, onBack, onPlay() { write(storageKey('tutorial.v2', storageScope), '1'); onPlay(); } });
 }
 
 export function mountGameTutorial(root, options) {
@@ -187,7 +201,7 @@ export function mountGameTutorial(root, options) {
   return { destroy() { tutorial.destroy(); frame.remove(); } };
 }
 
-function showResult(frame, { board, week, onBack, nextLabel }, found, review) {
+function showResult(frame, { board, week, onBack, nextLabel, backLabel }, found, review) {
   const sheet = el('section', 'sj-sheet sj-result');
   const header = heading(review ? 'Řešení Spojek' : 'Řetěz je celý!', week);
   const { tray, cells, inks } = gridFor(board, false);
@@ -231,7 +245,7 @@ function showResult(frame, { board, week, onBack, nextLabel }, found, review) {
   spread.append(list, details);
   sheet.append(header, spread);
   if (!review && nextLabel) sheet.append(el('p', 'sj-next-week', nextLabel));
-  const navigation = topRow();
+  const navigation = topRow(undefined, undefined, backLabel);
   bindTaps(navigation, '.sj-back', onBack);
   frame.replaceChildren(navigation, sheet);
   header.querySelector('h1').focus({ preventScroll: true });
@@ -247,15 +261,15 @@ export function reviewSolution(root, options) {
 }
 
 export function mountGame(root, options) {
-  const { board, week, onBack, onProgress, hintImage } = options;
+  const { board, week, onBack, onProgress, hintImage, storageScope } = options;
   const frame = el('section', 'sj-game');
   root.replaceChildren(frame);
-  let state = loadState(board);
+  let state = loadState(board, storageScope);
   let lastProgress = progressOf(state);
   const letters = lettersOf(board);
   const cols = board.rows[0].length;
-  const draftKey = boardKey(board);
-  const answerKeys = board.answers.map((_, i) => answerKey(board, i));
+  const draftKey = storageKey(board.id, storageScope);
+  const answerKeys = board.answers.map((_, i) => `${draftKey}.answer.${i}`);
   let finishing = false;
   let activePointer = null;
   let notice = '';
@@ -582,23 +596,23 @@ export function mountGame(root, options) {
     function resume() {
       tutorial.destroy();
       tutorial = null;
-      state = loadState(board);
+      state = loadState(board, storageScope);
       if (state.found.every(Boolean)) display();
       else showGame();
       if (replay) frame.querySelector('.sj-rules-button')?.focus({ preventScroll: true });
     }
-    tutorial = openTutorial(frame, { onPlay: resume, onBack: replay ? resume : onBack, replay });
+    tutorial = openTutorial(frame, { onPlay: resume, onBack: replay ? resume : onBack, replay, storageScope });
   }
 
   function display() {
     if (state.found.every(Boolean)) { finishing = true; showResult(frame, options, state.found, false); }
-    else if (state.started || read(introKey)) showGame();
+    else if (state.started || read(storageKey('tutorial.v2', storageScope))) showGame();
     else showTutorial();
   }
 
   function storageChange(event) {
     if (event.key !== null && event.key !== draftKey && !answerKeys.includes(event.key)) return;
-    const latest = loadState(board);
+    const latest = loadState(board, storageScope);
     if (tutorial) {
       state = latest;
       lastProgress = progressOf(state);
