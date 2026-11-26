@@ -43,9 +43,9 @@
   const extra=q('#studioExtraCard'),tajenka=q('#tajenkaPreviewCard');
   if(visible(extra)){const detail=reward(extra)?'':text(extra.querySelector('p')?.lastElementChild);tiles.push({key:'extra',title:'Extra',detail:/^(?:✓\s*)?(?:Hotovo|Dokončeno)$/i.test(detail)?'✓ Hotovo':detail,reward:reward(extra),art:icon(extra),target:'#studioExtraCard>button',label:'Extra. '+separatedText(extra.querySelector('p'))+'. '+text(extra.querySelector('button')),kind:'extra'});}
   if(visible(tajenka)){
-   const done=tajenka.classList.contains('completed');
+   const done=tajenka.classList.contains('completed'),archiveOnly=tajenka.classList.contains('tajenka-archive-only');
    const target=done?'#tajenkaPreviewCard [data-tajenka-recap]':'#tajenkaPreviewBtn';
-   tiles.push({key:'tajenka',title:'Tajenka',detail:done?'✓ Hotovo':/pokračovat/i.test(text(q(target)))?'Rozehráno':'',reward:done?'':reward(tajenka),art:icon(tajenka)||'/tajenka.svg',target,label:'Tajenka. '+text(q(target)),kind:'tajenka'});
+   tiles.push({key:'tajenka',title:archiveOnly?'Tajenky':'Tajenka',editions:!archiveOnly&&!!q('#tajenkaPreviewCard [data-tajenka-editions]'),detail:archiveOnly?'Poslední vydání':done?'✓ Hotovo':/pokračovat/i.test(text(q(target)))?'Rozehráno':'',reward:done?'':reward(tajenka),art:icon(tajenka)||'/tajenka.svg',target,label:'Tajenka. '+text(q(target)),kind:'tajenka'});
   }
   const archiveResume=q('#axArchiveResume'),freeResume=q('#homeResumeCard');
   const resume=visible(archiveResume)?archiveResume:visible(freeResume)?freeResume:null;
@@ -97,6 +97,22 @@
   }
   return e;
  }
+ let tajenkaGroup=null,calendar=null;
+ function tile(model){
+  const primary=button(model,'os-tile');
+  if(model.key!=='tajenka'||!model.editions)return primary;
+  if(!tajenkaGroup){
+   tajenkaGroup=make('div','os-taj-combo');
+   calendar=make('button','os-taj-calendar');calendar.type='button';
+   calendar.setAttribute('aria-label','Posledních sedm Tajenek');calendar.title='Posledních sedm Tajenek';
+   calendar.setAttribute('aria-haspopup','dialog');calendar.setAttribute('aria-controls','tajenkaEditionsDialog');
+   const mark=make('span','','7');mark.setAttribute('aria-hidden','true');calendar.append(mark);
+   calendar.onclick=()=>{if(!unavailable(q('#tajenkaPreviewCard [data-tajenka-editions]'),true))window.PropletDailyTajenka?.open(calendar)};
+  }
+  calendar.disabled=unavailable(q('#tajenkaPreviewCard [data-tajenka-editions]'),true);
+  if(tajenkaGroup.firstElementChild!==primary)tajenkaGroup.replaceChildren(primary,calendar);
+  return tajenkaGroup;
+ }
  function reconcile(parent,items){
   for(const child of [...parent.children])if(!items.includes(child))child.remove();
   items.forEach((child,index)=>{if(parent.children[index]!==child)parent.insertBefore(child,parent.children[index]||null);});
@@ -106,7 +122,7 @@
   raf=0;if(!ready)return;
   const model=read();if(!model||!mount())return;
   reconcile(featureSlot,[button(model.feature,'os-feature')]);
-  reconcile(grid,model.tiles.map(t=>button(t,'os-tile')));
+  reconcile(grid,model.tiles.map(tile));
   const ws=JSON.stringify(model.week);
   if(ws!==weekSignature){
    weekSignature=ws;weekSlot.replaceChildren();

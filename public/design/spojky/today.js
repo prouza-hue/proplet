@@ -1,10 +1,17 @@
 const printshop = '/difficulty/printshop/';
 const pilotArt = name => new URL(name, import.meta.url).href;
-const currentDay = 2;
+const levels = {
+  easy: ['Snadná', 'easy.webp'],
+  medium: ['Střední', 'medium.webp'],
+  hard: ['Těžká', 'hard.webp'],
+  hardcore: ['Mozkožrout', 'hardcore.webp'],
+  mozkomor: ['Mozkomor', 'mozkomor.webp'],
+  mozkokalypsa: ['Mozkokalypsa', 'mozkokalypsa-series-ochre.svg'],
+};
 const weekdays = [
-  ['Po', 'easy.webp'], ['Út', 'easy.webp'], ['St', 'medium.webp', 'hardcore.webp'],
-  ['Čt', 'medium.webp'], ['Pá', 'medium.webp', 'mozkomor.webp'],
-  ['So', 'hard.webp'], ['Ne', 'hard.webp', 'mozkokalypsa-series-ochre.svg'],
+  ['Po', 'easy'], ['Út', 'easy'], ['St', 'medium', 'hardcore'],
+  ['Čt', 'medium'], ['Pá', 'medium', 'mozkomor'],
+  ['So', 'hard'], ['Ne', 'hard', 'mozkokalypsa'],
 ];
 const dayMillis = 24 * 60 * 60 * 1000;
 const namedDate = new Intl.DateTimeFormat('cs-CZ', {weekday:'long', day:'numeric', month:'long', timeZone:'UTC'});
@@ -22,14 +29,24 @@ const navigation = [
 
 const art = (src, cls = '') => `<img class="${cls}" src="${src}" alt="" draggable="false">`;
 
-function weekStrip(range) {
+function weekdayIndex(date) {
+  return (date.getUTCDay() + 6) % 7;
+}
+
+export function reviewRhythm(dateISO) {
+  const index = weekdayIndex(new Date(dateISO + 'T12:00:00Z'));
+  const [, daily, extra = null] = weekdays[index];
+  return { daily, extra };
+}
+
+function weekStrip(range, currentDay) {
   const days = weekdays.map(([label, base, extra], i) => `
     <span class="pt-day"${i === currentDay ? ' aria-current="date"' : ''}>
       <b>${label}</b>
-      <span class="pt-day-art">${art(printshop + base)}${extra ? art(printshop + extra) : ''}</span>
+      <span class="pt-day-art">${art(printshop + levels[base][1])}${extra ? art(printshop + levels[extra][1]) : ''}</span>
     </span>`).join('');
   return `<button type="button" class="pt-week" data-other="Týdenní rozvrh"
-      aria-label="Týdenní rozvrh výzev, ${range}, dnes středa">
+      aria-label="Týdenní rozvrh výzev, ${range}, dnes ${weekdays[currentDay][0]}">
     <span class="pt-week-title"><b>Tento týden</b><span>${range}</span></span>
     <span class="pt-days">${days}</span>
   </button>`;
@@ -44,9 +61,15 @@ function tile({key, label, detail, image, xp}) {
   </button>`;
 }
 
-export function renderToday(root, {week, weekStart, progress, nextLabel, onPlay, onPreview, onOther}) {
-  const monday = weekStart ? Date.parse(weekStart + 'T00:00:00Z') : Date.UTC(2026, 10, 30 + 7 * (week - 1));
-  const weekdayDate = namedDate.format(monday + currentDay * dayMillis);
+export function renderToday(root, {week, weekStart, dateISO, progress, nextLabel, tajenkaStatus = 'new',
+  dailyStatus = 'new', extraStatus = 'new', freeStatus = 'started', freeLevel = 12, hasExtra, hasResume,
+  onPlay, onPreview, onOther, onTajenka, onCalendar}) {
+  const monday = Date.parse(weekStart + 'T12:00:00Z');
+  const selectedDate = dateISO ? Date.parse(dateISO + 'T12:00:00Z') : monday + 2 * dayMillis;
+  const currentDay = weekdayIndex(new Date(selectedDate));
+  const [, base, scheduledExtra] = weekdays[currentDay];
+  const extra = hasExtra === false ? null : levels[scheduledExtra];
+  const weekdayDate = namedDate.format(selectedDate);
   const date = weekdayDate[0].toLocaleUpperCase('cs') + weekdayDate.slice(1);
   const range = shortDate.formatRange(monday, monday + 6 * dayMillis);
   const started = progress.status === 'started';
@@ -54,6 +77,18 @@ export function renderToday(root, {week, weekStart, progress, nextLabel, onPlay,
   const linkHint = started ? `Rozehráno · ${progress.found} ze 3` : 'Slova se mohou křížit';
   const linkAction = complete ? 'Řetěz' : started ? 'Pokračovat' : 'Hrát';
   const linkLabel = complete ? 'Prohlédnout dokončený řetěz Spojek' : started ? 'Pokračovat ve Spojkách' : 'Hrát Spojky s křížením';
+  const tajenkaComplete = tajenkaStatus === 'done';
+  const tajenkaStarted = tajenkaStatus === 'started';
+  const tajenkaAction = tajenkaComplete ? 'Zobrazit výsledek dnešní Tajenky' : tajenkaStarted ? 'Pokračovat v dnešní Tajence' : 'Luštit dnešní Tajenku';
+  const dailyComplete = dailyStatus === 'done';
+  const dailyAction = dailyComplete ? 'Výsledek' : dailyStatus === 'started' ? 'Pokračovat' : 'Hrát';
+  const extraComplete = extraStatus === 'done';
+  const extraDetail = extraComplete ? '✓ Hotovo' : extraStatus === 'started' ? 'Rozehráno' : extra?.[0];
+  const resume = hasResume !== false && freeStatus === 'started';
+  const level = Number.isInteger(freeLevel) && freeLevel > 0 ? freeLevel : 12;
+  const freeDetail = `${freeStatus === 'done' ? 'Výsledek' : 'Střední'} · úroveň\u00a0${level}`;
+  const freeTile = tile({key:'free',label:resume ? 'Rozehráno' : 'Volná hra',detail:freeDetail,
+    image:printshop + 'medium.webp'});
   const nav = navigation.map(([label, glyph], i) => `<button type="button"
       ${i === 0 ? 'aria-current="page"' : `data-other="${label}"`}>
     <svg viewBox="0 0 24 24" aria-hidden="true">${glyph}</svg><span>${label}</span>
@@ -75,13 +110,13 @@ export function renderToday(root, {week, weekStart, progress, nextLabel, onPlay,
           <span class="pt-daily-copy">
             <strong>Denní výzva</strong>
             <span class="pt-date">${date}</span>
-            <span class="pt-daily-stats">Střední <span class="pt-xp">+100 XP</span></span>
+            <span class="pt-daily-stats">${dailyComplete ? '✓ Hotovo' : `${levels[base][0]} <span class="pt-xp">+100 XP</span>`}</span>
           </span>
           ${art('/rewards/printshop/symbol-daily.svg', 'pt-daily-art')}
-          <span class="pt-streak">Dohráním udržíš sérii.</span>
-          <span class="pt-primary-cta">Hrát</span>
+          ${dailyComplete ? '' : '<span class="pt-streak">Dohráním udržíš sérii.</span>'}
+          <span class="pt-primary-cta">${dailyAction}</span>
         </button>
-        ${weekStrip(range)}
+        ${weekStrip(range, currentDay)}
       </div>
 
       <button type="button" class="pt-links" data-spojky data-state="${progress.status}" aria-label="${linkLabel}">
@@ -96,16 +131,24 @@ export function renderToday(root, {week, weekStart, progress, nextLabel, onPlay,
       </button>
 
       <div class="pt-tiles">
-        ${tile({key:'extra',label:'Extra',detail:'Mozkožrout',image:printshop + 'hardcore.webp',xp:200})}
-        <div class="pt-tajenka pt-tile">
-          <button type="button" class="pt-taj-play" data-other="Denní Tajenka">
+        ${dailyComplete ? freeTile : ''}
+        ${extra ? tile({key:'extra',label:'Extra',detail:extraDetail,image:printshop + extra[1],xp:extraComplete ? 0 : 200}) : ''}
+        <div class="os-taj-combo pt-taj-combo">
+          <button type="button" class="pt-tile pt-taj-play" data-tajenka-today aria-label="${tajenkaAction}">
             ${art(pilotArt('./tajenka.webp'), 'pt-tile-art')}
-            <span class="pt-tile-copy"><strong>Tajenka</strong><span>Dnešní hra</span></span>
+            <span class="pt-tile-copy">
+              <strong>Tajenka</strong>
+              ${tajenkaComplete ? '<span>✓ Hotovo</span>' : `${tajenkaStarted ? '<span>Rozehráno</span>' : ''}<span class="pt-xp">+200 XP</span>`}
+            </span>
           </button>
-          <button type="button" class="pt-archive" data-other="Archiv Tajenek">Archiv tajenek<span class="pt-angle" aria-hidden="true"></span></button>
+          <button type="button" class="os-taj-calendar pt-taj-calendar" data-tajenka-calendar
+              title="Posledních sedm Tajenek" aria-label="Posledních sedm Tajenek" aria-haspopup="dialog" aria-controls="tajenkaEditionsDialog">
+            <span aria-hidden="true">7</span>
+          </button>
         </div>
-        ${tile({key:'free',label:'Rozehráno',detail:'Úroveň 12',image:printshop + 'medium.webp'})}
+        ${dailyComplete ? '' : freeTile}
         ${tile({key:'team',label:'Soutěže',detail:'Týdenní · měsíční',image:'/assets/navigation/competitions-v1.webp'})}
+        ${extra ? '' : tile({key:'archive',label:'Archiv',detail:'800 desek',image:'/assets/archive/archive-letterpress-v2.webp'})}
       </div>
       <a class="pt-support" href="${proplet}/?open=daily#patronTodayLink:~:text=Podpo%C5%99it%20Proplet"
          aria-label="Podpořit Proplet na hrajproplet.cz" title="Přejít k podpoře na hrajproplet.cz">
@@ -130,6 +173,8 @@ export function renderToday(root, {week, weekStart, progress, nextLabel, onPlay,
   if (complete) root.querySelector('.pt-next').textContent = nextLabel || '';
   root.querySelector('[data-preview]').addEventListener('click', onPreview);
   root.querySelector('[data-spojky]').addEventListener('click', onPlay);
+  root.querySelector('[data-tajenka-today]').addEventListener('click', event => onTajenka(event.currentTarget));
+  root.querySelector('[data-tajenka-calendar]').addEventListener('click', event => onCalendar(event.currentTarget));
   for (const control of root.querySelectorAll('[data-other]')) {
     control.addEventListener('click', () => onOther(control.dataset.other));
   }

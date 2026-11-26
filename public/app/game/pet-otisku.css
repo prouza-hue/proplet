@@ -33,8 +33,20 @@
 .otisky-stamp.earned { border: 3px double currentColor; color: var(--stamp-ink); transform: rotate(-4deg); }
 .otisky-stamp.earned:nth-child(even) { transform: rotate(3deg); }
 html[data-theme="dark"] .otisky-result { --stamp-ink: #f49e80; }
+.otisky-progress { display: flex; align-items: center; justify-content: center; gap: .35rem; margin: 1rem 0; }
+.otisky-progress span { margin-inline-start: .2rem; font-size: .875rem; }
+.otisky-impression {
+  width: .8rem; height: .8rem; border: 3px double var(--stamp-ink);
+  border-radius: 45% 52% 47% 43%; transform: rotate(-12deg);
+}
+.otisky-impression:nth-child(even) { transform: rotate(22deg); }
 .otisky-note { margin: .7rem 0 0; }
 .otisky-result .otisky-sign { margin: .2rem 0 .85rem; font: inherit; font-size: .8125rem; font-weight: 400; color: var(--td-muted, currentColor); }
 .otisky-award { font-weight: 700; }
 .otisky-actions { display: grid; grid-template-columns: 1fr; gap: .45rem; }
 .otisky-actions button { min-height: 2.7rem; }
+
+@media (max-width: 340px) {
+  #screen-game.otisky-mode #boardStage:has(.ultra-board) { padding-inline: 0; }
+  #screen-game.otisky-mode #board.ultra-board { gap: 1px; }
+}

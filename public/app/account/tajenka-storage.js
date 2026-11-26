@@ -51,10 +51,13 @@
     if (preferred.puzzleId !== fallback.puzzleId) return savedAt(preferred) >= savedAt(fallback) ? preferred : fallback;
     const newer = savedAt(preferred) >= savedAt(fallback) ? preferred : fallback;
     const older = newer === preferred ? fallback : preferred;
+    const differentAttempts = !!(older.attemptId && newer.attemptId && older.attemptId !== newer.attemptId);
     return {
       ...older,
       ...newer,
       found: mergeFound(newer.found, older.found),
+      mergedAttempts: !!(newer.mergedAttempts || older.mergedAttempts || differentAttempts),
+      timingUnverified: !!(newer.timingUnverified || older.timingUnverified || differentAttempts),
       moves: Math.max(Number(preferred.moves) || 0, Number(fallback.moves) || 0),
       hints: Math.max(Number(preferred.hints) || 0, Number(fallback.hints) || 0),
       wrongAttempts: Math.max(Number(preferred.wrongAttempts) || 0, Number(fallback.wrongAttempts) || 0),
@@ -72,7 +75,22 @@
       completions[puzzleId] = mergeCompletion(completion, completions[puzzleId]);
     }
     const result = {...incoming, ...preferred, completions};
-    const progress = mergeProgress(preferred.inProgress, incoming.inProgress, completions);
+    function allProgress(state) {
+      const rows = {...objectState(state.progressByPuzzle)};
+      const latest = state.inProgress;
+      if (latest?.puzzleId) rows[latest.puzzleId] = mergeProgress(latest, rows[latest.puzzleId], completions);
+      return rows;
+    }
+    const before = allProgress(incoming);
+    const after = allProgress(preferred);
+    const progressByPuzzle = {};
+    for (const id of new Set([...Object.keys(before), ...Object.keys(after)])) {
+      const row = mergeProgress(after[id], before[id], completions);
+      if (row?.puzzleId === id) progressByPuzzle[id] = row;
+    }
+    result.progressByPuzzle = progressByPuzzle;
+    // Retain the latest compatible slot for older clients and KDO recovery.
+    const progress = Object.values(progressByPuzzle).sort((a,b) => savedAt(b) - savedAt(a))[0];
     if (progress) result.inProgress = progress;
     else delete result.inProgress;
     if (!result.completed) result.completed = preferred.completed || incoming.completed;
@@ -135,6 +153,7 @@
           remote: true,
         };
         if (state.inProgress?.puzzleId === row.puzzleId) delete state.inProgress;
+        if (state.progressByPuzzle) delete state.progressByPuzzle[row.puzzleId];
       }
       state.version = Math.max(Number(state.version) || 0, 2);
       write(state, scope);

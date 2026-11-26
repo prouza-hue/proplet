@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Promote the playtested Tajenka v2 candidate bank into the runtime bank.
+"""Promote the frozen Tajenka v2 editions into the runtime bank.
 
 This tool is intentionally NOT a generator. It treats the approved candidate geometry
 (mask, letters and answer paths) as immutable master assets and only wraps it in the
-runtime schema used by Proplet. Editorial semantic clues are supplied by a separate,
-explicitly curated overlay and never inferred from geometry.
+runtime schema used by Proplet. The original playtest has a shared clue overlay.
+Daily editions keep clues with their boards so a word can be used in different senses.
 """
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "data" / "tajenka_v2_approved.json"
 DEFAULT_CLUES = ROOT / "data" / "tajenka_v2_clues.json"
+DEFAULT_DAILY = ROOT / "content" / "tajenka-v2" / "daily-editions.json"
 DEFAULT_OUTPUT = ROOT / "data" / "tajenka_weekend_v2.json"
 DEFAULT_MANIFEST = ROOT / "data" / "tajenka_v2_freeze_manifest.json"
 REWARD_XP = 200
@@ -131,6 +132,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--clues", type=Path, default=DEFAULT_CLUES)
+    parser.add_argument("--daily-source", type=Path, default=DEFAULT_DAILY)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     args = parser.parse_args()
@@ -145,18 +147,28 @@ def main() -> None:
     clues = load_clues(args.clues, boards)
 
     puzzles = [promote_board(board, week, clues) for week, board in enumerate(boards, 1)]
+    daily = json.loads(args.daily_source.read_text(encoding="utf-8"))
+    seen_ids = {board["id"] for board in boards}
+    for board in daily["boards"]:
+        if board["week"] != len(puzzles) + 1 or board["id"] in seen_ids:
+            raise SystemExit(f"Duplicate or out-of-order Tajenka edition: {board['id']}")
+        board_clues = {answer["word"]: answer["clue"] for answer in board["answers"]}
+        puzzles.append(promote_board(board, board["week"], board_clues))
+        seen_ids.add(board["id"])
+    boards = boards + daily["boards"]
     bank = {
         "version": 2,
         "kind": "weekend_bonus_bank",
         "weeks": len(puzzles),
         "rewardXp": REWARD_XP,
-        "source": "approved-playtest-review1",
+        "source": "approved-playtest-review1+daily-editions",
         "puzzles": puzzles,
     }
     manifest = {
         "version": 1,
         "kind": "tajenka-v2-freeze-manifest",
         "source": str(args.source.relative_to(ROOT)) if args.source.is_relative_to(ROOT) else str(args.source),
+        "dailySource": str(args.daily_source.relative_to(ROOT)) if args.daily_source.is_relative_to(ROOT) else str(args.daily_source),
         "boards": [
             {
                 "week": week,

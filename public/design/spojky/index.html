@@ -12,20 +12,27 @@
   <link rel="icon" href="/brand/mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/fonts/proplet-fonts.css">
   <link rel="stylesheet" href="./pilot.css">
+  <link rel="stylesheet" href="/tajenka-editions.css">
   <link rel="stylesheet" href="./today.css">
   <link rel="stylesheet" href="./game.css">
   <link rel="stylesheet" href="./tutorial.css">
+  <link rel="stylesheet" href="./tajenka-preview.css">
   <script type="module" src="./pilot.js"></script>
 </head>
 <body>
   <div id="pilot-app"></div>
   <dialog id="pilot-menu" class="pilot-dialog" aria-labelledby="pilot-menu-title">
     <div class="pilot-dialog-head">
-      <h2 id="pilot-menu-title">Spojky s křížením</h2>
+      <h2 id="pilot-menu-title">Náhled Dnes</h2>
       <button type="button" class="pilot-close" data-action="close-menu" aria-label="Zavřít náhled">×</button>
     </div>
-    <p class="pilot-intro">Ve 2. a 4. týdnu tě čekají nové kartičky. Ve 3. týdnu si můžeš zkusit známé spojky v nové mřížce.</p>
+    <p class="pilot-intro">Vyber týden a den. Tajenka, Denní výzva a Extra používají pro ukázku dříve vydané desky. Postup se ukládá v tomto prohlížeči.</p>
     <div id="pilot-weeks" class="pilot-weeks" role="group" aria-label="Týden zobrazený na Dnes"></div>
+    <div class="pilot-settings-row">
+      <label for="pilot-day">Den na kartě Dnes</label>
+      <select id="pilot-day"></select>
+    </div>
+    <label class="pilot-resume-setting"><input id="pilot-resume" type="checkbox"> Hráč s rozehranou 12. úrovní</label>
     <div class="pilot-settings-row">
       <label for="pilot-theme">Vzhled</label>
       <select id="pilot-theme">

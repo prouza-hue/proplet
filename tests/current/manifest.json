@@ -11,6 +11,7 @@
       {"path":"tests/offline/service-worker-content.test.cjs","runner":"node"},
       {"path":"tests/current/test_public_search.py","runner":"python"},
       {"path":"tests/current/test_pet_otisku_resume.cjs","runner":"node"},
+      {"path":"tests/current/test_gift_editions_campaign.cjs","runner":"node"},
       {"path":"tests/current/test_cross_device_free_resume.cjs","runner":"node"},
       {"path":"tests/current/test_daily_partial_shell.cjs","runner":"node"},
       {"path":"tests/current/test_result_rate_retry.py","runner":"python"},
@@ -501,6 +502,10 @@
       },
       {
         "path": "tests/current/test_content_launch_push.py",
+        "runner": "python"
+      },
+      {
+        "path": "tools/test_tajenka_v2_production.py",
         "runner": "python"
       },
       {

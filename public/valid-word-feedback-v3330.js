@@ -424,7 +424,7 @@
       let candidate=null,g=null,foundBefore=0;
       try{
         g=currentGame;
-        if(g&&!g.finished&&g.mode!=='starter'&&g.mode!=='rescue'){
+        if(g&&!g.tajenkaReview&&!g.finished&&g.mode!=='starter'&&g.mode!=='rescue'){
           resetForGame(g);
           foundBefore=g.found.length;
           const word=currentWord();

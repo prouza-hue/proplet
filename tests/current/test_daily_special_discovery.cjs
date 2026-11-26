@@ -62,8 +62,9 @@ function client({mode="daily_special",saved={},practice=false,fail=false,loggedI
   const restoredTajenka=client({mode:'tajenka',saved:{[rewardKey]:oldTajenka}});await tick();assert.equal(restoredTajenka.claims.length,1);await restoredTajenka.ctx.window.PROPLET_WORD_DISCOVERY_API.sync();assert.equal(restoredTajenka.claims.length,1);
   const invalidTajenka=client({mode:'tajenka',saved:{[rewardKey]:{...oldTajenka,rejectedReason:'Slovo neodpovídá platné vedlejší cestě této desky'}}});await tick();assert.equal(invalidTajenka.claims.length,0);
   const app=fs.readFileSync('public/app.js','utf8');let savedRun;
-  const resume={currentGame:{mode:'tajenka',puzzle:{id:'tajenka-v2-week-17'},found:[],attemptId:'tajenka-resume',wordDiscoveryXpAwarded:4},tajenkaState:()=>({}),gameElapsed:()=>1000,saveTajenkaState:s=>savedRun=s,Date};
+  const resume={currentGame:{mode:'tajenka',puzzle:{id:'tajenka-v2-week-17'},found:[],attemptId:'tajenka-resume',wordDiscoveryXpAwarded:4},tajenkaState:()=>({}),tajenkaCompletion:(p,s)=>s.completions?.[p.id],gameElapsed:()=>1000,saveTajenkaState:s=>savedRun=s,Date};
   vm.runInNewContext(app.slice(app.indexOf('function saveTajenkaGameProgress('),app.indexOf('function clearGameProgress('))+';saveTajenkaGameProgress();',resume);
   assert.equal(savedRun.inProgress.wordDiscoveryXpAwarded,4,'Tajenka save retains run bonus for normal restore');
+  assert.equal(savedRun.progressByPuzzle['tajenka-v2-week-17'].wordDiscoveryXpAwarded,4);
   console.log('PASS Tajenka fresh bonus and exact-error proof retry; Extra live/guest discovery, practice exclusion, saved proof recovery, repeated sync and invalid proof rejection');
 })().catch(error=>{console.error(error);process.exitCode=1});
