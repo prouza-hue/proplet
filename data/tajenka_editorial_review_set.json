@@ -1,6 +1,6 @@
 {
   "setId": "daily-tajenka-2026-12",
-  "contentRevision": "d3581583901dfa33",
+  "contentRevision": "2026-12-review-64-r2",
   "editions": [
     {
       "id": "tajenka-v2-week-26",
@@ -414,28 +414,28 @@
       "date": "2026-12-14",
       "group": "new",
       "category": "observation",
-      "phrase": "Lístek z tramvaje dojel do půlky knížky.",
+      "phrase": "Ještě jednu kapitolu. To si říkám od desíti.",
       "source": null,
       "answers": [
         {
-          "word": "LÍSTEK",
-          "clue": "Vstupenka nebo jízdenka."
+          "word": "JEŠTĚ",
+          "clue": "Slůvko, kterým si u stolu řekneš o přídavek."
         },
         {
-          "word": "TRAMVAJE",
-          "clue": "Městského vozu na kolejích."
+          "word": "JEDNU",
+          "clue": "Kolik svíček sfoukne dítě na svém prvním narozeninovém dortu?"
         },
         {
-          "word": "DOJEL",
-          "clue": "Dorazil do cíle na kolech."
+          "word": "KAPITOLU",
+          "clue": "Co v románu dočteš těsně před nadpisem další části?"
         },
         {
-          "word": "PŮLKY",
-          "clue": "Jedné ze dvou stejných částí."
+          "word": "ŘÍKÁM",
+          "clue": "Povídám ti to vlastními slovy."
         },
         {
-          "word": "KNÍŽKY",
-          "clue": "Svazku stránek na čtení."
+          "word": "DESÍTI",
+          "clue": "Otevíráme hodinu po deváté. Od kolika?"
         }
       ]
     },
@@ -477,28 +477,28 @@
       "date": "2026-12-16",
       "group": "new",
       "category": "observation",
-      "phrase": "Papír dojde přesně v půlce dárku.",
+      "phrase": "Došel balicí papír. Podej mi ty noviny.",
       "source": null,
       "answers": [
         {
+          "word": "DOŠEL",
+          "clue": "Byl ho doma celý štos, teď už žádný nezbyl."
+        },
+        {
+          "word": "BALICÍ",
+          "clue": "Jaký papír se prodává v rolích s vánočními motivy?"
+        },
+        {
           "word": "PAPÍR",
-          "clue": "List, na který se dá psát nebo kreslit."
+          "clue": "Materiál, ze kterého se vyrábějí stránky knih."
         },
         {
-          "word": "DOJDE",
-          "clue": "Nezbude ho ani kousek."
+          "word": "PODEJ",
+          "clue": "Dej mi to do ruky, prosím."
         },
         {
-          "word": "PŘESNĚ",
-          "clue": "Na milimetr nebo na vteřinu."
-        },
-        {
-          "word": "PŮLCE",
-          "clue": "Přesně uprostřed, mezi začátkem a koncem."
-        },
-        {
-          "word": "DÁRKU",
-          "clue": "Zabaleného překvapení pod stromkem."
+          "word": "NOVINY",
+          "clue": "Co si rozložíš na stole, když si chceš přečíst včerejší zprávy na papíře?"
         }
       ]
     },
@@ -568,28 +568,28 @@
       "date": "2026-12-18",
       "group": "new",
       "category": "observation",
-      "phrase": "Pravá rukavice přežila čtyři levé.",
+      "phrase": "Našel jsem obě rukavice. Každou z jiného páru.",
       "source": null,
       "answers": [
         {
-          "word": "PRAVÁ",
-          "clue": "Ta na straně, kde většina lidí drží tužku."
+          "word": "NAŠEL",
+          "clue": "Co udělal hledač, když konečně spatřil poklad?"
         },
         {
           "word": "RUKAVICE",
-          "clue": "Palčák nebo jeho prstový příbuzný."
+          "clue": "V zimě chrání prsty, v boxu taky."
         },
         {
-          "word": "PŘEŽILA",
-          "clue": "Vydržela déle než ostatní."
+          "word": "KAŽDOU",
+          "clue": "Kterou noc jsi spal ve stanu, když jsi v něm strávil celý týden?"
         },
         {
-          "word": "ČTYŘI",
-          "clue": "Počet stran čtverce."
+          "word": "JINÉHO",
+          "clue": "Odlišného, nikoli stejného."
         },
         {
-          "word": "LEVÉ",
-          "clue": "Protějšky pravých, třeba mezi botami."
+          "word": "PÁRU",
+          "clue": "Dvě stejné ponožky patří do jednoho …"
         }
       ]
     },
@@ -631,28 +631,28 @@
       "date": "2026-12-20",
       "group": "new",
       "category": "observation",
-      "phrase": "Křivé kousky mizí rovnou z plechu.",
+      "phrase": "Polámané rohlíčky můžeme sníst hned.",
       "source": null,
       "answers": [
         {
-          "word": "KŘIVÉ",
-          "clue": "Pravítko by k nim nepřiléhalo."
+          "word": "POLÁMANÉ",
+          "clue": "Jaké jsou sušenky, když se po cestě rozdrobily na kusy?"
         },
         {
-          "word": "KOUSKY",
-          "clue": "Drobné části celku."
+          "word": "ROHLÍČKY",
+          "clue": "Vanilkové cukroví ve tvaru malých podkov."
         },
         {
-          "word": "MIZÍ",
-          "clue": "Ztrácejí se před očima."
+          "word": "MŮŽEME",
+          "clue": "Máme dovoleno."
         },
         {
-          "word": "ROVNOU",
-          "clue": "Přímo, bez zastávky."
+          "word": "SNÍST",
+          "clue": "Nenechat z porce ani sousto."
         },
         {
-          "word": "PLECHU",
-          "clue": "Kovového tácu, na kterém se peče."
+          "word": "HNED",
+          "clue": "Bez čekání, teď."
         }
       ]
     },
@@ -971,28 +971,28 @@
       "date": "2026-12-30",
       "group": "new",
       "category": "observation",
-      "phrase": "Malíček potmě pozná každou židli.",
+      "phrase": "Hledám brýle. Proč se mi všichni smějete?",
       "source": null,
       "answers": [
         {
-          "word": "MALÍČEK",
-          "clue": "Nejmenší prst na noze i na ruce."
+          "word": "HLEDÁM",
+          "clue": "Nemůžu něco najít, a tak po tom pátrám."
         },
         {
-          "word": "POTMĚ",
-          "clue": "Když je zhasnuto a není vidět."
+          "word": "BRÝLE",
+          "clue": "Na nose drží dvě skla v obroučkách."
         },
         {
-          "word": "POZNÁ",
-          "clue": "Dovede určit, co má před sebou."
+          "word": "PROČ",
+          "clue": "Ptáš se tak na důvod."
         },
         {
-          "word": "KAŽDOU",
-          "clue": "Jednu jako druhou, bez výjimky."
+          "word": "VŠICHNI",
+          "clue": "Kdo přišel, když nikdo nechyběl?"
         },
         {
-          "word": "ŽIDLI",
-          "clue": "Kus nábytku s opěradlem, obvykle pro jednoho."
+          "word": "SMĚJETE",
+          "clue": "Co děláte, když vám někdo vypráví dobrý vtip? Doplň „… se“."
         }
       ]
     },
@@ -1158,28 +1158,28 @@
       "date": "2027-01-04",
       "group": "new",
       "category": "observation",
-      "phrase": "Zimní bunda vrací drobné až napřesrok.",
+      "phrase": "Hele, stovka! Tu bundu bych měl nosit častěji.",
       "source": null,
       "answers": [
         {
-          "word": "ZIMNÍ",
-          "clue": "Do mrazu a sněhu."
+          "word": "HELE",
+          "clue": "Jak upozorníš kamaráda, aby se rychle podíval?"
         },
         {
-          "word": "BUNDA",
-          "clue": "Kratší svrchní oděv s rukávy."
+          "word": "STOVKA",
+          "clue": "Bankovka s Karlem IV., lidově."
         },
         {
-          "word": "VRACÍ",
-          "clue": "Dává zpátky."
+          "word": "BUNDU",
+          "clue": "Co si oblékneš přes mikinu, když se venku ochladí?"
         },
         {
-          "word": "DROBNÉ",
-          "clue": "Mince místo bankovek."
+          "word": "NOSIT",
+          "clue": "Mívat něco na sobě."
         },
         {
-          "word": "NAPŘESROK",
-          "clue": "Až v příštím roce."
+          "word": "ČASTĚJI",
+          "clue": "Víckrát za stejnou dobu."
         }
       ]
     },
@@ -1249,28 +1249,28 @@
       "date": "2027-01-06",
       "group": "new",
       "category": "observation",
-      "phrase": "Pod gaučem zbyl dílek modré oblohy.",
+      "phrase": "Chybí nám poslední dílek. Zvedni loket.",
       "source": null,
       "answers": [
         {
-          "word": "GAUČEM",
-          "clue": "Pod pohovkou v obýváku."
+          "word": "CHYBÍ",
+          "clue": "V sérii jsou čísla jedna, dvě a čtyři. Co platí o trojce?"
         },
         {
-          "word": "ZBYL",
-          "clue": "Zůstal jako poslední."
+          "word": "POSLEDNÍ",
+          "clue": "Který doběhl závodník, jehož všichni předběhli?"
         },
         {
           "word": "DÍLEK",
-          "clue": "Kousek skládačky, který do něčeho zapadne."
+          "clue": "Jeden kousek skládačky."
         },
         {
-          "word": "MODRÉ",
-          "clue": "Barvy pomněnek."
+          "word": "ZVEDNI",
+          "clue": "Povel pro ruku, která má jít nahoru."
         },
         {
-          "word": "OBLOHY",
-          "clue": "Nebe nad hlavou."
+          "word": "LOKET",
+          "clue": "Kloub mezi paží a předloktím."
         }
       ]
     },
@@ -1312,28 +1312,28 @@
       "date": "2027-01-08",
       "group": "new",
       "category": "observation",
-      "phrase": "Spící kocour slyší krájet šunku.",
+      "phrase": "Koupíš kočce pelíšek. Stejně spí v krabici.",
       "source": null,
       "answers": [
         {
-          "word": "SPÍCÍ",
-          "clue": "Ten, kdo právě podřimuje."
+          "word": "KOUPÍŠ",
+          "clue": "Zaplatíš za věc v obchodě a odneseš si ji."
         },
         {
-          "word": "KOCOUR",
-          "clue": "Samec domácí šelmy, která přede."
+          "word": "KOČCE",
+          "clue": "Komu se dává klubko na hraní a škrabadlo na drápky?"
         },
         {
-          "word": "SLYŠÍ",
-          "clue": "Vnímá ušima."
+          "word": "PELÍŠEK",
+          "clue": "Postýlka pro čtyřnohého mazlíčka."
         },
         {
-          "word": "KRÁJET",
-          "clue": "Dělit nožem na plátky."
+          "word": "STEJNĚ",
+          "clue": "Naráz odstartovali a do cíle dorazili zároveň. Běželi tedy jak rychle?"
         },
         {
-          "word": "ŠUNKU",
-          "clue": "Libovou uzeninu krájenou u pultu."
+          "word": "KRABICI",
+          "clue": "V čem přiveze kurýr nové boty?"
         }
       ]
     },
