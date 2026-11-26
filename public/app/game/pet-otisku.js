@@ -1,23 +1,35 @@
 (function installPetOtiskuGame(global) {
   'use strict';
 
-  const bankUrl = '/app/content/pet-otisku.json?v=2';
-  const apiPath = '/api/pet-otisku';
-  const stamps = ['D', 'Í', 'K', 'Y', '!'];
-  let bankPromise;
+  const november = '2026-11';
+  const series = new Map([
+    [november, {
+      title: 'Pět otisků', finale: 'Dopis je doručený', stamps: 'DÍKY!',
+      thanks: 'Díky za každé propletené slovo!',
+      bank: '/app/content/pet-otisku.json?v=2', api: '/api/pet-otisku', storage: 'nov26'
+    }],
+    ['2026-12', {
+      title: 'Ještě jeden plech', finale: 'Poslední kousek je Váš', stamps: 'PLECH',
+      thanks: 'Tenhle jsem Vám schoval. Děkuju a přeju krásné svátky.',
+      bank: '/app/content/2026-12.json', api: '/api/gift-editions/2026-12', storage: '2026-12'
+    }]
+  ]);
+  const banks = new Map();
   let dialog;
   let launchId = 0;
 
-  function bank() {
-    if (!bankPromise) {
-      bankPromise = fetch(bankUrl).then(async response => {
+  function bank(edition) {
+    if (!banks.has(edition)) {
+      const config = series.get(edition);
+      const loaded = fetch(config.bank).then(async response => {
         if (!response.ok) throw new Error('Dárkové desky se nepodařilo načíst.');
         const {boards} = await response.json();
-        if (!Array.isArray(boards) || boards.length !== stamps.length) throw new Error('Balíček desek je neúplný.');
+        if (!Array.isArray(boards) || boards.length !== config.stamps.length) throw new Error('Balíček desek je neúplný.');
         return boards;
-      }).catch(error => { bankPromise = null; throw error; });
+      }).catch(error => { banks.delete(edition); throw error; });
+      banks.set(edition, loaded);
     }
-    return bankPromise;
+    return banks.get(edition);
   }
 
   function read(key, fallback) {
@@ -25,7 +37,7 @@
     catch { return fallback; }
   }
   function key(context, puzzle) {
-    return 'proplet:pet-otisku:nov26:' + context.scope + ':' + puzzle.id;
+    return 'proplet:pet-otisku:' + series.get(context.edition || november).storage + ':' + context.scope + ':' + puzzle.id;
   }
   function scope(preview) { return preview ? 'preview' : 'account:' + playerScope(); }
   function sameAccount(context) { return context.scope === scope(context.preview); }
@@ -55,17 +67,21 @@
       wrongAttempts: +row.wrongAttempts || 0};
   }
 
-  const demoKey = 'proplet:pet-otisku:nov26:preview:completed';
-  function currentStatus(preview) {
-    if (preview) return {eligible: true, completed: read(demoKey, [])};
-    return api(apiPath);
+  function demoKey(edition) {
+    return 'proplet:pet-otisku:' + series.get(edition).storage + ':preview:completed';
+  }
+  function previewCompleted(edition = november) { return read(demoKey(edition), []); }
+  function currentStatus(preview, edition) {
+    if (preview) return {eligible: true, completed: previewCompleted(edition)};
+    return api(series.get(edition).api);
   }
 
-  async function open({preview = false, board = null, overview = false} = {}) {
+  async function open({edition = november, preview = false, board = null, overview = false} = {}) {
+    if (!series.has(edition)) return false;
     const id = ++launchId;
-    const context = {scope: scope(preview), preview};
+    const context = {scope: scope(preview), preview, edition};
     try {
-      const [boards, status] = await Promise.all([bank(), currentStatus(preview)]);
+      const [boards, status] = await Promise.all([bank(edition), currentStatus(preview, edition)]);
       if (id !== launchId || !sameAccount(context)) return false;
       if (!status.eligible) throw new Error('Dárek se otevře po potvrzení příspěvku.');
       context.completed = status.completed || [];
@@ -123,33 +139,50 @@
     document.body.append(dialog);
     return dialog;
   }
-  function imprint({completed, boardStamps}) {
+  function imprint({completed, boardStamps, edition = november}) {
+    const {title, stamps} = series.get(edition);
     const earnedStamps = new Set(completed.map(n => boardStamps[n - 1]));
     const strip = element('div', '', 'otisky-strip');
     strip.setAttribute('role','img');
-    strip.setAttribute('aria-label',completed.length === 5 ? 'Pět otisků. DÍKY!' : 'Získané otisky: ' + completed.length + ' z pěti');
-    stamps.forEach(letter => {
+    strip.setAttribute('aria-label',completed.length === 5 ? title + '. ' + stamps : 'Získané otisky: ' + completed.length + ' z pěti');
+    Array.from(stamps).forEach(letter => {
       const earned = earnedStamps.has(letter);
       strip.append(element('span', earned ? letter : '', earned ? 'otisky-stamp earned' : 'otisky-stamp'));
     });
     return strip;
   }
-  function appendThanks(view) {
-    view.append(element('p', 'Díky za každé propletené slovo!', 'otisky-note'),
+  function appendThanks(view, edition = november) {
+    view.append(element('p', series.get(edition).thanks, 'otisky-note'),
       element('p', 'Pavel', 'otisky-sign'));
   }
   function actionBar() { return element('div', '', 'otisky-actions'); }
+  function collection({editions = [], preview = false} = {}) {
+    const available = [...new Set(editions)].filter(edition => series.has(edition)).sort().reverse();
+    if (!available.length) return false;
+    if (available.length === 1) return open({edition: available[0], preview, overview: true});
+    ++launchId;
+    const view = sheet('Vaše dárkové desky');
+    const menu = actionBar();
+    for (const edition of available) {
+      menu.append(button(series.get(edition).title, () => open({edition, preview, overview: true})));
+    }
+    menu.append(button('Zavřít', leave));
+    view.append(menu);
+    view.showModal();
+    return true;
+  }
   function showCollection(boards, context) {
     const complete = context.completed.length === boards.length;
-    const view = sheet(complete ? 'Dopis je doručený' : 'Pět otisků');
+    const config = series.get(context.edition);
+    const view = sheet(complete ? config.finale : config.title);
     view.append(imprint(context));
-    if (complete) appendThanks(view);
+    if (complete) appendThanks(view, context.edition);
     const menu = actionBar();
     const next = boards.findIndex((_, i) => !context.completed.includes(i + 1)) + 1;
     boards.forEach((b, i) => {
       const n = i + 1;
       if (context.completed.includes(n) || n === next) {
-        menu.append(button((n === next ? 'Pokračovat · ' : 'Znovu · ') + b.title, () => open({preview:context.preview, board:n}), n === next));
+        menu.append(button((n === next ? 'Pokračovat · ' : 'Znovu · ') + b.title, () => open({edition:context.edition, preview:context.preview, board:n}), n === next));
       }
     });
     menu.append(button('Zavřít', leave));
@@ -161,17 +194,19 @@
     if (!context || !sameAccount(context)) return;
     stopTimer();
     persist(game);
+    const edition = context.edition || november;
+    const config = series.get(edition);
     const done = [...new Set(context.completed.concat(context.board))];
     let receipt;
     try {
       if (context.preview) {
-        const previous = read(demoKey, []);
+        const previous = previewCompleted(edition);
         const completed = [...new Set(previous.concat(context.board))];
-        localStorage.setItem(demoKey, JSON.stringify(completed));
+        localStorage.setItem(demoKey(edition), JSON.stringify(completed));
         receipt = {completed, awardedXp: previous.includes(context.board) ? 0 : 300};
       } else {
         const solution = [...game.found].sort((a,b) => a.answerIndex - b.answerIndex).map(row => row.path);
-        receipt = await api(apiPath + '/complete', {method:'POST', body:JSON.stringify({board:context.board, solution})});
+        receipt = await api(config.api + '/complete', {method:'POST', body:JSON.stringify({board:context.board, solution})});
       }
     } catch (error) {
       game.finishing = false;
@@ -190,19 +225,19 @@
     // A second tab may already have acknowledged the same board. Only the server's receipt awards XP.
     if (sameAccount(context)) {
       try { localStorage.removeItem(key(context, game.puzzle)); } catch {}
-      document.dispatchEvent(new CustomEvent('proplet:pet-otisku-completed',{detail:{preview:context.preview,completed:context.completed}}));
+      document.dispatchEvent(new CustomEvent('proplet:pet-otisku-completed',{detail:{edition,preview:context.preview,completed:context.completed}}));
       if (!context.preview) refreshRemoteProfile().catch(() => {});
     }
     if (currentGame !== game || currentScreen !== 'game' || !sameAccount(context)) return;
     releaseGameWakeLock();
-    const complete = context.completed.length === stamps.length;
-    const view = sheet(complete ? 'Dopis je doručený' : game.puzzle.title);
+    const complete = context.completed.length === config.stamps.length;
+    const view = sheet(complete ? config.finale : game.puzzle.title);
     view.append(imprint(context));
     view.append(element('p',receipt.awardedXp > 0 ? '+300 XP do osobní hodnosti' : 'Dohráno znovu · bez dalších XP','otisky-award'));
-    if (complete) appendThanks(view);
+    if (complete) appendThanks(view, context.edition);
     const actions = actionBar();
-    if (!complete) actions.append(button('Další deska', () => open({preview:context.preview}), true));
-    actions.append(button('Přehled série', () => open({preview:context.preview,overview:true})),button('Zpět do Hrát', leave,complete));
+    if (!complete) actions.append(button('Další deska', () => open({edition:context.edition, preview:context.preview}), true));
+    actions.append(button('Přehled série', () => open({edition:context.edition, preview:context.preview,overview:true})),button('Zpět do Hrát', leave,complete));
     view.append(actions); view.showModal();
   }
 
@@ -215,5 +250,5 @@
     closeDialog();
     if (currentGame?.mode === 'otisky' && !sameAccount(currentGame.otisky) && currentScreen === 'game') nav('free', {replace:true});
   });
-  global.PropletPetOtiskuGame = {open, persist, restore, finish, previewCompleted: () => currentStatus(true).completed};
+  global.PropletPetOtiskuGame = {open, collection, persist, restore, finish, previewCompleted};
 })(window);

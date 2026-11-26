@@ -38,3 +38,8 @@ html[data-theme="dark"] .otisky-result { --stamp-ink: #f49e80; }
 .otisky-award { font-weight: 700; }
 .otisky-actions { display: grid; grid-template-columns: 1fr; gap: .45rem; }
 .otisky-actions button { min-height: 2.7rem; }
+
+@media (max-width: 340px) {
+  #screen-game.otisky-mode #boardStage:has(.ultra-board) { padding-inline: 0; }
+  #screen-game.otisky-mode #board.ultra-board { gap: 1px; }
+}
