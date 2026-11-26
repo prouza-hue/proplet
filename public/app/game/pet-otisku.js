@@ -2,6 +2,7 @@
   'use strict';
 
   const november = '2026-11';
+  const chapterCount = 5;
   const series = new Map([
     [november, {
       title: 'Pět otisků', finale: 'Dopis je doručený', stamps: 'DÍKY!',
@@ -9,9 +10,9 @@
       bank: '/app/content/pet-otisku.json?v=2', api: '/api/pet-otisku', storage: 'nov26'
     }],
     ['2026-12', {
-      title: 'Ještě jeden plech', finale: 'Poslední kousek je Váš', stamps: 'PLECH',
-      thanks: 'Tenhle jsem Vám schoval. Děkuju a přeju krásné svátky.',
-      bank: '/app/content/2026-12.json', api: '/api/gift-editions/2026-12', storage: '2026-12'
+      title: 'Ještě jeden plech', finale: 'NÁŠUP',
+      thanks: 'Když zbude poslední linecké, každý ho nabízí tomu druhému. Já ho dneska nabízím Vám. Děkuju, že Proplet může mít další rok.',
+      bank: '/app/content/2026-12.json?v=2', api: '/api/gift-editions/2026-12', storage: '2026-12-r2'
     }]
   ]);
   const banks = new Map();
@@ -24,7 +25,7 @@
       const loaded = fetch(config.bank).then(async response => {
         if (!response.ok) throw new Error('Dárkové desky se nepodařilo načíst.');
         const {boards} = await response.json();
-        if (!Array.isArray(boards) || boards.length !== config.stamps.length) throw new Error('Balíček desek je neúplný.');
+        if (!Array.isArray(boards) || boards.length !== chapterCount) throw new Error('Balíček desek je neúplný.');
         return boards;
       }).catch(error => { banks.delete(edition); throw error; });
       banks.set(edition, loaded);
@@ -85,7 +86,7 @@
       if (id !== launchId || !sameAccount(context)) return false;
       if (!status.eligible) throw new Error('Dárek se otevře po potvrzení příspěvku.');
       context.completed = status.completed || [];
-      context.boardStamps = boards.map(puzzle => puzzle.stamp);
+      if (edition === november) context.boardStamps = boards.map(puzzle => puzzle.stamp);
       const next = boards.findIndex((_, i) => !context.completed.includes(i + 1)) + 1;
       if (overview || (!board && !next)) {
         showCollection(boards, context);
@@ -140,6 +141,16 @@
     return dialog;
   }
   function imprint({completed, boardStamps, edition = november}) {
+    if (edition !== november) {
+      const progress = element('div', '', 'otisky-progress');
+      for (let i = 0; i < completed.length; i++) {
+        const mark = element('i', '', 'otisky-impression');
+        mark.setAttribute('aria-hidden', 'true');
+        progress.append(mark);
+      }
+      progress.append(element('span', 'Dohráno ' + completed.length + ' z ' + chapterCount));
+      return progress;
+    }
     const {title, stamps} = series.get(edition);
     const earnedStamps = new Set(completed.map(n => boardStamps[n - 1]));
     const strip = element('div', '', 'otisky-strip');
@@ -230,7 +241,7 @@
     }
     if (currentGame !== game || currentScreen !== 'game' || !sameAccount(context)) return;
     releaseGameWakeLock();
-    const complete = context.completed.length === config.stamps.length;
+    const complete = context.completed.length === chapterCount;
     const view = sheet(complete ? config.finale : game.puzzle.title);
     view.append(imprint(context));
     view.append(element('p',receipt.awardedXp > 0 ? '+300 XP do osobní hodnosti' : 'Dohráno znovu · bez dalších XP','otisky-award'));
