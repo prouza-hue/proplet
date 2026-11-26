@@ -12,6 +12,7 @@
   }
 
   function nextTajenkaCopy(){
+    if(window.PropletDailyTajenka?.nextIsTomorrow())return 'Další Tajenka vyjde zítra.';
     const day=pragueWeekday();
     return ['Sat','Sun','Mon','Tue'].includes(day)
       ? 'Další tajenka přijde ve středu.'

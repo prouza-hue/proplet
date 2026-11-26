@@ -10,6 +10,7 @@ import re
 import secrets
 import time
 import uuid
+from bisect import bisect_right
 from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from contextvars import ContextVar
@@ -147,6 +148,9 @@ REWARD_STATS_COLUMNS = "id,points,reward_key,reward_word"
 RESCUE_COLUMNS = "id,missed_date,puzzle_id,status,started_at,completed_at,elapsed_ms"
 TAJENKA_FIRST_SATURDAY = date(2026, 8, 29)
 TAJENKA_TWICE_WEEKLY_START = date(2026, 9, 12)
+TAJENKA_DAILY_START = date(2026, 11, 27)
+# Three evergreen editions bring daily play forward without moving the December calendar.
+TAJENKA_NOVEMBER_BRIDGE = (63, 65, 66)
 GEN4_RETURNING_BONUS_XP = 500
 MAX_REQUEST_BYTES = 64 * 1024
 SECONDARY_SESSION_DAYS = 180
@@ -907,18 +911,40 @@ def load_tajenka_bank() -> dict:
     return json.loads(TAJENKA_BANK_PATH.read_text(encoding="utf-8"))
 
 
+@lru_cache(maxsize=1)
+def tajenka_release_dates() -> tuple[date, ...]:
+    """Chronological release slots, followed by the first unprepared date."""
+    dates = [TAJENKA_FIRST_SATURDAY]
+    for _ in range(int(load_tajenka_bank().get("weeks") or 0)):
+        previous = dates[-1]
+        if previous < TAJENKA_TWICE_WEEKLY_START:
+            upcoming = previous + timedelta(weeks=1)
+        elif previous < TAJENKA_DAILY_START:
+            next_gap = 4 if previous.weekday() == 5 else 3
+            upcoming = min(previous + timedelta(days=next_gap), TAJENKA_DAILY_START)
+        else:
+            upcoming = previous + timedelta(days=1)
+        dates.append(upcoming)
+    return tuple(dates)
+
+
+@lru_cache(maxsize=1)
+def tajenka_release_order() -> tuple[int, ...]:
+    """Permanent puzzle numbers in release order. Saved progress keeps its original ID."""
+    weeks = [int(puzzle["week"]) for puzzle in load_tajenka_bank().get("puzzles", [])]
+    november_bridge = [week for week in TAJENKA_NOVEMBER_BRIDGE if week in weeks]
+    return tuple([week for week in weeks if week <= 25] + november_bridge
+                 + [week for week in weeks if week > 25 and week not in november_bridge])
+
+
 def tajenka_week_for(day: date) -> Optional[int]:
-    """Return the active finite Tajenka slot for the Saturday/Wednesday cadence."""
-    initial_offset = (day - TAJENKA_FIRST_SATURDAY).days
-    if initial_offset < 0:
-        return None
-    if day < TAJENKA_TWICE_WEEKLY_START:
-        week = initial_offset // 7 + 1
-    else:
-        cadence_offset = (day - TAJENKA_TWICE_WEEKLY_START).days
-        week = 3 + (cadence_offset // 7) * 2 + (1 if cadence_offset % 7 >= 4 else 0)
-    prepared = int(load_tajenka_bank().get("weeks") or 0)
-    return week if 1 <= week <= prepared else None
+    dates = tajenka_release_dates()
+    slot = bisect_right(dates, day)
+    return tajenka_release_order()[slot - 1] if 0 < slot < len(dates) else None
+
+
+def released_tajenka_weeks(day: date) -> tuple[int, ...]:
+    return tajenka_release_order()[:bisect_right(tajenka_release_dates(), day)]
 
 
 def tajenka_puzzle_for_week(week: int) -> Optional[dict]:
@@ -1332,12 +1358,10 @@ def is_daily_generation_upgrade(old: dict, payload: ResultCreate) -> bool:
 
 
 def released_tajenka(puzzle_id: str, today: date) -> Optional[dict]:
-    latest = tajenka_week_for(today) or 0
-    # Keep this one published board redeemable after the finite season ends.
-    if puzzle_id == TAJENKA_RECOVERY_ID and today >= TAJENKA_SHORT_WORD_FIX_AT.date():
-        latest = max(latest, 18)
+    # A past edition remains valid for its shared link, saved game and queued XP.
+    released = released_tajenka_weeks(today)
     return next((p for p in load_tajenka_bank().get("puzzles", [])
-                 if p.get("id") == puzzle_id and 1 <= int(p.get("week") or 0) <= latest), None)
+                 if p.get("id") == puzzle_id and int(p.get("week") or 0) in released), None)
 
 
 def puzzle_exists(puzzle_id: str, mode: str, difficulty: str) -> bool:
@@ -1462,7 +1486,7 @@ def shared_puzzle(
         puzzle = next((p for bank in banks for p in bank if p.get("id") == puzzle_id), None)
         if puzzle is None and "dated_daily_shared_body" in globals():
             puzzle = dated_daily_shared_body(puzzle_id)
-    elif kind == "tajenka" and (TAJENKA_RELEASE_ENABLED or VERCEL_ENV == "preview"):
+    elif kind == "tajenka" and (TAJENKA_RELEASE_ENABLED or (VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW)):
         puzzle = released_tajenka(puzzle_id, today)
     if not puzzle or (puzzle.get("meta") or {}).get("archiveSummaryOnly"):
         raise HTTPException(404, "Tahle sdílená úloha už není dostupná")
@@ -1470,7 +1494,7 @@ def shared_puzzle(
 
 
 @app.get("/api/tajenka")
-def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=37)):
+def current_tajenka(week: Optional[int] = Query(default=None, ge=1)):
     """Serve one released board without exposing the remaining weekend bank."""
     today = current_prague_date()
     if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
@@ -1483,6 +1507,28 @@ def current_tajenka(week: Optional[int] = Query(default=None, ge=1, le=37)):
     if not puzzle:
         raise HTTPException(404, "Tajenka pro tento týden není připravená")
     return JSONResponse(content=puzzle, headers={"Cache-Control": "private, no-store"})
+
+
+@app.get("/api/tajenka/recent")
+def recent_tajenky(review: bool = False):
+    """List the seven latest published editions, newest first, without solutions."""
+    isolated_preview = VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW
+    if not TAJENKA_RELEASE_ENABLED and not isolated_preview:
+        raise HTTPException(404, "Tajenka zatím není vydaná")
+    today = current_prague_date()
+    if review and isolated_preview and VERCEL_GIT_COMMIT_REF == backend_config.DAILY_TAJENKA_REVIEW_BRANCH:
+        today = date(2026, 12, 19)
+    dates = tajenka_release_dates()
+    released = released_tajenka_weeks(today)
+    editions = []
+    for slot in reversed(range(max(0, len(released) - 7), len(released))):
+        week = released[slot]
+        puzzle = tajenka_puzzle_for_week(week)
+        if puzzle:
+            editions.append({"id": puzzle["id"], "week": week, "date": dates[slot].isoformat(),
+                             "difficulty": puzzle["difficulty"]})
+    return JSONResponse({"date": today.isoformat(), "dailyFrom": TAJENKA_DAILY_START.isoformat(),
+                         "editions": editions}, headers={"Cache-Control": "private, no-store"})
 
 
 @app.get("/")

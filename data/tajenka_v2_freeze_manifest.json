@@ -1,7 +1,8 @@
 {
   "version": 1,
   "kind": "tajenka-v2-freeze-manifest",
-  "source": "data\\tajenka_v2_approved.json",
+  "source": "data/tajenka_v2_approved.json",
+  "dailySource": "content/tajenka-v2/daily-editions.json",
   "boards": [
     {
       "week": 1,
@@ -261,6 +262,209 @@
       "sourceId": "tajenka-v2-c49",
       "geometrySha256": "21c20d303d9c03f61e1efebcccee899c1d6c795de7161056afd2723f392f1657",
       "displayText": "Banán dozraje ve chvíli, kdy odejdeš z domu."
+    },
+    {
+      "week": 38,
+      "runtimeId": "tajenka-v2-week-38",
+      "sourceId": "tajenka-v2-2026-12-13",
+      "geometrySha256": "b06f17b3e52cf4ab34b3092c099d2018b177e639b946a07dc6c6101ef82b58e6",
+      "displayText": "Svatá Lucie noci upije, ale dne nepřidá."
+    },
+    {
+      "week": 39,
+      "runtimeId": "tajenka-v2-week-39",
+      "sourceId": "tajenka-v2-2026-12-14",
+      "geometrySha256": "01d5ae0c5194947634b3a4bbda08b6bf0b3ec5bbbc1c2ac60f251a46729c60a2",
+      "displayText": "Ještě jednu kapitolu. To si říkám od desíti."
+    },
+    {
+      "week": 40,
+      "runtimeId": "tajenka-v2-week-40",
+      "sourceId": "tajenka-v2-2026-12-15",
+      "geometrySha256": "7e6073ef13029a85b5b71ebaf88a9a6f38adebe49bf7adee3efda769f6e9cfbb",
+      "displayText": "Dřív visely vánoční stromky u stropu."
+    },
+    {
+      "week": 41,
+      "runtimeId": "tajenka-v2-week-41",
+      "sourceId": "tajenka-v2-2026-12-16",
+      "geometrySha256": "a30a30ff06106379bd72b39708fb0c8f8f6379a9cbfb3d563333a572d36b5545",
+      "displayText": "Došel balicí papír. Podej mi ty noviny."
+    },
+    {
+      "week": 42,
+      "runtimeId": "tajenka-v2-week-42",
+      "sourceId": "tajenka-v2-2026-12-17",
+      "geometrySha256": "d2609718e040951eed0c9dcae5556b64eee24e9ce1ccd5d6ae50629ced4fbf4c",
+      "displayText": "Na Marsu zapadá Slunce do modré záře."
+    },
+    {
+      "week": 43,
+      "runtimeId": "tajenka-v2-week-43",
+      "sourceId": "tajenka-v2-2026-12-18",
+      "geometrySha256": "079fe1e53f4dcd2f0eeaf5c9fae000494986eb0dd48018109283143145d5683b",
+      "displayText": "Našel jsem obě rukavice. Každou z jiného páru."
+    },
+    {
+      "week": 44,
+      "runtimeId": "tajenka-v2-week-44",
+      "sourceId": "tajenka-v2-2026-12-19",
+      "geometrySha256": "738775cedd3319b24e43b74f50e6f2ad88d3c6bbb3351ea5b6649aac1822f5a8",
+      "displayText": "Sobům v zimě zmodrá vrstva za sítnicí."
+    },
+    {
+      "week": 45,
+      "runtimeId": "tajenka-v2-week-45",
+      "sourceId": "tajenka-v2-2026-12-20",
+      "geometrySha256": "7955f5feba8ecc3a8a55ae66de932c487b37a777bfd8784a33ef9d7ab1707a42",
+      "displayText": "Polámané rohlíčky můžeme sníst hned."
+    },
+    {
+      "week": 46,
+      "runtimeId": "tajenka-v2-week-46",
+      "sourceId": "tajenka-v2-2026-12-21",
+      "geometrySha256": "c3ce878967e3f8c062435a6a9a8fae2eb463abbfae0d4a42ff76e9ef92928d52",
+      "displayText": "V Poniklé foukají duté skleněné perle."
+    },
+    {
+      "week": 47,
+      "runtimeId": "tajenka-v2-week-47",
+      "sourceId": "tajenka-v2-2026-12-22",
+      "geometrySha256": "f359147b6384da6e224c8a112228ca5069c9e18f41fcf7a38571f24705c04c44",
+      "displayText": "Z chodby vypadá stromek skoro rovně."
+    },
+    {
+      "week": 48,
+      "runtimeId": "tajenka-v2-week-48",
+      "sourceId": "tajenka-v2-2026-12-23",
+      "geometrySha256": "1b13a430cfbdd39ba9ea856ecee1f56b0bf6a5b1a76c9128ec37b5e16576c4f1",
+      "displayText": "„Hoj, ty štědrý večere, ty tajemný svátku!“"
+    },
+    {
+      "week": 49,
+      "runtimeId": "tajenka-v2-week-49",
+      "sourceId": "tajenka-v2-2026-12-24",
+      "geometrySha256": "d64827f849ec21e535c03f80523f86aedc203151c716d6194ae2f4ff072f8bad",
+      "displayText": "Při premiéře Tiché noci zněla kytara."
+    },
+    {
+      "week": 50,
+      "runtimeId": "tajenka-v2-week-50",
+      "sourceId": "tajenka-v2-2026-12-25",
+      "geometrySha256": "19370766f9737c2296ce1bc7438b9d691bbc1296b406cd4eef0be9683bd3cd2c",
+      "displayText": "Na společné fotce hledáš nejdřív sebe."
+    },
+    {
+      "week": 51,
+      "runtimeId": "tajenka-v2-week-51",
+      "sourceId": "tajenka-v2-2026-12-26",
+      "geometrySha256": "21efca28284fe3e94d5e8a8e38b230812ee0aafd9cb864db3e40f704a3d400f2",
+      "displayText": "Čerstvý prašan tlumí hluk ulice."
+    },
+    {
+      "week": 52,
+      "runtimeId": "tajenka-v2-week-52",
+      "sourceId": "tajenka-v2-2026-12-27",
+      "geometrySha256": "bf225da3a5a29572f84542cfa4759deac030bf0f2e2f4148fcce73e624ca1b03",
+      "displayText": "Řízek na cestu zmizí před prvním tunelem."
+    },
+    {
+      "week": 53,
+      "runtimeId": "tajenka-v2-week-53",
+      "sourceId": "tajenka-v2-2026-12-28",
+      "geometrySha256": "9b54add2231fc70500ee57eac739c9fd7d5ac2d728a5c8589ce5a2c3c1aab086",
+      "displayText": "Lední medvěd má pod srstí černou kůži."
+    },
+    {
+      "week": 54,
+      "runtimeId": "tajenka-v2-week-54",
+      "sourceId": "tajenka-v2-2026-12-29",
+      "geometrySha256": "ca9eb85217792130047718b6f63f9bbe9845851239608652c9f2033124f6b5d2",
+      "displayText": "Zakázané ovoce chutná nejlépe."
+    },
+    {
+      "week": 55,
+      "runtimeId": "tajenka-v2-week-55",
+      "sourceId": "tajenka-v2-2026-12-30",
+      "geometrySha256": "9be53e421dc96f43bdf21aaf10d6f69bdb3e409d2d1b7023461215392c19016d",
+      "displayText": "Hledám brýle. Proč se mi všichni smějete?"
+    },
+    {
+      "week": 56,
+      "runtimeId": "tajenka-v2-week-56",
+      "sourceId": "tajenka-v2-2026-12-31",
+      "geometrySha256": "2968d0facaef99710ebd8412f296ea3419289770de01db1df2b56a402f1008a6",
+      "displayText": "Madrid vítá nový rok dvanácti kuličkami vína."
+    },
+    {
+      "week": 57,
+      "runtimeId": "tajenka-v2-week-57",
+      "sourceId": "tajenka-v2-2027-01-01",
+      "geometrySha256": "be67a463f678d74263584a1cd106130c90feb8d68aa11e0ac1d7c74e84249c6a",
+      "displayText": "Do nového diáře píšu úhledně. Zatím."
+    },
+    {
+      "week": 58,
+      "runtimeId": "tajenka-v2-week-58",
+      "sourceId": "tajenka-v2-2027-01-02",
+      "geometrySha256": "e4248e7e98dd516edc6bab006f5cca3d57eb50ac2cae775b871979a5ff7546ad",
+      "displayText": "Slovo robot vymyslel Josef Čapek."
+    },
+    {
+      "week": 59,
+      "runtimeId": "tajenka-v2-week-59",
+      "sourceId": "tajenka-v2-2027-01-03",
+      "geometrySha256": "adb83e37927b7c0d635971f42c43bff2ec3e70f6bfda493d00fda16ac83d4905",
+      "displayText": "V lednu bývá Země Slunci nejblíž."
+    },
+    {
+      "week": 60,
+      "runtimeId": "tajenka-v2-week-60",
+      "sourceId": "tajenka-v2-2027-01-04",
+      "geometrySha256": "2eead225c464c94aa84e015b13e95caf08e489bdba0e77ec818a0a207b9c4c47",
+      "displayText": "Hele, stovka! Tu bundu bych měl nosit častěji."
+    },
+    {
+      "week": 61,
+      "runtimeId": "tajenka-v2-week-61",
+      "sourceId": "tajenka-v2-2027-01-05",
+      "geometrySha256": "ec556bbc0ad02c8c5bc0e8a91a96028000a955fb912b3428caa82d70172fa61c",
+      "displayText": "Část písku na Havaji prošla rybou."
+    },
+    {
+      "week": 62,
+      "runtimeId": "tajenka-v2-week-62",
+      "sourceId": "tajenka-v2-2027-01-06",
+      "geometrySha256": "70e229097e87422cd9110ef63622a5a7d0e8c7a7af9d7c43ad1ca579e9a51d82",
+      "displayText": "Chybí nám poslední dílek. Zvedni loket."
+    },
+    {
+      "week": 63,
+      "runtimeId": "tajenka-v2-week-63",
+      "sourceId": "tajenka-v2-2027-01-07",
+      "geometrySha256": "77bba6b15221a082989c72d372983de29374a92aa3cb7a0ece0cd190e820bf3d",
+      "displayText": "Tučňák oslí staví hnízdo z kamínků."
+    },
+    {
+      "week": 64,
+      "runtimeId": "tajenka-v2-week-64",
+      "sourceId": "tajenka-v2-2027-01-08",
+      "geometrySha256": "18a725733bb3848e2c1e2c50c292b32b76b835053b051b7ed59fa772230e177e",
+      "displayText": "Koupíš kočce pelíšek. Stejně spí v krabici."
+    },
+    {
+      "week": 65,
+      "runtimeId": "tajenka-v2-week-65",
+      "sourceId": "tajenka-v2-2027-01-09",
+      "geometrySha256": "294d1911c02767f978ba58e8277e331a666461b9e2a406413ef60dcf4ca4a167",
+      "displayText": "Most z Londýna stojí v arizonské poušti."
+    },
+    {
+      "week": 66,
+      "runtimeId": "tajenka-v2-week-66",
+      "sourceId": "tajenka-v2-2027-01-10",
+      "geometrySha256": "d14d6276791e4702059cbf1cbe8e1f3fbf2ee9c1ebbedff089124e8c374e4b21",
+      "displayText": "Z gauče se každá penalta kope snadno."
     }
   ]
 }

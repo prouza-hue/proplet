@@ -3,12 +3,18 @@ const app=fs.readFileSync('public/app.js','utf8');
 const code=app.slice(app.indexOf('function tajenkaRulesKey(){'),app.indexOf('function startStarter(){'));
 let hidden=true,paused=0,resumed=0,scope='guest';const storage=new Map();
 const modal={classList:{contains:()=>hidden,add:()=>hidden=true,remove:()=>hidden=false}};
-const ctx={currentGame:{mode:'tajenka'},playerScope:()=>scope,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},$:s=>s==='#tajenkaRulesModal'?modal:{focus(){}},pauseGameClock:()=>paused++,resumeGameClock:()=>resumed++};
+const ctx={window:{},currentGame:{mode:'tajenka'},playerScope:()=>scope,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},$:s=>s==='#tajenkaRulesModal'?modal:{focus(){}},pauseGameClock:()=>paused++,resumeGameClock:()=>resumed++};
 vm.createContext(ctx);vm.runInContext(code,ctx);
 assert.equal(ctx.tajenkaRulesSeen(),false);ctx.openTajenkaRules();assert.equal(hidden,false);assert.equal(paused,1);assert.equal(ctx.tajenkaRulesSeen(),false);
 ctx.closeTajenkaRules();assert.equal(hidden,true);assert.equal(resumed,1);assert.equal(ctx.tajenkaRulesSeen(),true);
 ctx.closeTajenkaRules();assert.equal(resumed,1);ctx.openTajenkaRules();assert.equal(hidden,false);assert.equal(paused,2);ctx.closeTajenkaRules();
 scope='another-player';assert.equal(ctx.tajenkaRulesSeen(),false);ctx.currentGame.mode='free';ctx.openTajenkaRules();assert.equal(hidden,true);
+// The playtest uses the same dialog without storing the rules receipt for the real player.
+ctx.window.PropletDailyTajenka={isReview:()=>true};
+ctx.tajenkaReviewRules=false;ctx.currentGame.mode='tajenka';
+const receipts=storage.size;
+assert.equal(ctx.tajenkaRulesSeen(),false);ctx.openTajenkaRules();ctx.closeTajenkaRules();
+assert.equal(ctx.tajenkaRulesSeen(),true);assert.equal(storage.size,receipts);
 const resume=app.slice(app.indexOf('function resumeGameClock('),app.indexOf('async function acquireGameWakeLock(){'));
 hidden=false;
 const guard={...ctx,$:()=>modal,gameSession:()=>{throw Error('must not resume while rules are open')}};vm.createContext(guard);vm.runInContext(resume,guard);assert.equal(guard.resumeGameClock(),false);
@@ -65,6 +71,7 @@ console.log('PASS: Kdo and již are visible on entry. The four saved paths compl
   $:s=>s==='#tajenkaRecoveryNotice'?notice:button,
   startGame:async(board,mode,date,options)=>{assert.equal(board.id,quote.id);assert.equal(options.kdoRecovery,true);started++}};
  vm.createContext(context);
+ vm.runInContext(app.slice(app.indexOf('function tajenkaProgressRow('),app.indexOf('function savedTajenkaProgress(')),context);
  const begin=app.indexOf('const KDO_PUZZLE_ID='),end=app.indexOf('function hideClaimedKdoNotice()',begin);
  vm.runInContext(app.slice(begin,end),context);
  const old={puzzleId:quote.id,savedAt:1793795842700,found:oldFound};
@@ -80,3 +87,17 @@ console.log('PASS: Kdo and již are visible on entry. The four saved paths compl
  state={inProgress:old};await context.refreshKdoNotice();assert.equal(hidden,true);
  console.log('PASS: KDO apology checks the original four paths and excludes partial, newer and already rewarded games.');
 })().catch(err=>{console.error(err);process.exitCode=1});
+
+// Replay the real front-end slot selector across the bridge and compare authoring dates.
+const clock=vm.createContext({window:{}});
+const readRange=(from,to)=>app.substring(app.indexOf(from),app.indexOf(to,app.indexOf(from)));
+vm.runInContext(readRange('function dayOffsetISO(', '\n'),clock);
+vm.runInContext(readRange('const TAJENKA_FIRST_SATURDAY=', 'let activeTajenkaWeek='),clock);
+vm.runInContext(readRange('function tajenkaReleaseSlotForISO(', 'function refreshTajenkaAvailability('),clock);
+const slot=clock.tajenkaReleaseSlotForISO;
+assert.deepEqual(['26','27','28','29','30'].map(day=>slot('2026-11-'+day)),[24,25,63,65,66]);
+assert.equal(slot('2026-12-01'),26);
+for(const board of JSON.parse(fs.readFileSync('content/tajenka-v2/daily-editions.json','utf8')).boards) {
+ assert.equal(slot(board.releaseDate),board.week);
+}
+console.log('PASS: Today selects each stable puzzle ID on its scheduled Prague date.');

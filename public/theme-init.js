@@ -248,7 +248,7 @@
 
   const loadExtras=async()=>{
     loadScript('/challenge-cta-v3333.js?v=result-sticker1','propletChallengeCtaV3333');
-    await loadScript('/runtime-meta.js?v=darkove-serie2','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=denni-tajenka2','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=all-resume1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
@@ -258,7 +258,7 @@
     await loadScript('/app/client-diagnostics.js?v=actor-context1','propletClientDiagnostics',{wait:true});
     loadScript('/gesture-guard-v3325.js?v=clienterrors2','propletGestureGuard');
     await loadScript('/recognition/lexicon.js?v=bonuscs1','propletBonusLexicon',{wait:true});
-    loadScript('/valid-word-feedback-v3330.js?v=pet-otisku1','propletValidWordFeedback');
+    loadScript('/valid-word-feedback-v3330.js?v=denni-tajenka2','propletValidWordFeedback');
     loadScript('/copy-density-v3327.js?v=play-one-screen1','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
@@ -268,9 +268,9 @@
     await loadScript('/account-conversion-v3331.js?v=ui-refinement1','propletAccountConversionV3331',{wait:true});
     loadScript('/settings-ia-v40122.js?v=monthly-releaseprep6','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=ui-refinement1','propletSettingsPolishV40122');
-    await loadScript('/printshop-release-polish.js?v=play-one-screen1','propletPrintshopReleasePolish',{wait:true});
-    await loadScript('/tajenka-release-fix.js?v=play-one-screen1','propletTajenkaReleaseFix',{wait:true});
-    loadScript('/tajenka-cadence-copy.js?v=1','propletTajenkaCadenceCopy');
+    await loadScript('/printshop-release-polish.js?v=denni-tajenka2','propletPrintshopReleasePolish',{wait:true});
+    await loadScript('/tajenka-release-fix.js?v=denni-tajenka2','propletTajenkaReleaseFix',{wait:true});
+    loadScript('/tajenka-cadence-copy.js?v=denni-tajenka2','propletTajenkaCadenceCopy');
     loadScript('/tajenka-card-polish.js?v=result-heading2','propletTajenkaCardPolish');
     loadScript('/tajenka-runtime-polish.js?v=idleoffline1','propletTajenkaRuntimePolish');
 

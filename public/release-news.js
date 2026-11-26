@@ -4,12 +4,12 @@
  const productionHosts=new Set(['hrajproplet.cz','www.hrajproplet.cz','proplet-nine.vercel.app','proplet-pavel-prouzas-projects.vercel.app','proplet-git-main-pavel-prouzas-projects.vercel.app']);
  const CAMPAIGN='november-2026-release-v1';
  function allowed(href,environment,enabled=false){try{const host=new URL(href).hostname;return (environment==='preview'&&!productionHosts.has(host)&&!host.endsWith('.hrajproplet.cz'))||(environment==='production'&&enabled===true);}catch{return false;}}
- function delivery({getProfile,request,online=()=>true,now=Date.now}){
+ function delivery({getProfile,request,online=()=>true,now=Date.now,campaign=CAMPAIGN,path='/api/release-news'}){
   let scope='',version=0,state=null,loading=null,claiming=null,retryAt=0,loadedAt=0;
   const key=p=>p?.id&&p?.token?JSON.stringify([String(p.id),p.token]):'';
   function sync(){const next=key(getProfile());if(next!==scope){scope=next;version++;state=null;loading=null;claiming=null;retryAt=0;loadedAt=0;}return scope;}
   const snapshot=()=>{sync();return {state,pending:!!loading,retryAt,loadedAt};};
-  const valid=value=>value?.campaignId===CAMPAIGN&&typeof value.enabled==='boolean'&&typeof value.eligible==='boolean'&&typeof value.canShowAutomatically==='boolean';
+  const valid=value=>value?.campaignId===campaign&&typeof value.enabled==='boolean'&&typeof value.eligible==='boolean'&&typeof value.canShowAutomatically==='boolean';
   function load(force=false){
    if(!sync()||!online())return Promise.resolve(null);
    if(loading)return loading;
@@ -17,7 +17,7 @@
    if(now()<retryAt&&!force)return Promise.resolve(null);
    const p={...getProfile()},captured=scope,ticket=version;
    const current=()=>sync()===captured&&version===ticket;
-   const promise=(async()=>{try{const value=await request('/api/release-news',{authProfile:p});if(!current())return null;if(!valid(value))throw Error('release-status');state=value;loadedAt=now();retryAt=0;return state;}catch{if(current()){retryAt=now()+30000;}return null;}})().finally(()=>{if(loading===promise)loading=null;});loading=promise;return promise;
+   const promise=(async()=>{try{const value=await request(path,{authProfile:p});if(!current())return null;if(!valid(value))throw Error('release-status');state=value;loadedAt=now();retryAt=0;return state;}catch{if(current()){retryAt=now()+30000;}return null;}})().finally(()=>{if(loading===promise)loading=null;});loading=promise;return promise;
   }
   function canOffer(account){sync();const p=getProfile();return !!scope&&String(p.id)===String(account)&&online()&&now()>=retryAt&&(!state||(state.enabled&&state.eligible&&state.canShowAutomatically));}
   async function show(permit,open){
@@ -27,7 +27,7 @@
    const status=await load();if(!current()||!status?.enabled||!status.eligible||!status.canShowAutomatically)return false;
    const claim={};claiming=claim;
    try{
-    const value=await request('/api/release-news/claim',{method:'POST',authProfile:p});
+    const value=await request(path+'/claim',{method:'POST',authProfile:p});
     if(sync()!==captured||version!==ticket)return false;
     if(!valid(value)||typeof value.displayGranted!=='boolean')throw Error('release-claim');
     // Keep the pre-claim offer eligible until the queue's final permit recheck.
@@ -99,7 +99,7 @@
   const observer=new win.MutationObserver(records=>{if(records.some(record=>!record.target.closest?.('#releaseNewsDialog,#releaseNewsSettings'))&&(!q('#releaseNewsSettings')||(requested&&reviewRequested)))schedule();});
   observer.observe(doc.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','hidden','open']});
   register();reconcile();
-  win.PropletReleaseNews=Object.freeze({open:()=>open(true)});
+  win.PropletReleaseNews=Object.freeze({open:()=>open(true),delivery});
  }
  return {CAMPAIGN,allowed,delivery,install};
 });

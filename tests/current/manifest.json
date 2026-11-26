@@ -504,6 +504,10 @@
         "runner": "python"
       },
       {
+        "path": "tools/test_tajenka_v2_production.py",
+        "runner": "python"
+      },
+      {
         "path": "tests/current/test_tajenka_weekly_availability.py",
         "runner": "python"
       },

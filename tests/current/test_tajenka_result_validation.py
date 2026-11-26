@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import sys
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -101,6 +101,52 @@ assert synced[0]["puzzleId"] == week_one["id"]
 assert synced[0]["challengeKey"] == f"tajenka:{week_one['id']}"
 assert synced[0]["points"] == 200
 
+with (
+    patch.object(server, "TAJENKA_RELEASE_ENABLED", True),
+    patch.object(server, "current_prague_date", return_value=date(2026, 12, 20)),
+    patch.object(server, "enforce_rate_limit"),
+    patch.object(server, "auth_player", return_value={"id": result_rows[0]["player_id"]}),
+    patch.object(server, "db_select", return_value=result_rows),
+    patch.object(server, "db_insert") as insert_again,
+    patch.object(server, "db_update") as update_again,
+    patch.object(server, "record_puzzle_run"),
+    patch.object(server, "player_stats", return_value={"xp": 200}),
+):
+    replay = server.result(payload_for(week_one), Mock(), "Bearer test")
+    assert replay["firstCompletion"] is False and replay["awardedPoints"] == 0
+    insert_again.assert_not_called()
+    update_again.assert_not_called()
+
+# Offline finish from the December list can sync when it is no longer in that list.
+# Keep its original time, distinct Tajenka identity and once-per-board reward key.
+first_daily = server.tajenka_puzzle_for_week(26)
+queued = payload_for(first_daily).model_copy(update={
+    "completed_at": "2026-12-04T16:25:00+01:00", "timing_unverified": True,
+})
+receipt = {"firstCompletion": True, "awardedPoints": 200, "dailyGenerationUpgrade": False, "transferredSlot": False}
+with (
+    patch.object(server, "TAJENKA_RELEASE_ENABLED", True),
+    patch.object(server, "ATOMIC_RESULT_V1_ENABLED", True),
+    patch.object(server, "current_prague_datetime", return_value=datetime(2026, 12, 20, 12, tzinfo=server.TZ)),
+    patch.object(server, "enforce_rate_limit"),
+    patch.object(server, "auth_player", return_value={"id": result_rows[0]["player_id"]}),
+    patch.object(server, "db_select", return_value=[]) as select_result,
+    patch.object(server, "db_atomic_result_rpc", return_value=receipt) as submit,
+    patch.object(server, "rankings_v2_schema_ready", return_value=False),
+    patch.object(server, "player_stats", return_value={"xp": 200}),
+):
+    response = server.result(queued, Mock(headers={}), "Bearer test")
+    assert response["awardedPoints"] == 200
+    routine, arguments = submit.call_args.args
+    command = arguments["p_command"]
+    assert routine == "proplet_submit_offline_result_v1"
+    assert (command["challengeKey"], command["puzzleId"]) == (queued.challenge_key, first_daily["id"])
+    assert command["completedAt"] == queued.completed_at and command["elapsedMs"] == queued.elapsed_ms
+    assert command["dailyDate"] is None and command["points"] == 200 and command["timingUnverified"]
+    select_result.return_value = [{"request_digest": command["requestDigest"], "receipt": receipt}]
+    assert server.result(queued, Mock(headers={}), "Bearer test") == response
+    submit.assert_called_once()
+
 
 with (
     patch.object(server, "TAJENKA_RELEASE_ENABLED", True),
@@ -161,7 +207,7 @@ with (
     key = f"tajenka:{week_eighteen['id']}"
     assert server.tajenka_week_for(date(2027, 4, 1)) is None
     assert server.puzzle_exists(week_eighteen["id"], "tajenka", "medium")
-    assert not server.puzzle_exists(week_two["id"], "tajenka", "medium")
+    assert server.puzzle_exists(week_two["id"], "tajenka", week_two["difficulty"])
     server.validate_result_sanity(result)
     shared = server.shared_puzzle(Mock(), "tajenka", week_eighteen["id"], None)
     assert week_eighteen["id"].encode() in shared.body

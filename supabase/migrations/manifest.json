@@ -819,6 +819,30 @@
       ]
     },
     {
+      "id": "daily-tajenka-news-20261125",
+      "order": 700,
+      "version": "2026.11.25",
+      "path": "supabase/migrations/20261125120100_daily_tajenka_news.sql",
+      "type": "migration",
+      "status": "prepared-daily-tajenka-announcement",
+      "sha256": "a6e1ab34175f28dadf51d93c190a45f84b6a49836f2e989b98ecb1156a7def01",
+      "supersedes": [],
+      "replaced_rpc_definitions": [
+        "public.proplet_release_news_v1"
+      ]
+    },
+    {
+      "id": "daily-tajenka-launch-nov27",
+      "order": 701,
+      "version": "2026.11.26",
+      "path": "supabase/migrations/20261126193400_daily_tajenka_launch_nov27.sql",
+      "type": "migration",
+      "status": "daily-tajenka-launch-november-27",
+      "sha256": "83096151bf7485a91e62bcaeceab5cf5036bf08931d4d21659e9c9f0d4a5cd69",
+      "supersedes": [],
+      "replaced_rpc_definitions": []
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",

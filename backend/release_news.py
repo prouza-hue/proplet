@@ -3,17 +3,30 @@ from typing import Optional
 
 from fastapi import Header, HTTPException, Request, Response
 
+from backend.config import settings
+
 CAMPAIGN_ID = "november-2026-release-v1"
+DAILY_TAJENKA_CAMPAIGN = "daily-tajenka-2026-12"
 
 
-def install(app, *, auth_player, db_rpc, enforce_rate_limit, enabled):
-    def execute(authorization, claim):
+def daily_tajenka_news_enabled():
+    return settings.vercel_env == "production" and settings.tajenka_release_enabled
+
+
+def install(app, *, auth_player, db_rpc, enforce_rate_limit, enabled,
+            tajenka_enabled=daily_tajenka_news_enabled):
+    def execute(authorization, claim, campaign=CAMPAIGN_ID):
         player = auth_player(authorization)
-        base = {"campaignId": CAMPAIGN_ID, "enabled": False, "eligible": False,
+        base = {"campaignId": campaign, "enabled": False, "eligible": False,
                 "canShowAutomatically": False, **({"displayGranted": False} if claim else {})}
-        if not enabled():
+        is_daily_tajenka = campaign == DAILY_TAJENKA_CAMPAIGN
+        if not (tajenka_enabled() if is_daily_tajenka else enabled()):
             return base
-        value = db_rpc("proplet_release_news_v1", {"p_player": player["id"], "p_claim": claim})
+        params = {"p_player": player["id"], "p_claim": claim}
+        if is_daily_tajenka:
+            value = db_rpc("proplet_campaign_news_v1", {**params, "p_campaign": campaign})
+        else:
+            value = db_rpc("proplet_release_news_v1", params)
         fields = ("enabled", "eligible", "canShowAutomatically", "displayGranted")
         if not isinstance(value, dict) or any(type(value.get(key)) is not bool for key in fields):
             raise HTTPException(503, "Oznámení je momentálně nedostupné")
@@ -35,3 +48,15 @@ def install(app, *, auth_player, db_rpc, enforce_rate_limit, enabled):
         response.headers["Cache-Control"] = "no-store"
         enforce_rate_limit(request, "release_news_claim", limit=60, window_seconds=3600)
         return execute(authorization, True)
+
+    @app.get("/api/release-news/daily-tajenka")
+    def tajenka_status(request: Request, response: Response, authorization: Optional[str] = Header(default=None)):
+        response.headers["Cache-Control"] = "no-store"
+        enforce_rate_limit(request, "release_news_read", limit=120, window_seconds=3600)
+        return execute(authorization, False, DAILY_TAJENKA_CAMPAIGN)
+
+    @app.post("/api/release-news/daily-tajenka/claim")
+    def tajenka_claim(request: Request, response: Response, authorization: Optional[str] = Header(default=None)):
+        response.headers["Cache-Control"] = "no-store"
+        enforce_rate_limit(request, "release_news_claim", limit=60, window_seconds=3600)
+        return execute(authorization, True, DAILY_TAJENKA_CAMPAIGN)
