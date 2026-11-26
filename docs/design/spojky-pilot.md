@@ -1,5 +1,13 @@
 # Spojky v Propletu
 
+## Předání k integraci Spojek na Dnes
+
+**26. 11. 2026.** Pavel schválil všech 29 vydání denní Tajenky. Start se připravuje na pátek 27. 11. v 00.00 pražského času. Pro začlenění Spojek použij po vydání v4.10.53 aktuální `main`.
+
+Na kartě Dnes zůstává hlavní Denní výzva. Pod ní jsou akční dlaždice. Tělo dlaždice Tajenky otevře dnešní desku, rozehranou hru nebo výsledek podle stavu hráče. Samostatné tlačítko s kalendářem otevře posledních sedm vydání. První dokončení každé Tajenky přináší 200 XP.
+
+Spojky přidej vedle stávajících dlaždic podle schváleného návrhu. Zachovej výzvu k podpoře, spodní odkazy a podmíněné zobrazení Extra i rozehrané hry. Při integraci vycházej ze souborů `public/today-one-screen.js`, `public/app/content/tajenka-editions.js` a `public/tajenka-editions.css` v novém vydání.
+
 ## Návod a průběh hry před vydáním
 
 **26. 11. 2026.** Po dalším playtestu Pavel hodnotí křížení jako zábavnější. Větev `preview/spojky-pruniky-navod-20261126` navazuje na čtyři zkoušené desky ve verzi `7a03b6e`. O vydání se rozhodne po kontrole tohoto náhledu.
