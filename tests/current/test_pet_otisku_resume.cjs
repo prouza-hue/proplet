@@ -58,5 +58,57 @@ async function run() {
   assert.equal(gift.restore(puzzle,ctx),null);
   assert.equal(JSON.stringify(store),before);
   assert.equal(session.restore(prior,'free').found.length,1);
+
+  // A November board saved by a pre-series client remains resumable. The same
+  // ordinal in another edition cannot read or overwrite it, even on this account.
+  const novemberKey = 'proplet:pet-otisku:nov26:account:p1:' + puzzle.id;
+  values.set(novemberKey, JSON.stringify({found:[1], hints:2}));
+  assert.equal(gift.restore(puzzle,{...ctx,edition:'2026-11',completed:[]}).hints,2);
+  const december = '2026-12';
+  const decemberCtx = {...ctx,edition:december,completed:[]};
+  assert.equal(gift.restore(puzzle,decemberCtx),null);
+  const decemberBoard = {...puzzle,id:'gift-2026-12-01'};
+  const newGame = {...game,puzzle:decemberBoard,finished:false,otisky:decemberCtx,hints:0,found:[]};
+  const hints = require('../../public/app/game/hints.js').create({getGame:()=>newGame});
+  const target = hints.pickTarget();
+  assert.deepEqual(hints.applyState(3,target).path,decemberBoard.answers[target.i].path);
+  newGame.found = decemberBoard.answers.map(item);
+  assert.equal(gift.persist(newGame),true);
+  assert.equal(gift.restore(decemberBoard,decemberCtx).hints,1);
+  context.api = async (url,opts) => {
+    assert.equal(url,'/api/gift-editions/2026-12/complete');
+    assert.deepEqual(JSON.parse(opts.body),{board:1,solution:puzzle.answers.map(a=>a.path)});
+    return {completed:[1],awardedXp:300};
+  };
+  await gift.finish(newGame);
+  assert.equal(newGame.finished,true);
+  assert.ok(values.has(novemberKey));
+  assert.equal(gift.restore(decemberBoard,decemberCtx),null);
+
+  const fetches=[];
+  context.fetch=async url=>{
+    fetches.push(url);
+    return {ok:true,json:async()=>({boards:bank.boards.map((b,i)=>({...b,id:'fixture-'+i}))})};
+  };
+  context.api=async ()=>{throw new Error('Preview must stay local');};
+  context.showToast=msg=>{throw new Error(msg);};
+  context.message=()=>{};
+  context.startGame=async (p,mode,date,opts)=>{
+    context.currentGame={puzzle:p,mode,otisky:opts.otisky,found:[],hints:1};
+    return true;
+  };
+  values.set('proplet:pet-otisku:nov26:preview:completed','[1,2]');
+  assert.equal(await gift.open({edition:december,preview:true}),true);
+  const demo=context.currentGame;
+  assert.equal(demo.otisky.board,1);
+  assert.equal(fetches[0],'/app/content/2026-12.json');
+  demo.found=demo.puzzle.answers.map(item);
+  await gift.finish(demo);
+  assert.deepEqual(Array.from(gift.previewCompleted(december)),[1]);
+  assert.deepEqual(Array.from(gift.previewCompleted('2026-11')),[1,2]);
+  assert.equal(await gift.open({edition:december,preview:true}),true);
+  assert.equal(context.currentGame.otisky.board,2);
+  assert.equal(await gift.open({edition:december,preview:true,board:4}),false);
+  assert.equal(fetches.length,1);
 }
 run().catch(error=>{console.error(error);process.exitCode=1;});

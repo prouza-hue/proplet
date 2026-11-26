@@ -42,6 +42,7 @@ def main():
    c.execute("""create table public.account_rewards(player_id uuid, points integer, reward_key text, reward_word text);
    grant select on public.account_rewards to service_role;""")
    c.execute((ROOT/'supabase/migrations/20261124210000_pet_otisku.sql').read_text(encoding='utf8'))
+   c.execute((ROOT/'supabase/migrations/20261126080000_monthly_gift_editions.sql').read_text(encoding='utf8'))
   ids=[str(uuid4()) for _ in range(4)];player,other,balanced,admin=ids
   for index,pid in enumerate(ids):c.execute('insert into public.players(id,name,family_code,token_hash,support_mode,public_rankings) values(%s,%s,%s,%s,%s,true)',(pid,'Patron SQL '+str(index),'patron-test',secrets.token_hex(32),'younger' if pid==balanced else 'none'))
   # Use the existing schema's required admin columns, if present.
