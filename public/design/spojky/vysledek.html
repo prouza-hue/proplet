@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="cs">
+<html lang="cs" class="ribbon-ui">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="./game.css">
   <link rel="stylesheet" href="./tutorial.css">
   <link rel="stylesheet" href="./tajenka-preview.css">
+  <link rel="stylesheet" href="/ribbon-ui.css?v=boardcontrast1">
   <link rel="stylesheet" href="./vysledek.css">
   <script type="module" src="./vysledek.js"></script>
 </head>
@@ -31,6 +32,7 @@
       <div class="pilot-dialog-head"><h2 id="vr-menu-title">Vyzkoušet výsledek</h2><button type="button" class="pilot-close" data-close aria-label="Zavřít">×</button></div>
       <p class="pilot-intro">Každá ukázka má vlastní postup a cvičných 200 XP.</p>
       <div class="vr-choices">
+        <button type="button" data-scene="deska">Deska se dvěma nálezy</button>
         <button type="button" data-scene="tah">Zahrát poslední tah</button>
         <button type="button" data-scene="poprve">První dohrání</button>
         <button type="button" data-scene="navrat">Návrat k výsledku</button>

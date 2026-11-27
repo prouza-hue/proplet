@@ -5,7 +5,7 @@ import { playSamples } from './preview-play-boards.js';
 
 const board = boards[0];
 const sample = playSamples['g4-m-001'];
-const scenarios = new Set(['tah', 'poprve', 'navrat', 'offline']);
+const scenarios = new Set(['deska', 'tah', 'poprve', 'navrat', 'offline']);
 const app = document.querySelector('#vr-app');
 const menu = document.querySelector('#vr-menu');
 const guide = document.querySelector('#vr-guide');
@@ -28,14 +28,14 @@ function seed(name) {
   scope = 'result-preview.' + crypto.randomUUID();
   const prefix = 'proplet.spojky.crossings.v1.' + scope + '.' + board.id;
   const signature = [board.rows.join('/'), ...board.chain, ...board.answers.map(answer => answer.word)].join('|');
-  const lastMove = name === 'tah';
+  const lastMove = name === 'tah' || name === 'deska';
   const answers = lastMove ? board.answers.slice(0, -1) : board.answers;
   for (const [i, answer] of answers.entries()) {
     localStorage.setItem(prefix + '.answer.' + i, JSON.stringify({ signature, path: answer.path }));
   }
   if (lastMove) {
     const finalPath = board.answers[2].path;
-    localStorage.setItem(prefix, JSON.stringify({ signature, started: true, pair: [2, 3], path: finalPath.slice(0, -1) }));
+    localStorage.setItem(prefix, JSON.stringify({ signature, started: true, pair: [2, 3], path: name === 'deska' ? [] : finalPath.slice(0, -1) }));
   }
   if (name === 'navrat') localStorage.setItem(awardKey(), 'credited');
   if (name === 'offline') localStorage.setItem(awardKey(), 'pending');
@@ -49,7 +49,7 @@ function resultState(firstFinish) {
   guide.hidden = true;
   const previous = localStorage.getItem(awardKey());
   const pending = previous === 'pending';
-  const firstAward = firstFinish || scenario === 'poprve' || scenario === 'tah';
+  const firstAward = firstFinish || scenario === 'poprve' || scenario === 'tah' || scenario === 'deska';
   if (!previous && firstAward) localStorage.setItem(awardKey(), 'credited');
   sync.hidden = !pending;
   const daily = dailyStatus();
@@ -97,7 +97,10 @@ function render() {
   else if (location.hash === '#denni') {
     mounted = mountWordBoard(app, { puzzle: sample, progressKey: dailyKey(), title: 'Denní výzva', subtitle: 'Střední · ukázková deska', mode: 'daily', resultTitle: 'Denní výzva splněna', onBack: () => navigate('dnes') });
   } else {
-    guide.hidden = scenario !== 'tah' || getProgress(board, scope).status === 'complete';
+    guide.textContent = scenario === 'deska'
+      ? 'Propoj Strom a Rovnici. Začni na K úplně vpravo ve třetím řádku.'
+      : 'Poslední tah je rozehraný. Klepni na N ve druhém řádku mřížky.';
+    guide.hidden = !['tah', 'deska'].includes(scenario) || getProgress(board, scope).status === 'complete';
     mounted = mountGame(app, { board, storageScope: scope, week: 1, onBack: () => navigate('dnes'),
       nextLabel: 'Další deska v pondělí 7. prosince', hintImage: '/assets/hints/printshop/gentle-v1.webp',
       resultPreview: { onResult: resultState, onShare: share, onPrimary: () => navigate(dailyStatus() === 'done' ? 'dnes' : 'denni') } });
