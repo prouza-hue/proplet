@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="noindex,nofollow">
+  <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; form-action 'none'; object-src 'none'">
+  <title>Spojky · Hratelný náhled výsledku</title>
+  <link rel="icon" href="/brand/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/fonts/proplet-fonts.css">
+  <link rel="stylesheet" href="./pilot.css">
+  <link rel="stylesheet" href="/result-refresh.css">
+  <link rel="stylesheet" href="./game.css">
+  <link rel="stylesheet" href="./tutorial.css">
+  <link rel="stylesheet" href="./tajenka-preview.css">
+  <link rel="stylesheet" href="./vysledek.css">
+  <script type="module" src="./vysledek.js"></script>
+</head>
+<body>
+  <div class="vr-shell">
+    <header class="vr-tools">
+      <span class="vr-brand"><img src="/brand/mark.svg" alt="">Proplet</span>
+      <button type="button" id="vr-options" aria-haspopup="dialog">Možnosti náhledu</button>
+    </header>
+    <p id="vr-guide" class="vr-guide" hidden>Poslední tah je rozehraný. Klepni na <strong>N</strong> ve druhém řádku mřížky.</p>
+    <main id="vr-app"></main>
+    <div id="vr-sync" hidden><button type="button">Vyzkoušet připojení</button></div>
+    <p id="vr-notice" class="vr-notice" role="status"></p>
+    <dialog id="vr-menu" class="pilot-dialog" aria-labelledby="vr-menu-title">
+      <div class="pilot-dialog-head"><h2 id="vr-menu-title">Vyzkoušet výsledek</h2><button type="button" class="pilot-close" data-close aria-label="Zavřít">×</button></div>
+      <p class="pilot-intro">Každá ukázka má vlastní postup a cvičných 200 XP.</p>
+      <div class="vr-choices">
+        <button type="button" data-scene="tah">Zahrát poslední tah</button>
+        <button type="button" data-scene="poprve">První dohrání</button>
+        <button type="button" data-scene="navrat">Návrat k výsledku</button>
+        <button type="button" data-scene="offline">Dohrání bez připojení</button>
+      </div>
+      <label class="pilot-settings-row" for="vr-theme">Vzhled <select id="vr-theme"><option value="auto">Podle zařízení</option><option value="light">Světlý</option><option value="dark">Tmavý</option></select></label>
+    </dialog>
+    <dialog id="vr-share" class="pilot-dialog" aria-labelledby="vr-share-title">
+      <div class="pilot-dialog-head"><h2 id="vr-share-title">Sdílet Spojky</h2><button type="button" class="pilot-close" data-close aria-label="Zavřít">×</button></div>
+      <textarea id="vr-share-text" readonly aria-label="Pozvánka ke zkopírování"></textarea>
+      <button type="button" id="vr-copy">Zkopírovat pozvánku</button>
+    </dialog>
+    <noscript>Pro hratelný náhled zapni JavaScript.</noscript>
+  </div>
+</body>
+</html>

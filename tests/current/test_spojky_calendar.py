@@ -81,7 +81,8 @@ with (patch.object(server, "VERCEL_ENV", "preview"), patch.object(server, "LIVE_
     with patch.object(server, "LIVE_PLAYER_PREVIEW", True):
         assert client.get("/api/spojky?review=2027-01-18").status_code == 404
 
-for branch in (server.backend_config.SPOJKY_REVIEW_BRANCH, "preview/spojky-davka-20270125"):
+for branch in (server.backend_config.SPOJKY_REVIEW_BRANCH, server.backend_config.SPOJKY_RESULT_PREVIEW_BRANCH,
+               "preview/spojky-davka-20270125"):
     with patch.dict(os.environ, {"VERCEL_ENV": "preview", "VERCEL_GIT_COMMIT_REF": branch,
                                  "SUPABASE_URL": "https://production.example", "SUPABASE_SECRET_KEY": "fixture",
                                  "VAPID_PRIVATE_KEY": "fixture", "CRON_SECRET": "fixture"}, clear=True):

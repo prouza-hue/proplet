@@ -26,6 +26,7 @@ def _env(name: str, default: str = "") -> str:
 
 DAILY_TAJENKA_REVIEW_BRANCH = "feature/denni-tajenka-prosinec-2026"
 SPOJKY_REVIEW_BRANCH = "preview/spojky-pruniky-navod-20261126"
+SPOJKY_RESULT_PREVIEW_BRANCH = "preview/spojky-vysledek-20261127"
 
 
 def spojky_review_branch(ref: str) -> bool:
@@ -145,7 +146,7 @@ def load_settings() -> Settings:
             raise RuntimeError("Daily specials preview requires its exact branch and isolated test database")
     playtest_preview = vercel_env == "preview" and (vercel_git_commit_ref in {
         "feat/mozkokalypsa-playtest", "feat/mozkokalypsa-round2-release", "feat/mozkokalypsa-round2-invite",
-        "feat/mozkokalypsa-round3-release", DAILY_TAJENKA_REVIEW_BRANCH,
+        "feat/mozkokalypsa-round3-release", DAILY_TAJENKA_REVIEW_BRANCH, SPOJKY_RESULT_PREVIEW_BRANCH,
     } or spojky_review_branch(vercel_git_commit_ref))
     data_root = root / "data"
     return Settings(

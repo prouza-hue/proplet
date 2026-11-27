@@ -1,0 +1,24 @@
+.vr-shell { width:min(100%,50rem); padding:.65rem clamp(.65rem,2vw,1.1rem) max(1rem,env(safe-area-inset-bottom)); margin:0 auto; }
+.vr-tools { display:flex; align-items:center; justify-content:space-between; gap:.6rem; padding-bottom:.4rem; margin-bottom:.4rem; border-bottom:1px solid var(--pilot-line); }
+.vr-brand { display:inline-flex; align-items:center; gap:.38rem; font:650 1.4rem/1 Fraunces,Georgia,serif; }
+.vr-brand img { width:1.6rem; height:1.6rem; }
+.vr-tools button, .vr-choices button, #vr-sync button, #vr-copy { border:1px solid var(--pilot-line); border-radius:.55rem; background:var(--pilot-paper); color:var(--pilot-ink); padding:.48rem .75rem; min-height:44px; font-weight:550; }
+.vr-tools button { font-size:.875rem; }
+.vr-guide { font-size:.96rem; line-height:1.4; padding:.65rem .85rem; border-radius:.55rem; background:var(--pilot-picked); margin:.5rem 0; }
+.vr-choices { display:grid; gap:.45rem; margin:.85rem 0; }
+.vr-choices button { text-align:left; }
+#vr-sync { text-align:center; padding:.65rem; }
+.vr-notice { margin:0; color:var(--pilot-green); text-align:center; }
+.vr-notice:not(:empty) { margin-top:.45rem; }
+#vr-share-text { display:block; width:100%; min-height:6rem; resize:vertical; padding:.6rem; margin:.85rem 0; font:inherit; color:var(--pilot-ink); background:var(--pilot-paper); border:1px solid var(--pilot-line); border-radius:.4rem; }
+.vr-home { max-width:40rem; margin:1rem auto; }
+.vr-home h1 { font:650 2.2rem Fraunces,Georgia,serif; margin:.4rem 0 1rem; }
+.vr-card { display:grid; width:100%; grid-template-columns:3.7rem 1fr auto; align-items:center; gap:.6rem; border-radius:1rem; border:1px solid #b99d6f; padding:1rem .85rem; margin:.7rem 0; background:#f3e4bd; color:#4c361e; text-align:left; box-shadow:0 2px 0 #b99d6f; }
+.vr-card img { width:100%; height:3.3rem; object-fit:contain; }
+.vr-card strong { display:block; font:650 1.55rem/1.2 Fraunces,Georgia,serif; }
+.vr-card small { display:block; margin-top:.22rem; font-size:.91rem; }
+.vr-card b { font-weight:600; }
+.vr-card.vr-daily { background:#cce5ff; color:#152f56; border-color:#a4bbd4; box-shadow:0 2px 0 #a4bbd4; }
+:root[data-theme=dark] .vr-card { background:#453720; color:#fff0d3; border-color:#8d7047; box-shadow:0 2px 0 #8d7047; }
+:root[data-theme=dark] .vr-card.vr-daily { background:#244c70; color:#f0f6ff; border-color:#557590; box-shadow:0 2px 0 #557590; }
+@media(max-width:365px) { .vr-card { grid-template-columns:2.5rem 1fr auto; padding:.75rem .6rem; gap:.4rem; } .vr-card strong { font-size:1.28rem; } }

@@ -20,7 +20,7 @@ STAGES = (
 SPOJKY_REVIEW_FILES = (
     "index.html", "pilot.js", "boards.js", "preview-play.js", "preview-play-boards.js",
     "board-preview.js", "tajenka-preview.js", "tajenka-samples.js",
-    "vydani.html", "vydani.js", "vydani.css",
+    "vydani.html", "vydani.js", "vydani.css", "vysledek.html", "vysledek.js", "vysledek.css",
 )
 
 
