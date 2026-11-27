@@ -59,6 +59,16 @@ const assert = require('node:assert/strict');
   assert.match(card.querySelector('.os-spojky-detail').textContent, /2 ze 3/);
   assert.equal(getProgress(board, 'live.guest').found, 0);
   assert.equal(getProgress(board, 'review.guest').found, 1);
+  localStorage.setItem('proplet.spojky.crossings.v1.live.alena.'+board.id+'.answer.2', JSON.stringify({signature,path:board.answers[2].path}));
+  for (const [instant, label] of [
+    ['2026-12-01T23:00:00Z', 'Příští již za 5 dní'],
+    ['2026-12-03T23:00:00Z', 'Příští již za 3 dny'],
+    ['2026-12-05T23:00:00Z', 'Příští již zítra'],
+  ]) {
+    now = instant;
+    document.dispatchEvent(new Event('visibilitychange'));
+    assert.equal(detail.textContent, label);
+  }
   play.removeAccount(owner);
   assert.equal(getProgress(board, 'live.alena').found, 0);
 

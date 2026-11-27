@@ -89,10 +89,16 @@
    e.setAttribute('aria-label',label);e.onclick=()=>{if(unavailable(q(model.target),needsProgress))return;if(model.key==='daily-base'){const ui=typeof dailySpecialUI==='function'?dailySpecialUI():null;if(!ui)return;ui.select('base');}run(model.target,needsProgress);};
    const copy=make('span','os-copy');copy.append(make('strong','os-title',model.title));
    if(model.detail)copy.append(make('span','os-detail',model.detail));
-   if(model.reward)copy.append(make('span','os-reward',model.reward));
+   const dailyHero = model.key === 'feature' && !model.special;
+   if(model.reward && !dailyHero)copy.append(make('span','os-reward',model.reward));
    const children=[copy];if(model.art)children.push(image(model.art,'os-art'));
    const arrow=make('span','os-arrow',model.action?model.action+' →':'→');arrow.setAttribute('aria-hidden','true');
-   if(model.complete){const result=make('span','os-completion-row');if(model.metrics)result.append(make('span','os-metrics',model.metrics));result.append(arrow);children.push(result);}else children.push(arrow);
+   if (dailyHero) {
+    const footer = make('span','os-feature-footer');
+    if (model.reward) footer.append(make('span','os-reward',model.reward));
+    if (model.metrics) footer.append(make('span','os-metrics',model.metrics));
+    footer.append(arrow); children.push(footer);
+   } else children.push(arrow);
    e.replaceChildren(...children);
    if(model.colors)model.colors.forEach((v,i)=>e.style.setProperty(['--os-feature','--os-ink','--os-muted','--os-action'][i],v));
    e.classList.toggle('os-complete',!!model.complete);e.classList.toggle('os-special',!!model.special);e.dataset.signature=signature;
