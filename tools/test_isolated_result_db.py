@@ -188,6 +188,9 @@ def main():
         report['checks'].append('entry catchup: fixed activation quota, completion, retry, rollback and immutable windows')
         verify_entry_readout(c)
         report['checks'].append('entry experiment readout: silent identities, test exclusion, explicit attempt link, 24h/D1 bounds')
+        from tools.test_entry_december_db import verify_december_entry
+        verify_december_entry(c)
+        report['checks'].append('December entry: separate window, stable hash, sticky retries, blinded 24h readout')
         c.execute((ROOT/'supabase/tests/account_integrity_counts.sql').read_text(encoding='utf8'))
         report['checks'].append('admin integrity: exact 20001 results, bounded IDs, no fanout, service-role only, invoker, rollback')
         c.execute((ROOT/'supabase/tests/account_created.sql').read_text(encoding='utf8'))

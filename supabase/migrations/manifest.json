@@ -854,6 +854,17 @@
       "replaced_rpc_definitions": ["public.proplet_campaign_news_v1"]
     },
     {
+      "id": "entry-december-202612",
+      "order": 703,
+      "version": "2026.11.27",
+      "path": "supabase/migrations/20261127120000_entry_december.sql",
+      "type": "migration",
+      "status": "prepared-december-entry-disabled",
+      "sha256": "247fb349589dafd97ed1a406bcf81282d4c93d28ec60750d2adc9b740b78d0a2",
+      "supersedes": [],
+      "replaced_rpc_definitions": ["public.proplet_entry_allocate_v1", "public.proplet_entry_assign_v1"]
+    },
+    {
       "id": "verify-v3.23",
       "order": 900,
       "version": "3.23",
