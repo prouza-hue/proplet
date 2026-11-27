@@ -27,7 +27,12 @@ SPOJKY_REVIEW_FILES = (
 def prepare_spojky_output(public_dir, environment):
     if environment == "production":
         for filename in SPOJKY_REVIEW_FILES:
-            (public_dir / "design/spojky" / filename).unlink(missing_ok=True)
+            # Vercel enumerates static paths before the build and opens them afterward.
+            # Keep each path packagable while removing the entire editorial payload.
+            target = public_dir / "design/spojky" / filename
+            content = ('<!doctype html><html lang="cs"><meta charset="utf-8"><title>Spojky</title>'
+                       '<a href="/?open=spojky">Hrát aktuální Spojky</a></html>') if target.suffix == ".html" else ""
+            target.write_text(content, encoding="utf-8")
 
 
 def main():

@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 
 import server
 from backend import spojky
-from tools.build_vercel import prepare_spojky_output
+from tools.build_vercel import SPOJKY_REVIEW_FILES, prepare_spojky_output
 
 
 bank = json.loads(spojky.BANK.read_text(encoding="utf-8"))
@@ -93,11 +93,17 @@ with TemporaryDirectory() as tmp:
     public = Path(tmp) / "public"
     files = public / "design/spojky"
     copytree(server.ROOT / "public/design/spojky", files)
-    review_files = ("index.html", "pilot.js", "boards.js", "vydani.html", "vydani.js")
+    original = {p.name: p.read_bytes() for p in files.iterdir() if p.is_file()}
     prepare_spojky_output(public, "preview")
-    assert all((files / name).is_file() for name in review_files)
+    assert all((files / name).read_bytes() == data for name, data in original.items())
     prepare_spojky_output(public, "production")
-    assert not any((files / name).exists() for name in review_files)
-    assert all((files / name).is_file() for name in ("game.js", "game.css", "tutorial.js", "ink.js", "spojky-print.svg"))
+    for name, data in original.items():
+        packaged = (files / name).read_bytes()
+        if name not in SPOJKY_REVIEW_FILES:
+            assert packaged == data, name
+        elif name.endswith(".html"):
+            assert b'/?open=spojky' in packaged and b'<script' not in packaged, name
+        else:
+            assert packaged == b"", name
 
 print("PASS: Spojky Prague launch, weekly boundaries, finite bank, isolated editorial review and production privacy")
