@@ -59,3 +59,21 @@ def edition_for(day: date) -> dict:
 def editorial_calendar() -> dict:
     return {"editions": [{"week": e.week, "start": e.start.isoformat(), "end": e.end.isoformat()}
                          for e in load_editions()]}
+
+
+def completed_paths(board: dict, paths: list[list[int]]) -> bool:
+    letters = "".join(board["rows"])
+    cols = len(board["rows"][0])
+    if len(paths) != len(board["answers"]):
+        return False
+    for path, answer in zip(paths, board["answers"]):
+        if len(path) != len(answer["word"]) or len(set(path)) != len(path):
+            return False
+        if any(index < 0 or index >= len(letters) for index in path):
+            return False
+        if "".join(letters[index] for index in path) != answer["word"]:
+            return False
+        for a, b in zip(path, path[1:]):
+            if abs(a % cols - b % cols) + abs(a // cols - b // cols) != 1:
+                return False
+    return True

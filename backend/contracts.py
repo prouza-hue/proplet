@@ -7,6 +7,11 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field, StrictInt
 
 
+class SpojkyResult(BaseModel):
+    boardId: str = Field(min_length=1, max_length=80)
+    paths: list[list[StrictInt]] = Field(min_length=3, max_length=3)
+
+
 class PlayerCreate(BaseModel):
     inviteCode: Optional[str] = Field(default=None, min_length=8, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
     name: str = Field(min_length=1, max_length=24)

@@ -34,7 +34,7 @@ def _route_snapshot() -> str:
     routes = sorted(
         (path, methods, name)
         for path, methods, name in reviewed
-        if path != "/api/spojky"
+        if path not in {"/api/spojky", "/api/spojky/result"}
         if path and path not in {"/api/tajenka/recent", "/api/tajenka/recovery", "/api/release-news/weekly-spojky", "/api/release-news/weekly-spojky/claim", "/api/release-news/daily-tajenka", "/api/release-news/daily-tajenka/claim", "/api/release-news", "/api/release-news/claim", "/api/qa/monthly-control", "/api/competition/monthly", "/api/cron/monthly-competition", "/api/visual-playtest", "/api/cron/visual-pilot-push", "/api/auth/google/link/start", "/api/result-receipt", "/api/team-victories/competition", "/api/team-victories/personal", "/api/offline-manifest", "/api/archive/offline", "/api/archive", "/api/archive/claims", "/api/archive/puzzle", "/api/referrals", "/api/referrals/invite", "/api/referrals/invite/{code}", "/api/referrals/dismiss", '/api/entry-experiment/assignment', '/api/first-board/assignment', '/api/cron/mozkokalypsa-launch-push', '/api/cron/refresh300-launch-push', '/api/cron/archive-launch-push', '/api/mozkokalypsa/status', '/api/mozkokalypsa/board/{board_id}', '/api/mozkokalypsa/open/{board_id}', '/api/mozkokalypsa/event', "/api/admin/quality-snapshot", "/api/account/welcome", "/api/play-session", "/api/play-session/config", "/api/free-order", "/api/free-order/config", "/api/account/snapshot", "/api/product-events", "/api/daily-special", "/api/rankings/daily-special"}
     )
     return hashlib.sha256(

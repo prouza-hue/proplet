@@ -207,9 +207,10 @@ export function mountGameTutorial(root, options) {
   return { destroy() { tutorial.destroy(); frame.remove(); } };
 }
 
-function showResult(frame, { board, week, onBack, nextLabel, backLabel }, found, review) {
+function showResult(frame, { board, week, onBack, nextLabel, backLabel, resultActions }, found, review, firstFinish = false) {
   const sheet = el('section', 'sj-sheet sj-result');
-  const header = heading(review ? 'Řešení Spojek' : 'Řetěz je celý!', week);
+  const actionsConfig = review ? null : resultActions;
+  const header = heading(review ? 'Řešení Spojek' : 'Řetěz je celý!', actionsConfig ? null : week);
   const { tray, cells, inks } = gridFor(board, false);
   const list = el('ol', 'sj-sequence');
   list.setAttribute('aria-label', 'Celý řetěz');
@@ -249,7 +250,30 @@ function showResult(frame, { board, week, onBack, nextLabel, backLabel }, found,
   });
   const spread = el('div', 'sj-result-spread');
   spread.append(list, details);
-  sheet.append(header, spread);
+  if (actionsConfig) {
+    sheet.classList.add('sj-connected-result');
+    const mark = el('img', 'sj-result-mark');
+    mark.src = new URL('./spojky-print.svg', import.meta.url).href;
+    mark.alt = '';
+    const reward = el('div', 'sj-result-reward');
+    reward.setAttribute('aria-live', 'polite');
+    function updateReward(result) {
+      reward.replaceChildren();
+      if (result.xpLabel) {
+        const rewardClass = (result.firstAward ?? firstFinish) ? 'xp-sticker' : 'sj-result-receipt';
+        reward.append(el('span', rewardClass, result.xpLabel));
+      }
+      if (result.notice) reward.append(el('p', 'sj-result-notice', result.notice));
+    }
+    const result = actionsConfig.onResult(firstFinish, updateReward, found);
+    updateReward(result);
+    header.prepend(mark);
+    header.append(reward);
+    const actions = el('div', 'sj-result-actions');
+    actions.append(button('sj-primary', result.primaryLabel, actionsConfig.onPrimary),
+      button('sj-share-result', 'Sdílet Spojky', actionsConfig.onShare));
+    sheet.append(header, spread, actions);
+  } else sheet.append(header, spread);
   if (!review && nextLabel) sheet.append(el('p', 'sj-next-week', nextLabel));
   const navigation = topRow(undefined, undefined, backLabel);
   bindTaps(navigation, '.sj-back', onBack);
@@ -367,7 +391,7 @@ export function mountGame(root, options) {
           save();
           // Chrome dispatches touchend after pointerup. Keep their original target for both.
           requestAnimationFrame(() => {
-            if (finishing && frame.isConnected) showResult(frame, options, state.found, false);
+            if (finishing && frame.isConnected) showResult(frame, options, state.found, false, true);
           });
           return;
         }
