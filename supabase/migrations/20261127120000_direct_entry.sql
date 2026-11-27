@@ -1,43 +1,28 @@
--- Separate recruitment window on the existing entry wire protocol and ledger.
--- Applying the migration leaves December enrollment disabled.
+-- Route fresh players through the existing no-training flow once enabled.
+-- Preserve the historical experiment control and assignments.
 begin;
 set local lock_timeout='5s';
 
-create table proplet_experiment_internal.entry_december_control (
+create table proplet_experiment_internal.entry_direct_control (
     environment text primary key check (environment in ('production','preview','local')),
     lock_marker boolean not null default true check (lock_marker),
     enabled boolean not null default false,
     starts_at timestamptz,
-    ends_at timestamptz not null,
-    check (not enabled or starts_at is not null),
-    check (starts_at is null or starts_at < ends_at),
-    check (environment<>'production' or (
-        ends_at='2027-01-01 00:00 Europe/Prague'::timestamptz
-        and (starts_at is null or starts_at>='2026-12-01 00:00 Europe/Prague'::timestamptz)
-    ))
+    check (not enabled or starts_at is not null)
 );
-insert into proplet_experiment_internal.entry_december_control (environment,ends_at)
-values ('production','2027-01-01 00:00 Europe/Prague');
-alter table proplet_experiment_internal.entry_december_control enable row level security;
-revoke all on proplet_experiment_internal.entry_december_control from public,anon,authenticated,service_role;
+insert into proplet_experiment_internal.entry_direct_control (environment)
+values ('production');
+alter table proplet_experiment_internal.entry_direct_control enable row level security;
+revoke all on proplet_experiment_internal.entry_direct_control from public,anon,authenticated,service_role;
 -- SELECT FOR SHARE needs UPDATE on a column. The service cannot change the schedule or enable enrollment.
-grant select,update(lock_marker) on proplet_experiment_internal.entry_december_control to service_role;
-
-create function proplet_experiment_internal.entry_december_variant_v1(anonymous_id text)
-returns text language sql immutable strict security invoker
-set search_path = pg_catalog
-as $$
-    select case when get_byte(sha256(convert_to('new-player-entry-december-2026:'||anonymous_id,'UTF8')),0)<128
-        then 'A' else 'B' end
-$$;
-revoke all on function proplet_experiment_internal.entry_december_variant_v1(text) from public,anon,authenticated;
-grant execute on function proplet_experiment_internal.entry_december_variant_v1(text) to service_role;
+grant select,update(lock_marker) on proplet_experiment_internal.entry_direct_control to service_role;
 
 alter table proplet_experiment_internal.entry_assignments
     drop constraint entry_assignment_allocation_phase,
     add constraint entry_assignment_allocation_phase check (
-        (allocation_policy in ('hash50_v1','december_hash50_v1')
-            and allocation_ordinal is null and allocation_switched_at is null)
+        (allocation_policy in ('hash50_v1','direct_entry_v1')
+            and allocation_ordinal is null and allocation_switched_at is null
+            and (allocation_policy<>'direct_entry_v1' or variant='B'))
         or (allocation_policy='alternating_v1' and allocation_ordinal is not null
             and allocation_ordinal>0 and allocation_switched_at is not null
             and variant=case when allocation_ordinal%2=1 then 'A' else 'B' end)
@@ -51,20 +36,20 @@ set search_path = pg_catalog,proplet_experiment_internal
 as $$
 declare
     control proplet_experiment_internal.entry_control%rowtype;
-    december proplet_experiment_internal.entry_december_control%rowtype;
+    direct_entry proplet_experiment_internal.entry_direct_control%rowtype;
 begin
     -- Also protect direct/stale INSERT callers that do not hold the RPC lock.
     perform pg_advisory_xact_lock(hashtextextended('first-board-v1:'||new.environment||':'||new.is_test::text,0));
-    if new.allocation_policy='december_hash50_v1' then
-        select * into december from proplet_experiment_internal.entry_december_control
+    if new.allocation_policy='direct_entry_v1' then
+        select * into direct_entry from proplet_experiment_internal.entry_direct_control
         where environment=new.environment for share;
         new.assigned_at := clock_timestamp();
-        if not found or not december.enabled
+        if not found or not direct_entry.enabled
            or new.is_test is distinct from (new.environment<>'production')
-           or new.assigned_at<december.starts_at or new.assigned_at>=december.ends_at then
-            raise exception 'December entry window closed' using errcode='22023';
+           or new.assigned_at<direct_entry.starts_at then
+            raise exception 'Direct entry is inactive' using errcode='22023';
         end if;
-        new.variant := proplet_experiment_internal.entry_december_variant_v1(new.anonymous_id);
+        new.variant := 'B';
         new.allocation_ordinal := null;
         new.allocation_switched_at := null;
         return new;
@@ -116,7 +101,7 @@ as $$
 declare
     a proplet_experiment_internal.entry_assignments%rowtype;
     decision_at timestamptz;
-    december proplet_experiment_internal.entry_december_control%rowtype;
+    direct_entry proplet_experiment_internal.entry_direct_control%rowtype;
     allocation text := 'hash50_v1';
     eligibility_start timestamptz;
     control proplet_experiment_internal.entry_control%rowtype;
@@ -146,11 +131,11 @@ begin
             -- Serialize eligibility with historical first-board allocations as well as same-identity retries.
             perform pg_advisory_xact_lock(hashtextextended('first-board-v1:'||p_environment||':'||p_is_test::text,0));
             decision_at := clock_timestamp();
-            select * into december from proplet_experiment_internal.entry_december_control
+            select * into direct_entry from proplet_experiment_internal.entry_direct_control
             where environment=p_environment for share;
-            if december.enabled and decision_at>=december.starts_at and decision_at<december.ends_at then
-                allocation := 'december_hash50_v1';
-                eligibility_start := december.starts_at;
+            if direct_entry.enabled and decision_at>=direct_entry.starts_at then
+                allocation := 'direct_entry_v1';
+                eligibility_start := direct_entry.starts_at;
             elsif p_environment='production' then
                 select * into control from proplet_experiment_internal.entry_control where singleton for share;
                 if not found or not control.enabled or decision_at<control.starts_at
