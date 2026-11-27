@@ -6,6 +6,12 @@ const storageKey = (name, scope = '') => `${storagePrefix}${scope ? scope + '.' 
 const sessionCopy = new Map();
 const unwritten = new Set();
 
+// Both dates are Prague calendar days in YYYY-MM-DD format.
+export function launchSubtitle(day, launchDate) {
+  const elapsedDays = (Date.parse(day) - Date.parse(launchDate)) / 86400000;
+  return elapsedDays >= 0 && elapsedDays < 7 ? 'Nový herní mód' : '';
+}
+
 function read(key) {
   if (unwritten.has(key)) return sessionCopy.get(key) ?? null;
   try { return localStorage.getItem(key); }

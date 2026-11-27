@@ -1,4 +1,4 @@
-import { getProgress, mountGame, transferProgress } from '../../design/spojky/game.js';
+import { getProgress, launchSubtitle, mountGame, transferProgress } from '../../design/spojky/game.js';
 
 const dateFormat = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Prague', year: 'numeric', month: '2-digit', day: '2-digit' });
 const prettyDate = new Intl.DateTimeFormat('cs-CZ', { timeZone: 'Europe/Prague', day: 'numeric', month: 'long' });
@@ -41,7 +41,8 @@ function updateCard() {
   const detail = entry.querySelector('.os-spojky-detail');
   const action = entry.querySelector('.os-spojky-action-text');
   entry.dataset.state = status;
-  detail.textContent = status === 'complete' ? nextLabel() : status === 'started' ? `Rozehráno · ${found} ze 3` : 'Slova se mohou křížit';
+  const newBoardDetail = edition.week === 1 ? launchSubtitle(today(), edition.start) : '';
+  detail.textContent = status === 'complete' ? nextLabel() : status === 'started' ? `Rozehráno · ${found} ze 3` : newBoardDetail;
   entry.querySelector('.os-spojky-done').hidden = status !== 'complete';
   action.textContent = status === 'complete' ? 'Řetěz' : status === 'started' ? 'Pokračovat' : 'Hrát';
   entry.setAttribute('aria-label', status === 'complete' ? 'Prohlédnout dokončený řetěz Spojek' : status === 'started' ? 'Pokračovat ve Spojkách' : 'Hrát Spojky');

@@ -1,3 +1,6 @@
+import { launchDate } from './boards.js';
+import { launchSubtitle } from './game.js';
+
 const printshop = '/difficulty/printshop/';
 const pilotArt = name => new URL(name, import.meta.url).href;
 const levels = {
@@ -14,7 +17,6 @@ const weekdays = [
   ['So', 'hard'], ['Ne', 'hard', 'mozkokalypsa'],
 ];
 const dayMillis = 24 * 60 * 60 * 1000;
-const namedDate = new Intl.DateTimeFormat('cs-CZ', {weekday:'long', day:'numeric', month:'long', timeZone:'UTC'});
 const shortDate = new Intl.DateTimeFormat('cs-CZ', {day:'numeric', month:'numeric', timeZone:'UTC'});
 const proplet = 'https://hrajproplet.cz';
 const patronHeart = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20S3 14.5 3 8.5C3 3 10 2.5 12 7c2-4.5 9-4 9 1.5C21 14.5 12 20 12 20Z" fill="currentColor"/></svg>';
@@ -65,16 +67,14 @@ export function renderToday(root, {week, weekStart, dateISO, progress, nextLabel
   dailyStatus = 'new', extraStatus = 'new', freeStatus = 'started', freeLevel = 12, hasExtra, hasResume,
   onPlay, onPreview, onOther, onTajenka, onCalendar}) {
   const monday = Date.parse(weekStart + 'T12:00:00Z');
-  const selectedDate = dateISO ? Date.parse(dateISO + 'T12:00:00Z') : monday + 2 * dayMillis;
-  const currentDay = weekdayIndex(new Date(selectedDate));
+  const day = dateISO || new Date(monday + 2 * dayMillis).toISOString().slice(0, 10);
+  const currentDay = weekdayIndex(new Date(day + 'T12:00:00Z'));
   const [, base, scheduledExtra] = weekdays[currentDay];
   const extra = hasExtra === false ? null : levels[scheduledExtra];
-  const weekdayDate = namedDate.format(selectedDate);
-  const date = weekdayDate[0].toLocaleUpperCase('cs') + weekdayDate.slice(1);
   const range = shortDate.formatRange(monday, monday + 6 * dayMillis);
   const started = progress.status === 'started';
   const complete = progress.status === 'complete';
-  const linkHint = started ? `Rozehráno · ${progress.found} ze 3` : 'Slova se mohou křížit';
+  const linkHint = started ? `Rozehráno · ${progress.found} ze 3` : launchSubtitle(day, launchDate);
   const linkAction = complete ? 'Řetěz' : started ? 'Pokračovat' : 'Hrát';
   const linkLabel = complete ? 'Prohlédnout dokončený řetěz Spojek' : started ? 'Pokračovat ve Spojkách' : 'Hrát Spojky s křížením';
   const tajenkaComplete = tajenkaStatus === 'done';
@@ -109,11 +109,9 @@ export function renderToday(root, {week, weekStart, dateISO, progress, nextLabel
         <button type="button" class="pt-daily" data-other="Denní výzva">
           <span class="pt-daily-copy">
             <strong>Denní výzva</strong>
-            <span class="pt-date">${date}</span>
             <span class="pt-daily-stats">${dailyComplete ? '✓ Hotovo' : `${levels[base][0]} <span class="pt-xp">+100 XP</span>`}</span>
           </span>
           ${art('/rewards/printshop/symbol-daily.svg', 'pt-daily-art')}
-          ${dailyComplete ? '' : '<span class="pt-streak">Dohráním udržíš sérii.</span>'}
           <span class="pt-primary-cta">${dailyAction}</span>
         </button>
         ${weekStrip(range, currentDay)}
@@ -125,7 +123,7 @@ export function renderToday(root, {week, weekStart, dateISO, progress, nextLabel
           <span class="pt-links-heading"><strong>Spojky</strong>
             ${complete ? '<span class="pt-done"><span aria-hidden="true">✓</span> Hotovo</span>' : ''}
           </span>
-          ${complete ? '<span class="pt-next"></span>' : `<span class="pt-link-status">${linkHint}</span>`}
+          ${complete ? '<span class="pt-next"></span>' : linkHint ? `<span class="pt-link-status">${linkHint}</span>` : ''}
         </span>
         <span class="pt-links-action">${linkAction}<span class="pt-angle" aria-hidden="true"></span></span>
       </button>

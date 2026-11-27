@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.11.0-tydenni-spojky1';
+const APP_PREVIEW_RELEASE='proplet-v4.11.0-tydenni-spojky2';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 function resetReloadEntry(){
  if(globalThis.performance?.getEntriesByType?.('navigation')?.[0]?.type!=='reload')return;

@@ -101,7 +101,6 @@ html[data-theme='dark'] .pt-today {
 }
 .pt-daily-copy { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
 .pt-daily-copy strong { font: 730 clamp(1.7rem,7.2vw,2.4rem)/1.06 Fraunces, Georgia, serif; letter-spacing: -.043em; }
-.pt-date { margin-top: .25rem; font-size: .9375rem; line-height: 1.35; }
 .pt-daily-stats { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-top: .35rem; font-size: .9375rem; font-weight: 600; }
 .pt-today .pt-xp {
   display: inline-block; width: max-content; max-width: 100%;
@@ -110,7 +109,6 @@ html[data-theme='dark'] .pt-today {
   font: 700 .8125rem/1.25 Outfit, system-ui, sans-serif; transform: rotate(-2deg);
 }
 .pt-daily-art { width: clamp(4rem, 10svh, 6.5rem); height: clamp(4rem, 10svh, 6.5rem); justify-self: center; filter: drop-shadow(0 2px 1px #18203321); }
-.pt-streak { align-self: center; font-size: .9375rem; line-height: 1.35; }
 .pt-primary-cta { grid-column: 2; display: inline-flex; align-items: center; justify-content: center; justify-self: stretch; padding: .3rem .8rem; min-height: 1.95rem; border-radius: .52rem; background: var(--daily-action); color: var(--daily); box-shadow: 0 2px 0 color-mix(in srgb,var(--daily-action) 70%,#101c2b); font-weight: 700; }
 .pt-week { min-height: 2.75rem; border: 0; border-radius: .65rem; padding: 0; background: transparent; }
 .pt-week-title { display: none; }
@@ -238,7 +236,7 @@ html[data-theme='dark'] .pt-today {
   .pt-primary-row { gap: 1.8rem; }
   .pt-daily { min-height: 12.35rem; padding: 1.15rem 1.6rem 1rem; gap: .45rem 1rem; }
   .pt-daily-copy strong { font-size: 2.5rem; }
-  .pt-date, .pt-daily-stats, .pt-streak { font-size: 1rem; }
+  .pt-daily-stats { font-size: 1rem; }
   .pt-week { gap: .95rem; }
   .pt-days { gap: .35rem; }
   .pt-day { min-height: 5.4rem; gap: .58rem; }
@@ -273,8 +271,8 @@ html[data-theme='dark'] .pt-today {
   .pt-head { padding-block: 0 .12rem; }
   .pt-daily { min-height: 6.55rem; row-gap: .13rem; padding: .42rem .8rem; }
   .pt-daily-copy strong { font-size: 1.56rem; }
-  .pt-date, .pt-daily-stats, .pt-streak { font-size: .875rem; line-height: 1.2; }
-  .pt-date, .pt-daily-stats { margin-top: .14rem; }
+  .pt-daily-stats { font-size: .875rem; line-height: 1.2; }
+  .pt-daily-stats { margin-top: .14rem; }
   .pt-primary-cta { min-height: 1.7rem; padding-block: .14rem; }
   .pt-daily-art { width: 3.5rem; height: 3.5rem; }
   .pt-day { min-height: 2.75rem; }
