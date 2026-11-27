@@ -35,6 +35,14 @@ function available() { return validEdition(edition, today()); }
 function nextLabel() {
   return isoDate(edition?.nextStart) ? 'Další deska v pondělí ' + prettyDate.format(new Date(edition.nextStart + 'T12:00:00Z')) : '';
 }
+function nextCardLabel(nextStart, day) {
+  if (!isoDate(nextStart)) return '';
+  // Compare Prague calendar dates at a common UTC midnight, including across DST.
+  const days = (Date.parse(nextStart) - Date.parse(day)) / 86400000;
+  if (!(days > 0)) return '';
+  if (days === 1) return 'Příští již zítra';
+  return `Příští již za ${days} ${days <= 4 ? 'dny' : 'dní'}`;
+}
 function updateCard() {
   entry.hidden = !available();
   if (entry.hidden) return;
@@ -43,7 +51,7 @@ function updateCard() {
   const action = entry.querySelector('.os-spojky-action-text');
   entry.dataset.state = status;
   const newBoardDetail = edition.week === 1 ? launchSubtitle(today(), edition.start) : '';
-  detail.textContent = status === 'complete' ? nextLabel() : status === 'started' ? `Rozehráno · ${found} ze 3` : newBoardDetail;
+  detail.textContent = status === 'complete' ? nextCardLabel(edition.nextStart, today()) : status === 'started' ? `Rozehráno · ${found} ze 3` : newBoardDetail;
   entry.querySelector('.os-spojky-done').hidden = status !== 'complete';
   action.textContent = status === 'complete' ? 'Řetěz' : status === 'started' ? 'Pokračovat' : 'Hrát';
   entry.setAttribute('aria-label', status === 'complete' ? 'Prohlédnout dokončený řetěz Spojek' : status === 'started' ? 'Pokračovat ve Spojkách' : 'Hrát Spojky');

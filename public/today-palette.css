@@ -59,8 +59,7 @@ html[data-theme=dark] #oneScreenToday {
 #oneScreenToday :is(.os-detail, .os-metrics, .os-tile > .os-arrow, .os-special > .os-arrow) {
   color: inherit;
 }
-#oneScreenToday .os-completion-row .os-arrow { color: var(--daily-action); }
-#oneScreenToday .os-feature:not(.os-special):not(.os-complete) > .os-arrow {
+#oneScreenToday .os-feature-footer .os-arrow {
   background: var(--daily-action);
   color: var(--daily-paper);
 }
