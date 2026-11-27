@@ -1,3 +1,4 @@
+import { resultAward, transferAwards } from './spojky-award.js';
 import { getProgress, launchSubtitle, mountGame, transferProgress } from '../../design/spojky/game.js';
 
 const dateFormat = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Prague', year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -121,12 +122,36 @@ async function openEntry(restore) {
   await refresh();
   if (document.getElementById('screen-daily').classList.contains('active')) open(restore);
 }
+function dailyStatus() {
+  const day = today();
+  try {
+    const daily = window.dailyResultState(day);
+    if (daily.active) return 'done';
+    if (window.savedProgressFor(daily.puzzle, 'daily', day)) return 'started';
+  } catch { /* The daily bank may still be loading on an offline start. */ }
+  return 'new';
+}
+function resultActions(boardEdition) {
+  return {
+    onResult(firstFinish, updateReward, paths) {
+      const status = dailyStatus();
+      const award = review ? {} : resultAward(boardEdition, firstFinish, updateReward, paths);
+      return { ...award, primaryLabel: status === 'done' ? 'Zpět na Dnes' : status === 'started' ? 'Pokračovat v denní výzvě' : 'Hrát dnešní výzvu' };
+    },
+    onPrimary() {
+      const done = dailyStatus() === 'done';
+      window.nav('daily', { replace: true });
+      if (!done) window.startDaily();
+    },
+    onShare: () => window.shareProplet('Týdenní Spojky mám! Podaří se Ti propojit všechny čtyři kartičky?\n\nZahraj si taky: https://hrajproplet.cz/?open=spojky'),
+  };
+}
 function syncScreen(name) {
   if (name === 'spojky' && available() && !playing) {
     mountedScope = scope();
     screen.scrollTop = 0;
     playing = mountGame(screen, { board: edition.board, week: edition.week, storageScope: mountedScope,
-      hintImage: '/assets/hints/printshop/gentle-v1.webp', nextLabel: nextLabel(),
+      resultActions: resultActions(edition), hintImage: '/assets/hints/printshop/gentle-v1.webp', nextLabel: nextLabel(),
       onBack: () => history.back(), onProgress: updateCard });
   } else if (name !== 'spojky' && playing) {
     playing.destroy();
@@ -143,8 +168,14 @@ function accountChanged() {
 
 window.PropletSpojky = {
   available, settled: () => settledDay === today(), open: () => open(), openEntry,
-  adoptGuest: id => transferProgress(scopeFor('guest'), scopeFor(id)),
-  removeAccount: id => transferProgress(scopeFor(id), null),
+  adoptGuest: id => {
+    if (!review) transferAwards('guest', id);
+    return transferProgress(scopeFor('guest'), scopeFor(id));
+  },
+  removeAccount: id => {
+    if (!review) transferAwards(id, null);
+    return transferProgress(scopeFor(id), null);
+  },
 };
 entry.addEventListener('click', () => open());
 document.addEventListener('proplet:screen-changed', event => syncScreen(event.detail.screen));

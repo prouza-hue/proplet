@@ -89,6 +89,28 @@ for branch in (server.backend_config.SPOJKY_REVIEW_BRANCH, "preview/spojky-davka
         assert not any((settings.live_player_preview, settings.supabase_url, settings.supabase_secret_key,
                         settings.vapid_private_key, settings.cron_secret))
 
+# A previous edition can sync offline progress; a future or incomplete one cannot mint XP.
+with (patch.object(server, "auth_player", return_value={"id": "player-a"}),
+      patch.object(server, "enforce_rate_limit"),
+      patch.object(server, "current_prague_date", return_value=date(2026, 12, 7)),
+      patch.object(server, "VERCEL_ENV", "production"),
+      patch.object(server, "db_request", side_effect=[[{"id": "grant"}], []]) as insert):
+    def finish(board, paths):
+        return client.post("/api/spojky/result", json={"boardId": board["id"], "paths": paths})
+
+    paths = [a["path"] for a in boards[0]["answers"]]
+    assert finish(boards[0], [paths[0], paths[1], paths[2][:-1]]).status_code == 422
+    assert finish(boards[2], [a["path"] for a in boards[2]["answers"]]).status_code == 404
+    insert.assert_not_called()
+    assert finish(boards[0], paths).json() == {"newlyGranted": True, "points": 200}
+    assert finish(boards[0], paths).json() == {"newlyGranted": False, "points": 200}
+    for args, kwargs in insert.call_args_list:
+        assert args == ("POST", "account_rewards")
+        assert kwargs["params"]["on_conflict"] == "player_id,reward_key"
+        assert "resolution=ignore-duplicates" in kwargs["prefer"]
+        assert kwargs["body"]["reward_key"] == "spojky_v1:" + boards[0]["id"]
+        assert kwargs["body"]["player_id"] == "player-a" and kwargs["body"]["points"] == 200
+
 with TemporaryDirectory() as tmp:
     public = Path(tmp) / "public"
     files = public / "design/spojky"

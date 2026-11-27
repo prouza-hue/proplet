@@ -90,6 +90,7 @@ from backend.contracts import (
     RescueFinish,
     ResultCreate,
     SupportModeSet,
+    SpojkyResult,
     SupportReportCreate,
     SupportReportUpdate,
     TeamMembershipSet,
@@ -1530,6 +1531,26 @@ def recent_tajenky(review: bool = False):
                              "difficulty": puzzle["difficulty"]})
     return JSONResponse({"date": today.isoformat(), "dailyFrom": TAJENKA_DAILY_START.isoformat(),
                          "editions": editions}, headers={"Cache-Control": "private, no-store"})
+
+
+@app.post("/api/spojky/result")
+def complete_spojky(payload: SpojkyResult, request: Request, authorization: Optional[str] = Header(default=None)):
+    enforce_rate_limit(request, "spojky_result", limit=120, window_seconds=3600)
+    player = auth_player(authorization)
+    today = current_prague_date()
+    edition = next((e for e in spojky.load_editions()
+                    if e.start <= today and e.board["id"] == payload.boardId), None)
+    if edition is None:
+        raise HTTPException(404, "Tato deska Spojek ještě nevyšla.")
+    if not spojky.completed_paths(edition.board, payload.paths):
+        raise HTTPException(422, "Spojení slov na desce nejsou úplná.")
+    if VERCEL_ENV == "preview" and not LIVE_PLAYER_PREVIEW:
+        raise HTTPException(403, "Tento náhled nepřipisuje skutečné XP.")
+    rows = db_request("POST", "account_rewards", params={"on_conflict": "player_id,reward_key", "select": "id"},
+                      body={"id": str(uuid.uuid4()), "player_id": player["id"], "puzzle_id": payload.boardId,
+                            "reward_key": "spojky_v1:" + payload.boardId, "reward_type": "spojky", "points": 200},
+                      prefer="resolution=ignore-duplicates,return=representation")
+    return {"newlyGranted": bool(rows), "points": 200}
 
 
 @app.get("/api/spojky")
