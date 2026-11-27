@@ -20,9 +20,9 @@
   --team-ink: #632638;
   --archive: #decae6;
   --archive-ink: #4d3158;
-  --links: #e6dcf0;
-  --links-ink: #463151;
-  --links-action: #61456f;
+  --links: #f3e4bd;
+  --links-ink: #4c361e;
+  --links-action: #794711;
   --patron-blue: #315d91;
   --patron-cream: #fff0cd;
   --patron-edge: #c9ad7e;
@@ -50,9 +50,9 @@ html[data-theme='dark'] .pt-today {
   --team-ink: #fff5df;
   --archive: #52415e;
   --archive-ink: #fff5df;
-  --links: #4b3b57;
-  --links-ink: #fff2dc;
-  --links-action: #e3c8ef;
+  --links: #453720;
+  --links-ink: #fff0d3;
+  --links-action: #f4c779;
   --patron-blue: #adcaff;
 }
 .pt-today *, .pt-today *::before, .pt-today *::after { box-sizing: border-box; }
