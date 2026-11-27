@@ -195,11 +195,16 @@ html[data-theme=dark] .sj-game {
 .sj-trace-picker { display: flex; flex-wrap: wrap; gap: .15rem .35rem; margin: .45rem 0 .25rem; }
 .sj-game .sj-trace-choice {
   position: relative; display: inline-flex; align-items: center; justify-content: center; gap: .38em;
-  min-height: 44px; padding: .4em .55em; border: 0; border-radius: .35rem; background: transparent; color: var(--sj-muted);
+  min-height: 44px; padding: .4em .55em; border: 1px solid transparent; border-radius: .35rem; background: transparent; color: var(--sj-muted);
   font: 560 .88rem/1.15 Outfit, sans-serif;
 }
 .sj-trace-choice[data-ink]::before { content: ''; }
-.sj-game .sj-trace-choice[aria-pressed=true] { color: var(--sj-color, var(--sj-ink)); background: var(--sj-wash, var(--sj-tray)); box-shadow: inset 0 -2px 0 var(--sj-color, var(--sj-strong)); }
+.sj-game .sj-trace-choice[aria-pressed=true] {
+  color: var(--sj-color, var(--sj-ink));
+  background: var(--sj-wash, var(--sj-tile));
+  border-color: var(--sj-edge);
+  border-color: color-mix(in srgb, var(--sj-color, var(--sj-muted)) 45%, var(--sj-wash, var(--sj-tile)));
+}
 .sj-grid-details[open] .sj-tray { margin: .35rem 0 0; justify-self: start; }
 .sj-grid-details summary:hover, .sj-top button:hover, .sj-clear:hover { text-decoration: underline; text-underline-offset: .14em; }
 .sj-next-week { margin: 1rem 0 0; padding-top: .75rem; border-top: 1px dashed var(--sj-edge); color: var(--sj-muted); font-size: .97rem; }
