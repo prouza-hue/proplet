@@ -1,0 +1,89 @@
+.taj-ed-dialog {
+  --td-ink: var(--pilot-ink);
+  --td-paper: var(--pilot-paper);
+  --td-line: var(--pilot-line);
+  --td-muted: var(--pilot-quiet);
+}
+
+.wb-head { margin-bottom: 1rem; }
+.wb-subtitle, .wb-count, .wb-feedback, .wb-summary { margin: 0; }
+.wb-subtitle { margin-top: .3rem; color: var(--sj-muted); }
+.wb-play { display: grid; gap: .85rem 1.25rem; }
+.wb-copy, .wb-tools { min-width: 0; }
+.wb-count { color: var(--sj-strong); font-weight: 680; font-variant-numeric: tabular-nums; }
+.wb-phrase {
+  margin: .45rem 0 0; color: var(--sj-ink);
+  font: 570 clamp(1.25rem, 4.5cqi, 1.72rem)/1.47 Fraunces, Georgia, serif;
+}
+.wb-slot { white-space: nowrap; }
+.wb-slot[data-pending] {
+  padding: 0 .12em; border-bottom: 1px dashed var(--sj-edge);
+  color: var(--sj-muted); font-family: Outfit, sans-serif; letter-spacing: .11em;
+}
+.wb-targets, .wb-found { display: flex; flex-wrap: wrap; align-items: baseline; gap: .28rem; margin: .4rem 0 0; }
+.wb-targets { color: var(--sj-muted); }
+.wb-length, .wb-word {
+  display: inline-block; border: 1px solid var(--sj-line); border-radius: .34rem;
+  background: var(--sj-tile); color: var(--sj-ink); font-weight: 600;
+}
+.wb-length { min-width: 1.55em; text-align: center; font-variant-numeric: tabular-nums; }
+.wb-word { padding: .05em .4em; border-bottom: 2px solid var(--word-color); }
+.wb-stage {
+  display: grid; place-items: center; justify-self: center; align-self: start; min-width: 0;
+  width: min(100%, calc(var(--wb-cols) * 3.32rem + 1rem));
+  aspect-ratio: var(--wb-cols) / var(--wb-rows);
+  padding: clamp(.34rem, 1.6cqi, .7rem); border: 1px solid var(--sj-tray-line); border-radius: .8rem;
+  background: radial-gradient(color-mix(in srgb, var(--sj-tray-line) 57%, transparent) .65px, transparent .9px) 0 0/4px 4px var(--sj-tray);
+}
+.wb-wrap { position: relative; }
+.wb-grid {
+  display: grid; width: 100%; height: 100%; gap: clamp(2px, .65cqi, 4px);
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.wb-grid .cell {
+  display: grid; place-items: center; position: relative;
+  min-width: 0; min-height: 0; border: 1px solid var(--sj-edge); border-bottom-width: 3px; border-radius: .38rem;
+  color: var(--sj-ink); background: var(--sj-tile); cursor: pointer;
+  font: 610 clamp(.9rem, calc(var(--cell-size, 40px) * .52), 1.9rem)/1 Fraunces, Georgia, serif;
+}
+.wb-grid .cell.used {
+  background: color-mix(in srgb, var(--word-color) 16%, var(--sj-tile)); border-color: var(--word-color); cursor: default;
+}
+.wb-grid .cell.active { color: var(--sj-on-strong); border-color: var(--sj-strong); background: var(--sj-strong); }
+.wb-grid .cell:focus-visible { outline: 3px solid var(--sj-mark); outline-offset: -4px; }
+.wb-grid .cell.wb-hinted { outline: 2px dashed var(--sj-mark); outline-offset: -5px; }
+.wb-paths { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.wb-paths .path-found, .wb-paths .path-active { opacity: .27; }
+.wb-tools { display: flex; flex-wrap: wrap; gap: .35rem .6rem; align-items: baseline; }
+.wb-feedback { flex: 1 1 13rem; color: var(--sj-muted); }
+.wb-game .wb-hint-button, .wb-game .wb-hint-choice, .wb-result .sj-primary {
+  min-height: 44px; border: 1px solid var(--sj-edge); border-radius: .5rem;
+  padding: .4rem .8rem; background: var(--sj-tile); font: 590 1rem/1.25 Outfit, sans-serif;
+}
+.wb-game .wb-hint-button { color: var(--sj-strong); }
+.wb-hints {
+  width: min(26rem, calc(100% - 1.5rem)); max-height: calc(100dvh - 2rem); margin: auto;
+  padding: clamp(1rem, 4vw, 1.45rem); border: 1px solid var(--sj-line); border-radius: 1rem;
+  color: var(--sj-ink); background: var(--sj-paper); box-shadow: 0 12px 60px #10171042;
+  overflow: auto; overscroll-behavior: contain;
+}
+.wb-hints::backdrop { background: #1c211ea8; }
+.wb-hints h2 { margin: 0 0 .6rem; font: 630 1.55rem/1.2 Fraunces, Georgia, serif; letter-spacing: -.025em; }
+.wb-game .wb-hint-choice { display: block; width: 100%; margin: .45rem 0; text-align: left; }
+.wb-hint-choice strong, .wb-hint-choice small { display: block; }
+.wb-hint-choice small { margin-top: .18rem; color: var(--sj-muted); font-size: .93rem; font-weight: 400; }
+.wb-hints .sj-clear { margin-top: .25rem; }
+.wb-result .wb-phrase { margin: .7rem 0; }
+.wb-result .wb-summary { color: var(--sj-strong); font-weight: 620; }
+.wb-result .wb-found { margin: .6rem 0 1.15rem; }
+.wb-game .wb-result .sj-primary { color: var(--sj-on-strong); border-color: var(--sj-strong); background: var(--sj-strong); }
+@container (min-width: 39rem) {
+  .wb-play {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, .9fr);
+    grid-template-rows: auto 1fr; grid-template-areas: "board copy" "board tools";
+  }
+  .wb-stage { grid-area: board; }
+  .wb-copy { grid-area: copy; }
+  .wb-tools { grid-area: tools; align-self: start; }
+  .wb-tools .wb-feedback { flex-basis: 100%; }
+}

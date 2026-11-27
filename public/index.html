@@ -9,10 +9,10 @@
   <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
   <script src="/referral-transport.js?v=profile-entry1"></script>
-<script src="/runtime-meta.js?v=denni-tajenka2" data-proplet-runtime-meta="1" data-loaded="1"></script>
+<script src="/runtime-meta.js?v=tydenni-spojky1" data-proplet-runtime-meta="1" data-loaded="1"></script>
   <script src="/app/client-diagnostics.js?v=actor-context1" id="propletClientDiagnostics"></script>
   <script src="/analytics-init.js?v=guide-seo1"></script>
-  <script src="/theme-init.js?v=denni-tajenka2"></script>
+  <script src="/theme-init.js?v=tydenni-spojky1"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Spojuj sousední písmena do českých slov a zaplň celou desku. Zahraj si Proplet zdarma bez registrace. Každý den tě čeká nová slovní výzva." />
@@ -106,14 +106,16 @@
 <link rel="stylesheet" href="/first-steps.css?v=2">
 <link rel="stylesheet" href="/mozkokalypsa.css?v=mk3release1">
 <link rel="stylesheet" href="/studio-edition.css?v=play-grid3">
-<link rel="stylesheet" href="/today-one-screen.css?v=spacing1">
+<link rel="stylesheet" href="/today-one-screen.css?v=tydenni-spojky2">
+<link rel="stylesheet" href="/design/spojky/game.css">
+<link rel="stylesheet" href="/design/spojky/tutorial.css">
 <link rel="stylesheet" href="/ui-playtest-preview.css?v=1">
 <link rel="stylesheet" href="/patrons.css?v=woodpecker1">
 <link rel="stylesheet" href="/app/engagement/pet-otisku.css?v=1">
 <link rel="stylesheet" href="/app/game/pet-otisku.css?v=4">
 <link rel="stylesheet" href="/today-palette.css?v=1">
 <link rel="stylesheet" href="/tajenka-editions.css?v=1">
-<link rel="stylesheet" href="/app/engagement/daily-tajenka-news.css?v=1">
+<link rel="stylesheet" href="/app/engagement/daily-tajenka-news.css?v=3">
 </head>
 <body class="studio-edition today-one-screen">
   <noscript>
@@ -193,6 +195,12 @@
       </aside>
 
       <div id="todayNewContentBanner" class="new-content-banner hidden"></div>
+
+      <button type="button" id="spojkyWeeklyBtn" class="os-spojky" data-os-key="spojky" hidden>
+        <img src="/design/spojky/spojky-print.svg" width="72" height="72" alt="">
+        <span class="os-spojky-copy"><span class="os-spojky-name"><strong>Spojky</strong><span class="os-spojky-done" hidden>✓ Hotovo</span></span><span class="os-spojky-detail"></span></span>
+        <span class="os-spojky-action"><span class="os-spojky-action-text">Hrát</span><i aria-hidden="true"></i></span>
+      </button>
 
       <div id="tajenkaPreviewCard" class="card tajenka-preview-card hidden"></div>
 
@@ -346,6 +354,8 @@
         <div class="trust-links"><a href="/privacy.html">Ochrana soukromí</a><span>·</span><a href="/terms.html">Podmínky používání</a></div>
       </div>
     </section>
+
+    <section id="screen-spojky" class="screen" aria-label="Spojky"></section>
 
     <section id="screen-game" class="screen game-screen">
       <div class="game-top">
@@ -815,7 +825,7 @@
   <script src="/app/core/storage.js?v=offline-timing1"></script>
   <script src="/app/account/session.js"></script>
   <script src="/app/account/tajenka-storage.js?v=denni-tajenka2"></script>
-  <script src="/app/content/tajenka-editions.js?v=2"></script>
+  <script src="/app/content/tajenka-editions.js?v=3"></script>
   <script src="/app/account/statistics.js?v=ui-refinement1"></script>
   <script src="/app/account/account.js?v=woodpecker1"></script>
   <script src="/app/game/state.js?v=pet-otisku1"></script>
@@ -851,8 +861,8 @@
   <script src="/app/archive/solution-contract.js"></script>
   <script src="/app/archive/experience.js?v=play-one-screen1"></script>
   <script src="/release-news.js?v=denni-tajenka2"></script>
-  <script src="/app/engagement/daily-tajenka-news.js?v=1"></script>
-  <script src="/app.js?v=denni-tajenka2"></script>
+  <script src="/app/engagement/daily-tajenka-news.js?v=2"></script>
+  <script src="/app.js?v=tydenni-spojky3"></script>
   <script src="/app/weekly/competition.js?v=resource1"></script>
   <script src="/app/monthly/competition.js?v=refresh-today1"></script>
 
@@ -865,7 +875,8 @@
   <script src="/app/mozkokalypsa-launch.js?v=archive-release1"></script>
 <script src="/referrals.js?v=ui-refinement2"></script>
   <script src="/studio-shell.js?v=1"></script>
-  <script src="/today-one-screen.js?v=denni-tajenka2"></script>
+  <script src="/today-one-screen.js?v=tydenni-spojky1"></script>
+  <script type="module" src="/app/game/spojky.js"></script>
 
   <script src="/ui-playtest-preview.js?v=1"></script>
 <script src="/visual-playtest.js?v=1"></script>

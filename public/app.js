@@ -1,4 +1,4 @@
-const APP_PREVIEW_RELEASE='proplet-v4.10.53-denni-tajenka2';
+const APP_PREVIEW_RELEASE='proplet-v4.11.0-tydenni-spojky3';
 const APP_VERSION=window.PROPLET_RUNTIME_META?.version||'0.0.0';
 function resetReloadEntry(){
  if(globalThis.performance?.getEntriesByType?.('navigation')?.[0]?.type!=='reload')return;
@@ -541,7 +541,7 @@ function rankingsOrchestration(){
   $,$$,api,pragueDateISO,ensureRankingProfileState,getProfile,updateAccountProfile,
   esc,countCz,levelFor,fmtTime,adjustAccountRankingData:data=>window.PROPLET_ACCOUNT_BONUS_API?.adjustRankingData?.(data)||data,
   nav,openProfileModal,openTeamMembershipModal,openFamilyLeagueModal,showToast,
-  canShowRankingPrivacyNotice:()=>{if(window.PropletFirstSteps?.quiet())return false;const stats=effectiveStats();return (stats.totalCompleted>0||stats.tajenkaCompleted>0)&&currentScreen!=='game'&&!document.querySelector('.modal:not(.hidden)')},
+  canShowRankingPrivacyNotice:()=>{if(window.PropletFirstSteps?.quiet())return false;const stats=effectiveStats();return (stats.totalCompleted>0||stats.tajenkaCompleted>0)&&currentScreen!=='game'&&currentScreen!=='spojky'&&!document.querySelector('.modal:not(.hidden)')},
  });
  return rankingsOrchestrationController;
 }
@@ -707,7 +707,7 @@ function adoptGuestData(profileId){
   try{const gq=JSON.parse(localStorage.getItem(guestQueueKey)||'[]'),pq=JSON.parse(localStorage.getItem(playerQueueKey)||'[]');const ids=new Set(pq.map(r=>r.attemptId||`${r.challengeKey}:${r.completedAt}`));for(const r of gq){const id=r.attemptId||`${r.challengeKey}:${r.completedAt}`;if(!ids.has(id)){pq.push(r);ids.add(id)}}localStorage.setItem(playerQueueKey,JSON.stringify(pq))}catch{}
   localStorage.removeItem(guestStateKey);localStorage.removeItem(guestQueueKey);
  }
- adoptGuestTajenkaData(profileId);window.PropletArchiveExperience?.adoptGuest(profileId);
+ adoptGuestTajenkaData(profileId);window.PropletArchiveExperience?.adoptGuest(profileId);window.PropletSpojky?.adoptGuest(profileId);
 }
 const THEME_MODES=new Set(['auto','light','dark']);
 const THEME_COLORS={light:'#6c5ce7',dark:'#111019'};
@@ -912,21 +912,23 @@ function calcStreak(dateStrings){const set=new Set(dateStrings);if(!set.size)ret
 function calcLongest(dateStrings){const arr=[...new Set(dateStrings)].sort();let best=0,cur=0,prev=null;for(const s of arr){const d=Date.parse(`${s}T12:00:00Z`);cur=prev!==null&&d-prev===86400000?cur+1:1;best=Math.max(best,cur);prev=d}return best}
 function levelFor(points){let i=0;for(let n=0;n<LEVELS.length;n++)if(points>=LEVELS[n].xp)i=n;const current=LEVELS[i],next=LEVELS[i+1]||null;const pct=next?Math.max(0,Math.min(100,((points-current.xp)/(next.xp-current.xp))*100)):100;return {index:i+1,current,next,pct}}
 
-const ROUTE_SCREENS=new Set(['daily','free','leaderboard','profile','game']);
+const ROUTE_SCREENS=new Set(['daily','free','leaderboard','profile','game','spojky']);
 // v3.21.3 — orientation is responsive-only; it never blocks or pauses play.
 function applyScreen(screen){
  screen=ROUTE_SCREENS.has(screen)?screen:'daily';const prev=currentScreen;
  if(prev==='game'&&screen!=='game'){if(!currentGame?.finished)trackStarterPhase(currentGame?.starterTrace,'left','navigation');releaseGameWakeLock();pauseGameClock('menu');if(currentGame?.mode!=='rescue'){saveGameProgress();sendAttemptCheckpoint('leave')}trackTajenkaAbandon();stopTimer()}
  currentScreen=screen;$$('.screen').forEach(x=>x.classList.remove('active'));$(`#screen-${screen}`).classList.add('active');
- document.body.classList.toggle('playing',screen==='game');$$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===(screen==='archive'?'free':screen)));$('.bottom-nav').classList.toggle('hidden',screen==='game');
+ const playing=screen==='game'||screen==='spojky';
+ document.body.classList.toggle('playing',playing);$$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===(screen==='archive'?'free':screen)));$('.bottom-nav').classList.toggle('hidden',playing);
  if(screen==='daily'){renderDaily();refreshRescueStatus()}if(screen==='free'){renderFree();if(prev!==screen)refreshFreeOrder()}if(screen==='leaderboard')renderLeaderboard();if(screen==='profile')renderProfile({focusRoadmap:prev!=='profile'});if(screen==='game')requestAnimationFrame(fitGameBoard);else window.scrollTo({top:0,behavior:'instant'});
  globalThis.PropletArchiveExperience?.screen(screen,prev);
- if(screen!==prev&&screen!=='game')trackProductEvent(`screen_${screen}_viewed`);
+ if(screen!==prev&&!playing)trackProductEvent(`screen_${screen}_viewed`);
  document.dispatchEvent(new CustomEvent('proplet:screen-changed',{detail:{screen}}));
  if(prev==='game'&&currentGame?.tajenkaEditionsScreen===screen)requestAnimationFrame(()=>{if(currentScreen===screen)window.PropletDailyTajenka?.open()});
 }
 function nav(screen,{replace=false,fromPop=false}={}){
  screen=ROUTE_SCREENS.has(screen)?screen:'daily';
+ if(screen==='spojky'&&!window.PropletSpojky?.available())screen='daily';
  if(!fromPop&&screen!==currentScreen){const state={proplet:true,screen};if(replace)history.replaceState(state,'',location.href);else history.pushState(state,'',location.href)}
  applyScreen(screen);
 }
@@ -938,6 +940,7 @@ function initNavigation(){
   const modal=openTransientModal();
   if(modal){
    if(modal.id==='tajenkaEditionsDialog')window.PropletDailyTajenka.close();
+   else if(currentScreen==='spojky'&&modal.matches?.('.sj-dialog[open]'))modal.close();
    else if(modal.id==='winModal'&&(window.PropletDailyTajenka?.isReview()||tajenkaRecapOpen&&tajenkaRecapFromEditions))await closeWinAndContinue();
    else if(modal.id==='archiveExperienceModal')globalThis.PropletArchiveExperience.closeModal();
    else if(modal.id==='onboardingModal'&&onboardingMandatory){}
@@ -991,7 +994,7 @@ function bindPwaBack(dismissModal){
  syncWatcher();
 }
 function transientModals(){return ['archiveExperienceModal','tajenkaRulesModal','winModal','accountNudgeModal','progressGuardModal','pushNudgeModal','installNudgeModal','profileModal','teamMembershipModal','passwordModal','hintModal','supportModeModal','helperOfferModal','rescueOfferModal','onboardingModal','wordReportModal','validWordFailsafeModal','playedLevelsModal','levelDetailModal','mk100LaunchPreview','freeRefreshAnnouncement','dailyExtraIntro'].map(id=>document.getElementById(id)).filter(Boolean)}
-function openTransientModal(){return document.querySelector('#tajenkaEditionsDialog[open]')||document.querySelector('#achievementDetail[open]')||document.querySelector('#contentReleaseModal[open]')||transientModals().find(el=>!el.classList.contains('hidden'))||null}
+function openTransientModal(){return document.querySelector('#screen-spojky .sj-dialog[open]')||document.querySelector('#tajenkaEditionsDialog[open]')||document.querySelector('#achievementDetail[open]')||document.querySelector('#contentReleaseModal[open]')||transientModals().find(el=>!el.classList.contains('hidden'))||null}
 function closeTransientModals(){window.PropletDailyTajenka?.close();globalThis.PropletArchiveExperience?.closeModal();window.PropletAchievementDetails?.close();window.PropletRefreshRelease?.close();window.PropletContentRelease?.close();if(typeof dailySpecialUIController!=='undefined')dailySpecialUIController?.closeIntro();transientModals().forEach(el=>el.classList.add('hidden'))}
 function goBackFromGame(){
  if(currentScreen!=='game')return;
@@ -1657,7 +1660,7 @@ function progressGuardLastPromptAt(){
 }
 function canOfferProgressGuard(source){
  if(window.PropletFirstSteps?.quiet())return false;
- if(getProfile()?.token||completedGameCount()<1||currentScreen==='game'||openTransientModal())return false;
+ if(getProfile()?.token||completedGameCount()<1||currentScreen==='game'||currentScreen==='spojky'||openTransientModal())return false;
  if(source==='desktop'&&progressGuardHasCoarsePointer())return false;
  if(source==='mobile'&&!progressGuardHasCoarsePointer())return false;
  const last=progressGuardLastPromptAt();return !last||Date.now()-last>=PROGRESS_GUARD_COOLDOWN_MS;
@@ -1907,7 +1910,7 @@ function trackInboundCampaign(){
 function trackAppSession(){
  try{const now=Date.now(),day=pragueDateISO(),last=JSON.parse(sessionStorage.getItem(ANALYTICS_SESSION_KEY)||'null');if(last?.day===day&&now-last.at<1800000)return;sessionStorage.setItem(ANALYTICS_SESSION_KEY,JSON.stringify({at:now,day}))}catch{}
  trackProductEvent('app_session_started');
- if(currentScreen!=='game')trackProductEvent(`screen_${currentScreen}_viewed`);
+ if(currentScreen!=='game'&&currentScreen!=='spojky')trackProductEvent(`screen_${currentScreen}_viewed`);
 }
 
 async function syncQueue({announce=false,waitForProfile=true}={}){
@@ -2021,6 +2024,7 @@ async function deleteAccount(){
  button.disabled=true;button.textContent='Mažu účet…';const deletedId=p.id;
  try{
   await api('/api/account',{method:'DELETE',body:JSON.stringify({confirmation:'SMAZAT',password:p.hasPassword?password:null})});
+  window.PropletSpojky?.removeAccount(deletedId);
   try{const reg=await getPushRegistration(),sub=await reg.pushManager.getSubscription();if(sub)await sub.unsubscribe()}catch{}
   try{const reg=await navigator.serviceWorker?.ready,sub=await reg?.pushManager?.getSubscription?.();if(sub)await sub.unsubscribe()}catch{}
   clearAccountProfile();localStorage.removeItem(scopedStorageKey(STORE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(REJECTED_QUEUE_KEY,deletedId));localStorage.removeItem(scopedStorageKey(RESCUE_OFFER_KEY,deletedId));tajenkaStorage()?.remove(deletedId);localStorage.removeItem(tajenkaStateKey(deletedId));localStorage.removeItem(ACCOUNT_NUDGE_KEY);localStorage.removeItem(PROGRESS_GUARD_KEY);localStorage.removeItem(PUSH_NUDGE_KEY);localStorage.removeItem(SUPPORT_MODE_KEY);rotateAnonymousId();syncState={status:'idle',error:null,lastAt:null};currentGame=null;stopTimer();$('#deleteAccountModal').classList.add('hidden');updateProfileChip();renderProfile();renderDaily();renderFree();nav('daily',{replace:true});showToast('Účet a serverová data jsou smazaná.');
@@ -2296,7 +2300,7 @@ async function maybeOpenQaDashboard(){
 }
 
 function canAutomaticallyUpdate(){
- return currentScreen!=='game'&&document.visibilityState==='visible'&&navigator.onLine!==false&&!openTransientModal()&&!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]');
+ return currentScreen!=='game'&&currentScreen!=='spojky'&&document.visibilityState==='visible'&&navigator.onLine!==false&&!openTransientModal()&&!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]');
 }
 function automaticUpdateAttempt(targetVersion){
  try{
@@ -3238,11 +3242,15 @@ async function boot(){
  const entryParams=new URLSearchParams(location.search),forcedTutorial=entryParams.get('tutorial')==='1';
  const guideMode=requestedGuideMode(entryParams),tajenkaReview=dailyTajenkaUI?.isReview();
  const stampPreview=previewRuntime()&&['dar','prosba'].includes(entryParams.get('pet_otisku'));
+ const restoreSpojky=history.state?.proplet===true&&history.state.screen==='spojky';
+ const spojkyEntry=!forcedTutorial&&(entryParams.get('open')==='spojky'||restoreSpojky);
+ const spojkyReview=window.PROPLET_RUNTIME_META?.environment==='preview'&&/^\d{4}-\d{2}-\d{2}$/.test(entryParams.get('spojkyReview')||'');
+ const standaloneEntry=guideMode||tajenkaReview||stampPreview||spojkyEntry||spojkyReview;
  if(navigator.onLine!==false&&freshStarterVisit()&&!forcedTutorial)await loadRuntimeCapabilities();
  try{
-  if(navigator.onLine!==false&&!guideMode&&!tajenkaReview&&!stampPreview&&!forcedTutorial)await window.PropletFirstSteps.prepareEntry(entryExperimentEnabled,entryExperimentTest);
+  if(navigator.onLine!==false&&!standaloneEntry&&!forcedTutorial)await window.PropletFirstSteps.prepareEntry(entryExperimentEnabled,entryExperimentTest);
  }catch{reportClientError('entry_assignment_failed','entry-contract');showPuzzleBootError();return}
- if(!guideMode&&!tajenkaReview&&freshStarterVisit()&&!window.PropletFirstSteps?.directEntryPending()){starterBootTrace=createStarterTrace();trackStarterPhase(starterBootTrace,'requested')}
+ if(!guideMode&&!tajenkaReview&&!spojkyEntry&&!spojkyReview&&freshStarterVisit()&&!window.PropletFirstSteps?.directEntryPending()){starterBootTrace=createStarterTrace();trackStarterPhase(starterBootTrace,'requested')}
  try{puzzleDB=await loadPuzzleDatabaseWithRecovery();trackStarterPhase(starterBootTrace,'data_ready')}catch{if(!guideMode)window.PropletFirstSteps?.recordEntryLoadFailure?.();trackStarterPhase(starterBootTrace,'failed','data');try{reportClientError('puzzle_boot_failed','both-attempts-failed')}catch{}showPuzzleBootError();return}
  const requestedOpen=entryParams.get('open');
  // The installed game's ordinary launch can render the saved bank and account
@@ -3276,11 +3284,15 @@ async function boot(){
  refreshRollingContent().catch(()=>null);syncQueue({announce:false});refreshRescueStatus();
  setTimeout(()=>{
   const installPreview=openInstallPreview();
-  const directEntry=!guideMode&&!tajenkaReview&&!stampPreview&&!installPreview&&!forcedTutorial&&window.PropletFirstSteps?.openDirectEntry();
+  const directEntry=!standaloneEntry&&!installPreview&&!forcedTutorial&&window.PropletFirstSteps?.openDirectEntry();
   if(guideMode)openGuideGame(guideMode);
-  else if(!tajenkaReview&&!stampPreview&&!directEntry&&!installPreview&&!(!livePlayerPreview()&&window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&entryParams.get('releasePreview')==='1'))openOnboarding(forcedTutorial);
+  else if(spojkyEntry){
+   const open=()=>window.PropletSpojky?.openEntry(restoreSpojky);
+   if(window.PropletSpojky)open();else document.addEventListener('proplet:spojky-ready',open,{once:true});
+  }
+  else if(!standaloneEntry&&!directEntry&&!installPreview&&!(!livePlayerPreview()&&window.PROPLET_RUNTIME_META?.gen5CandidatePreview&&entryParams.get('releasePreview')==='1'))openOnboarding(forcedTutorial);
   document.dispatchEvent(new CustomEvent('proplet:ready',{detail:{localLaunch}}));
-  if(!stampPreview&&!tajenkaReview&&!guideMode&&!installPreview&&!directEntry)openSpecialInvitation().catch(()=>{});
+  if(!standaloneEntry&&!installPreview&&!directEntry)openSpecialInvitation().catch(()=>{});
  },80);
  window.addEventListener('online',refreshDailyAfterResume);window.addEventListener('focus',refreshDailyAfterResume);window.addEventListener('pageshow',refreshDailyAfterResume);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshDailyAfterResume()});

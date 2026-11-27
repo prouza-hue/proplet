@@ -1,6 +1,27 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const source=fs.readFileSync(path.join(__dirname,'../../public/app.js'),'utf8');
 function extract(start,end){const from=source.indexOf(start),to=source.indexOf(end,from);assert.ok(from>=0&&to>from);return source.slice(from,to);}
+function screenEvents() {
+  const events = [];
+  const noop = () => {};
+  const node = {classList: {add: noop, toggle: noop}};
+  const context = {
+    currentScreen: 'daily', currentGame: null, $: () => node, $$: () => [],
+    document: {body: node, dispatchEvent: noop}, window: {scrollTo: noop}, CustomEvent: class {},
+    renderDaily: noop, refreshRescueStatus: noop, renderFree: noop, refreshFreeOrder: noop,
+    renderLeaderboard: noop, renderProfile: noop, requestAnimationFrame: noop, fitGameBoard: noop,
+    trackProductEvent: event => events.push(event),
+  };
+  vm.createContext(context);
+  vm.runInContext(extract('const ROUTE_SCREENS=', 'function nav('), context);
+  for (const screen of ['daily','free','free','leaderboard','profile','daily','spojky','daily','game','game']) {
+    context.applyScreen(screen);
+  }
+  assert.deepEqual(events, [
+    'screen_free_viewed', 'screen_leaderboard_viewed', 'screen_profile_viewed',
+    'screen_daily_viewed', 'screen_daily_viewed',
+  ], 'each menu entry is counted once; game screens do not send product view events');
+}
 async function navigation(modalId,owner){
   const handlers={},background={inert:true},body={style:{overflow:'hidden'}};
   let closed=null,hidden=false,pushed=0;
@@ -69,4 +90,4 @@ function startup(){
   assert.equal(context.result,type==='reload'?'/?utm_source=test#anchor':undefined,'only reload consumes launch parameters');
  }
 }
-(async()=>{startup();await navigation('mk100LaunchPreview','content');await navigation('freeRefreshAnnouncement','refresh');await pwaBack();await resume();console.log('PASS: root Android Back stays native; overlays retain close ownership; hard 319 resumes without altering progress.');})().catch(error=>{console.error(error);process.exitCode=1;});
+(async()=>{screenEvents();startup();await navigation('mk100LaunchPreview','content');await navigation('freeRefreshAnnouncement','refresh');await pwaBack();await resume();console.log('PASS: menu views, native Android Back, overlay ownership and saved game navigation.');})().catch(error=>{console.error(error);process.exitCode=1;});

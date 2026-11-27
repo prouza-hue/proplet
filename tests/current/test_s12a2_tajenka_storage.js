@@ -116,3 +116,41 @@ assert.deepStrictEqual(events, ['timing stopped','free']);
 assert.strictEqual(oldGame.fairPlay, false);
 
 console.log('PASS: Sprint 12A.2 scopes, migrates, adopts, syncs, and deletes Tajenka state by account');
+
+// Both timelines can offer the same edition ID with different board content.
+(async function checkPublishedCalendarCache() {
+  const storage = memoryStorage();
+  const window = {localStorage: storage};
+  const modulePath = path.resolve(__dirname, '../../public/app/content/tajenka-editions.js');
+  vm.runInNewContext(fs.readFileSync(modulePath, 'utf8'), {
+    window, document: {addEventListener() {}}, navigator: {onLine: true},
+  });
+  const calendar = window.PropletDailyTajenka;
+  const productionKey = 'proplet-published-tajenky-v1';
+  const id = 'tajenka-v2-week-40';
+  const options = {dailyFrom: '2026-11-27', previewHost: () => false, valid: board => board.id === id};
+  const listing = date => ({date, dailyFrom: options.dailyFrom, editions: [{id, week: 40, date: '2026-12-15'}]});
+  let finishList, finishBoard;
+  calendar.configure({...options, cacheKey: 'preview-2026-12-16', today: () => '2026-12-16',
+    fetchRecent: () => new Promise(resolve => { finishList = resolve; }),
+    fetchPuzzle: () => new Promise(resolve => { finishBoard = resolve; }),
+  });
+  const pending = [calendar.list(), calendar.load(id)];
+  await Promise.resolve();
+
+  const liveBoard = {id, source: 'published'};
+  calendar.configure({...options, today: () => '2026-12-15',
+    fetchRecent: () => listing('2026-12-15'), fetchPuzzle: () => liveBoard,
+  });
+  const live = [calendar.list(), calendar.load(id)];
+  await new Promise(resolve => setImmediate(resolve));
+  const saved = storage.getItem(productionKey);
+  assert.deepStrictEqual(JSON.parse(saved), {boards: [liveBoard], listing: listing('2026-12-15')});
+
+  finishList(listing('2026-12-16'));
+  finishBoard({id, source: 'sample'});
+  await Promise.all([...pending, ...live]);
+  assert.strictEqual(storage.getItem(productionKey), saved, 'late sample requests overwrote the live cache');
+  assert.strictEqual(calendar.cached(id).source, 'published');
+  console.log('PASS: a late preview listing and board preserve the default published Tajenka cache');
+})().catch(error => { console.error(error); process.exitCode = 1; });

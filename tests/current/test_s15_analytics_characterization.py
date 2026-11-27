@@ -53,10 +53,8 @@ else:
 # Baseline quirk: callers may pass a second argument, but product analytics sends event_type only.
 assert "trackProductEvent('starter_hint_used',{level})" in APP
 
-# Event timing / duplicate guards must remain behavior-identical.
-assert "if(screen!==prev&&screen!='game')" not in APP  # guard uses strict JS comparison
-assert "if(screen!==prev&&screen!=='game')" in APP
-assert "trackProductEvent(`screen_${screen}_viewed`)" in APP
+# Navigation events, including duplicate views and game screens, are exercised
+# through the router in test_mobile_resume_navigation.cjs.
 assert "if(last?.day===day&&now-last.at<1800000)return;" in APP
 assert "if(show&&!button.dataset.impression)" in APP
 assert "trackProductEvent('win_account_cta_shown')" in APP

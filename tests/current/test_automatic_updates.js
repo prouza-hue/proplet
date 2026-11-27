@@ -21,8 +21,8 @@ function harness({store=new Map(),release='old',now=100000}={}){
 }
 (async()=>{
  const h=harness();h.ctx.showUpdateBanner({});h.ctx.showUpdateBanner({});assert.equal(h.timers.size,1);await h.tick();assert.equal(h.reloads,1);assert.equal(h.deletes,0,'automatic updates retain offline caches');
- for(const block of ['game','hidden','offline','modal','editing']){
-  const h=harness();if(block==='game')h.ctx.currentScreen='game';if(block==='hidden')h.ctx.document.visibilityState='hidden';if(block==='offline')h.ctx.navigator.onLine=false;if(block==='modal')h.modal={};if(block==='editing')h.editing=true;
+ for(const block of ['game','spojky','hidden','offline','modal','editing']){
+  const h=harness();if(block==='game'||block==='spojky')h.ctx.currentScreen=block;if(block==='hidden')h.ctx.document.visibilityState='hidden';if(block==='offline')h.ctx.navigator.onLine=false;if(block==='modal')h.modal={};if(block==='editing')h.editing=true;
   h.ctx.scheduleAutomaticUpdate('new');await h.tick();assert.equal(h.reloads,0,block);
   h.ctx.currentScreen='daily';h.ctx.document.visibilityState='visible';h.ctx.navigator.onLine=true;h.modal=null;h.editing=false;await h.tick();assert.equal(h.reloads,1,`${block} resumes automatically`);
  }

@@ -1,8 +1,8 @@
 /* Published Tajenka editions; progress and rewards remain with the normal game. */
 (function install(global){
  'use strict';
- const cacheKey='proplet-published-tajenky-v1',limit=7;
- let deps=null,stored=null,reviewList=null,pendingList=null,dialog=null,body=null,opener=null,view=0;
+ const defaultCacheKey='proplet-published-tajenky-v1',limit=7;
+ let cacheKey=defaultCacheKey,deps=null,stored=null,reviewList=null,pendingList=null,dialog=null,body=null,opener=null,view=0;
  const sampleBoards=new Map();
  const make=(tag,cls,value)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(value!=null)node.textContent=value;return node};
  const button=(cls,label)=>{const el=make('button',cls,label);el.type='button';return el};
@@ -47,8 +47,10 @@
   if(saved&&(review||saved.date===deps.today()))return saved;
   if(!review&&navigator.onLine===false&&saved)return saved;
   if(pendingList)return pendingList;
-  const job=Promise.resolve().then(()=>deps.fetchRecent(review)).then(data=>{
+  const key=cacheKey,fetchRecent=deps.fetchRecent;
+  const job=Promise.resolve().then(()=>fetchRecent(review)).then(data=>{
    const listing=validateListing(data);if(!listing)throw Error('editions');
+   if(key!==cacheKey)return listing;
    if(review)reviewList=listing;else{cache().listing=listing;save()}return listing;
   }).catch(error=>{if(saved)return saved;throw error});
   pendingList=job;
@@ -58,8 +60,9 @@
   if(!validId(id))throw Error('edition');
   const review=isReview(),hit=review?sampleBoards.get(id):cached(id);
   if(hit)return hit;
-  const p=await deps.fetchPuzzle(id,review);
+  const key=cacheKey,p=await deps.fetchPuzzle(id,review);
   if(!p||p.id!==id||!deps.valid(p))throw Error('edition');
+  if(key!==cacheKey)return p;
   if(review)sampleBoards.set(id,p);else remember(p);
   return p;
  }
@@ -81,7 +84,7 @@
   const closeButton=button('taj-ed-close','×');closeButton.setAttribute('aria-label','Zavřít');closeButton.onclick=close;
   header.append(title,closeButton);
   body=make('div','taj-ed-body');dialog.append(header,body);document.body.append(dialog);
-  dialog.addEventListener('close',()=>{view++;body.replaceChildren();if(opener?.isConnected)opener.focus({preventScroll:true});opener=null});
+  dialog.addEventListener('close',()=>{if(dialog.open)return;view++;body.replaceChildren();if(opener?.isConnected)opener.focus({preventScroll:true});opener=null});
   dialog.addEventListener('click',e=>{if(e.target!==dialog)return;const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close()});
  }
  function close(){if(dialog?.open)dialog.close()}
@@ -126,8 +129,14 @@
    close();await deps.openPuzzle(p,true);
   }catch{if(token===view&&dialog.open)errorMessage(navigator.onLine===false?'Tuhle Tajenku si poprvé otevři s připojením.':'Tajenku se nepodařilo načíst.',()=>open())}
  }
- function openFromNews(){if(!available())return false;const p=deps.current();return !readyToday()||deps.status(p.id)==='done'?open():deps.openPuzzle(p)}
+ function openToday(){return readyToday() && deps.openPuzzle(deps.current())}
+ function openFromNews(){if(!available())return false;const p=deps.current();return !readyToday()||deps.status(p.id)==='done'?open():openToday()}
  document.addEventListener('proplet:tajenka-ready',()=>{if(dialog?.open)open()});
- const api={configure(options){deps=options},available,nextIsTomorrow,readyToday,isReview,remember,cached,list,load,open,openFromNews,syncPlayEntry,close};
+ function configure(options){
+  const key=options.cacheKey||defaultCacheKey;
+  if(key!==cacheKey){cacheKey=key;stored=null;pendingList=null;reviewList=null;sampleBoards.clear()}
+  deps=options;
+ }
+ const api={configure,available,nextIsTomorrow,readyToday,isReview,remember,cached,list,load,open,openToday,openFromNews,syncPlayEntry,close};
  global.PropletDailyTajenka=api;
 })(typeof window!=='undefined'?window:globalThis);
