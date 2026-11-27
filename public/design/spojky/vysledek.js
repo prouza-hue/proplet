@@ -105,6 +105,10 @@ function render() {
       nextLabel: 'Další deska v pondělí 7. prosince', hintImage: '/assets/hints/printshop/gentle-v1.webp',
       resultPreview: { onResult: resultState, onShare: share, onPrimary: () => navigate(dailyStatus() === 'done' ? 'dnes' : 'denni') } });
   }
+  if (new URLSearchParams(location.search).get('mrizka') === '1') {
+    const details = app.querySelector('.sj-grid-details');
+    if (details) details.open = true;
+  }
   window.scrollTo(0, 0);
 }
 
