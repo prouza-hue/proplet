@@ -182,6 +182,8 @@ def main():
                 report['checks'].append('entry migration preserves historical B assignments and exact recruitment window; new sequence starts at zero')
             report['schemaFiles'].append({'path': path.relative_to(ROOT).as_posix(),
                                          'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+        c.execute((ROOT/'supabase/tests/spojky_competition_xp.sql').read_text(encoding='utf8'))
+        report['checks'].append('Spojky: replay, personal monthly XP, team snapshot, period cut-off and weekly trophy')
         c.execute((ROOT/'supabase/tests/new_player_entry.sql').read_text(encoding='utf8'))
         report['checks'].append('entry experiment: immutable assignment, both branches, history, claim and grants')
         c.execute((ROOT/'supabase/tests/entry_fixed_catchup.sql').read_text(encoding='utf8'))

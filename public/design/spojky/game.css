@@ -114,6 +114,22 @@ html[data-theme=dark] .sj-game {
 .sj-grid-details .sj-grid:not(.sj-inspecting) .sj-cell[data-owners="1"] { background: var(--sj-bg1); }
 .sj-grid-details .sj-grid:not(.sj-inspecting) .sj-cell[data-owners="2"] { background: var(--sj-bg2); }
 .sj-grid-details .sj-grid:not(.sj-inspecting) .sj-cell[data-owners*=" "] { border-color: var(--sj-muted); }
+/* The ink numbers follow the legend, independently of discovery order. */
+.sj-game .sj-cell[data-owners~="0"] { --first-ink: var(--sj-bg0); }
+.sj-game .sj-cell[data-owners~="1"] { --last-ink: var(--sj-bg1); }
+.sj-game .sj-cell[data-owners~="2"] { --last-ink: var(--sj-bg2); }
+.sj-game .sj-cell[data-owners~="1"]:not([data-owners~="0"]) { --first-ink: var(--sj-bg1); }
+
+.sj-game .sj-playing .sj-cell[data-owners="0"]:not(.sj-current) { background: var(--sj-bg0); }
+.sj-game .sj-playing .sj-cell[data-owners="1"]:not(.sj-current) { background: var(--sj-bg1); }
+.sj-game .sj-playing .sj-cell[data-owners="2"]:not(.sj-current) { background: var(--sj-bg2); }
+.sj-game .sj-grid:not(.sj-inspecting) .sj-cell[data-owners*=" "]:not(.sj-current) {
+  background: linear-gradient(135deg, var(--first-ink) 50%, var(--last-ink) 50%);
+}
+.sj-game .sj-grid:not(.sj-inspecting) .sj-cell[data-owners~="0"][data-owners~="1"][data-owners~="2"]:not(.sj-current) {
+  background: linear-gradient(90deg, var(--sj-bg0) 0 33.33%, var(--sj-bg1) 33.33% 66.67%, var(--sj-bg2) 66.67%);
+}
+
 .sj-cell.sj-trace-start::before { content: "1"; position: absolute; top: .2rem; left: .3rem; font: 650 .65rem/1 Outfit, sans-serif; }
 
 .sj-impressions { position: absolute; inset: 0; pointer-events: none; }
