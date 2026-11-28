@@ -213,7 +213,9 @@
 
     document.body.classList.toggle(PHONE_CLASS,blocked);
     document.querySelector('.phone-landscape-guard').style.display=blocked?'grid':'none';
+    const main=document.querySelector('.game-main');
     if(blocked){
+      main?.classList.remove('word-list-in-rail');
       setDebugMode('phone-landscape-blocked',d,landscape,'phone');
       document.body.classList.remove(TABLET_CLASS,TABLET_PORTRAIT_CLASS,DESKTOP_CLASS);
       syncControlSide();
@@ -233,17 +235,28 @@
     /* Fine-pointer wide screens keep the dedicated desktop composition. Touch-first unfolded
        Fold/tablet screens use the proven compact rail in both orientations. 540px is intentional:
        a real unfolded Fold may expose a narrower CSS viewport than its physical panel suggests. */
-    const desktopWide=playing&&!phone&&finePointer()&&d.w>=1000&&d.h>=650;
-    const largeTouchRail=playing&&!desktopWide&&!phone&&coarsePointer()&&d.w>=540&&d.w<=1280;
-    const portraitRail=largeTouchRail&&!landscape;
-    document.body.classList.toggle(TABLET_CLASS,largeTouchRail);
+    const ordinaryBoard=!document.querySelector('#screen-game:is(.tajenka-mode,.starter-mode,.otisky-mode)');
+    const desktopWide=playing&&!phone&&d.w>=1000&&d.h>=650
+      &&(finePointer()||(ordinaryBoard&&d.w>1280));
+    const largeTouchRail=coarsePointer()&&d.w>=540&&d.w<=1280;
+    // A narrow desktop window still has room for a compact list beside a 10×10 board.
+    const compactWindowRail=ordinaryBoard&&finePointer()&&d.w>=700&&d.h>=520;
+    const compactRail=playing&&!desktopWide&&!phone&&(largeTouchRail||compactWindowRail);
+    const portraitRail=compactRail&&!landscape;
+    document.body.classList.toggle(TABLET_CLASS,compactRail);
     document.body.classList.toggle(TABLET_PORTRAIT_CLASS,portraitRail);
     document.body.classList.toggle(DESKTOP_CLASS,desktopWide);
     syncControlSide();
 
-    if(desktopWide){
+    const wordRail=(desktopWide||compactRail)&&ordinaryBoard;
+    main?.classList.toggle('word-list-in-rail',wordRail);
+    if(wordRail){
+      restoreCurrentWord();
+      const rail=document.querySelector('.game-control-column');
+      if(gameInfo&&rail&&gameInfo.parentNode!==rail)rail.prepend(gameInfo);
+    }else if(desktopWide){
       moveDesktopStatusToRail();
-    }else if(largeTouchRail){
+    }else if(compactRail){
       restoreGameInfo();
       moveCurrentWordToRail();
     }else{
@@ -251,15 +264,16 @@
     }
 
     const dock=document.querySelector('#magnifierDock');
-    const dockParent=largeTouchRail||desktopWide?document.querySelector('.game-control-column'):currentWord;
+    const dockParent=compactRail||desktopWide?document.querySelector('.game-control-column'):currentWord;
     if(dock&&dockParent&&dock.parentNode!==dockParent)dockParent.appendChild(dock);
 
-    const largeTouchMode=landscape?'tablet-landscape':'tablet-portrait-rail';
+    const compactMode=largeTouchRail?(landscape?'tablet-landscape':'tablet-portrait-rail'):'compact-wide';
+    const desktopPointer=desktopWide||(compactWindowRail&&!largeTouchRail);
     setDebugMode(
-      desktopWide?'desktop-wide':largeTouchRail?largeTouchMode:playing?'standard':'inactive',
+      desktopWide?'desktop-wide':compactRail?compactMode:playing?'standard':'inactive',
       d,
       landscape,
-      desktopWide?'desktop':largeTouchRail?'large-touch':phone?'phone':'standard',
+      desktopPointer?'desktop':compactRail?'large-touch':phone?'phone':'standard',
     );
     refit();
   };
@@ -274,6 +288,8 @@
     ensureSideToggle();
     const observer=new MutationObserver(schedule);
     observer.observe(document.body,{attributes:true,attributeFilter:['class']});
+    const game=document.querySelector('#screen-game');
+    if(game)observer.observe(game,{attributes:true,attributeFilter:['class']});
     const modeLabel=document.querySelector('#gameModeLabel');
     if(modeLabel)new MutationObserver(schedule).observe(modeLabel,{childList:true,characterData:true,subtree:true});
     window.addEventListener('resize',schedule,{passive:true});

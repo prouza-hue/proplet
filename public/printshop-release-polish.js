@@ -250,7 +250,7 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
   }
 
   function rankingQuality(row){
-    if(row?.cleanSolve===true)return 'Čistě · bez nápovědy';
+    if(row?.hintsUsed==null&&row?.cleanSolve!==true)return 'Dokončeno';
     const hints=Math.max(0,Number(row?.hintsUsed)||0);
     return hints?countCzech(hints,'nápověda','nápovědy','nápověd'):'Bez nápovědy';
   }

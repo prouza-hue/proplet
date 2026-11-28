@@ -10,10 +10,10 @@
   <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
   <script src="/referral-transport.js?v=profile-entry1"></script>
-<script src="/runtime-meta.js?v=dnes-rytmus1" data-proplet-runtime-meta="1" data-loaded="1"></script>
+<script src="/runtime-meta.js?v=game-hints2" data-proplet-runtime-meta="1" data-loaded="1"></script>
   <script src="/app/client-diagnostics.js?v=actor-context1" id="propletClientDiagnostics"></script>
   <script src="/analytics-init.js?v=guide-seo1"></script>
-  <script src="/theme-init.js?v=dnes-rytmus1"></script>
+  <script src="/theme-init.js?v=game-hints2"></script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Spojuj sousední písmena do českých slov a zaplň celou desku. Zahraj si Proplet zdarma bez registrace. Každý den tě čeká nová slovní výzva." />
@@ -377,7 +377,7 @@
 
           <div class="current-word card">
             <div><span class="stat-label">Skládáš</span><strong id="currentWord">—</strong></div>
-            <span id="cleanStatus" class="clean-status">✨ Čistě</span>
+            <span id="cleanStatus" class="clean-status hidden"></span>
             <div id="gameMessage" class="game-message" aria-live="polite"></div>
             <div id="magnifierDock" aria-hidden="true"></div>
           </div>
@@ -626,7 +626,7 @@
         <button class="support-choice" data-support-mode="none"><span>🧠</span><div><strong>Nenabízet</strong><small>sám se neozve</small></div></button>
       </div>
       <div id="supportModeOutcome" class="support-outcome" aria-live="polite"></div>
-      <p class="support-fineprint">XP zůstávají celé. Přijatá pomoc se počítá jako nápověda: ukončí ✨ čisté řešení a ovlivní pořadí. Nastavení můžeš kdykoli změnit.</p>
+      <p class="support-fineprint">Za dohrání získáš stejné XP i s nápovědou. V žebříčku rozhoduje i počet nápověd.</p>
       <button id="saveSupportModeBtn" class="primary-btn big">Uložit nastavení</button>
     </div>
   </div>
@@ -636,7 +636,6 @@
       <svg class="helper-offer-art" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M17 33h14M19 39h10M21 44h6M17 29c0-4-7-6-7-14a14 14 0 0 1 28 0c0 8-7 10-7 14"/><path d="m19 17 5 5 5-5M24 22v7"/></svg>
       <h2 id="helperOfferTitle">Hodí se nápověda?</h2>
       <p id="helperOfferText">Ukážu ti začátek jednoho slova.</p>
-      <p class="helper-offer-note">Řešení se označí jako s nápovědou.</p>
       <button id="helperAcceptBtn" class="primary-btn big">Napovědět</button>
       <button id="helperDismissBtn" class="secondary-btn">Pokračovat v luštění</button>
     </div>
@@ -671,7 +670,7 @@
     <div class="modal-card left hint-card">
       <button id="closeHintModal" class="modal-close" type="button" aria-label="Zavřít nápovědu">×</button>
       <h2 id="hintTitle">Kolik pomoci chceš?</h2>
-      <p id="hintConsequence" class="muted" hidden>Nápověda nemění nárok na XP. Řešení se označí jako s nápovědou.</p>
+      <p id="hintConsequence" class="muted" hidden>Za dohrání získáš stejné XP i s nápovědou. V žebříčku rozhoduje i počet nápověd.</p>
       <button class="hint-choice" type="button" data-hint-level="1"><span aria-hidden="true"><img class="hint-art" src="/assets/hints/printshop/gentle-v1.webp" width="64" height="64" alt="" decoding="async"></span><div><strong>Lehká</strong><small>Začátek a délka slova.</small></div></button>
       <button class="hint-choice" type="button" data-hint-level="2"><span aria-hidden="true"><img class="hint-art" src="/assets/hints/printshop/steps-v1.webp" width="64" height="64" alt="" decoding="async"></span><div><strong>Silnější</strong><small>První tři políčka cesty.</small></div></button>
       <button class="hint-choice" type="button" data-hint-level="3"><span aria-hidden="true"><img class="hint-art" src="/assets/hints/printshop/reveal-v1.webp" width="64" height="64" alt="" decoding="async"></span><div><strong>Odhalit</strong><small>Na chvíli celé slovo i cestu.</small></div></button>
@@ -848,7 +847,7 @@
   <script src="/app/content/daily-special-ui.js?v=daily-guard1"></script>
   <script src="/app/content/progression.js?v=progression-compat1"></script>
   <script src="/app/content/daily.js?v=daily-guard1"></script>
-  <script src="/app/rankings/rankings.js?v=recurring-patron1"></script>
+  <script src="/app/rankings/rankings.js?v=game-hints1"></script>
   <script src="/ribbon-catalog.js?v=mk-achievements1"></script>
   <script src="/ribbon-ui.js?v=artcutout3"></script>
 
@@ -863,13 +862,13 @@
   <script src="/app/archive/experience.js?v=play-one-screen1"></script>
   <script src="/release-news.js?v=denni-tajenka2"></script>
   <script src="/app/engagement/daily-tajenka-news.js?v=2"></script>
-  <script src="/app.js?v=dnes-rytmus1"></script>
+  <script src="/app.js?v=game-hints2"></script>
   <script src="/app/weekly/competition.js?v=resource1"></script>
   <script src="/app/monthly/competition.js?v=refresh-today1"></script>
 
   <script src="/app/mozkokalypsa.js?v=mk3release1"></script>
   <script src="/app/marketing.js?v=5"></script>
-  <script src="/quality-v334.js?v=play-one-screen1"></script>
+  <script src="/quality-v334.js?v=game-hints1"></script>
   <script src="/achievement-stories.js?v=1"></script>
   <script src="/achievement-details.js?v=rank-details1"></script>
   <script src="/organic-ui-v4023.js?v=woodpecker-contrast1"></script>

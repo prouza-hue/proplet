@@ -130,7 +130,7 @@ assert(xpTeam.includes('4 členové'),'XP team member count drifted');
 assert(!xpTeam.includes('<small>tento týden</small>'),'XP team rows must not repeat the table period');
 
 const dailyPlayer=rankings.daily(payload,'players');
-assert(dailyPlayer.includes('Čistě · 7 tahů'),'Daily player quality/moves drifted');
+assert(dailyPlayer.includes('Bez nápovědy · 7 tahů'),'Daily player quality/moves drifted');
 assert(dailyPlayer.includes('1:23'),'Daily player time drifted');
 assert(!dailyPlayer.includes('<small>dnešní výzva</small>'),'Daily rows must not repeat the selected view');
 const hintedDaily={players:[{...payload.players[0],cleanSolve:false,hintsUsed:2,moves:1}],teams:[]};

@@ -204,7 +204,7 @@
     ['/brand-wordmark-fraunces.css?v=offline1','propletBrandWordmarkFrauncesCss'],
     ['/tajenka-release-fix.css?v=uipolish1','propletTajenkaReleaseFixCss'],
     ['/tajenka-card-polish.css?v=2','propletTajenkaCardPolishCss'],
-    ['/game-release-polish.css?v=3','propletGameReleasePolishCss'],
+    ['/game-release-polish.css?v=game-hints1','propletGameReleasePolishCss'],
     ['/tajenka-runtime-polish.css?v=1','propletTajenkaRuntimePolishCss'],
     ['/training-layout.css?v=2','propletTrainingLayoutCss'],
   ];
@@ -248,13 +248,13 @@
 
   const loadExtras=async()=>{
     loadScript('/challenge-cta-v3333.js?v=result-sticker1','propletChallengeCtaV3333');
-    await loadScript('/runtime-meta.js?v=dnes-rytmus1','propletRuntimeMeta',{wait:true});
+    await loadScript('/runtime-meta.js?v=game-hints2','propletRuntimeMeta',{wait:true});
     loadScript('/version.js?v=3','propletVersion');
     loadScript('/home-layout.js?v=all-resume1','propletHomeLayout');
     loadScript('/ranking-polish.js?v=3','propletRankingPolish');
     await loadScript('/account-auth.js?v=woodpecker1','propletAccountAuth',{wait:true});
     loadScript('/auth-recovery-guard-v3326.js?v=2','propletAuthRecoveryGuard');
-    loadScript('/game-layout-v3330.js?v=control-side3','propletGameLayout');
+    loadScript('/game-layout-v3330.js?v=game-hints2','propletGameLayout');
     await loadScript('/app/client-diagnostics.js?v=actor-context1','propletClientDiagnostics',{wait:true});
     loadScript('/gesture-guard-v3325.js?v=clienterrors2','propletGestureGuard');
     await loadScript('/recognition/lexicon.js?v=bonuscs1','propletBonusLexicon',{wait:true});
@@ -262,14 +262,14 @@
     loadScript('/copy-density-v3327.js?v=play-one-screen1','propletCopyDensity');
     loadScript('/push-retention-v3329.js?v=settingssimple1','propletPushRetention');
     loadScript('/account-team-v33210.js?v=3','propletAccountTeamIntegrity');
-    loadScript('/competitive-sharing-v3331.js?v=analytics2','propletCompetitiveSharing');
+    loadScript('/competitive-sharing-v3331.js?v=game-hints1','propletCompetitiveSharing');
     loadScript('/footer-hotfix-v40120.js?v=search1','propletFooterHotfixV40120');
     await loadScript('/account-bonus-v3331.js?v=monthly-releaseprep6','propletAccountBonusV3331',{wait:true});
     await loadScript('/account-conversion-v3331.js?v=ui-refinement1','propletAccountConversionV3331',{wait:true});
-    loadScript('/settings-ia-v40122.js?v=monthly-releaseprep6','propletSettingsIaV40122');
+    loadScript('/settings-ia-v40122.js?v=game-hints1','propletSettingsIaV40122');
     loadScript('/settings-polish-v40122.js?v=ui-refinement1','propletSettingsPolishV40122');
-    await loadScript('/printshop-release-polish.js?v=denni-tajenka2','propletPrintshopReleasePolish',{wait:true});
-    await loadScript('/tajenka-release-fix.js?v=denni-tajenka2','propletTajenkaReleaseFix',{wait:true});
+    await loadScript('/printshop-release-polish.js?v=game-hints2','propletPrintshopReleasePolish',{wait:true});
+    await loadScript('/tajenka-release-fix.js?v=game-hints2','propletTajenkaReleaseFix',{wait:true});
     loadScript('/tajenka-cadence-copy.js?v=denni-tajenka2','propletTajenkaCadenceCopy');
     loadScript('/tajenka-card-polish.js?v=result-heading2','propletTajenkaCardPolish');
     loadScript('/tajenka-runtime-polish.js?v=idleoffline1','propletTajenkaRuntimePolish');
