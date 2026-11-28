@@ -23,8 +23,10 @@ class NewsTests(unittest.TestCase):
             return {'id':self.auth}
         def rpc(name,params):
             self.calls.append((name,params));return self.value
+        self.tajenka_enabled=True
         release_news.install(app,auth_player=authenticate,db_rpc=rpc,
-            enforce_rate_limit=lambda *a,**k:None,enabled=lambda:self.enabled)
+            enforce_rate_limit=lambda *a,**k:None,enabled=lambda:self.enabled,
+            tajenka_enabled=lambda:self.tajenka_enabled)
         self.routes={r.path:r.endpoint for r in app.routes if r.path.startswith('/api/release-news')}
 
     def call(self,claim=False,token='Bearer known'):
@@ -53,6 +55,46 @@ class NewsTests(unittest.TestCase):
         self.assertFalse(self.call(True)['displayGranted'])
         self.auth='account-B';self.call(True)
         self.assertEqual(self.calls[-1][1],{'p_player':'account-B','p_claim':True})
+
+    def test_daily_tajenka_uses_its_own_release_and_receipt(self):
+        self.enabled=False
+        route='/api/release-news/daily-tajenka'
+        with self.assertRaises(HTTPException):
+            self.routes[route+'/claim'](None,Response(),None)
+        for suffix,claim in (('',False),('/claim',True)):
+            self.value.update(displayGranted=claim,canShowAutomatically=not claim)
+            response=Response()
+            result=self.routes[route+suffix](None,response,'Bearer known')
+            self.assertEqual(result['campaignId'],'daily-tajenka-2026-12')
+            self.assertEqual(response.headers['cache-control'],'no-store')
+            self.assertEqual(self.calls[-1],('proplet_campaign_news_v1',{
+                'p_player':'account-A','p_claim':claim,'p_campaign':'daily-tajenka-2026-12'}))
+        self.tajenka_enabled=False
+        self.assertFalse(self.routes[route+'/claim'](None,Response(),'Bearer known')['displayGranted'])
+        self.assertEqual(len(self.calls),2)
+
+    def test_joint_launch_uses_separate_receipt_and_authenticated_prior_news(self):
+        route='/api/release-news/weekly-spojky'
+        with self.assertRaises(HTTPException):
+            self.routes[route+'/claim'](None,Response(),None)
+        self.value.update(sawDailyTajenka=False)
+        status=self.routes[route](None,Response(),'Bearer known')
+        self.assertEqual(status['campaignId'],release_news.SPOJKY_CAMPAIGN)
+        self.assertFalse(status['sawDailyTajenka'])
+        self.assertNotIn('displayGranted',status)
+        self.value.update(sawDailyTajenka=True,displayGranted=True,canShowAutomatically=False)
+        response=Response()
+        claim=self.routes[route+'/claim'](None,response,'Bearer known')
+        self.assertTrue(claim['sawDailyTajenka'] and claim['displayGranted'])
+        self.assertEqual(response.headers['cache-control'],'no-store')
+        self.assertEqual(self.calls[-1],('proplet_campaign_news_v1',{
+            'p_player':'account-A','p_claim':True,'p_campaign':release_news.SPOJKY_CAMPAIGN}))
+        self.value['sawDailyTajenka']='private text'
+        with self.assertRaises(HTTPException) as invalid:self.routes[route+'/claim'](None,Response(),'Bearer known')
+        self.assertEqual(invalid.exception.status_code,503)
+        self.tajenka_enabled=False
+        self.assertFalse(self.routes[route](None,Response(),'Bearer known')['enabled'])
+        self.assertEqual(len(self.calls),3)
 
     def test_enabled_new_and_seen_are_distinct(self):
         self.value.update(eligible=False,canShowAutomatically=False)

@@ -235,7 +235,7 @@
     /* Fine-pointer wide screens keep the dedicated desktop composition. Touch-first unfolded
        Fold/tablet screens use the proven compact rail in both orientations. 540px is intentional:
        a real unfolded Fold may expose a narrower CSS viewport than its physical panel suggests. */
-    const ordinaryBoard=!document.querySelector('#screen-game:is(.tajenka-mode,.starter-mode)');
+    const ordinaryBoard=!document.querySelector('#screen-game:is(.tajenka-mode,.starter-mode,.otisky-mode)');
     const desktopWide=playing&&!phone&&d.w>=1000&&d.h>=650
       &&(finePointer()||(ordinaryBoard&&d.w>1280));
     const largeTouchRail=coarsePointer()&&d.w>=540&&d.w<=1280;

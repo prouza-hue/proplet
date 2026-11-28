@@ -1,0 +1,52 @@
+#screen-game.otisky-mode #gameModeLabel { display: none; }
+.otisky-result {
+  --stamp-ink: #ad4c36;
+  box-sizing: border-box;
+  width: min(28rem, calc(100% - 1.5rem));
+  max-height: min(90dvh, 42rem);
+  padding: clamp(1.15rem, 4vw, 2rem);
+  border: 1px solid var(--td-line, #c4b79d);
+  border-radius: 1rem;
+  background: var(--td-paper, #fff8e9);
+  color: var(--td-ink, var(--ink, #322e28));
+  box-shadow: 0 14px 65px #19151345;
+  text-align: center;
+}
+.otisky-result::backdrop { background: #19181b9c; }
+.otisky-result h2 {
+  font-family: Fraunces, Georgia, serif;
+  font-size: clamp(1.6rem, 6vw, 2.35rem);
+  margin: 0;
+  line-height: 1.1;
+}
+.otisky-strip { display: flex; gap: clamp(.25rem, 1.2vw, .5rem); justify-content: center; margin: 1.2rem 0; }
+.otisky-stamp {
+  box-sizing: border-box;
+  width: clamp(2.5rem, 12vw, 3.7rem);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  font: 750 clamp(1.45rem, 6vw, 2.45rem)/1 Fraunces, Georgia, serif;
+  border: 1px dashed var(--td-line, #ae9d86);
+  border-radius: 5px;
+}
+.otisky-stamp.earned { border: 3px double currentColor; color: var(--stamp-ink); transform: rotate(-4deg); }
+.otisky-stamp.earned:nth-child(even) { transform: rotate(3deg); }
+html[data-theme="dark"] .otisky-result { --stamp-ink: #f49e80; }
+.otisky-progress { display: flex; align-items: center; justify-content: center; gap: .35rem; margin: 1rem 0; }
+.otisky-progress span { margin-inline-start: .2rem; font-size: .875rem; }
+.otisky-impression {
+  width: .8rem; height: .8rem; border: 3px double var(--stamp-ink);
+  border-radius: 45% 52% 47% 43%; transform: rotate(-12deg);
+}
+.otisky-impression:nth-child(even) { transform: rotate(22deg); }
+.otisky-note { margin: .7rem 0 0; }
+.otisky-result .otisky-sign { margin: .2rem 0 .85rem; font: inherit; font-size: .8125rem; font-weight: 400; color: var(--td-muted, currentColor); }
+.otisky-award { font-weight: 700; }
+.otisky-actions { display: grid; grid-template-columns: 1fr; gap: .45rem; }
+.otisky-actions button { min-height: 2.7rem; }
+
+@media (max-width: 340px) {
+  #screen-game.otisky-mode #boardStage:has(.ultra-board) { padding-inline: 0; }
+  #screen-game.otisky-mode #board.ultra-board { gap: 1px; }
+}

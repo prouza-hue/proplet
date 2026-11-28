@@ -19,7 +19,9 @@
   const main=make('div','os-main');featureSlot=make('div','os-feature-slot');weekSlot=make('div','os-week-slot');
   main.append(featureSlot,weekSlot);grid=make('div','os-grid');grid.setAttribute('aria-label','Další hry');notices=make('div','os-notices');
   const recovery=q('#tajenkaRecoveryNotice');if(recovery)root.append(recovery);
-  root.append(main,grid,notices);screen.append(root);return true;
+  root.append(main);
+  const spojky=q('#spojkyWeeklyBtn');if(spojky)root.append(spojky);
+  root.append(grid,notices);screen.append(root);return true;
  }
  function reward(e){return text(e?.querySelector('.studio-xp,.tajenka-entry-reward'));}
  function read(){
@@ -43,16 +45,16 @@
   const extra=q('#studioExtraCard'),tajenka=q('#tajenkaPreviewCard');
   if(visible(extra)){const detail=reward(extra)?'':text(extra.querySelector('p')?.lastElementChild);tiles.push({key:'extra',title:'Extra',detail:/^(?:✓\s*)?(?:Hotovo|Dokončeno)$/i.test(detail)?'✓ Hotovo':detail,reward:reward(extra),art:icon(extra),target:'#studioExtraCard>button',label:'Extra. '+separatedText(extra.querySelector('p'))+'. '+text(extra.querySelector('button')),kind:'extra'});}
   if(visible(tajenka)){
-   const done=tajenka.classList.contains('completed');
+   const done=tajenka.classList.contains('completed'),archiveOnly=tajenka.classList.contains('tajenka-archive-only');
    const target=done?'#tajenkaPreviewCard [data-tajenka-recap]':'#tajenkaPreviewBtn';
-   tiles.push({key:'tajenka',title:'Tajenka',detail:done?'✓ Hotovo':/pokračovat/i.test(text(q(target)))?'Rozehráno':'',reward:done?'':reward(tajenka),art:icon(tajenka)||'/tajenka.svg',target,label:'Tajenka. '+text(q(target)),kind:'tajenka'});
+   tiles.push({key:'tajenka',title:archiveOnly?'Tajenky':'Tajenka',editions:!archiveOnly&&!!q('#tajenkaPreviewCard [data-tajenka-editions]'),detail:archiveOnly?'Poslední vydání':done?'✓ Hotovo':/pokračovat/i.test(text(q(target)))?'Rozehráno':'',reward:done?'':reward(tajenka),art:icon(tajenka)||'/tajenka.svg',target,label:'Tajenka. '+text(q(target)),kind:'tajenka'});
   }
   const archiveResume=q('#axArchiveResume'),freeResume=q('#homeResumeCard');
   const resume=visible(archiveResume)?archiveResume:visible(freeResume)?freeResume:null;
   const difficultyCount=document.querySelectorAll('#difficultyCards [data-play-free]').length;
-  const free={key:'free',title:resume?'Rozehráno':'Volná hra',detail:resume?text(resume.querySelector('strong')).replace(/^Rozehráno:\s*/,'').replace(/^Rozehráno v Archivu\s*·?\s*/,'Archiv · '):difficultyCount?difficultyCount+' obtížností':'',art:resume?icon(resume):'/difficulty/printshop/easy.webp',target:resume?'#'+resume.id:q('#axHomeFree .ax-card-action')?'#axHomeFree .ax-card-action':'.bottom-nav [data-nav="free"]',label:resume?text(resume):'Volná hra. Vybrat obtížnost.',kind:complete?'free next':'free'};
+  const free={key:'free',title:resume?'Rozehráno':'Volná hra',detail:resume?text(resume.querySelector('strong')).replace(/^Rozehráno:\s*/,'').replace(/^Rozehráno v Archivu\s*[:·]?\s*/,'Archiv · '):difficultyCount?difficultyCount+' obtížností':'',art:resume?icon(resume):'/difficulty/printshop/easy.webp',target:resume?'#'+resume.id:q('#axHomeFree .ax-card-action')?'#axHomeFree .ax-card-action':'.bottom-nav [data-nav="free"]',label:resume?text(resume):'Volná hra. Vybrat obtížnost.',kind:complete?'free next':'free'};
   const newsTarget='#todayNewContentBanner #playTodayNewContentBtn';
-  const playTile=visible(q('#todayNewContentBanner'))&&q(newsTarget)
+  const playTile=!resume&&visible(q('#todayNewContentBanner'))&&q(newsTarget)
    ?{key:'monday-five',title:'Pondělní pětka',detail:'Hrát novinky',art:'/weekly-banner-icon-optimized.svg',target:newsTarget,kind:free.kind}
    :free;
   complete?tiles.unshift(playTile):tiles.push(playTile);
@@ -87,15 +89,37 @@
    e.setAttribute('aria-label',label);e.onclick=()=>{if(unavailable(q(model.target),needsProgress))return;if(model.key==='daily-base'){const ui=typeof dailySpecialUI==='function'?dailySpecialUI():null;if(!ui)return;ui.select('base');}run(model.target,needsProgress);};
    const copy=make('span','os-copy');copy.append(make('strong','os-title',model.title));
    if(model.detail)copy.append(make('span','os-detail',model.detail));
-   if(model.reward)copy.append(make('span','os-reward',model.reward));
+   const dailyHero = model.key === 'feature' && !model.special;
+   if(model.reward && !dailyHero)copy.append(make('span','os-reward',model.reward));
    const children=[copy];if(model.art)children.push(image(model.art,'os-art'));
    const arrow=make('span','os-arrow',model.action?model.action+' →':'→');arrow.setAttribute('aria-hidden','true');
-   if(model.complete){const result=make('span','os-completion-row');if(model.metrics)result.append(make('span','os-metrics',model.metrics));result.append(arrow);children.push(result);}else children.push(arrow);
+   if (dailyHero) {
+    const footer = make('span','os-feature-footer');
+    if (model.reward) footer.append(make('span','os-reward',model.reward));
+    if (model.metrics) footer.append(make('span','os-metrics',model.metrics));
+    footer.append(arrow); children.push(footer);
+   } else children.push(arrow);
    e.replaceChildren(...children);
    if(model.colors)model.colors.forEach((v,i)=>e.style.setProperty(['--os-feature','--os-ink','--os-muted','--os-action'][i],v));
    e.classList.toggle('os-complete',!!model.complete);e.classList.toggle('os-special',!!model.special);e.dataset.signature=signature;
   }
   return e;
+ }
+ let tajenkaGroup=null,calendar=null;
+ function tile(model){
+  const primary=button(model,'os-tile');
+  if(model.key!=='tajenka'||!model.editions)return primary;
+  if(!tajenkaGroup){
+   tajenkaGroup=make('div','os-taj-combo');
+   calendar=make('button','os-taj-calendar');calendar.type='button';
+   calendar.setAttribute('aria-label','Posledních sedm Tajenek');calendar.title='Posledních sedm Tajenek';
+   calendar.setAttribute('aria-haspopup','dialog');calendar.setAttribute('aria-controls','tajenkaEditionsDialog');
+   const mark=make('span','','7');mark.setAttribute('aria-hidden','true');calendar.append(mark);
+   calendar.onclick=()=>{if(!unavailable(q('#tajenkaPreviewCard [data-tajenka-editions]'),true))window.PropletDailyTajenka?.open(calendar)};
+  }
+  calendar.disabled=unavailable(q('#tajenkaPreviewCard [data-tajenka-editions]'),true);
+  if(tajenkaGroup.firstElementChild!==primary)tajenkaGroup.replaceChildren(primary,calendar);
+  return tajenkaGroup;
  }
  function reconcile(parent,items){
   for(const child of [...parent.children])if(!items.includes(child))child.remove();
@@ -106,7 +130,7 @@
   raf=0;if(!ready)return;
   const model=read();if(!model||!mount())return;
   reconcile(featureSlot,[button(model.feature,'os-feature')]);
-  reconcile(grid,model.tiles.map(t=>button(t,'os-tile')));
+  reconcile(grid,model.tiles.map(tile));
   const ws=JSON.stringify(model.week);
   if(ws!==weekSignature){
    weekSignature=ws;weekSlot.replaceChildren();

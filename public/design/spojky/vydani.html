@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="connect-src 'self'; form-action 'none'; object-src 'none'">
+  <title>Vydání Spojek · Proplet</title>
+  <link rel="icon" href="/brand/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/fonts/proplet-fonts.css">
+  <link rel="stylesheet" href="./pilot.css">
+  <link rel="stylesheet" href="./game.css">
+  <link rel="stylesheet" href="./vydani.css">
+  <script type="module" src="./vydani.js"></script>
+</head>
+<body>
+  <main class="ed-shell">
+    <header class="ed-mast">
+      <a href="./vydani.html" class="ed-brand"><img src="/brand/mark.svg" alt="" width="31" height="31">Proplet</a>
+      <a class="ed-news" href="/?open=daily&amp;tajenkaReview=1&amp;tajenka=1&amp;tajenka_week=25&amp;spojkyReview=2026-11-27">Oznámení pro hráče</a>
+    </header>
+    <section id="ed-list" aria-labelledby="ed-title">
+      <h1 id="ed-title" tabindex="-1">Vydání Spojek</h1>
+      <p id="ed-status" role="status">Načítám vydání…</p>
+      <ol id="ed-weeks"></ol>
+      <button id="ed-retry" type="button" hidden>Zkusit znovu</button>
+    </section>
+    <div id="ed-solution" hidden></div>
+  </main>
+</body>
+</html>

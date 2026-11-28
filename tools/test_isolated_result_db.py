@@ -182,12 +182,17 @@ def main():
                 report['checks'].append('entry migration preserves historical B assignments and exact recruitment window; new sequence starts at zero')
             report['schemaFiles'].append({'path': path.relative_to(ROOT).as_posix(),
                                          'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+        c.execute((ROOT/'supabase/tests/spojky_competition_xp.sql').read_text(encoding='utf8'))
+        report['checks'].append('Spojky: replay, personal monthly XP, team snapshot, period cut-off and weekly trophy')
         c.execute((ROOT/'supabase/tests/new_player_entry.sql').read_text(encoding='utf8'))
         report['checks'].append('entry experiment: immutable assignment, both branches, history, claim and grants')
         c.execute((ROOT/'supabase/tests/entry_fixed_catchup.sql').read_text(encoding='utf8'))
         report['checks'].append('entry catchup: fixed activation quota, completion, retry, rollback and immutable windows')
         verify_entry_readout(c)
         report['checks'].append('entry experiment readout: silent identities, test exclusion, explicit attempt link, 24h/D1 bounds')
+        from tools.test_direct_entry_db import verify_direct_entry
+        verify_direct_entry(c)
+        report['checks'].append('Direct entry: 100% B, opt-in, sticky retries, mature 24h readout')
         c.execute((ROOT/'supabase/tests/account_integrity_counts.sql').read_text(encoding='utf8'))
         report['checks'].append('admin integrity: exact 20001 results, bounded IDs, no fanout, service-role only, invoker, rollback')
         c.execute((ROOT/'supabase/tests/account_created.sql').read_text(encoding='utf8'))

@@ -282,6 +282,7 @@
   const creditRunXp=(candidate,points=1)=>{const g=candidate?.game;if(!g||points<=0)return;g.wordDiscoveryXpAwarded=Math.max(0,Number(g.wordDiscoveryXpAwarded)||0)+Math.max(0,Number(points)||0);try{if(currentGame===g){if(!g.finished&&typeof saveGameProgress==='function')saveGameProgress();else if(g.finished&&typeof renderRunWinXp==='function')renderRunWinXp(g)}}catch{}};
   const awardDiscovery=async candidate=>{
     if(candidate?.mode==='playtest')return 'disabled';
+    if(candidate?.mode==='otisky')return 'disabled';
     if(rewardDisabled())return 'disabled';
     if(candidate?.mode==='daily_special'){
       const binding=candidate.game?.puzzle?.meta?.dailySpecialBinding;
@@ -423,7 +424,7 @@
       let candidate=null,g=null,foundBefore=0;
       try{
         g=currentGame;
-        if(g&&!g.finished&&g.mode!=='starter'&&g.mode!=='rescue'){
+        if(g&&!g.tajenkaReview&&!g.finished&&g.mode!=='starter'&&g.mode!=='rescue'){
           resetForGame(g);
           foundBefore=g.found.length;
           const word=currentWord();

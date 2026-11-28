@@ -88,6 +88,10 @@ const server=http.createServer(async(req,res)=>{
     return json(res,200,{key,variant,bucket,identityBucket,allocationPolicy,boardId,firstStepsRunId:data.first_steps_run_id,assignmentRecorded:true});
    }
    if(p==='/api/tajenka')return json(res,200,JSON.parse(fs.readFileSync(path.join(fixtureDir,'tajenka.json'))));
+   if(p==='/api/spojky'&&req.method==='GET'){
+    if(u.searchParams.has('review'))return json(res,404,{detail:'Redakční náhled Spojek není dostupný'});
+    return json(res,200,JSON.parse(fs.readFileSync(path.join(fixtureDir,'spojky-before-launch.json'),'utf8')));
+   }
    if(p==='/api/rolling-content'){if(controls.rolling==='hold'){heldRolling.push(res);return}return rolling(res)}
    if(p==='/api/free-order/config'||p==='/api/play-session/config')return json(res,200,{enabled:false});
    if(p==='/api/login-integrity'&&req.method==='POST')return data.name===syntheticProfile.name&&data.password==='fixture-password'?json(res,200,syntheticProfile):json(res,401,{detail:'synthetic login rejected'});

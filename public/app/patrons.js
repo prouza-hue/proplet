@@ -256,7 +256,7 @@
  const offerScreen=()=>typeof currentScreen==='string'&&['daily','free'].includes(currentScreen);
  const offerAnchor=()=>typeof currentScreen==='string'&&currentScreen==='free'?$('#difficultyCards'):$('#oneScreenToday .os-main')||$('#screen-daily .daily-hero');
  function offerEligible(){
-  if(!offerScreen()||!model.enabled||!model.authenticated
+  if(window.PropletPetOtiskuCampaign?.suppressRegularOffer()||!offerScreen()||!model.enabled||!model.authenticated
    ||!model.canOffer||model.paid||model.offersDisabled||model.pending||document.hidden
    ||$('#rankSpotlight:not(.hidden)'))return false;
   if($('#patronOffer'))return true;
@@ -296,7 +296,7 @@
   const confirmed=await displayOffer({receiptId}).catch(()=>null);
   if(epoch!==accountEpoch||!confirmed?.displayGranted||!card.isConnected){card.remove();return false;}
   model.canOffer=false;
-  const current=()=>epoch===accountEpoch&&model.enabled&&model.authenticated&&card.isConnected&&offerScreen()&&card.parentElement?.contains(offerAnchor());
+  const current=()=>!window.PropletPetOtiskuCampaign?.suppressRegularOffer()&&epoch===accountEpoch&&model.enabled&&model.authenticated&&card.isConnected&&offerScreen()&&card.parentElement?.contains(offerAnchor());
   let prepared=null,preparing=false,acting=false;
   function reportAction(action){
    if(!current())return;

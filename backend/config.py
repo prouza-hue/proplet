@@ -24,6 +24,14 @@ def _env(name: str, default: str = "") -> str:
     return os.environ.get(name, default).strip()
 
 
+DAILY_TAJENKA_REVIEW_BRANCH = "feature/denni-tajenka-prosinec-2026"
+SPOJKY_REVIEW_BRANCH = "preview/spojky-pruniky-navod-20261126"
+
+
+def spojky_review_branch(ref: str) -> bool:
+    return ref == SPOJKY_REVIEW_BRANCH or re.fullmatch(r"preview/spojky-davka-[0-9]{8}", ref) is not None
+
+
 def live_player_preview_enabled() -> bool:
     """Only explicitly approved preview branches may serve players against the live DB."""
     return (
@@ -135,7 +143,10 @@ def load_settings() -> Settings:
         if (vercel_env != "preview" or vercel_git_commit_ref != "work/daily-specials-integrated-20261012"
                 or _env("SUPABASE_URL").rstrip("/") != "https://eanzztstmwlamwfdskbf.supabase.co"):
             raise RuntimeError("Daily specials preview requires its exact branch and isolated test database")
-    playtest_preview = vercel_env == "preview" and vercel_git_commit_ref in {"feat/mozkokalypsa-playtest", "feat/mozkokalypsa-round2-release", "feat/mozkokalypsa-round2-invite", "feat/mozkokalypsa-round3-release"}
+    playtest_preview = vercel_env == "preview" and (vercel_git_commit_ref in {
+        "feat/mozkokalypsa-playtest", "feat/mozkokalypsa-round2-release", "feat/mozkokalypsa-round2-invite",
+        "feat/mozkokalypsa-round3-release", DAILY_TAJENKA_REVIEW_BRANCH,
+    } or spojky_review_branch(vercel_git_commit_ref))
     data_root = root / "data"
     return Settings(
         root=root,

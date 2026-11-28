@@ -1,0 +1,92 @@
+.sj-tutorial { width: min(100%, 37rem); margin: 0 auto; }
+.sj-tutorial .sj-top { min-height: 2.75rem; }
+.sj-game .sj-lesson-skip {
+  color: var(--sj-strong);
+  text-decoration: underline;
+  text-underline-offset: .18em;
+}
+.sj-lesson-lead, .sj-lesson-instruction {
+  margin: .55rem 0 0;
+  line-height: 1.45;
+}
+.sj-lesson-chain {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(.18rem, 1.1cqi, .55rem);
+  margin: clamp(.8rem, 3cqi, 1.25rem) 0;
+  padding: clamp(.7rem, 2cqi, 1rem) 0;
+  border-block: 1px solid var(--sj-line);
+}
+.sj-game .sj-lesson-noun {
+  flex: 0 1 auto;
+  padding-inline: clamp(.3rem, 1.6cqi, .7rem);
+}
+.sj-lesson-noun:disabled, .sj-lesson .sj-cell:disabled { cursor: default; }
+.sj-lesson-link {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(.84rem, 3cqi, .96rem);
+}
+.sj-lesson-missing {
+  min-width: 2.1em;
+  padding: .1em .4em;
+  border-radius: .28rem;
+  border: 1px dashed var(--sj-muted);
+  color: var(--sj-muted);
+  font-weight: 600;
+}
+.sj-lesson-question {
+  margin: 0;
+  font: 620 clamp(1.38rem, 5.1cqi, 1.75rem)/1.13 Fraunces, Georgia, serif;
+  letter-spacing: -.035em;
+}
+.sj-lesson-instruction { margin-top: .36rem; }
+.sj-lesson .sj-tray {
+  --sj-size: clamp(2.9rem, 13cqi, 3.35rem);
+  margin: .8rem auto .45rem;
+}
+.sj-lesson .sj-cell[data-owners="0"]:not(.sj-current) { background: var(--sj-bg0); }
+.sj-lesson .sj-cell[data-owners="1"]:not(.sj-current) { background: var(--sj-bg1); }
+.sj-lesson .sj-cell[data-owners*=" "] { border-color: var(--sj-ink); }
+.sj-lesson-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .1rem .55rem;
+  min-height: 1.45em;
+  line-height: 1.4;
+}
+.sj-lesson-word { color: var(--sj-strong); font-weight: 700; letter-spacing: .065em; }
+.sj-lesson-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .65rem; margin-top: .35rem; }
+.sj-game .sj-lesson-hint {
+  min-height: max(44px, 2.75rem);
+  padding: .45rem .78rem;
+  border: 1px solid var(--sj-edge);
+  border-radius: .55rem;
+  background: var(--sj-tile);
+  font-size: .95rem;
+  font-weight: 600;
+}
+.sj-lesson-hint:hover { text-decoration: underline; text-underline-offset: .15em; }
+@container (min-width: 35rem) {
+  .sj-lesson-exercise {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'question board' 'instruction board' 'status board' 'controls board';
+    grid-template-rows: auto auto 1fr auto;
+    column-gap: clamp(1rem, 3cqi, 1.5rem);
+  }
+  .sj-lesson-question { grid-area: question; }
+  .sj-lesson-instruction { grid-area: instruction; }
+  .sj-lesson-status { grid-area: status; align-self: start; margin-top: .65rem; }
+  .sj-lesson-actions { grid-area: controls; }
+  .sj-lesson .sj-tray { margin: 0; align-self: start; width: auto; }
+  .sj-lesson .sj-grid { grid-template-columns: repeat(var(--sj-cols), var(--sj-size)); }
+}
+@media (forced-colors: active) {
+  .sj-lesson-noun[aria-pressed=true] { outline: 2px solid Highlight; }
+  .sj-lesson .sj-cell[data-owners*=" "] { outline: 2px solid CanvasText; outline-offset: -3px; }
+}

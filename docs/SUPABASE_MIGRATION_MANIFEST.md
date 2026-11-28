@@ -58,3 +58,13 @@ sprint.
 ## Sprint 16 / current release hygiene
 
 Sprint 16 legacy cleanup nemění SQL soubory, pořadí migrací ani databázi. Aktuální release proces má používat tento manifest a `python tools/validate_migration_manifest.py`; historické release dokumenty nebo `SUPABASE_SETUP.sql` nejsou náhradou za kanonický lineage manifest.
+
+## Denní Tajenka
+
+Migrace `20261125120100_daily_tajenka_news.sql` založila kampaň v evidenci
+oznámení. Navazující `20261126193400_daily_tajenka_launch_nov27.sql` posouvá
+spuštění i hranici stáří účtu na 27. 11. 2026 v 00.00 pražského času.
+Oznámení může právě jednou převzít hráč s účtem založeným před spuštěním
+a alespoň pěti dokončenými deskami. Kampaň z 1. listopadu má vlastní účtenky.
+
+`20261127010000_spojky_launch_news.sql` připravuje společné oznámení Tajenky a Spojek se stejným termínem a stejným publikem. Přečtení původního oznámení nechá hráči jednu pozvánku na Spojky. Po převzetí společné pozvánky už starší klient původní oznámení nezobrazí. Obě kampaně mají vlastní účtenky. Přímý náhled ve větvi žádnou účtenku nevytváří.

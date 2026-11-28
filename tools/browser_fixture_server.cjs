@@ -12,7 +12,8 @@ const server=http.createServer((req,res)=>{
   const u=new URL(req.url,'http://127.0.0.1');
   if(!['GET','HEAD'].includes(req.method))return json(res,503,{detail:'isolated fixture: writes disabled'});
   if(u.pathname==='/api/health')return json(res,200,{ok:true,database:false,isolatedFixture:true,sha});
-  const fixture={'/api/config':'config.json','/api/tajenka':'tajenka.json'}[u.pathname];
+  if(u.pathname==='/api/spojky'&&u.searchParams.has('review'))return json(res,404,{detail:'Redakční náhled Spojek není dostupný'});
+  const fixture={'/api/config':'config.json','/api/tajenka':'tajenka.json','/api/spojky':'spojky-before-launch.json'}[u.pathname];
   if(fixture)return json(res,200,JSON.parse(fs.readFileSync(path.join(fixtures,fixture),'utf8')));
   if(u.pathname.startsWith('/api/'))return json(res,503,{detail:'no fixture for this endpoint'});
   const file=path.resolve(root,'.'+(u.pathname==='/'?'/index.html':decodeURIComponent(u.pathname)));

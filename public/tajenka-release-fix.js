@@ -23,8 +23,16 @@
   function currentPhrase(){
     try{return String(tajenkaPuzzle?.tajenka?.phrase||'').trim()}catch{return ''}
   }
+  function resultPuzzle(puzzleId){
+    try{
+      if(typeof tajenkaRecapOpen!=='undefined'&&tajenkaRecapOpen&&typeof tajenkaRecapPuzzle!=='undefined'&&tajenkaRecapPuzzle?.id===puzzleId)return tajenkaRecapPuzzle;
+      if(currentGame?.mode==='tajenka'&&currentGame.puzzle?.id===puzzleId)return currentGame.puzzle;
+      if(tajenkaPuzzle?.id===puzzleId)return tajenkaPuzzle;
+    }catch{}
+    return null;
+  }
   function currentSourceMarkup(puzzleId){
-    let puzzle=null;try{puzzle=currentGame?.mode==='tajenka'&&currentGame.puzzle?.id===puzzleId?currentGame.puzzle:tajenkaPuzzle}catch{}
+    const puzzle=resultPuzzle(puzzleId);
     const source=puzzle?.source;if(!source?.url||!/^https:\/\//i.test(String(source.url)))return '';
     const href=esc(String(source.url)),label=esc(source.label||'zdroj');
     if(source.author){
@@ -66,6 +74,7 @@
     if(recap)recap.onclick=event=>{event.preventDefault();source.querySelector('[data-tajenka-recap]')?.click()};
     const share=clone.querySelector('[data-tajenka-share]');
     if(share)share.onclick=event=>{event.preventDefault();source.querySelector('[data-tajenka-share]')?.click()};
+    const editions=clone.querySelector('[data-tajenka-editions]');if(editions)editions.onclick=()=>window.PropletDailyTajenka?.open(editions);
   }
   function syncExactTajenkaPlayCard(){
     const source=q('#tajenkaPreviewCard'),screen=q('#screen-free');
@@ -216,7 +225,7 @@
     let profile=null;try{profile=typeof getProfile==='function'?getProfile():null}catch{}
     // Compare the same zero-default hint count rendered by cleanLabel, including
     // historical completions saved before hint fields were recorded.
-    const hints=Math.max(0,Number(result?.hints??result?.hintsUsed)||0);
+    const hints=Math.max(0,Number(result?.hints??result?.hintsUsed)||0),review=window.PropletDailyTajenka?.isReview()===true;
     const view={kind:'tajenka',result,puzzleId,recap,game,profileId:profile?.id||null,profileToken:profileToken(),
       record:{mode:'tajenka',puzzleId,elapsedMs:result?.elapsedMs,moves:result?.moves,hintsUsed:hints,cleanSolve:Number.isInteger(hints)?hints===0:undefined}};
     board.tajenkaResultView=view;board.postWinRequest=view;board.resultContext=null;
@@ -229,14 +238,14 @@
     q('#tajenkaWinPhrase',modal)?.classList.add('hidden');
     const text=q('#winText',modal);if(text)text.textContent=resultLine(result);syncTajenkaSourceLine(modal,puzzleId);
     const chips=q('.win-summary-chips',modal);chips?.classList.remove('hidden');
-    const xp=q('#winXp',modal);if(xp){xp.textContent='+200 XP';xp.classList.remove('hidden')}
+    const xp=q('#winXp',modal);if(xp){xp.textContent=review?'Náhled · bez XP':!recap&&game?.isReplay?'Bez dalších XP':'+200 XP';xp.classList.remove('hidden')}
     const clean=q('#winClean',modal);if(clean){clean.textContent=cleanLabel(result);clean.classList.remove('hidden','hinted')}
     const share=q('#winShareBtn',modal);
     if(share){
-      share.classList.remove('hidden');share.textContent='Vyzvat kamaráda';
-      share.onclick=()=>{let puzzle=null;try{puzzle=currentGame?.mode==='tajenka'&&currentGame.puzzle.id===puzzleId?currentGame.puzzle:tajenkaPuzzle}catch{}window.PropletSharing?.shareTajenka(puzzle,result)};
+      share.classList.toggle('hidden',review);share.textContent='Vyzvat kamaráda';
+      share.onclick=()=>window.PropletSharing?.shareTajenka(resultPuzzle(puzzleId),result);
     }
-    const primary=q('#winPrimaryBtn',modal);if(primary){primary.textContent='Zpět';primary.classList.remove('hidden')}
+    const primary=q('#winPrimaryBtn',modal);if(primary){primary.textContent=review?'Zpět k vydáním':'Zpět';primary.classList.remove('hidden')}
     const details=q('#winDetails',modal),words=q('#winWords',modal),items=foundWords(result);
     if(words){
       words.innerHTML=items.map(item=>{
@@ -246,6 +255,7 @@
       }).join('');
     }
     details?.classList.toggle('hidden',items.length===0);
+    if(review){board.classList.add('hidden');return}
     board.classList.remove('hidden','free-level-board');
     board.classList.add('daily-global-board');
     board.innerHTML='<div class="leaderboard-empty"><strong>Načítám pořadí…</strong></div>';

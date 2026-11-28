@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 116" fill="none">
+  <title>Spojené články</title>
+  <defs>
+    <path id="brass" d="M33 42c-10 0-17 6-17 15s7 16 17 16h21c10 0 18-7 18-16s-7-15-17-15Z"/>
+    <path id="green" d="M78 38c-10 0-17 7-17 16s7 15 17 15h23c10 0 17-7 17-16s-7-15-17-15Z"/>
+    <g id="brass-print" stroke-linecap="round" stroke-linejoin="round">
+      <use href="#brass" transform="translate(-1 2.5)" stroke="#382b28" stroke-width="17"/>
+      <use href="#brass" stroke="#3c2a28" stroke-width="16"/>
+      <use href="#brass" stroke="#ab512d" stroke-width="12.5"/>
+      <use href="#brass" transform="translate(0 -1.5)" stroke="#eea349" stroke-width="9"/>
+      <use href="#brass" transform="translate(0 -2.5)" stroke="#f9cb79" stroke-width="4.5" stroke-dasharray="23 3 40 12 10 5"/>
+      <path d="m18 63 3-3m2 9 4-4m3 7 4-4m3 5 4-4m3 4 4-4m10 1 4-5" stroke="#7f432a" stroke-width="1.4"/>
+      <path d="M20 51c3-5 8-8 15-8m3-1h7" stroke="#fff0c2" stroke-width="2"/>
+    </g>
+    <g id="green-print" stroke-linecap="round" stroke-linejoin="round">
+      <use href="#green" transform="translate(-1 2.5)" stroke="#263534" stroke-width="17"/>
+      <use href="#green" stroke="#273436" stroke-width="16"/>
+      <use href="#green" stroke="#22544e" stroke-width="12.5"/>
+      <use href="#green" transform="translate(0 -1.5)" stroke="#438e7d" stroke-width="9"/>
+      <use href="#green" transform="translate(0 -2.5)" stroke="#82bca2" stroke-width="4.5" stroke-dasharray="36 8 18 5 20 9"/>
+      <path d="m63 59 3-2m0 7 4-4m3 7 4-4m5 7 4-4m3 4 4-4m4 3 3-4" stroke="#254d47" stroke-width="1.4"/>
+      <path d="M65 46c3-5 7-7 13-8m5 0h12" stroke="#d9e8c6" stroke-width="2"/>
+    </g>
+    <clipPath id="front"><path d="M48 29h31v25l-8 2-8-1-11 1Z"/></clipPath>
+  </defs>
+  <g transform="rotate(-32 66 58)">
+    <use href="#green-print"/>
+    <use href="#brass-print"/>
+    <g clip-path="url(#front)"><use href="#green-print"/></g>
+  </g>
+</svg>

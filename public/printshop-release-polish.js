@@ -266,7 +266,7 @@ html.tiskarna-ui #winModal.tajenka-result-mode .tajenka-board-note{display:block
   }
 
   async function loadTajenkaLeaderboard(puzzleId,box=q('#levelLeaderboardBox')){
-    if(!box||!puzzleId)return;
+    if(!box||!puzzleId||window.PropletDailyTajenka?.isReview())return;
     try{
       let token=null;
       try{token=getProfile?.()?.token||null}catch{}

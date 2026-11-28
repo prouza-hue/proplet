@@ -26,6 +26,20 @@ function setup({local=storage(),session=storage(),context=returning()}={}){
   assert.equal(await d.queue.kick(),false,JSON.stringify(patch));assert.equal(d.local.map.size,0);assert.equal(d.session.map.size,0);
   d.state.context=returning();assert.equal(await d.queue.kick(),true,'deferred offer must retry');
  }
+ // A gift recipient may have supported before their first completion. The
+ // campaign override must not loosen the first-steps, account or session gates.
+ const gift=setup({context:{...returning(),completed:0,blocked:true}});
+ gift.add('ordinary',100);
+ gift.add('gift',20,{minimumCompleted:0});
+ assert.equal(await gift.queue.kick(),false);
+ gift.state.context.blocked=false;
+ assert.equal(await gift.queue.kick(),true);
+ assert.deepEqual(gift.state.events,['gift']);
+ const ask=setup({context:{...returning(),completed:0}});
+ ask.add('ask',20,{minimumCompleted:1});
+ assert.equal(await ask.queue.kick(),false);
+ ask.state.context.completed=1;
+ assert.equal(await ask.queue.kick(),true);
  // A failed mount/preload is not a display; it cannot permanently lose a release.
  const f=setup();let mounts=0;f.add('archive',100,{show:()=>++mounts===1?false:true});
  assert.equal(await f.queue.kick(),false);assert(!f.queue.seen('archive'));assert.equal(await f.queue.kick(),true);

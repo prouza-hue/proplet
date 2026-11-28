@@ -1,0 +1,122 @@
+#dailyTajenkaNews {
+  --tn-accent: #a24029;
+  --tn-on-accent: #fffaf0;
+  --tn-edge: #81331f;
+  --tn-wash: #f7ecd4;
+  --tn-print: #d9b36e;
+  width: min(440px, calc(100% - 24px));
+  max-height: calc(100dvh - 24px);
+  box-sizing: border-box;
+  overflow: auto;
+  overscroll-behavior: contain;
+  margin: auto;
+  padding: 0;
+  color: var(--td-ink,#242f37);
+  background: var(--td-paper,#fffcf5);
+  border: 1px solid var(--td-line,#d8d2c7);
+  border-radius: 18px;
+  box-shadow: 0 18px 64px #17251e45;
+  font: 400 16px/1.4 Outfit,system-ui,sans-serif;
+}
+#dailyTajenkaNews::backdrop { background: #18221dd1; }
+html[data-theme=dark] #dailyTajenkaNews {
+  --tn-accent: #ffc0a5;
+  --tn-on-accent: #35221e;
+  --tn-edge: #b47963;
+  --tn-wash: #3a3836;
+  --tn-print: #81674b;
+}
+.tajenka-news-sheet { padding: 22px; }
+.tajenka-news-intro {
+  display: grid;
+  grid-template-columns: minmax(94px,.74fr) minmax(0,1.26fr);
+  align-items: center;
+  gap: 17px;
+}
+.tajenka-news-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  aspect-ratio: 1;
+}
+.tajenka-news-art::before {
+  content: '';
+  position: absolute;
+  inset: 5% 0 3% 5%;
+  z-index: -1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--tn-print) 0 .7px,transparent .95px) 0 0 / 4px 4px,
+    var(--tn-wash);
+}
+.tajenka-news-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 156px;
+  object-fit: contain;
+}
+#dailyTajenkaNews h2 {
+  margin: 0;
+  color: inherit;
+  font: 650 clamp(1.65rem,6vw,2.15rem)/1.02 Fraunces,Georgia,serif;
+  letter-spacing: -.036em;
+  text-transform: none;
+}
+#dailyTajenkaNews h2 span { display: block; color: var(--tn-accent); }
+#dailyTajenkaNews h2:focus { outline: 0; }
+#dailyTajenkaNews p {
+  margin: 9px 0 0;
+  color: var(--td-ink,#242f37);
+  font: inherit;
+  text-wrap: pretty;
+}
+.tajenka-news-actions {
+  display: flex; align-items: center; gap: 11px;
+  margin-top: 19px; padding-top: 15px;
+  border-top: 1px dashed var(--td-line,#d8d2c7);
+}
+#dailyTajenkaNews button {
+  min-height: 44px; margin: 0; padding: 8px 16px; border-radius: 9px;
+  font: 600 1rem/1.2 Outfit,system-ui,sans-serif; cursor: pointer; touch-action: manipulation;
+}
+#dailyTajenkaNews [data-tajenka-news-play] {
+  flex: 1; display: flex; justify-content: center; align-items: center; gap: .55em;
+  color: var(--tn-on-accent); background: var(--tn-accent); border: 1px solid var(--tn-edge);
+  box-shadow: 0 2px 0 var(--tn-edge);
+}
+#dailyTajenkaNews [data-tajenka-news-play]:active { translate: 0 1px; box-shadow: none; }
+#dailyTajenkaNews [data-tajenka-news-close] { background: transparent; border: 1px solid transparent; color: var(--td-ink,#242f37); }
+#dailyTajenkaNews button:focus-visible { outline: 3px solid var(--td-blue,#204fab); outline-offset: 3px; }
+@media (max-width: 374px), (max-height: 550px) {
+  .tajenka-news-sheet { padding: 16px; }
+  .tajenka-news-intro { gap: 12px; }
+  #dailyTajenkaNews p { font-size: .94rem; }
+  .tajenka-news-actions { margin-top: 13px; padding-top: 12px; }
+}
+
+#dailyTajenkaNews.is-combined { --tn-spojky: #794711; --tn-card: #f3e4bd; --tn-card-edge: #c9aa70; --tn-taj: #425f47; --tn-taj-card: #edf3e1; --tn-taj-edge: #b5c5a7; }
+html[data-theme=dark] #dailyTajenkaNews.is-combined { --tn-spojky: #f4c779; --tn-card: #453720; --tn-card-edge: #8d7047; --tn-taj: #d1e7b9; --tn-taj-card: #303b2e; --tn-taj-edge: #64785b; }
+#dailyTajenkaNews.is-combined h2 { margin-bottom: 16px; }
+#dailyTajenkaNews.is-combined h2 span { color: var(--tn-spojky); }
+.joint-news-games { display: grid; gap: 10px; }
+#dailyTajenkaNews .joint-news-games button {
+  display: grid;
+  grid-template-columns: 48px minmax(0,1fr);
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 15px;
+  background: var(--tn-card);
+  border: 1px solid var(--tn-card-edge);
+  box-shadow: 0 2px 0 var(--tn-card-edge);
+  color: var(--tn-spojky);
+  text-align: left;
+}
+#dailyTajenkaNews .joint-news-games [data-tajenka-news-play] { background: var(--tn-taj-card); border-color: var(--tn-taj-edge); box-shadow: 0 2px 0 var(--tn-taj-edge); color: var(--tn-taj); }
+#dailyTajenkaNews .joint-news-games button:active { translate: 0 1px; box-shadow: none; }
+.joint-news-games img { display: block; width: 100%; height: auto; }
+.joint-news-games strong { display: block; font: 650 1.2rem/1.2 Fraunces,Georgia,serif; }
+.joint-news-games small { display: block; margin-top: 4px; color: var(--td-ink,#242f37); font: 400 .94rem/1.38 Outfit,system-ui,sans-serif; }
+#dailyTajenkaNews.is-combined [data-tajenka-news-close] { display: block; margin: 10px auto -6px; }

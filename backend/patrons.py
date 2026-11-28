@@ -124,7 +124,8 @@ def install(app,*,auth_player,require_admin,db_rpc,enforce_rate_limit,enabled=fe
     def headers(response):response.headers['Cache-Control']='no-store'
     def state(pid):return run('proplet_patron_state_v1',{'p_player':pid,'p_claim':False})
 
-    from backend import patron_gifts
+    from backend import patron_gifts, pet_otisku
+    pet_otisku.install(app, auth_player=account, db_rpc=db_rpc, enforce_rate_limit=enforce_rate_limit)
     patron_gifts.install(app,auth_player=account,require_admin=require_admin,db_rpc=db_rpc,enforce_rate_limit=enforce_rate_limit)
 
     @app.get('/api/patrons')
