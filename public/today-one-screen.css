@@ -204,35 +204,39 @@ html[data-theme=dark] .os-feature>.os-arrow{color:var(--td-blue)}
 }
 @media(prefers-reduced-motion:reduce){.os-today button:active{transform:none!important}}
 
+/* Keep visible gutters consistent: a hard shadow occupies space below its card. */
 @media(max-width:899px){
  html.tiskarna-ui body.today-one-screen.one-screen-ready:has(#screen-daily.active){
-  --today-block-gap:10px;
-  /* The hard shadows extend past the cards' layout boxes. */
+  --today-related-gap:5px;
+  --today-tile-gap:8px;
+  --today-section-gap:12px;
   --today-card-depth:3px;
-  --today-support-depth:2px;
  }
- html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday{row-gap:var(--today-block-gap)}
- #oneScreenToday .os-grid{row-gap:calc(var(--today-block-gap) + var(--today-card-depth))}
+ html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday{row-gap:var(--today-tile-gap)}
+ #oneScreenToday .os-main{margin-bottom:calc(var(--today-section-gap) - var(--today-tile-gap))}
+ #oneScreenToday #spojkyWeeklyBtn{margin-bottom:var(--today-card-depth)}
+ #oneScreenToday .os-grid{
+  column-gap:var(--today-tile-gap);
+  row-gap:calc(var(--today-tile-gap) + var(--today-card-depth));
+ }
+ #oneScreenToday .os-grid:has(+ .os-notices:not([hidden])){margin-bottom:var(--today-card-depth)}
  html.tiskarna-ui body.today-one-screen.one-screen-ready:has(#screen-daily.active) #patronTodayLink.patron-today-link:not([hidden]){
-  margin:calc(var(--today-block-gap) + var(--today-card-depth)) auto 0!important;
+  margin:calc(var(--today-section-gap) + var(--today-card-depth)) auto 0!important;
  }
  html.tiskarna-ui body.today-one-screen.one-screen-ready:not(.playing):has(#screen-daily.active) .app-footer{
-  margin-top:calc(var(--today-block-gap) + var(--today-card-depth))!important;
+  margin-top:calc(var(--today-section-gap) + var(--today-card-depth))!important;
  }
  html.tiskarna-ui body.today-one-screen.one-screen-ready:not(.playing):has(#screen-daily.active) #patronTodayLink:not([hidden])+.app-footer{
-  margin-top:calc(var(--today-block-gap) + var(--today-support-depth))!important;
+  margin-top:calc(var(--today-section-gap) + 2px)!important;
  }
 }
 @media(max-width:599px){
- #oneScreenToday .os-main{row-gap:calc(var(--today-block-gap) + var(--today-card-depth))}
- #oneScreenToday .os-week{padding-block:0}
+ #oneScreenToday .os-main{row-gap:calc(var(--today-related-gap) + var(--today-card-depth))}
+ #oneScreenToday .os-week{padding:0}
  #oneScreenToday .os-week-slot:empty{display:none}
- html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday:has(.os-week-slot:empty){
-  row-gap:calc(var(--today-block-gap) + var(--today-card-depth));
- }
+ #oneScreenToday .os-main:has(.os-week-slot:empty){padding-bottom:var(--today-card-depth)}
+ #oneScreenToday .os-tile{min-height:clamp(76px,13svh,94px);padding-block:10px}
 }
 @media(min-width:600px) and (max-width:899px){
- html.tiskarna-ui body.today-one-screen #screen-daily #oneScreenToday{
-  row-gap:calc(var(--today-block-gap) + var(--today-card-depth));
- }
+ #oneScreenToday .os-main{column-gap:var(--today-tile-gap);padding-bottom:var(--today-card-depth)}
 }
